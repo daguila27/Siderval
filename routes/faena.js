@@ -151,8 +151,8 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.proceso, function(err, etapa){
 				if(err){console.log("Error Selecting : %s", err);}
 				connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "+
-					"(select produccion.*,producido.ruta,material.detalle, Siguiente(producido.ruta, '"+input.proceso+"') as nextStep from produccion"+
-					" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (fabricaciones.idproducto=producido.idproducto)"+
+					"(select produccion.*,coalesce(producido.ruta,'1,2,3,4,5') as ruta,material.detalle, Siguiente(coalesce(producido.ruta, '1,2,3,4,5'), '"+input.proceso+"') as nextStep from produccion"+
+					" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (fabricaciones.idmaterial=producido.idmaterial)"+
 					" WHERE produccion."+input.proceso+" > 0 AND produccion.el=false GROUP BY produccion.idproduccion ORDER BY fabricaciones.f_entrega ASC)"+
 					" as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`)",
 					/*connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "

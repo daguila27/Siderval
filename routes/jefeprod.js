@@ -366,19 +366,22 @@ router.get('/list_ops', function(req, res, next){
                         console.log("Select Error: %s",err);
                     }
                 connection.query("SELECT ordenproduccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,"+
-                    " min(produccion.cantidad = produccion.`8`+produccion.standby) as finalizado,max(produccion.cantidad > produccion.`8`+produccion.standby AND to_days(now()) > to_days(fabricaciones.f_entrega)-10 AND to_days(fabricaciones.f_entrega) > to_days(now())) as activo,max(produccion.cantidad > produccion.`8`+produccion.standby AND to_days(now()) < to_days(fabricaciones.f_entrega)-10) as incompleto,max(to_days(fabricaciones.f_entrega) < to_days(now()) AND produccion.cantidad > produccion.`8`+produccion.standby ) as atraso, GROUP_CONCAT(REPLACE(material.detalle, ',', '.'),"
+                    " min(produccion.cantidad = produccion.`8`+produccion.standby) as finalizado,max(produccion.cantidad > produccion.`8`+produccion.standby AND to_days(now()) >"
+                    +" to_days(fabricaciones.f_entrega)-10 AND to_days(fabricaciones.f_entrega) > to_days(now())) as activo,max(produccion.cantidad > produccion.`8`+produccion.standby AND to_days(now()) < to_days(fabricaciones.f_entrega)-10) as incompleto,max(to_days(fabricaciones.f_entrega) < to_days(now()) AND produccion.cantidad > produccion.`8`+produccion.standby ) as atraso, GROUP_CONCAT(REPLACE(material.detalle, ',', '.'),"
                     +"'@',fabricaciones.idorden_f,'@',produccion.cantidad) as oftoken,GROUP_CONCAT(produccion.1,'@',produccion.2,'@',produccion.3,'@'"
                     +",produccion.4,'@',produccion.5,'@',produccion.6,'@',produccion.7,'@',produccion.8,'@',COALESCE(trats.tratados,0),'@',to_days(fabricaciones.f_entrega) - to_days(now()),'@',fabricaciones.f_entrega, '@', opQuery.tok) AS etapatoken FROM ordenproduccion " +
-					" LEFT JOIN produccion ON ordenproduccion.idordenproduccion = produccion.idordenproduccion" +
+                    " LEFT JOIN produccion ON ordenproduccion.idordenproduccion = produccion.idordenproduccion" +
                     " LEFT JOIN (SELECT produccion.idproduccion, SUM(COALESCE(produccion_history.enviados,0)) as tratados FROM produccion LEFT JOIN produccion_history on produccion_history.idproduccion = produccion.idproduccion WHERE produccion_history.from = '5')" +
                     " trats ON trats.idproduccion = produccion.idproduccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
                     " LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion" +
-                    " LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=fabricaciones.idorden_f INNER JOIN material ON material.idmaterial = producido.idmaterial" +
-					" WHERE ordenproduccion.fin = false AND produccion.el = false GROUP BY ordenproduccion.idordenproduccion",function (err,ofs){
+                    " LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP')"
+                    +" as tok from ordenfabricacion left join fabricaciones on fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=fabricaciones.idorden_f INNER JOIN material ON material.idmaterial = producido.idmaterial" +
+                    " WHERE ordenproduccion.fin = false AND produccion.el = false GROUP BY ordenproduccion.idordenproduccion",function (err,ofs){
                     if(err){
                         console.log("Select Error: %s",err);
                     }
                     var aux = [];
+                    console.log("ofs");
                     console.log(ofs);
                     for(var i = 0;i< ofs.length;i++){
                     	if(typeof ofs[i].oftoken != 'null'){
