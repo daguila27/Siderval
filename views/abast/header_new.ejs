@@ -1,0 +1,368 @@
+
+
+        <!DOCTYPE html>
+    <html>
+        <head>
+
+
+             <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="description" content="">
+                <meta name="author" content="">
+
+                <title><%=page_title%></title>
+                <link rel="shortcut icon" href="/assets/img/logomin.png">
+                <!-- Bootstrap Core CSS -->
+                <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+                <!-- MetisMenu CSS -->
+                <link href="/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+                <!-- Custom CSS -->
+                <link href="/dist/css/sb-admin-2.css" rel="stylesheet">
+
+                <!-- Morris Charts CSS -->
+                <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+                
+
+
+                <!-- Advance Table CSS -->
+                <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">
+
+                <!-- Custom Fonts -->
+                <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+                <!--[if lt IE 9]>
+                    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+                <![endif]-->
+
+                <!-- jQuery Load -->
+                <script src="/js/jquery-3.1.1.min.js"></script>
+                <script src="/js/jquery-1.11.3.min.js"></script>
+                <script src="/js/socket.io.js"></script>
+                
+                <!-- Google Fonts -->
+                <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Julee" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Chicle" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet">
+
+
+
+              
+               <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_common.0.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.0.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.1.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
+               
+               
+   
+               
+                   <!--[if lt IE 10]>
+                       <body class="ie9">
+                   <![endif]-->
+               
+               <script type="text/javascript">
+                   
+               </script>
+           
+        </head>
+
+
+        <body class="o_web_client">
+                
+            
+            
+            
+
+            <nav id="oe_main_menu_navbar" class="navbar navbar-inverse">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+            
+                    <div class="navbar-collapse collapse">
+                                    
+                        <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
+                        
+                            <li>
+                                    
+                            
+                                <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Debates
+                                </span>
+                                </a>
+                    
+                            <li>
+                        
+                            <li>
+                                    
+                        
+                            <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Calendario
+                                </span>
+                            </a>
+                    
+                            </li>
+                        
+                        
+                        </ul>
+
+                        <%function show_user(usename){
+                            if(username == 'abastecimiento'){
+                                return "Abastecimiento";
+                            }
+                        }%>
+                        <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
+                                <li>
+                                    <div style="font-family: 'Lobster'; font-size: 15px; color: white;">Bienvenido <%=show_user(username)%></div>
+                                </li>
+                                <li>
+                                    <div><a href="../user/log_out">Cerrar sesión</a></div>
+                                </li>   
+                        </ul>
+
+                        <!--<ul class="nav navbar-nav navbar-right oe_user_menu_placeholder"></ul>
+                        <ul class="nav navbar-nav navbar-right oe_systray"></ul>-->
+
+                        <ul class="nav navbar-right o_mail_navbar_item open">
+                            <li class="dropdown">
+                                <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
+                                    <i class="fa fa-envelope fa-fw"></i>
+                                    <i class="fa fa-caret-down"></i>
+                                    <span class="badge badge-notificaciones"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
+                                    
+                                </ul>
+                                <!-- /.dropdown-messages -->
+                            </li>
+                            <!-- /.dropdown -->
+                        </ul> 
+
+                    
+                    </div>
+            </nav>
+
+
+
+
+            <div class="o_main">
+                <div class="o_sub_menu">
+                        
+                   
+                    <div class="o_sub_menu_content">
+                            
+                        <style type="text/css">
+                            .oe_secondary_menu_section{
+                                margin-top: 5px;
+                            }
+                            
+                        </style>
+                        <div class="oe_secondary_menu">
+                                
+                            <div class="oe_secondary_menu_section">
+                                        
+                                        
+                            
+                            </div>
+                                
+                                
+                            <div class="oe_secondary_menu_section">
+                                Orden de Compra
+                            </div>
+                                            
+                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                                
+                                <li class="active" onclick="ajax(this)" data-link="/abastecimiento/abast_myself">
+                                    
+                                    
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Crear OC
+                                        </span>
+                                    </a>
+                                
+                                            
+                            
+                        
+                                </li>
+                                <li onclick="ajax(this)" data-link="/abastecimiento/rec_odc">
+                                    
+                                    
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Ver Todas
+                                        </span>
+                                    </a>
+                                
+                                    
+                            
+                        
+                                </li>
+
+                                <li onclick="ajax(this)" data-link="/abastecimiento/all_odc">
+                                    
+                                    
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Ver Todas 2    
+                                        </span>
+                                    </a>
+                                
+                                    
+                            
+                        
+                                </li>
+                                
+
+
+                            </ul>
+                            <div class="oe_secondary_menu_section">
+                                Stock
+                            </div>
+                                            
+                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                                
+                                <li onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
+                                    
+                                    
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Materias Primas
+                                        </span>
+                                    </a>
+                                
+                                            
+                            
+                        
+                                </li>
+                                <li  onclick="ajax(this)" data-link="/abastecimiento/abast_ops">
+                                    
+                                    
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Abastecer OP
+                                        </span>
+                                    </a>
+                                
+                                    
+                            
+                        
+                                </li>
+                                <li onclick="ajax(this)" data-link="/abastecimiento/bom_mat_uni">
+                                    
+                            
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            BOM de Productos
+                                        </span>
+                                    </a>
+                        
+                                    
+                            
+                        
+                                </li>
+
+
+                            </ul>
+
+
+
+                            <div class="oe_secondary_menu_section">
+                                Proveedores
+                            </div>
+                                            
+                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                                
+                                <li>
+                                    
+                                    
+                                    <a class="oe_menu_leaf"  onclick="ajax(this)" data-link="/abastecimiento/all_proveedores">
+                                        <span class="oe_menu_text">
+                                            Ver Todos
+                                        </span>
+                                    </a>
+                                
+                                            
+                            
+                        
+                                </li>
+                                
+
+
+                            </ul>
+                        
+                                        
+                        </div>
+                        
+              
+                
+                    </div>
+
+                </div>        
+                    <div id="wrapper" style="overflow-y: scroll; background-color: white">
+
+                          <!-- Modal -->
+        <div class="modal fade" id="notifModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                    <h4>Confirmar recepción
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </h4>
+               </div>
+               <div class="modal-body">
+
+                <label for="sendcant">He recepcionado: </label>
+                <input type="number" name="sendcant" id="sendcant" class="form-control" min="1" placeholder="N° a enviar" required style="margin-top: 20px;margin-bottom: 20px;margin-right: 20px;">
+                <input type="hidden" id="idNotif">
+                <b>   unidades de </b><b class="matModal">.</b>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary confirmarNotif" data-dismiss="modal">Confirmar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal fade" id="crearocModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+              <form id="odcForm">  
+              <div class="modal-header">
+                    <h4>Crear Orden de Compra
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </h4>
+               </div>
+               <div class="modal-body">
+
+               </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Confirmar</button>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
+                        <div id="page-wrapper"  style="padding-top: 10px; margin: 0;">
+                          
+

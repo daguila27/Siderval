@@ -1,0 +1,66 @@
+<div class="row" style=" margin: 0;padding-top: 3%; padding-bottom: 2%; margin-right: 7%;margin-left: 7%;background-color: white; height: 100%">
+<h1 class="page-header" style="margin: 0; padding-top: 5%">Productos: <a class="btn btn-info pull-right getcsvmat" data-tipo="stock" href="#"><i class="fa fa-download"></i> Generar excel</a></h1>
+<%
+function letraMayus(string) {
+     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+} 
+%>
+<style type="text/css">
+	#tablaMaterial_wrapper{
+		padding: 1%;
+	}
+</style>
+<div class="panel panel-default">
+	<div class="panel-heading">Todos los productos:</div>
+	<table id="tablaMaterial" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+
+
+	        <thead>
+	            <tr>
+	                <th>Detalle</th>
+	                <th>Stock</th>
+	                <th>Cliente</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	        <%if(mat.length > 0){
+	        	for(var j=0; j < mat.length; j++){%>
+	        	<tr>
+	        		<td><%= letraMayus(mat[j].detalle)%></td>
+	        		<td><%= mat[j].stock%></td>
+	        		<td><%= mat[j].sigla%></td>
+	        	</tr>
+	        <%}
+	        }
+	        else{%>
+	        	<tr>
+	        		No hay materiales registrados.
+	        	</tr>
+	        <%}%>	
+	        </tbody>
+	</table>
+</div>
+<script type="text/javascript">
+    setDataTable("#tablaMaterial");
+
+    $(".getcsvmat").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","materiales hasta ~ " + new Date().toLocaleDateString() + ".xlsx");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar excel");
+                console.log(data);
+            }
+        });
+
+    });
+   
+</script>
+</div>

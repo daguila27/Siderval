@@ -1,0 +1,135 @@
+<div class="row" style=" margin: 0 ;padding-top: 3%; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<h1 class="page-header">Planta:</h1>
+<div class="form-group">
+  <label for="proceso">Seleccione una etapa:</label>
+  <select style="font-size: 20px;height: 40px" class="form-control" id="proceso" onchange="show_faena()">
+   <%for(var i=0; i< data.length; i++){%>
+    <option value="<%=data[i].value%>"><%=data[i].nombre_etapa%></option>
+   <%}%>
+  </select>
+
+</div>
+<div class="div-proceso"></div>
+
+<div class="modal fade" id="send_step" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="modalform">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span  aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Continuar Ruta</h4>
+        </div>
+        <div class="modal-body">
+          <div class="input-group">
+            <input id="sendnum" name="sendnum" type="number" class="form-control input-lg" min="1" placeholder="N° a enviar"  value="1" required>
+            <span class="input-group-addon totalSend">/100</span>
+            <div class="input-group-btn">
+              <a class="btn btn-lg btn-success" onclick="update('#sendnum',1)"><i class="fa fa-caret-up"></i></a>
+              <a class="btn btn-lg btn-danger" onclick="update('#sendnum',-1)"><i class="fa fa-caret-down"></i></a>
+            </div>
+          </div>
+          <input type="hidden" id="prod_id" value="">
+          <input type="hidden" id="e_act">
+          <input type="hidden" id="sgt_etapa" value="">
+          <p class="p-sigetp"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" id="dism" data-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary">Enviar</button>
+        </div><!-- /.modal -->
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+
+<script type="text/javascript">
+  function update(id,num){
+      $(id).val(parseInt($(id).val()) + num);
+  }
+	function show_faena(){
+        $("#e_act").val($("#proceso").val());
+		$(function(){
+			console.log("show_faena");
+			$.ajax({
+				type: 'GET',
+				url: 'faena/render_proceso/'+$("#proceso").val(),
+				success: function(data){
+					$(".div-proceso").html(data);
+					$.ajax({
+                        type: 'GET',
+                        url: 'faena/render_notificaciones/'+$("#proceso").val(),
+                        success: function(data){
+                            $(".notificaciones").html(data);
+                            //$(".badge-notificaciones").html($(".open-notif").data('cant'));
+                        }
+                    });
+				}
+			});
+		});
+	}
+   function make_faena(){
+                
+                $.ajax({
+                    type: 'GET',
+                    url: 'faena/render_proceso/'+$("#proceso").val(),
+                    success: function(data){
+                        $(".div-proceso").html(data);
+                        $.ajax({
+                            type: 'GET',
+                            url: 'faena/render_notificaciones/'+$("#proceso").val(),
+                            success: function(data){
+                                $(".notificaciones").html(data);
+                                //$(".badge-notificaciones").html($(".open-notif").data('cant'));
+                            }
+                        });
+                    }
+                });
+
+        }
+	show_faena();
+  //make_faena();
+    $("form#modalform").on('submit', function(e){
+        e.preventDefault();
+        var data = {};
+        console.log($("#sendnum").val());
+        data.idprod = $("#prod_id").val();
+        data.newetapa = $("#sgt_etapa").val();
+        data.sendnum = $("#sendnum").val();
+        data.etapa_act = $("#e_act").val();
+
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: 'faena/next_step',
+            success: function(data){
+                if(data == "si"){
+                    var input = {
+                        idproduccion: $("#prod_id").val(),
+                        cantidad: $("#sendnum").val(),
+                        key: 'fa'+$("#sgt_etapa").val()
+                    };
+                    io.emit('addNotificacion', input);
+                    show_faena();
+                    $("#dism").click();
+                }
+            }
+        });
+        /*$("#idordenproduccion").val($(this).data('id'));
+        $("#idproducido").val($(this).data('idp'));
+        $("#detallesProducido").html("<b style='margin-left: 10px'>Detalles: </b> "+$(this).data('detalle'));
+        var next = $(this).data('ruta');
+        next = next.split(',')[1];
+        $("#nextEtapa").val(next);
+        $("#nextProccess").html("<b style='margin-left: 10px'>Proxima etapa: </b> "+ next);
+        $("#cantModal").html($(this).data('cantidad'));*/
+
+    });
+    
+
+
+</script>
+</div>

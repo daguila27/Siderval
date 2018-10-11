@@ -1,0 +1,95 @@
+    <style type="text/css">
+        /*.notif-buttons i:hover{
+            background-color: rgba(147, 137, 98, 10);
+            cursor: pointer;
+        }*/
+        .notif-buttons{
+            width: 20%;
+        }
+        /*.notif-buttons i{
+            font-size: 170%;
+            padding: 10%;
+            border-radius: 15%;
+        }*/
+    </style>
+    <!-- /.navbar-static-side -->
+    <%if(notif.length > 0){
+        for(var u=0; u < notif.length; u++){
+            var desc = notif[u].descripcion.split('@');
+            var hora = desc[3].split(' ')[1].split(':')[0] +":"+desc[3].split(' ')[1].split(':')[1];
+            %>
+            <li class="notificacion" data-detalle="<%= notif[u].detalle%>" data-id="<%= desc[4]%>">
+                <a href="#">
+                    <div>
+                            <strong style="color: black">Producto Entrante</strong>
+                            <span class="pull-right text-muted">
+                            <em><%= hora%></em>
+                            </span>
+                    </div>
+
+                    <div>
+                        <p style="width: 100%">
+                            Ha recibido <%= desc[2]%> unidades de <%=notif[u].detalle%> en    OP N° <%= desc[5]%></p>
+                        <div style="display: flex;" class="notif-buttons">
+                            <button class="btn btn-success confirmar" data-idnotif="<%= notif[u].idnotificacion%>" style="margin: 0px 5px">Correcto</button>
+                            <button class="btn btn-danger reportNotif" data-idnotif="<%= notif[u].idnotificacion%>" data-idprod="<%= desc[4]%>" data-cant="<%= desc[2]%>" data-toggle="modal" data-target="#reportNotif" style="margin: 0px 5px">Error</button>
+                        </div>
+                    </div>
+                </a>
+            </li>
+            <li class="divider" style="margin: 0; padding: 0;height: 0;"></li>
+        <%}}
+    else{%>
+        <li class="notificacion">
+            <a href="#">
+                <div>
+                        <strong>No hay notificaciones</strong>
+                        <span class="pull-right text-muted">
+                        <em>Ahora mismo</em>
+                        </span>
+                </div>
+                <div>No tiene notificaciones.</div>
+            </a>
+        </li>
+    <%}%>
+
+
+<script type="text/javascript">
+    $(".confirmar").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: 'faena/confirm_notificacion/'+$(this).data('idnotif'),
+            success: function(data){
+                make_faena();
+                $(".notificaciones").html(data);
+
+            }
+        });
+    });
+    $(".reportNotif").on('click', function(e){
+        e.preventDefault();
+        $("#totalEsperado").val($(this).data('cant'));
+        $("#idprodModal").val($(this).data('idprod'));
+        $("#idnotifModal").val($(this).data('idnotif'));
+    });
+    $(".btnProd").prop("disabled", "");
+    $(".notificacion").each(function(){
+        $("#bq"+$(this).data('id')).prop("disabled", "disabled");
+        //$("#bq"+$(this).data('id')).css("background-color", "red");
+        $("#bq"+$(this).data('id')).removeClass("btn-success");
+        $("#bq"+$(this).data('id')).addClass("btn-danger");
+        //$(".fabricacionItem #"+$(this).data('id')).attr("data-toggle", "tooltip");
+        $(".fabricacionItem #"+$(this).data('id')).attr("title", "Material entrante, por favor confirmar notificación");
+    });
+
+
+    var cant_notif = parseInt("<%= notif.length%>");
+
+    $(".open-notif").data('cant', cant_notif);
+    $(".badge-notificaciones").html($(".open-notif").data('cant'));
+    if(cant_notif == 0)
+        $(".badge-notificaciones").css('display', 'none');
+    else
+        $(".badge-notificaciones").css('display', 'inline');
+</script>

@@ -1,0 +1,439 @@
+
+                        </div>
+                    </div>
+            </div>
+
+
+    <!-- Modal -->
+    <div id="newCliente" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <form id="addclientform">    
+             <!-- addclientform     editclientform-->
+            
+             <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Agregar Cliente:</h4>
+              </div>
+             <div class="modal-body">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="rut" type="text" class="form-control" placeholder="Rut Cliente">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                        <input name="sigla" type="text" class="form-control" placeholder="Sigla">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="razon" type="text" class="form-control" placeholder="Razon Social">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="giro" type="text" class="form-control" placeholder="Giro">
+                    </div>
+                    
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="dir" type="text" class="form-control" placeholder="Direccion">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="city" type="text" class="form-control" placeholder="Ciudad / Comuna">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="telefono" type="text" class="form-control" placeholder="Telefono">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="contacto" type="text" class="form-control" placeholder="Contacto">
+                    </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Registrar</button>
+                <button type="button" class="btn btn-default" id="close-clientemodal" data-dismiss="modal">Cancelar</button>
+              </div>
+            </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div id="saveplantModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Guardar Plantilla de OC:</h4>
+          </div>
+          <div class="modal-body">
+            <label style="width: 100%">Guardar Como: <input class="form-control" type="text" name=""></label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="loadplantModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Cargar Plantilla de OC</h4>
+          </div>
+          <div class="modal-body">
+            <label style="width: 100%">Selecccione Plantilla: <select class="form-control" id="sel1">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+              </select>
+            </label>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- Modal -->
+    <div id="editCliente" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <form id="editclientform">    
+             <!-- addclientform     editclientform-->
+            
+             <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Agregar Cliente:</h4>
+              </div>
+             <div class="modal-body">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="rut" id="rut" type="text" class="form-control" placeholder="Rut Cliente">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                        <input name="sigla" id="sigla" type="text" class="form-control" placeholder="Sigla">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="razon" id="razon" type="text" class="form-control" placeholder="Razon Social">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="giro" id="giro" type="text" class="form-control" placeholder="Giro">
+                    </div>
+                    
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="dir" id="dir" type="text" class="form-control" placeholder="Direccion">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="city" id="city" type="text" class="form-control" placeholder="Ciudad / Comuna">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="telefono" id="telefono" type="text" class="form-control" placeholder="Telefono">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="contacto" id="contacto" type="text" class="form-control" placeholder="Contacto">
+                    </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Editar</button>
+                <button type="button" class="btn btn-default" id="close-editclientemodal" data-dismiss="modal">Cancelar</button>
+              </div>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+
+    <script src="/js/pdftex.js"></script>
+
+    <script src="https://togetherjs.com/togetherjs-min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+
+    <!--<script src="/vendor/bootstrap-select/dist/js/bootstrap-select.js"></script>-->
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="/vendor/metisMenu/metisMenu.min.js"></script>
+
+
+
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+
+    <!-- Morris Charts JavaScript -->
+    <script src="/vendor/raphael/raphael.min.js"></script>
+    <script src="/vendor/morrisjs/morris.min.js"></script>
+    <script src="/data/morris-data.js"></script>
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
+    <script src="/vendor/jquery/jquery.twbsPagination.js" type="text/javascript"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/dist/js/sb-admin-2.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/lanzar_of/pedido',
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+    function setDataTable(str){
+        return $(str).DataTable({
+            responsive: true,
+            language: {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":    "",
+                    "sSearch":         "Buscar:",
+                    "sUrl":            "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":     "Último",
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+        });
+    }
+    $("#construir").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/construir',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+    $("#ver_of").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/list_ofs',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+    $("#lanzar_of").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/lanzar_of/of',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+    $("#lanzar_pedido").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/lanzar_of/pedido',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+
+    $("#show_prod").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/show_prod/1',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+    function ajax(yo){
+        $(".active").removeClass('active');
+        $(yo).addClass('active');
+        $.ajax({
+            type: 'GET',
+            url: $(yo).data('link'),
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+
+            }
+        });
+    }
+    $("#all_prod").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/all_prod',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+
+    $("#list_of").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/list_ofs',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html();
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+
+    $(".material_lanzamiento").on('click', function(e){
+        e.preventDefault();
+        var data = {tipo: $(this).data('tipo')};
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            url: '/plan/registro_mat',
+            beforeSend: function(){
+                $("#page-wrapper").css('display', 'none');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+
+
+    $("form#addclientform").on('submit', function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        var datos = {
+            rut: array[0].value,
+            sigla: array[1].value,
+            razon: array[2].value,
+            direccion: array[4].value,
+            ciudad: array[5].value,
+            giro: array[3].value,
+            telefono: array[6].value,
+            contacto: array[7].value 
+        };
+        $.ajax({
+            type: 'POST',
+            data: datos,
+            url: '/plan/add_client',
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#close-clientemodal").click();
+                $("#addclientform input").val('');
+            } 
+        });
+        
+
+    });
+
+    $("form#editclientform").on('submit', function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        var datos = {
+            rut: array[0].value,
+            sigla: array[1].value,
+            razon: array[2].value,
+            direccion: array[4].value,
+            ciudad: array[5].value,
+            giro: array[3].value,
+            telefono: array[6].value,
+            contacto: array[7].value 
+        };
+        $.ajax({
+            type: 'POST',
+            data: datos,
+            url: '/plan/edit_client',
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#close-editclientemodal").click();
+                $("#editclientform input").val('');
+                  
+            } 
+        });
+        
+
+    });
+    var io = io();
+    function emitToast(idOF){
+        io.emit('showToast', idOF);
+        io.emit('showToastnotif', idOF);
+    }
+    function emitToastCount(){
+        io.emit('showToastCount');
+    }
+
+    $(document).ajaxError(function myErrorHandler(event, xhr, ajaxOptions, thrownError) {
+        alert("There was an ajax error!");
+        console.log(xhr.responseText);
+        console.log(xhr);
+    });
+</script>
+    </html>

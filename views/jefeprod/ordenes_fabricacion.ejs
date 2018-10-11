@@ -1,0 +1,117 @@
+<h1 class="page-header">Cola de fabricación:</h1>
+<div class="modal fade" id="material-modal" role="dialog" aria-labelledby="gridSystemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="gridSystemModalLabel">
+          	Enviar a faena:
+          </h4>
+        </div>
+        <input type="hidden" id="idordenproduccion">
+        <input type="hidden" id="nextEtapa">
+        <input type="hidden" id="idproducido">
+        <div class="modal-body">
+          <div class="container-fluid">
+       		<div class="form-group">
+			  <label for="cuerpo-modal">Seleccione la cantidad que deseea enviar: </label>
+				<div id="cuerpo-modal">
+					<p id="detallesProducido"></p>
+					<p id="nextProccess"></p>
+					<div style="display: flex; margin-left: 10px; margin-top: 20px; ">
+						<label for="cantidadEnviar">Cantidad a enviar: <b id="cantModal"></b> en la cola</label>
+						<input type="hidden" style="margin-left: 3%; width: 50%" min="0" id="cantidadEnviar">
+					</div>
+				</div>
+			</div>
+
+       </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default reject-tofaena" data-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary send-tofaena" data-dismiss="modal">Enviar</button>
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+<style type="text/css">
+	.fabricacionItem{
+		border: solid 2px rgb(220,220,220);
+		border-radius: 2%;
+		margin-bottom: 10px;
+		box-shadow: 5px 5px 5px #888888;
+	}
+	.fabricacionItem div{
+		display: flex;
+		width: 100%;
+	}
+
+	.fabricacionItem div h2,h4,p{
+		width: 50%;
+		margin-top: 20px;
+	}
+</style>
+
+<div class="row" style="align-content: center;">
+  <%if(data.length == 0){%>
+  	<div style="text-align: center;">
+  		<h1>No hay productos en la cola.</h1>
+    </div>
+  <%}
+  else{
+  	for(var i=0; i< data.length; i++){%>
+    	<div class="col-sm-12 col-md-12 fabricacionItem">
+    		<div>
+    			<p style="font-size: 20px;"><b>Descripción: </b><%=data[i].detalle%></p>
+    			<%if(data[i].etapa == 'cola'){%>
+    				<p style="font-size: 20px;"><b>Por producir: </b><%=data[i].cantidad%> unidades</p>
+    				<button style="margin-top: 10px;" class="btn btn-default sendTofaena" data-id="<%=data[i].idordenproduccion%>" data-detalle="<%=data[i].detalle%>" data-ruta="<%=data[i].ruta%>" data-cantidad="<%=data[i].cantidad%>" 
+             data-toggle="modal" data-target="#material-modal">
+    				Enviar a faena</button>
+    			<%}
+    			else{%>	
+    				<p style="font-size: 20px;"><b>En producción: </b><%=data[i].cantidad%> unidades</p>
+    				<button style="margin-top: 10px;" class="btn btn-default sendTofaena" data-id="<%=data[i].idordenproduccion%>" data-detalle="<%=data[i].detalle%>" data-ruta="<%=data[i].ruta%>" data-cantidad="<%=data[i].cantidad%>"  disabled>En producción</button>
+    			<%}%>
+    		</div>
+    		<div>
+    			<p><b>Estado Actual: </b><%=data[i].etapa%> (<%=data[i].estadoproduccion%>)</p>
+    			<p><b>Procesos: </b> <%= data[i].ruta%></p>
+
+    		</div>
+    	</div>      
+	<%}}%>
+</div>
+
+<script type="text/javascript">
+	$(".sendTofaena").on('click', function(e){
+    e.preventDefault();
+    $("#idordenproduccion").val($(this).data('id'));
+    $("#detallesProducido").html("<b style='margin-left: 10px'>Detalles: </b> "+$(this).data('detalle'));
+    var next = $(this).data('ruta');
+    next = next.split(',')[0];
+    $("#nextEtapa").val(next);
+    $("#nextProccess").html("<b style='margin-left: 10px'>Proxima etapa: </b> "+ next);
+    $("#cantModal").html($(this).data('cantidad'));
+    $("#cantidadEnviar").val($(this).data('cantidad'));
+  });
+
+  $(".send-tofaena").on('click', function(e){
+    e.preventDefault();
+    $.ajax({
+      type: 'POST',
+      url: 'jefeprod/sendtoFaena',
+      data: {
+          'idproduccion':$("#idordenproduccion").val() ,
+          'cantidad': $("#cantidadEnviar").val(), 
+          'next': $("#nextEtapa").val(), 
+      },
+      success: function(data){
+        alert(data);
+      }
+    });
+  });
+</script>

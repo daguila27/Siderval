@@ -1,0 +1,44 @@
+<style type="text/css">
+	.pdf_item{
+		padding: 10px;
+	}
+	.pdf_item:hover{
+		background-color: rgb(200,200,200);
+		cursor: pointer;
+	}
+	.pdf_item img{
+		width: 100px;
+	}
+</style>
+<div class="row" style="margin-top: 10px">
+	<div class="col-md-2" style="display: flex;">
+	<%for(var i=0; i<data.length; i++){%>
+
+			<div class="pdf_item" data-name="<%=data[i].nombre%>">
+				<img src="/assets/pdf_icon.png">
+				<h6><%=data[i].nombre%></h6>
+				<form id="form_<%=i%>" method="get" action="/pdf_file/<%=data[i].nombre%>" target="_blank"></form>
+			</div>
+	<%}%>
+	</div>
+</div>
+<div class="render_pdf"></div>
+
+	<script type="text/javascript">
+		var width = $('.pdf_item').width();
+		var imgDim = $('.pdf_item img').width();
+		var margin_left = (width-imgDim)/2;
+		$(".pdf_item img").css("margin-left", margin_left+"px");
+		$(".pdf_item img").css("margin-right", margin_left+"px");
+		$(".pdf_item").on('click', function(e){
+			e.preventDefault();
+			var indice = $(this).data('in');
+			$.ajax({
+				type: 'GET',
+				url: '/pdf_file/'+$(this).data("name"),
+				success: function(data){
+					$(".render_pdf").html(data);
+				}
+			});
+		});
+	</script>

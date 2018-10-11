@@ -1,0 +1,33 @@
+Arreglar caracteres de BD
+**Cambiar csv a excel**
+**CREAR OC ---> Ingresar precio**
+**VER oc (csv) ---> codigo de producto 
+			 ---> estado (por entregar/atrasado/finalizado)
+			 ---> OF
+			 ---> SI tiene orden de compra mostrar NÚMERO o si no SIDERVAL
+			 ---> item ---> REVISAR
+			 ---> Cantidad despachada
+			 ---> peso unitario
+			 ---> aleación
+			 ---> peso total
+			 ---> peso por despachar
+			 ---> GUIAS DE DESPACHO (separadas por coma)
+			 ---> tipo de fabricación (PULVOMATIC / METALAM / OMAMET)(externalizadores)
+			 ---> días de atraso desde la ultima guia de despacho**
+
+**Productos -> VER TODOS ---->solo los P**
+
+**CLIENTES Y proveedores ---> VER oc pendientes**
+
+**LANZAR GD ---> AGREGAR COLUMNA OF**			 
+
+**notificaciones abastecimiento ---> se ha creado un nueva OF -- cliente**
+			 
+**CREACION OC---> QUITAR DESTINO (SUBCUENTAS) -------------- FALTA INGRESAR LA SUBCUENTA POR DEFECTO	
+
+----------------------------------------------------------------------------
+
+DAR LA POSIBILIDAD DE PASAR EL MODULO MODAL DE CREACION OCA AL PANEL DE CREACION (OCA -> CREAR OCA)		 
+			 
+			 
+				

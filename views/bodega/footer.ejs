@@ -1,0 +1,147 @@
+        </div>
+        <!-- /#page-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="/vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="/vendor/raphael/raphael.min.js"></script>
+    <script src="/vendor/morrisjs/morris.min.js"></script>
+    <script src="/data/morris-data.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/dist/js/sb-admin-2.js"></script>
+
+
+</body>
+
+<script type="text/javascript">
+    function setDataTable(str){
+        return $(str).DataTable({
+            responsive: true,
+            language: {
+                    "sProcessing":     "Procesando...",
+                    "sLengthMenu":     "Mostrar _MENU_ registros",
+                    "sZeroRecords":    "No se encontraron resultados",
+                    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                    "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                    "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                    "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                    "sInfoPostFix":    "",
+                    "sSearch":         "Buscar:",
+                    "sUrl":            "",
+                    "sInfoThousands":  ",",
+                    "sLoadingRecords": "Cargando...",
+                    "oPaginate": {
+                        "sFirst":    "Primero",
+                        "sLast":     "Último",
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                        "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                    }
+                }
+        });
+    }
+
+
+
+    
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/crear_gdd',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+    $("#gdd").click(function(){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/crear_gdd',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+    });
+    $("#stock").click(function(){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/show_stock',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+    });
+
+    $("#show_desp").click(function(){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/show_despachos',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+    });
+    $.ajax({
+        type: 'GET',
+        url: 'bodega/render_notificaciones',
+        success: function(data){
+            $(".notificaciones").html(data);
+        }
+    });
+
+    var io = io();
+    io.on('notif', function(){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/render_notificaciones',
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+        
+    });
+   /* $(".open-notif").on('click', function(e){
+        e.preventDefault();
+        $(".open-notif").data('cant', 0);
+        $(".badge-notificaciones").html($(".open-notif").data('cant'));            
+    });
+*/
+    $(".confirmarNotif").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/confirm_notificacion/'+$("#idNotif").val()+'/'+$("#sendcant").val(),
+            success: function(data){
+                $(".notificaciones").html(data);     
+                $.ajax({
+                    type: 'GET',
+                    url: 'bodega/show_stock',
+                    success: function(stock){
+                        $("#page-wrapper").html(stock);
+                    }
+                });
+            }
+        });
+    });
+
+
+    
+</script>
+</html>

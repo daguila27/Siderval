@@ -1,0 +1,35 @@
+
+<%
+function toFixed(num, fixed) {
+    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+    return num.toString().match(re)[0];
+}
+function toFixed2(num, fixed) {
+    return num.toString();
+}
+
+function formatoNumero(num){
+	if(num.split('.').length > 1){
+		return num.split('.')[0].split(',').join('.')+','+num.split('.')[1];
+	}
+	else{
+		return num.split('.')[0].split(',').join('.');
+	}
+}
+for(var e = 0 ; e < ins.length; e++){
+	console.log(ins[e]);
+%>
+	<tr>
+		<td><%= ins[e].detalle%></td>
+		<!--<td><%= ins[e].sinenviar%></td>-->
+		<!--<td><%= formatoNumero(ins[e].cantidad.toLocaleString())%></td>-->
+		<td><%= formatoNumero( (ins[e].cantidad*ins[e].sinenviar).toLocaleString())%></td>
+		<td><%= formatoNumero(ins[e].stock.toString())%></td>
+	    <td><%= ins[e].u_medida%></td>
+	    <td>
+	        <div class="btn-group">
+	            <a data-idm="<%= ins[e].idmaterial%>" data-cant="<%= toFixed( (ins[e].cantidad*ins[e].sinenviar).toLocaleString() ,2)%>" class="btn btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Añadir</a>
+	        </div>
+	    </td>
+	</tr>
+<%}%>

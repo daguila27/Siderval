@@ -1,0 +1,28 @@
+
+#container_all_tags{
+	margin-right: 0;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+
+.list-group-item:hover{
+	cursor: pointer;
+	background-color: rgb(238, 238, 238);
+}
+.list-group-item{
+	z-index: 5;
+	transition-duration: 0.3s;
+	height: 80px;
+	overflow: hidden;
+}
+.info{
+	position: absolute;
+	z-index: 10;
+	margin-top: 20px;
+	margin-bottom: 0;
+	margin-right: 0;
+	margin-left: 0;
+	width: 100%;
+	padding: 0;
+}

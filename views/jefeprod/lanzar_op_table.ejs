@@ -1,0 +1,31 @@
+<% function largeID(string, large){
+    var ceros = '';
+    var cant = Math.abs(large - string.length);
+    for(var e=0; e < cant; e++){
+        ceros += '0';
+    }    
+    return ceros+string;
+}%>
+<thead>
+        <tr>
+            <th>N° OF</th>
+            <th>Descripción</th>
+            <th style="text-align: center">Aleación</th>
+            <th style="text-align: center">Necesidad</th>
+            <th style="text-align: center">Fecha de Entrega</th>
+        </tr>
+        </thead>
+        <tbody>
+  <%
+    for(var i=0; i< data.length; i++){
+      %>
+            <tr id="<%=data[i].idfabricaciones%>" style="transition: 0.5s;">
+                <td data-toggle="tooltip" data-placement="bottom" title="N° OF"><%= largeID(data[i].idordenfabricacion.toString(), 6)%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Producto"><%=data[i].detalle%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Aleación" style="text-align: center"><%=data[i].subnom%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Necesitados" style="text-align: center"><%=data[i].restantes%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Entrega" style="text-align: center"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
+                <td><a data-aleacion="<%= data[i].subnom%>" data-restantes="<%= data[i].restantes%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" class="btn btn-success" onclick="sendtoQueue(this)"><i class="glyphicon glyphicon-plus"></i></a></td>
+            </tr>
+    <%}%>
+        </tbody>

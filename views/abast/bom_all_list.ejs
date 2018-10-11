@@ -1,0 +1,65 @@
+<div class="col-md-4">
+        <div role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+            <%
+              function letraMayus(string) {
+                 return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+              } 
+            if(data.length){
+                for(var i = 0; i< data.length;i++){
+                    %>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" style="display: flex;">
+                    <a style="width: 100%;" role="button" href="#c<%= i%>">
+                        <h3><%=data[i].detalle%></h3>
+                    <div style="display: flex;">
+                        <h3 style="width: 80%"><small><%= data[i].codigo%></small></h3>
+
+                        <button class="btn btn-primary pull-right ajax-bom" data-idmaterial="<%= data[i].idmaterial%>" onclick="expand_bom()" >B.O.M.</button>
+                    </div>
+                    </a>
+                </div>
+            </div>
+
+                <%}%>
+            <%}%>
+        </div>
+
+        
+    </div>
+    <div class="col-md-7 col-md-offset-3 col-sm-offset-1 col-sm-8 col-xs-offset-1 col-xs-10 div-bom" style="z-index: 10; box-shadow: 0px 5px 5px 0px #888888; background-color: rgb(245,245,245); border: 1px solid rgb(221,221,221);transform: scaleX(0); transition: 0.5s; position: fixed; top: 5%;">
+            <div style="display: flex;">
+                <h3 class="page-header" style="width: 95%">B.O.M. (Bill Of Materials):</h3>
+                <button type="button"  style="width: 5%;" class="close" onclick="close_bom()">&times;</button>
+            </div>
+            <div id="loading" style="padding-left: 45%; margin: 5% 0;"><img style="width: 10%" src="/loading.gif"></div>
+            <div class="bom-container">
+                
+            </div>
+    </div> 
+
+    <script type="text/javascript">
+    function expand_bom(){
+        $(".div-bom").css("transform", "scaleX(1)");
+    }
+
+    function close_bom(){
+        $(".div-bom").css("transform", "scaleX(0)");
+    }
+
+    $(".ajax-bom").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            data: {idmaterial: $(this).data('idmaterial')},
+            url: '/abastecimiento/data_bom',
+            beforeSend: function(xhr){
+                $(".bom-container").html('');
+                $("#loading").show();
+            },
+            success: function(data){
+                $("#loading").hide();
+                $(".bom-container").html(data);
+            }
+        });
+    });
+    </script>

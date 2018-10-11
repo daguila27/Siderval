@@ -1,0 +1,57 @@
+<%
+function numberFormat(numero){
+    var resultado = "";
+    if(numero[0]=="-")
+    {
+        nuevoNumero=numero.replace(/\./g,'').substring(1);
+    }else{
+        nuevoNumero=numero.replace(/\./g,'');
+    }
+    if(numero.indexOf(",")>=0)
+        nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+
+    for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+        resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+    if(numero.indexOf(",")>=0)
+        resultado+=numero.substring(numero.indexOf(","));
+    if(numero[0]=="-")
+    {
+        return "-"+resultado;
+    }else{
+        return resultado;
+    }
+}
+%>
+<div style="width: 100%;">
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Costo OCA</th>
+            <th>Costo Factura</th>
+            <th>Moneda</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%if(data.length){
+            for(var j = 0;j< data.length;j++){%>
+                <tr>
+                    <td><%= data[j].detalle%></td>
+                    <td><%= numberFormat(data[j].odacosto.toString())%></td>
+                    <td><%= numberFormat(data[j].costo.toString())%></td>
+                    <td><%= data[j].moneda.toUpperCase()%></td>
+                </tr>
+            <%}%>
+        <%}%>
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><b>Moneda OCA:</b> <%= mon.toUpperCase()%></td>
+            </tr>
+        </tfoot>
+    </table>      
+</div>

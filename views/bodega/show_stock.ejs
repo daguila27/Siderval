@@ -1,0 +1,64 @@
+<h1 class="page-header">Bodega <a class="btn btn-info pull-right getcsvof" data-tipo="stock" href="#"><i class="fa fa-download"></i> Generar csv</a></h1>
+<%
+function letraMayus(string) {
+     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+} 
+%>
+<style type="text/css">
+	#tablaStock_wrapper{
+		padding: 1%;
+	}
+</style>
+<div class="panel panel-default">
+	<div class="panel-heading">Stock de productos:</div>
+	<table id="tablaStock" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+
+
+	        <thead>
+	            <tr>
+	                <th>Detalle</th>
+	                <!--<th>Codigo</th>-->
+	                <th>En Planta</th>
+	                <th>Stock</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	        <%if(mat.length > 0){
+	        	for(var j=0; j < mat.length; j++){%>
+	        	<tr>
+	        		<td><%= letraMayus(mat[j].detalle)%></td>
+	        		<!--<td><%= mat[j].codigo%></td>-->
+	        		<td><%= mat[j].infaena%></td>
+	        		<td><%= mat[j].stock%></td>
+	        	</tr>
+	        <%}
+	        }
+	        else{%>
+	        	<tr>
+	        		No hay materiales en bodega.
+	        	</tr>
+	        <%}%>	
+	        </tbody>
+	</table>
+</div>
+<script type="text/javascript">
+    setDataTable("#tablaStock");
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/bodega/csv_' + $(this).data('tipo'),
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","stock hasta ~ " + new Date().toLocaleDateString() + ".csv");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar csv");
+                console.log(data);
+            }
+        });
+
+    });
+</script>

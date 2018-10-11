@@ -1,0 +1,98 @@
+<h1 class="page-header">Materiales pendientes:</h1>
+<div class="modal fade" id="material-modal" role="dialog" aria-labelledby="gridSystemModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="gridSystemModalLabel"></h4>
+          <input type="hidden" id="idmaterial">
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+       		<div class="form-group">
+			  <label for="bom">Buils Of Materials (BOM):</label>
+				<ul>
+					<li>100 kilos arena</li>
+					<li>10 kilos recina</li>
+				</ul>
+		</div>
+       </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default reject-material" data-dismiss="modal">Rechazar</button>
+          <button type="button" class="btn btn-primary send-material" data-dismiss="modal">Aprobar</button>
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+<div class="pendientes" style="padding: 20px">
+		
+
+	<div class="list-group">
+    	<%for(var i=0; i< data.length; i++){%>
+ 		<div class="list-group-item" style="display: flex;">
+ 		 	<div class="material-detalle">
+ 		 		<label for="detalle">Descripcion:</label>
+ 		 		<p id="detalle"><%=data[i].detalle%></p>
+ 		 	</div>
+
+ 		 	<button type="button" class="btn btn-primary boton-bom" data-name="<%=data[i].detalle%>" 
+ 		 	data-id="<%=data[i].idmaterial%>" data-toggle="modal" data-target="#material-modal"><span class="glyphicon glyphicon-check"></span>Aprobar</button>
+ 		</div>
+ 		<%}%>
+	</div>
+
+
+</div>
+<style type="text/css">
+	.material-detalle{
+		width: 90%;
+	}
+	.material-detalle label{
+		width: 100%;
+	}
+	.material-detalle p{
+		width: 95%;
+		margin-left: 5%;
+	}
+	.button-slider{
+		border-radius: 5%;
+	}
+	.button-slider span{
+		margin-right: 10px;
+	}
+</style>
+<script type="text/javascript">
+	$(".boton-bom").on('click', function(e){
+		e.preventDefault();
+		$(".modal-title").html("Enviar material: "+$(this).data('name'));
+		$("#idmaterial").val($(this).data('id'));
+	});
+
+	$(".send-material").on("click", function(e){
+		e.preventDefault();
+		$.ajax({
+			type: 'GET',
+			url: 'gerencia/updateMaterial/'+$("#idmaterial").val(),
+			success: function(data){
+				alert("Producto aprobado correctamente.");
+				$(".pendientes").html(data);
+			}
+		});
+	});
+
+	$(".reject-material").on("click", function(e){
+		e.preventDefault();
+		$.ajax({
+			type: 'GET',
+			url: 'gerencia/rejectMaterial/'+$("#idmaterial").val(),
+			success: function(data){
+				alert("Producto devuelto a definicion.");
+				$(".pendientes").html(data);
+			}
+		});
+	});
+
+</script>

@@ -1,0 +1,375 @@
+<div class="row" style=" margin: 0 ;padding-top: 3%; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<h2 class="page-header" style="margin: 2% 10%;">Ordenes de Fabricación: <a class="btn btn-info pull-right getcsvof" data-tipo="of" href="#"><i class="fa fa-download"></i> Generar excel</a></h2>
+<div id="divalert" class="collapse">
+    <div class="alert alert-danger" id="alerta" role="alert" >
+        
+    </div>
+</div>
+
+<div class="container" style="width: 100%; font-family: 'Oswald">
+
+    <form id="of-search" >
+        <div class="form-group col-md-offset-1" style="display: flex; margin-top: 25px">
+            <div class="form-group col-md-3">
+                <label for="fecha" style="position: absolute; top:-25px">Fecha:</label>
+                <input type="date" class="form-control" name="fecha" tabindex="1">
+            </div>
+            <div class="form-group col-md-2">
+                  <label for="ocvinc" style="position: absolute;top: -25px">Filtro:</label>
+                  <select class="form-control" id="ocvinc" name="ocvinc" tabindex="2" onchange="refreshSelect()" value="<%=filtro%>">
+                    <%
+                    if(filtro == '!="_"'){%>
+                        <option value='!="_"' selected="selected">Todos</option>
+                        <option value='!="Sin OC"'>Con OC</option>
+                        <option value='="Sin OC"'>Sin OC</option> 
+                    <%}else if(filtro == '!="Sin OC"'){%>
+                        <option value='!="_"'>Todos</option>
+                        <option value='!="Sin OC"' selected="selected">Con OC</option>
+                        <option value='="Sin OC"'>Sin OC</option>
+                    <%}else if(filtro == '="Sin OC"'){%>
+                        <option value='!="_"'>Todos</option>
+                        <option value='!="Sin OC"'>Con OC</option>
+                        <option value='="Sin OC"' selected="selected">Sin OC</option> 
+                    <%}else{%>
+                        <option value='!="_"'>Todos</option>
+                        <option value='!="Sin OC"'>Con OC</option>
+                        <option value='="Sin OC"'>Sin OC</option> 
+                    <%}%>
+                  </select>
+                </div>
+            <div class="form-group col-md-6" style="display: flex;">
+                <input style="width: 80%" name="num" type="text" class="form-control" placeholder="N° OC / N° OF / Detalle de Producto" tabindex="3">
+                <button style="width: 10%" type="submit" class="input-group-addon btn btn-searchOF" tabindex="4"><i class="glyphicon glyphicon-search"></i></button>
+                <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="5" onclick="refresh_list()"><i class="glyphicon glyphicon-refresh"></i></button>
+            </div>
+        </div>
+    </form>
+    <div class="col-md-10 col-md-offset-1">
+    <div id="accordion_of" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+        <%
+          function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+          function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }
+        if(data.length){
+            var color = '';
+            var estado = '';
+            for(var i = 0; i< data.length;i++){
+                    data[i].creacion = new Date(data[i].creacion).toLocaleDateString();
+                    if(data[i].atraso){
+                        color = 'danger';
+                        estado = 'Atrasado';
+                    }
+                    else if(data[i].sum_cant == data[i].sum_desp){
+                        color = 'success';
+                        estado = 'Despachado';
+                    }
+                    else{
+                        color = 'warning';
+                        estado = 'Activo';
+                    }
+                %>
+        <div class="panel panel-default panel-of">
+            <div class="panel-heading" role="tab" id="h<%= data[i].idordenfabricacion%>" style="display: flex;">
+                <a role="button" href="#c<%= data[i].idordenfabricacion%>" data-toggle="collapse" data-parent="#accordion_of"  aria-expanded="true" aria-controls="h<%= data[i].idordenfabricacion%>">
+                    <h3>Orden de Fabricación #<%= data[i].numordenfabricacion%> 
+                        <small>
+                            <%if(data[i].numoc == 'Sin OC'){%> 
+                                sin OC vinculada (<%=estado%>)
+                            <%}else{%>
+                                de la Orden de Compra #<%= data[i].numoc%> (<%=estado%>)
+                            <%}%>
+                        </small>
+                    </h3>
+                    <p class="pull-left"><b>Fecha de creacion: </b> <%=data[i].creacion%></p>
+                </a>
+            </div>
+            <div id="c<%= data[i].idordenfabricacion%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= data[i].idordenfabricacion%>">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>N° Item</th>
+                        <th>Nombre</th>
+                        <th style="text-align: center;">Solicitados</th>
+                        <th style="text-align: center;">Sin producir</th>
+                        <th style="text-align: center;">Planta</th>
+                        <th style="text-align: center;">PT</th>
+                        <th style="text-align: center;">Despachado</th>
+                        <th style="text-align: center;">Fecha de despacho / Fecha de entrega</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="t<%= data[i].idordenfabricacion%>">
+                    <% 
+                    if(data[i].token){
+                        var estado = '';
+                        var mensaje = '';
+                        var pt;
+                        data[i].token = data[i].token.split(',');
+                        for(var j = 0;j< data[i].token.length;j++){
+                            data[i].token[j] = data[i].token[j].split('@');
+                            if(data[i].token[j][5] != 'Sin OC vinculada'){
+                                pt = data[i].token[j][1] - data[i].token[j][3] - data[i].token[j][4];
+                                if(data[i].token[j][1] > data[i].token[j][5] ){    
+                                    if(data[i].token[j][6] >= 0 && data[i].token[j][6] <= 10){
+                                        mensaje = "Quedan "+ data[i].token[j][6] + " días para despachar";
+                                        estado = 'warning';
+                                    }
+                                    else if(data[i].token[j][6] < 0){
+                                        mensaje = "Pedido retrasado "+ Math.abs(data[i].token[j][6]) + " días";
+                                        estado = 'danger';
+                                    }
+                                    else{
+                                        mensaje = "Quedan "+ data[i].token[j][6] + " días para despachar";
+                                        estado = 'success';
+                                    }
+                                }
+                                else{
+                                    mensaje = "Despachado";    
+                                    estado = 'default';
+                                }
+                            }
+                            else{
+                                pt = data[i].token[j][1] - data[i].token[j][3] - data[i].token[j][4];
+                                if(parseInt(data[i].token[j][1]) > parseInt(data[i].token[j][4]) ){    
+                                    if(data[i].token[j][6] >= 0 && data[i].token[j][6] <= 10){
+                                        mensaje = "Quedan "+ data[i].token[j][6] + " días para fecha prevista";
+                                        estado = 'warning';
+                                    }
+                                    else if(data[i].token[j][6] < 0){
+                                        mensaje = "Fabricación retrasada "+ Math.abs(data[i].token[j][6]) + " días";
+                                        estado = 'danger';
+                                    }
+                                    else{
+                                        mensaje = "Quedan "+ data[i].token[j][6] + " días para fecha prevista";
+                                        estado = 'success';
+                                    }
+                                }
+                                else{
+                                    console.log("Finalizada: "+ (data[i].token[j][1] > data[i].token[j][4]));
+                                    mensaje = "Fabricación finalizada";    
+                                    estado = 'default';
+                                }
+                            }
+                            %>
+                        <tr class="<%=estado%>" data-toggle="tooltip" data-placement="bottom" title="<%= mensaje%>">
+                            <!--productoterminado = solicitados - restantes-->
+                            <%
+                            if(data[i].token[j][7] == '0'){%>
+                                <td><%=j+1%></td>
+                                <td><%= data[i].token[j][0]%></td>
+                                <td style="text-align: center;"><%= numberFormat(data[i].token[j][1].toString())%></td>
+                                <td style="text-align: center;"><%= numberFormat(data[i].token[j][3].toString())%></td>
+                                <%
+                                var sinprod = false;
+                                if(parseInt(data[i].token[j][3].toString()) > 0){
+                                    sinprod = true;
+                                }%>
+                                <td style="text-align: center;"><%= numberFormat(pt.toString())%></td>
+                                <td style="text-align: center;"><%= numberFormat(data[i].token[j][4].toString())%></td>
+                                <td style="text-align: center;">
+                                    <%if(data[i].token[j][5] == 'Sin OC vinculada'){%>  
+                                        <%= data[i].token[j][5]%>    
+                                    <%}else{%>
+                                        <%= numberFormat(data[i].token[j][5].toString())%>    
+                                    <%}%>
+                                </td>
+                                <td style="text-align: center;"><%= new Date(data[i].token[j][2]).toLocaleDateString()%></td>
+                                <%
+                                if(sinprod){
+                                    if(data[i].token[j][8] == '1'){%>
+                                        <td><i class="fa fa-lock" onclick="habFabricacion(this)" data-state="1" data-id="<%= data[i].token[j][9]%>"></i></td>
+                                    <%}else{%>
+                                        <td><i class="fa fa-unlock" onclick="habFabricacion(this)" data-state="0" data-id="<%= data[i].token[j][9]%>"></i></td>
+                                    <%}
+                                }
+                                else{%>
+                                    <td><i class="fa fa-ban"></i></td>
+                                <%}%>
+                            <%}else{%>
+                                <td><%=j+1%></td>
+                                <td><%= data[i].token[j][0]%></td>
+                                <td style="text-align: center;"><%= numberFormat(data[i].token[j][1].toString())%></td>
+                                <td style="text-align: center;"> - </td>
+                                <td style="text-align: center;"> - </td>
+                                <td style="text-align: center;"> - </td>
+                                <td style="text-align: center;">
+                                    <%if(data[i].token[j][5] == 'Sin OC vinculada'){%>  
+                                        <%= data[i].token[j][5]%>    
+                                    <%}else{%>
+                                        <%= numberFormat(data[i].token[j][5].toString())%>    
+                                    <%}%>
+                                </td>
+                                <td style="text-align: center;"><%= new Date(data[i].token[j][2]).toLocaleDateString()%></td>
+                                <td><i class="fa fa-ban"></i></td>
+                                
+                            <%}%>
+                        </tr>
+                        <%}
+                    }%>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <%}%>
+        <%if(!nomore){%>    
+            <div class="panel panel-default panel-plus">
+                <div class="panel-heading" role="tab" style="display: flex;" data-plusitem="10" onclick="loadItems(this)">
+                    <a role="button" style="width: 100%">
+                        <h3 style="text-align: center;width: 100%"><i class="fa fa-caret-down"></i> Cargar </h3>
+                    </a>
+                </div>
+            </div>
+        <%}else{%>
+            <div class="panel panel-default panel-plus" style="display: none">
+                <div class="panel-heading" role="tab" style="display: flex;" data-plusitem="10" onclick="loadItems(this)">
+                    <a role="button" style="width: 100%">
+                        <h3 style="text-align: center;width: 100%"><i class="fa fa-caret-down"></i> Cargar </h3>
+                    </a>
+                </div>
+            </div>
+        <%}%>
+        <%}else{%>
+
+            <h1 style="text-align: center; margin-top: 10px"> No hay OF registradas</h1>
+        <%}%>
+    </div>
+
+   
+</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var count = 0; 
+        $(".panel-of").each(function(){
+            count++;
+        });
+        $(".panel-plus div").data('plusitem',count);
+    });
+    $(".panel-of .panel-collapse table tbody tr").each(function(){
+            if($(this).attr('class') == 'danger'){
+                $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-of').addClass('panel-danger');
+            }
+            else if($(this).attr('class') == 'warning' && $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-of').attr('class').split(' ')[1] == 'panel-default'){
+                $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-of').addClass('panel-warning');        
+            }
+            else if($(this).attr('class') == 'success' && $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-of').attr('class').split(' ')[1] == 'panel-default'){
+               $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-of').addClass('panel-success');        
+                
+            }
+    });
+    function loadItems(yo){
+        $(yo).data('plusitem',parseInt($(yo).data('plusitem')) +10);
+        $("#of-search").submit();
+    }
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","ofs hasta ~ " + new Date().toLocaleDateString() + ".xlsx");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar csv");
+                console.log(data);
+            }
+        });
+    });
+    function refreshSelect(){
+        $(".panel-plus div").data('plusitem', 10);
+        $(".btn-searchOF").click();
+    }
+    $("#of-search").submit(function(e){
+        e.preventDefault();
+        var formArray = $(this).serializeArray();
+        var returnArray = {};
+        for (var i = 0; i < formArray.length; i++){
+            returnArray[formArray[i]['name']] = formArray[i]['value'];
+        }
+        if($(".panel-plus div").data('plusitem') < 10){
+            returnArray.items = 10;
+        }
+        else{
+            returnArray.items = $(".panel-plus div").data('plusitem');
+        }
+        console.log(returnArray);
+        $.ajax({
+            type: 'POST',
+            data: returnArray,
+            url: '/plan/buscar_of',
+            success: function(data){
+                if(data == 'null'){
+                    $("#alerta").html('<strong>Error!</strong> No se ha encontrado ningun pedido');
+                    $("#divalert").collapse('toggle');
+                    setTimeout(function () {
+                        $("#divalert").collapse('toggle');
+                    },3000);
+                }
+                else{
+                    $("#page-wrapper").html(data);
+                }
+            }
+        });
+    });
+    function refresh_list(){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/list_ofs',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+    }
+
+    function habFabricacion(yo){
+        var lock = $(yo).data('state');
+        var idfab = $(yo).data('id');
+        $.ajax({
+            type: 'POST',
+            data: {lock: lock, idfab: idfab},
+            url: '/plan/habilitar_fabricacion',
+            success: function(data){
+                if(lock == '1'){
+                    $(yo).removeClass('fa-lock');
+                    $(yo).addClass('fa-unlock');
+                    $(yo).data('state', '0');
+                    emitToastCount();
+                }
+                else{
+                    $(yo).removeClass('fa-unlock');
+                    $(yo).addClass('fa-lock');
+                    $(yo).data('state', '1');
+                }
+            }
+        });
+    }
+</script>
+
+</div>

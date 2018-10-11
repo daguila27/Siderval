@@ -1,0 +1,34 @@
+<% if(sess.length){
+for(var i = 0;i< sess.length;i++){%>
+<tr>
+    <td><%= sess[i][5]%></td>
+    <td><%= sess[i][6]%></td>
+    <td><%= new Date(sess[i][1]).toLocaleDateString()%></td>
+    <td><%= sess[i][0]%></td>
+    <td><a class="drp_sess btn btn-danger" data-id="<%= i%>"><i class="fa fa-remove"></i> Quitar</a></td>
+</tr>
+<%  }
+} else {%>
+<tr>
+    <td>No hay productos añadidos</td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+<%}%>
+<script type="text/javascript">
+    $(function(){
+        $(".drp_sess").click(function(e){
+            $.ajax({
+                type: 'POST',
+                data: {id: $(this).data('id')},
+                url: '/plan/rmsession_prefabr',
+                success: function(data){
+                    $("#session_fabrs").html(data);
+                }
+
+            });
+        });
+
+    });
+</script>

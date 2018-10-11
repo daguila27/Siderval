@@ -1,0 +1,253 @@
+    <div class="panel panel-primary cargando-panel" style="display: none;">
+        <div class="panel-heading">
+            <div style="width: 100%;text-align: center;">
+                <img style="width: 25%" src="/loading.gif">
+            </div>
+        </div>
+    </div>
+    <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
+        <form id="send_of">
+    <div class="panel panel-primary panel-defecto" style="display: block;">
+            <div class="panel-heading" style="display: flex">
+                <div style="width: 45%">
+                <h3>Lanzar Orden de Compra: #<%=last%></h3>
+                <div>
+                        <button class="btn btn-primary" onclick="saveState()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+                        <button class="btn btn-primary" onclick="loadState()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                    </div>
+                </div>
+                <div style="width: 20%">
+                        <label>Proveedor: </label>
+                        <div class='predic_text' onkeyup='getPredictions(this)'><input type='text' name='prov' autocomplete='off' required></input><div></div></div>         
+                </div>
+                <div style="width: 30%; margin-left: 2%">
+                        <label>Moneda: </label>
+                        <select class="form-control" name="money" id="money" onchange="conversor(this)">
+                          <option value="usd">Dolares (USD)</option>
+                          <option value="eur">Euro (EUR)</option>
+                          <option value="clp" selected>Pesos Chilenos (CLP)</option>
+                          <option value="gbp">Libra (GBP)</option>
+                        </select>
+                        <!--<label>
+                          <input type="checkbox" name="exento"> Exento de IVA
+                        </label>-->
+                </div>
+            </div>
+             <div style="overflow-y: scroll; max-height: 300px;">
+                
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Exento</th>
+                    <th>Descripción</th>
+                    <th>Mínimo de Compra</th>
+                    <th>Cantidad</th>
+                    <th>Precio x Unidad</th>
+                    <th>Total</th>
+                    <th>C.C.</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="session_fabrs">
+                      <%
+                      if(data['idm[]']){
+                      for(var t=0; t < data['idm[]'].length; t++){%>
+                        <tr>
+                            <td style="align-content: center;" class="td-ex">
+                              <%if(data['ex_iva[]'][t] == 'on'){%>
+                                  <input type="checkbox" name="ex_iva" class="ex_iva" onchange="refreshAllCost()" checked>
+                              <%}else{%>
+                                  <input type="checkbox" name="ex_iva" class="ex_iva" onchange="refreshAllCost()">
+                              <%}%>
+                            </td>
+                            <td><%= data['dets[]'][t]%><input type="hidden" name="idm" value="<%=data['idm[]'][t]%>"></td>
+                            <td style="align-content: center;"><%= data['u_compra[]'][t]%></td>
+                            <td style="display: flex" class="td-cant">
+                              <input class="form-control cant_compra" type="number" name="cants" min="0" onkeyup="refreshAllCost()" onchange="refreshAllCost()" step="1" value="<%= data['cants[]'][t]%>">
+                              <b style="margin-left: 2%"><%= data['u_med[]'][t]%></b>
+                            </td>
+                            <td class="td-money">
+                              <input class="form-control moneda key_money" type="float" name="costo" onkeyup="refreshAllCost()" onchange="refreshAllCost()" min="0" value="<%= data['costo[]'][t]%>">
+                            </td>
+                            <td class="costo-total">0</td>
+                            <td>
+                              <%if(data['subcuenta[]'][t] == null){%>
+                                <input type="hidden" name="centroc" id="centroc<%= t%>">
+                                <a class='setCC' onclick="selectCC(this)" data-toggle="modal" data-target="#ccModal">
+                                  N.D.
+                                </a>
+                              <%}else{%>
+                                <input type="hidden" name="centroc" id="centroc<%= t%>">
+                                <a class="setCC" onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'><%= data['subcuenta[]'][t]%></a>
+                              <%}%>
+                            </td>
+                            <td><a onclick="drop(this)" class="btn btn-danger"><i class="fa fa-remove"></i></a></td>
+                        </tr>
+                      <%}}%>
+                </tbody>
+            </table>
+
+                </div>
+            <div class="panel-footer">
+                <h4 style="width: 100%;display: flex;">
+                  <div style="margin-left: 10%;width: 30%;text-align: left" class="total-neto"><small>Neto: </small></div> 
+                  <div style="margin-left: 0%;width: 30%;text-align: left" class="total-iva"><small>IVA: </small></div>  
+                  <div style="margin-left: 0%;width: 30%;text-align: left" class="total-total"><small>Total: </small></div> 
+                </h4>
+                <div style="width: 100%;text-align: center; cursor: pointer; margin-bottom: 5px"><a data-toggle="collapse" data-target="#generalInfo"><b>Información general <i class="fa fa-caret-down desp-arrow"></i></b></a></div>
+                <div class="collapse" id="generalInfo">
+                      <div class="form-group" style="display: flex; width: 100%">
+                        <div style="display: none;">
+                          <label for="cuent">Cuenta:</label>
+                          <!--<input type="text" class="form-control" id="cuent" name='cuent'>-->
+                          
+                        </div>
+                        <div style="width: 50%; display: none">
+                        <label for="dest">Destino:</label>
+                        <input type="text" class="form-control" id="dest" name='dest' value="<%= data.dest%>">
+                        </div>
+                        <!--<div style="width: 50%">
+                        <label for="dest">Descuento (%):</label>
+                        <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()">
+                        </div>-->
+                    </div>
+                    <div class="form-group" style="display: flex; width: 100%">
+                      <div style="width: 33%">
+                      <label for="plae">Plazo de entrega:</label>
+                      <input type="date" class="form-control" id="plae" name="plae" value="<%= data.plae%>" required>
+                      </div>
+                      <div style="width: 33%">
+                      <label for="pag">Forma de pago:</label>
+                      <input type="text" class="form-control" id="pag" value="<%= data.pag%>" name="pag">
+                      </div>
+                      <div style="width: 33%">
+                      <label for="entr">Lugar de entrega:</label>
+                        <select type="text" class="form-control" id="entr" name="entr">
+                          <option value="siderval">Bodega Siderval</option>
+                          <option value="proveedor">Bodega Proveedor</option>
+                          <option value="Por definir">Por definir</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group" style="display: flex;">
+                        <div style="width: 50%">
+                          <label for="obs">Observaciones:</label>
+                          <input type="text" class="form-control" id="obs" name="obs" value="<%= data.obs%>">
+                        </div>                  
+                        <div style="width: 50%">
+                          <label for="dest">Descuento (%):</label>
+                          <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()" value="<%= data.desc%>">
+                        </div>
+                    </div>
+                  </div>  
+                <div class="form-inline">
+                    <input type="text" name="nroordenfabricacion" id="num" style="width:80%; display: none" placeholder="N° Orden de Compra / N° Orden de Venta" class="form-control" value="<%=last%>" required>
+                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
+                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                </div>
+
+            </div>
+    </div>
+        </form>
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+        refreshAllCost();
+      });
+  function moveArrow(){
+    $(".desp-arrow").css('transform', 'rotate(180deg)');  
+  }
+    function getPredictions(yo){
+        if($(yo).children('input').val()!=''){
+               $.ajax({
+                    type: 'GET',
+                    url: '/plan/get_client_pred/'+$(yo).children('input').val(),
+                    success: function(data){
+                        $(yo).children('div').css('width', $(yo).width()+"px");
+                        $(yo).children('div').html(data);
+                    }
+                }); 
+        }
+        else{
+            $(yo).children('div').html('');         
+        }
+    }
+
+    $("#send_of").submit(function(e){
+       e.preventDefault();
+       lista = $(this).serializeArray();
+       var data = {
+           idm: [],
+           idp: [],
+           fechas: [],
+           cants: [],
+           cliente: $("#cliente").val(),
+           prov: [],
+           costo: [],
+           ex_iva: [],
+           centroc: []
+       }
+       
+       console.log(lista);
+       for(var i =0;i<$(this).serializeArray().length;i++){
+           if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
+               data[lista[i].name].push(lista[i].value);
+            } else{
+               data[lista[i].name] = lista[i].value;
+           }
+       }
+       data.ex_iva = [];
+       $("#send_of :checkbox").each(function(){
+           if($(this).is(':checked')){
+             data.ex_iva.push('on');
+           }
+           else{
+             data.ex_iva.push('off');  
+           }
+           //console.log($(this).val());
+       });
+       console.log(data);
+       if(confirm("¿Esta segúro que desea crear la OC?")){
+       $.ajax({
+           type: 'POST',
+           data: data,
+           url: '/abastecimiento/crear_oda',
+           success: function(data){
+               if(data == 'error'){
+                   alert("La OC que esta intentando crear es inválida.");
+               } else {
+                   alert("La OC fue creada exitosamente.");
+                   $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+                   $(".hidden form").submit();
+                   $.ajax({
+                       type: 'GET',
+                       url: '/abastecimiento/abast_myself',
+                       success: function(data){
+                           $("#page-wrapper").html(data);
+                       }
+                   });
+               }
+           }
+       });
+       }
+    });
+
+     function renderInsumos(idof){
+      //alert("AJAX");
+      $.ajax({
+        type: 'GET',
+        url: '/abastecimiento/get_insumos_of/'+idof,
+        success: function(data){
+            if(data == 'err'){
+              alert("Ha ocurrido un error al obtener los insumos.");
+            }
+            else{
+              //alert(data);
+              $("#ins"+idof).html(data);
+            }
+        }
+      });
+     }
+
+
+    </script>

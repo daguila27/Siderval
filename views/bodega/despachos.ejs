@@ -1,0 +1,239 @@
+﻿<div class="row" style=" margin: 0 ;padding-top: 3%;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<h2 class="page-header">Guías De Despacho: <a class="btn btn-info pull-right getcsvof" data-tipo="desp" href="#"><i class="fa fa-download"></i> Generar excel</a></h2>
+
+
+<div class="container" style="width: 100%; font-family: 'Oswald">
+    <div class="col-md-10 col-md-offset-1">
+    <div class="form-group" style="display: flex;">
+      <div style="width: 50%">
+          <label for="fill-gdd">Filtrar por tipo:</label>
+          <select class="form-control" name="fill-gdd" id="fill-gdd" onchange="fillGdd(this)">
+            <option value="Todas">Todas</option>
+            <option value="Venta">Venta</option>
+            <option value="Devolucion">Devolucion</option>
+            <option value="Traslado">Traslado</option>
+            <option value="Anulado">Anulado</option>
+            <option value="Otro">Otro</option>
+            <option value="Blanco">Blanco</option>
+          </select>
+      </div>
+      <div style="width: 50%">
+        <label for="num-gdd">Numero GD:</label>
+        <div style="display: flex;">
+            <input class="form-control" id="num-gdd" type="number">
+            <button type="button" class="btn btn-primary search_gdd"><i class="fa fa-search"></i> 
+                Buscar</button>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="accordion_desp" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+        <% if(data.length){
+            var pcolor;
+            var color;
+            for(var i = 0; i< data.length;i++){
+                    data[i].fecha = new Date(data[i].fecha).toLocaleDateString();
+                    switch(data[i].estado){
+                        case "Anulado":
+                            color = "danger";
+                            break;
+                        case "Devolucion":
+                            color = "warning";
+                            break;
+                        case "Blanco":
+                        case "Otro":
+                            color = "info";
+                            break;
+                        case "Venta":
+                        case "Traslado":
+                        default:
+                            color = "success";
+                            break;
+                    }
+                %>
+        <div class="panel panel-<%=color%>" style="border-top-right-radius: 4px;border-top-left-radius: 4px;border-bottom-right-radius: 0%;border-bottom-left-radius: 0%;">
+            <!--"alert alert-danger-->
+            <div class="alert alert-<%=color%>" role="tab" id="h<%= data[i].iddespacho%>" style="/*box-shadow: 5px 5px 5px;*/ display: flex; position:relative; margin: 0; border-radius: 0;">
+                <h3>
+                    <a role="button" href="#c<%= data[i].iddespacho%>"  data-toggle="collapse" data-parent="#accordion_desp"  aria-expanded="true" aria-controls="h<%= data[i].iddespacho%>">
+                        Guía de despacho #<%= data[i].iddespacho%> <small style="margin-left: 10px">ODC: 
+                            <%if(data[i].numordenfabricacion == '' || data[i].numordenfabricacion == null){%>
+                                Sin OC
+                            <%}else{%>
+                                <%=data[i].numordenfabricacion%>   
+                            <%}%>
+                            (<%=  data[i].estado%>)</small>
+                    </a>
+                </h3>
+                    <p class="pull-right" style="position: absolute;right:20px"><b>Creada el: </b> <%=data[i].fecha%> <b>| Última modificacion: </b> <%= new Date(data[i].last_mod).toLocaleString()%></p>
+                    <p class="pull-right" style="position: absolute;right:20px; top:40px">
+                        <%if(data[i].estado != 'Anulado'){
+                            if(data[i].estado == 'Blanco'){%>
+                                <button type="button" class="btn btn-<%=color%> activar-blanco" data-id="<%=data[i].iddespacho%>">Activar</button>
+                            <%}
+                            else{%>
+                                <a class="btn btn-<%=color%> genguia" data-id="<%=data[i].iddespacho%>"><i class="fa fa-download"></i> Generar GD</a>
+                            <%}%>
+                                <button type="button" class="btn btn-<%=color%> anular" data-id="<%=data[i].iddespacho%>" data-val="1"><i class="glyphicon glyphicon-remove-circle"></i> Anular</button>
+                        <%}else{%>
+                            <button type="button" class="btn btn-<%=color%>" data-id="<%=data[i].iddespacho%>" data-val="0" disabled>Anulado</button>
+                        <%}%>
+                    </p>
+            </div>
+            <div id="c<%= data[i].iddespacho%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= data[i].iddespacho%>" style="border-radius: 0%;">
+                <% if(data[i].obs != "" && data[i].obs != null){%>
+                <div class="alert alert-<%=color%>" style="border-radius: 0%">
+                    <b>Comentario:</b>
+                    <div style="margin: 0; background-color: white; padding: 2%; margin-left: 10px;border-radius: 3px; border: 0.5px solid black; color:black;"><%= data[i].obs%></div>
+                </div>
+                <%}%>
+                <table class="table table-striped table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Detalle</th>
+                        <th>Cantidad</th>
+                    </tr>
+                    </thead>
+                    <tbody id="t<%= data[i].iddespacho%>">
+                    <% 
+                    if(data[i].mat_token){
+                        data[i].mat_token = data[i].mat_token.split('@@');
+                        data[i].cant_token = data[i].cant_token.split(',');
+                        for(var j = 0;j< data[i].mat_token.length;j++){
+                            %>
+                        <tr>
+                            <!--productoterminado = solicitados - restantes-->
+                            <td><%= data[i].mat_token[j].substring(0,1).toUpperCase() + data[i].mat_token[j].substring(1,data[i].mat_token[j].length).toLowerCase() %></td>
+                            <td><%= data[i].cant_token[j]%></td>
+                        </tr>
+                        <%}
+                    }%>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <%}%>
+        <%}else{%>
+        <h1 style="text-align: center; margin-top: 10px">No hay GDD</h1>
+        <%}%>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    
+    $("#fill-gdd").val("<%= tipo%>")
+
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","Despachos hasta ~ " + new Date().toLocaleDateString() + ".xlsx");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar excel");
+                console.log(data);
+            }
+        });
+
+    });
+    $(".anular").click(function(e){
+        e.preventDefault();
+        var resp = confirm("Anular la Guia de despacho retorna el stock a los materiales involucrados y ademas es irreversible. \n\n                         ¿Esta seguro que desea continuar?");
+        if(resp){
+            $.ajax({
+                type: 'POST',
+                data: {id: $(this).data('id'), val: $(this).data('val')},
+                url: 'bodega/anular_gdd',
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                }
+            });
+        }
+    });
+    $(".activar-blanco").click(function(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                data: {id: $(this).data('id')},
+                url: 'bodega/activar_gdd',
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                }
+            });
+    });
+    $(".genguia").click(function(e){
+            //e.preventDefault();
+            var yo = $(this);
+
+            if($(yo).attr('class').split(" ")[2] == 'genguia'){
+                $.ajax({
+                    type: 'GET',
+                    url: 'bodega/gen_pdfgdd/'+yo.data('id'),
+                    success: function(data){
+                        console.log(data);
+                        yo.attr("href",data);
+                        yo.attr("download","gdd"+yo.data('id')+".xlsx");
+                        yo.removeClass("genguia");
+                        yo.addClass("genok");
+                        yo.html("<i class='fa fa-download'></i> Descargar GD");   
+                    }
+                });
+            }
+    });
+
+    $(".search_gdd").click(function(e){
+            e.preventDefault();
+            if($("#num-gdd").val() != ''){
+                $.ajax({
+                    type: 'GET',
+                    url: 'bodega/search_gdd/'+$("#num-gdd").val(),
+                    success: function(data){
+                        $("#page-wrapper").html(data);
+                    }
+                });
+            }
+            else{
+                $.ajax({
+                    type: 'GET',
+                    url: 'bodega/show_despachos',
+                    success: function(data){
+                        $("#page-wrapper").html(data);
+                    }
+                });  
+            }
+    });
+    function fillGdd(tipo){
+        console.log($(tipo).val());
+        if($(tipo).val()!='Todas'){
+            $.ajax({
+                type: 'POST',
+                data: {tipo: $(tipo).val()},
+                url: 'bodega/render_gdd',
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                }
+            });
+        }
+        else{
+            $.ajax({
+                type: 'GET',
+                url: 'bodega/show_despachos',
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                }
+            });
+        }
+        
+    }
+
+</script>
+
+</div>

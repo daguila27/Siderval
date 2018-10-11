@@ -1,0 +1,74 @@
+<%
+
+function numberFormat(numero){
+        var resultado = "";
+        if(numero[0]=="-")
+        {
+            nuevoNumero=numero.replace(/\./g,'').substring(1);
+        }else{
+            nuevoNumero=numero.replace(/\./g,'');
+        }
+ 		if(numero.indexOf(",")>=0)
+            nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+ 
+        for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+            resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+ 		if(numero.indexOf(",")>=0)
+            resultado+=numero.substring(numero.indexOf(","));
+ 		if(numero[0]=="-")
+        {
+            return "-"+resultado;
+        }else{
+            return resultado;
+        }
+    }
+
+function trunc (x, posiciones = 0) {
+	  	var s = x.toString()
+	  	var l = s.length
+	  	if(s.indexOf('.') == -1){
+	  		return x;
+	  	}
+	  	else{
+			var decimalLength = s.indexOf('.') + 1;
+	  		var numStr = s.substr(0, decimalLength + posiciones);
+	  		return Number(numStr);
+	  	}
+	  	
+	}
+					var clase;
+					var hab = true;
+					if(semi.length){
+						semi[0].d_token = semi[0].d_token.split('@');
+						semi[0].c_token = semi[0].c_token.split('@');
+						semi[0].s_token = semi[0].s_token.split('@');
+						semi[0].p_token = semi[0].p_token.split('@');
+						semi[0].u_token = semi[0].u_token.split('@');
+						for(var n=0; n < semi[0].d_token.length; n++){
+							if( parseInt(semi[0].s_token[n]) >= parseInt(semi[0].c_token[n]*cantidad) ){
+								clase = 'success';
+							}
+							else{
+								hab = false;
+								clase = 'danger';
+							}
+						%>
+						<tr class="<%= clase%>">
+								<td><%=semi[0].d_token[n].substring(0,1).toUpperCase() + semi[0].d_token[n].substring(1,semi[0].d_token[n].length).toLowerCase()%></td>
+								<td><%=trunc(semi[0].c_token[n], 2)%> <%=semi[0].u_token[n]%></td>
+								<td>$<%= numberFormat(semi[0].p_token[n])%></td>
+								<td><%= trunc(semi[0].c_token[n]*cantidad,2)%> <%=semi[0].u_token[n]%></td>
+								<td><%=semi[0].s_token[n]%> <%=semi[0].u_token[n]%></td>
+								<td>$<%= numberFormat(parseInt(semi[0].p_token[n]*cantidad).toString())%></td>
+						</tr>
+
+					<%}}%>
+
+<script type="text/javascript">
+	if(<%= hab%>){
+	 	$('.abast-button').prop('disabled', false);
+	}
+	else{
+     	$('.abast-button').prop('disabled', true);
+	}
+</script>

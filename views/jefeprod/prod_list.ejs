@@ -1,0 +1,26 @@
+ <%
+                    if(datalen.length){
+                        for(var i = 0; i< datalen.length; i++){
+                    %>
+                    <tr>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="N° OF" style="text-align: center"><%= datalen[i].numordenfabricacion %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad %></td>
+                        <!--<td data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center"><%= datalen[i].abastecidos %></td>-->
+                        <td data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-1"><%= datalen[i]['1'] %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-2"><%= datalen[i]['2'] %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-3"><%= datalen[i]['3'] %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-4"><%= datalen[i]['4'] %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-5"><%= datalen[i]['5'] %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-6"><%= datalen[i]['6'] %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-7"><%= datalen[i]['7'] %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" style="text-align: center" id="prod<%=datalen[i].idproduccion%>-8"><%= datalen[i]['8'] %></td>
+                        <td class='danger' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
+                    </tr>
+                    <%  }
+                    } else {
+                        %>
+                    <tr><td>No hay nada por producir</td></tr>
+                    <%
+                    }
+                    %>

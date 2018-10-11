@@ -1,0 +1,165 @@
+
+<h1 class="page-header">
+    Abastecer Órdenes de Producción:
+    <!--<p class="pull-right ayuda" href="#help" data-toggle="collapse"  aria-expanded="true" aria-controls="help"><i class="fa fa-info-circle"></i></p>-->
+</h1>
+<div id="help" class="panel-collapse collapse" role="tabpanel" aria-labelledby="help" style="margin: 0 5%;background-color: rgb(202,202,202);">
+              <p style="padding: 20px;font-style: italic;">
+                 <b>Abastecimiento de Ordenes de Producción lanzadas:</b><br>
+                    A continuación se listan todas las OP's sin finalizar junto con un detalle de todos los insumos necesarios para fabricar la totalidad de esta. <br> <br>
+                    Pestaña <b>Abastecer:</b> <br>
+                        
+                        Al pulsar <b class="btn btn-primary info-button">Abastecer</b> se desplagará el listado maestro de insumos para la OP seleccionada, luego deberá ingresar la cantidad de insumos que desea despachar. Finalizado esto pulse en <b class="btn btn-primary info-button">Confirmar</b> para restar la cantidad especificada de su Bodega de Materias Primas. (Para cancelar presione <b class="btn btn-default info-button">Cerrar</b>)<br> <br>
+                        Al pulsar <b class="btn btn-danger info-button">Devolución</b> obtendrá una lista con todos los insumos despachados para la OP seleccionada, dando asi la posibilidad de retornar insumos a Bodega de Materias Primas simplemente ingresando las cantidades a devolver. Luego de esto presione <b class="btn btn-danger info-button">Devolución</b> para confirmar (Para cancelar presione <b class="btn btn-default info-button">Cerrar</b>).<br> <br>
+                    Pestaña <b>Informe de Stock:</b> <br>
+                        
+              </p> 
+            </div>
+<!-- Modal -->
+<div id="bomModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    
+    <div class="modal-content">
+      <form id="abastForm">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Modal Header</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">He recibido</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+    </form>
+    </div>
+
+  </div>
+</div>
+<div class="container col-md-12" style="font-family: 'Oswald';">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#abastecidos" aria-controls="profile" role="tab" data-toggle="tab">Abastecer</a></li>
+            <li role="presentation"><a href="#devoluciones" aria-controls="home" role="tab" data-toggle="tab">Cerrados</a></li>
+            <!--<li role="presentation"><a href="#guias_desp" aria-controls="home" role="tab" data-toggle="tab">Informe de Stock</a></li>-->
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content col-md-10 col-md-offset-1">
+            <div role="tabpanel" class="tab-pane active" id="abastecidos">
+                <form id="form-of">
+                    <div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top: 10px;display: flex;">
+                        <input style="width: 80%" id="of-num" type="text" class="form-control" placeholder="Ingrese numero de OP" tabindex="1">
+                        <button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+                        <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_of()"><i class="glyphicon glyphicon-refresh"></i></button>
+                    </div>
+                </form>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination" id="paginationup">
+                    </ul>
+                </nav>
+                <div class="page-container">  
+                    <h1 style="text-align: center; margin-top: 10px"> No hay OP por abastecer</h1>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination" id="paginationdown">
+                    </ul>
+                </nav>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="devoluciones">
+                <form id="form-of-dev">
+                    <div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top: 10px;display: flex;">
+                        <input style="width: 80%" id="of-num" type="text" class="form-control" placeholder="Ingrese numero de OP" tabindex="1">
+                        <button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+                        <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_of()"><i class="glyphicon glyphicon-refresh"></i></button>
+                    </div>
+                </form>
+                <nav aria-label="Page navigation">
+                    <ul class="paginationdev" id="paginationupdev">
+                    </ul>
+                </nav>
+                <div class="page-containerdev">
+                        <h1 style="text-align: center;margin-top: 10px">No hay OP cerradas</h1>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="paginationdev" id="paginationdowndev">
+                    </ul>
+                </nav>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="guias_desp">
+                
+                <div class="page-containerinfo">
+                </div>
+                
+            </div>
+        </div>
+</div>
+
+
+<script type="text/javascript">
+   
+    var options = {
+            totalPages: <%=Math.ceil(largo/15)%>,
+            visiblePages: 5,
+            first:"Primero",
+            prev: '<span aria-hidden="true">&laquo;</span>',
+            next: '<span aria-hidden="true">&raquo;</span>',
+            last: "Ultimo",
+            loop: true,
+            onPageClick: function (event, page) {
+                $.ajax({
+                    type:'GET', 
+                    url: '/abastecimiento/abast_ops_page/'+page,
+                    success: function(data){
+                        $(".page-container").html(data);
+                    }
+                });
+            }
+        };
+    var options2 = {
+            totalPages: <%=Math.ceil(largo2/15)%>,
+            visiblePages: 5,
+            first:"Primero",
+            prev: '<span aria-hidden="true">&laquo;</span>',
+            next: '<span aria-hidden="true">&raquo;</span>',
+            last: "Ultimo",
+            loop: true,
+            onPageClick: function (event, page) {
+                $.ajax({
+                    type:'GET', 
+                    url: '/abastecimiento/dev_ops_page/'+page,
+                    success: function(data){
+                        $(".page-containerdev").html(data);
+                    }
+                });
+            }
+        };
+    
+    $(function(){
+        window.pagObj = $('.pagination').twbsPagination(options).on('page', function (event, page) {
+            console.info(page + ' (from event listening)');
+        });
+    });
+
+   $(function(){
+        window.pagObj2 = $('.paginationdev').twbsPagination(options2).on('page', function (event, page) {
+            console.info(page + ' (from event listening)');
+        });
+    });
+
+
+
+    $.ajax({
+            type:'POST', 
+            url: '/abastecimiento/stock_info',
+            success: function(data){
+                    $(".page-containerinfo").html(data);
+            }
+    });
+
+    
+</script>

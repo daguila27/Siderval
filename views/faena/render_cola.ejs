@@ -1,0 +1,99 @@
+<h1 class="page-header">Lista de Fabricación: <%= nombreetapa%></h1>
+
+<style type="text/css">
+	.fabricacionItem{
+		padding: 25px;
+		border: solid 2px rgb(220,220,220);
+		border-radius: 2%;
+		margin-bottom: 10px;
+		box-shadow: 5px 5px 5px #888888;
+    background-color: rgb(235,235,235);
+	}
+	.fabricacionItem > div{
+		display: flex;
+		width: 100%;
+	}
+
+	.fabricacionItem div h2,h4,p{
+		width: 50%;
+		margin-top: 20px;
+	}
+</style>
+
+<div class="row scroll-cola" style="align-content: center;">
+  
+  <input type="hidden" id="idordenproduccion">
+     <!--return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();-->
+  <%
+  function letraMayus(string) {
+    return string;
+  }
+  if(data.length == 0){%>
+  	<div style="text-align: center;">
+  		<h1>No hay producciones en la etapa.</h1>
+    </div>
+  <%}else{
+  for(var i=0; i< data.length; i++){%>
+    	<div class="col-sm-12 col-md-12 fabricacionItem">
+    		<div id="<%= data[i].idproduccion%>" data-toggle="tooltip" title="Enviar a siguiente etapa" data-placement="bottom">
+    			<div style="width: 83%">
+    				<div style="display: flex;">
+    					<h3 style="width: 75%"><b> </b><%= letraMayus(data[i].detalle)%></h3>
+    					<p style="width: 25%"><b>Por producir: </b><%= data[i][etapaactual]%> unidades</p>
+    				</div>
+    				<div style="display: flex">
+	    				<p style="width: 75%"><b>Siguiente Etapa: </b><%= data[i].sigetapa%></p>
+    					<p style="width: 25%"><b>OP N° </b><%= data[i].idordenproduccion%></p>
+    				</div>
+    			</div>	
+                <button style="margin-top: 10px;" class="btn btn-success btnProd" id="bq<%=data[i].idproduccion%>" data-cantidad="<%=data[i][etapaactual]%>" onclick="setmodal(this)" data-id="<%=data[i].idproduccion%>" data-sgt_etapa="<%=data[i].nextstep%>" data-sigetp="<%= data[i].sigetapa%>" data-toggle="modal" data-target="#send_step">
+                  Enviar Producto</button>
+	        </div>
+    	</div>
+	<%}}%>
+</div>
+<script type="text/javascript">
+	
+
+
+	function setmodal(yo){
+	  $("#prod_id").val($(yo).data('id'));
+    $("#sgt_etapa").val($(yo).data('sgt_etapa'));
+    $("#sendnum").attr('max',$(yo).data('cantidad'));
+    $("#sendnum").val($(yo).data('cantidad'));
+    $(".totalSend").html("/ "+$(yo).data('cantidad'));
+    $(".p-sigetp").html("<b>Siguiente etapa: </b> "+$(yo).data('sigetp'));
+		console.log($(yo).data('sgt_etapa'));
+	}
+
+	
+        //io.on('refreshfaena<%= etapaactual%>', function(){
+            //alert("Refrescar la pagina");
+
+            //add_notificacion(notif);
+            //show_faena();
+        	//make_faena();
+        //});
+
+
+
+
+	/*$(".send-tofaena").on('click', function(e){
+		e.preventDefault();
+    $.ajax({
+      type: 'POST',
+      url: 'faena/startProduccion',
+      data: {
+          'idproduccion':$("#idordenproduccion").val() ,
+          'cantidad': $("#cantidadEnviar").val(), 
+          'etapa': $("#stationFaena").val(), 
+          'idproducido':  $("#idproducido").val()
+      },
+      success: function(data){
+        alert(data);
+      }
+    });
+	});*/
+
+  
+</script>

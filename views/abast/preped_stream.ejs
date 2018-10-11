@@ -1,0 +1,29 @@
+
+<% 
+function letraMayus(string) {
+     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+} 
+
+
+if(data.length){
+for(var i = 0;i< data.length;i++){
+    %>
+<tr>
+    <td><%= letraMayus(data[i].detalle)%></td>
+    <td><%= data[i].cnom%></td>
+    <td><%= data[i].stock%></td>
+    <td>
+        <div class="btn-group">
+            <a data-idm="<%= data[i].idmaterial%>" class="btn btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Añadir</a>
+        </div>
+    </td>
+</tr>
+
+
+<%
+}
+} else {%>
+<tr>
+    <td>No Hay productos para mostrar</td>
+</tr>
+<%}%>

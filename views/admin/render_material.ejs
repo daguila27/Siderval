@@ -1,0 +1,18 @@
+<%for(var i=0; i< data.length; i++){%>
+ 		<div class="list-group-item" style="display: flex;">
+ 		 	<div class="material-detalle">
+ 		 		<label for="detalle">Descripcion:</label>
+ 		 		<p id="detalle"><%=data[i].detalle%></p>
+ 		 	</div>
+
+ 		 	<button type="button" class="btn btn-primary boton-bom" data-name="<%=data[i].detalle%>" 
+ 		 	data-id="<%=data[i].idmaterial%>" data-toggle="modal" data-target="#material-modal"><span class="glyphicon glyphicon-check"></span>Aprobar</button>
+ 		</div>
+ 		<%}%>
+ 		<script type="text/javascript">
+ 			$(".boton-bom").on('click', function(e){
+				e.preventDefault();
+				$(".modal-title").html("Enviar material: "+$(this).data('name'));
+				$("#idmaterial").val($(this).data('id'));
+			});
+ 		</script>

@@ -1,0 +1,74 @@
+<div id="accordion_gdd" role="tablist" aria-multiselectable="true" style="margin-top: 20px;" class="panel-group">
+        <%
+
+        function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }
+          function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+        if(gdd.length){
+            for(var i = 0; i< gdd.length;i++){
+                %>
+        <div class="col-md-10 col-md-offset-1 panel panel-default" style="padding: 0;">
+            <div class="panel-heading" role="tab" id="h<%= gdd[i].idingreso%>" style="display: flex;">
+                <a role="button" href="#c<%= gdd[i].idingreso%>" data-toggle="collapse" data-parent="#accordion_gdd"  aria-expanded="true" aria-controls="h<%= gdd[i].idingreso%>" style="width: 100%; text-align: center;">
+                    <h3>Guia de Despacho #<%= gdd[i].numgdd%> <small>para OCA #<%= gdd[i].numoda%></small></h3>
+                    <p class="pull-right">Fecha de creación: <%=new Date(gdd[i].fecha).toLocaleString()%></p>
+                    <p class="pull-left">Proveedor: <%=gdd[i].sigla%> - <%=gdd[i].razon%></p>
+                </a>
+            </div>
+            <div id="c<%= gdd[i].idingreso%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= gdd[i].idingreso%>">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Recibidos</th>
+                        <th>Unidad</th>
+                    </tr>
+                    </thead>
+                    <tbody id="t<%= gdd[i].idingreso%>">
+                    <% 
+                    if(gdd[i].idmat_token){
+                        gdd[i].idmat_token = gdd[i].idmat_token.split('@');
+                        gdd[i].mat_token = gdd[i].mat_token.split('@');
+                        gdd[i].cant_token = gdd[i].cant_token.split('@');
+                        gdd[i].un_token = gdd[i].un_token.split('@');
+                        for(var j = 0;j< gdd[i].idmat_token.length;j++){%>
+                            <tr>
+                                <td><%= letraMayus(gdd[i].mat_token[j])%></td>
+                                <td><%= numberFormat(gdd[i].cant_token[j])%></td>
+                                <td><%= gdd[i].un_token[j]%></td>
+                            </tr>
+                        <%}
+                    }%>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <%}%>
+        <%}else{%>
+            <h2 style="text-align: center; margin-top: 40px">Sin GD registradas</h2>
+        <%}%>
+    </div>

@@ -1,0 +1,32 @@
+
+		JEFE DE PRODUCCIÓN
+**Pintura en kilos**
+
+2 usuarios de moldeo
+
+**Candado para producción (no deja crear OP) activado por planificación.**
+
+**Detalle <---> Descripcion**
+**Necesitados <---> Necesidad**
+**Lista de Abastecimiento <---> Lista de Insumos**
+**Itemizar producto <---> Comprimir productos**
+
+**Ver OP ----> OF desplegar informacion de OP vinculadas**
+
+Programar OP
+	---> Crear OP que será liberada posteriormente
+
+Lanzar OP total o parcial
+
+Envio de produccion total o parcial
+
+OP por etapa
+
+**Excel general ---> N° OF**
+
+
+
+		PLANIFICACION
+
+Utilizar Stock
+

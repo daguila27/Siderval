@@ -1,0 +1,158 @@
+<style type="text/css">
+    .option-oda li{
+        cursor: pointer;
+    }
+</style>
+<div id="accordion_of" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+        <%
+          function fechaLatino(date){
+                date = date.split('-');
+                var aux = date[2];
+                date[2] = date[0];
+                date[0] = aux;
+                return date.join('-'); 
+            }
+          function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+
+        function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }
+        if(data.length){
+            for(var i = 0; i< data.length;i++){
+                %>
+        <div class="col-md-10 col-md-offset-1 panel panel-default" style="padding: 0">
+            <div class="panel-heading" role="tab" id="h<%= data[i].idoda%>" style="display: flex;">
+                <a role="button" href="#c<%= data[i].idoda%><%=recepcionar%>" data-toggle="collapse" data-parent="#accordion_of"  aria-expanded="true" aria-controls="h<%= data[i].idoda%>" style="width: 100%; text-align: center;">
+                    <h3>Orden de Compra #<%= data[i].numoda%>
+                    </h3>
+                    <p class="pull-right">Fecha de creación: <%=fechaLatino(new Date(data[i].creacion).toLocaleDateString())%></p>
+                    <p class="pull-left">Proveedor: <%=data[i].sigla%> - <%=data[i].razon%> <br>
+                        <%if(data[i].full_facturado){%>
+                            Completamente Facturado <br>   
+                        <%}if(!data[i].incompleta_rec){%>
+                            Completamente Recepcionado
+                        <%}%>  
+                    </p>
+                </a>
+                <div style="position: absolute; right: 5%; display: flex;">
+                    <a style="position: absolute; top: 0px; right: 15px; z-index: 10" href="/pdf/odc<%= data[i].numoda%>.pdf" download="OCA<%= data[i].numoda%>.pdf" data-numoda="<%= data[i].numoda%>" data-idoda="<%= data[i].idoda%>" download><i class="fa fa-file-pdf-o"></i></a>
+                    <%if(recepcionar){%>
+                        <div class="dropdown" style="position: absolute; top: 0px; right: -5px; z-index: 10">
+                          <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
+                          <ul class="dropdown-menu dropdown-menu-right option-oda">
+                                <li>
+                                    <a data-numoda="<%= data[i].numoda%>" data-idoda="<%= data[i].idoda%>" onclick="verPdf(this)">Ver PDF</a>
+                                </li>
+                            <%if(!data[i].full_facturado){%>
+                                <li>
+                                    <a data-idoda="<%= data[i].idoda%>" data-numoda="<%= data[i].numoda%>" onclick="setFactuNum(this)" data-toggle="modal" data-target="#facturaModal">Adjuntar Factura</a>
+                                </li>    
+                            <%}if(data[i].incompleta_rec){%>
+                                <li>
+                                    <a data-toggle="modal" data-target="#receivedModal" data-id="<%= data[i].idoda%>" onclick="oda_data(this)">Recepcionar</a>
+                                </li>    
+                            <%}%>  
+                          </ul>
+                        </div>
+                  
+                            
+                    <%}else{%>
+                    <!--<form method="POST" target="_blank" action="/plan/view_ordenpdf">-->
+                        <!--<input type="hidden" name="idoda" value="<%=data[i].idoda%>">-->
+                        <%if(data[i].numfac == null){%>
+                        <%}else{%>
+                            <button class="pull-right btn btn-success" data-numoda="<%= data[i].numoda%>" data-idoda="<%= data[i].idoda%>" onclick="verPdf(this)">Ver OC</button>
+                            <a class="pull-right" data-numoda="<%= data[i].idoda%>" style="margin-right: 5px" disabled>Factura N°<%= data[i].numfac%></a>
+                        <%}%>
+                    <%}%>
+                    <!--</form>-->
+                </div>
+            </div>
+            <div id="c<%= data[i].idoda%><%=recepcionar%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= data[i].idoda%>">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Solicitados</th>
+                        <th>Recibidos</th>
+                        <th>Por recibir</th>
+                        <th>Unidades</th>
+                        <th>Costo</th>
+                    </tr>
+                    </thead>
+                    <tbody id="t<%= data[i].idoda%>">
+                    <%if(data[i].matd){
+                        data[i].matd = data[i].matd.split('@');
+                        data[i].xrec = data[i].xrec.split(',');
+                        data[i].cant = data[i].cant.split(',');
+                        data[i].reci = data[i].reci.split(',');
+                        data[i].umed = data[i].umed.split(',');
+                        data[i].cost = data[i].cost.split(',');
+                        for(var j = 0; j < data[i].matd.length; j++){%>
+                            <tr>
+                                <td><%= data[i].matd[j]%></td>
+                                <td><%= numberFormat(data[i].cant[j])%></td>
+                                <td><%= numberFormat(data[i].reci[j])%></td>
+                                <td><%= numberFormat(data[i].xrec[j])%></td>
+                                <td><%= data[i].umed[j]%></td>
+                                <td><%= data[i].cost[j]%> <%= data[i].tokenoda.split('@')[6]%></td>
+                            </tr>
+                        <%}
+                    }%>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <%}%>
+        <%}else{%>
+            <h1 style="text-align: center; margin-top: 10px"> No hay OC registradas</h1>
+        <%}%>
+    </div>
+
+<script type="text/javascript">
+    function oda_data(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_dataoda/'+$(yo).data('id'),
+            success: function(data){
+                $("#receivedModal div div form").html(data);
+            }
+        });
+    }
+
+    function habInput(yo){
+        if($(yo).is(":checked")){
+            $(yo).parent().parent().children('.input-tr').prop('disabled', false);
+        }
+        else{
+            $(yo).parent().parent().children('.input-tr').prop('disabled', true);
+        }
+    }
+
+
+
+
+</script>

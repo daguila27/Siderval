@@ -1,0 +1,14 @@
+.list-group-item{
+	display: flex;
+}
+
+
+
+.list-group-item h4{
+	position: absolute;
+	right: 20px;
+}
+.col-md-8 .input-group{
+	width: 100%;
+	margin-bottom: 50px;
+}

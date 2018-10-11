@@ -1,0 +1,363 @@
+<h1 class="page-header">
+    Ordenes de Compra
+    <!--<p class="pull-right ayuda" href="#help" data-toggle="collapse"  aria-expanded="true" aria-controls="help"><i class="fa fa-info-circle"></i></p>-->
+</h1>
+<div id="help" class="panel-collapse collapse" role="tabpanel" aria-labelledby="help" style="margin: 0 5%;background-color: rgb(202,202,202);">
+              <p style="padding: 20px;font-style: italic;">
+                 <b>Recepcionar Ordenes de Compra:</b><br>
+                    A continuación se listan las OC pendientes por recibir y las GD de aquellas que han sido recibidas. <br> <br>
+                    Pestaña <b>Por Recibir:</b> <br>
+                        En esta sección permite recibir las OC's pendientes. Al pulsar <b class="btn btn-primary info-button">Recepcionar</b> se despliega el detalle de los productos con sus respectivas cantidades por recibir. Luego de ingresadas las cantidades recepcionadas y especificado el número de GD pulse <b class="btn btn-primary info-button">He recibido</b> para aplicar los cambios (para cancelar pulse <b class="btn btn-default button-info">Cerrar</b>), inmediatamente se creara la GD respectiva.<br><br>
+                    Pestaña <b>Guías de Despacho:</b> <br>
+                        
+              </p>  
+            </div>
+
+
+
+<!-- Modal -->
+<div id="receivedModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+        <form id="rec_form">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Modal Header</h4>
+      </div>
+      <div class="modal-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+        </form>
+    </div>
+
+  </div>
+</div>
+
+<div class="container col-md-12" style="font-family: 'Oswald';">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#abastecidos" aria-controls="profile" role="tab" data-toggle="tab">Ordenes de Compra</a></li>
+            <!--<li role="presentation"><a href="#devoluciones" aria-controls="home" role="tab" data-toggle="tab">Recibidos</a></li>-->
+            <li role="presentation"><a href="#guias_desp" aria-controls="home" role="tab" data-toggle="tab">Guías de despacho</a></li>
+            <li role="presentation"><a href="#facturas" aria-controls="home" role="tab" data-toggle="tab">Facturas</a></li>
+            <li role="presentation"><a href="#informacion" aria-controls="info" role="tab" data-toggle="tab">Información</a></li>
+
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content col-md-10 col-md-offset-1" style="margin:0; width: 100%">
+            <div role="tabpanel" class="tab-pane active" id="abastecidos">
+                
+                <form id="form-oc-prec">
+                    <div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top: 10px;display: flex;">
+                        <input style="width: 80%" id="oc-num-prec" type="text" class="form-control" placeholder="¿Que busca?" tabindex="1">
+                        <button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+                        <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_oc_prec()"><i class="glyphicon glyphicon-refresh"></i></button>
+                    </div>
+                </form>
+                 <nav aria-label="Page navigation">
+                        <ul class="pagination" id="paginationup">
+                        </ul>
+                </nav>
+                <div class="page-container">                   
+                    <h1 style="text-align: center; margin-top: 10px"> No hay OC registradas</h1>
+                </div>
+                <nav aria-label="Page navigation">
+                        <ul class="pagination" id="paginationdown">
+                        </ul>
+                </nav>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="devoluciones">
+                <form id="form-oc-dev">
+                    <div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top: 10px;display: flex;">
+                        <input style="width: 80%" id="oc-num-dev" type="text" class="form-control" placeholder="¿Que busca?" tabindex="1">
+                        <button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+                        <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_oc_rec()"><i class="glyphicon glyphicon-refresh"></i></button>
+                    </div>
+                </form>
+                <nav aria-label="Page navigation">
+                        <ul class="paginationrec">
+                        </ul>
+                </nav>
+                <div class="page-container-recibidos">
+                    <h1 style="text-align: center; margin-top: 30px"> No hay OC recibidas</h1>
+                    
+                </div>
+                <nav aria-label="Page navigation">
+                        <ul class="paginationrec" >
+                        </ul>
+                </nav>
+            </div>
+
+            <div role="tabpanel" class="tab-pane fade" id="guias_desp" style="padding-bottom: 20px">
+                <form id="form-oc-gdd">
+                    <div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top: 10px;display: flex;">
+                        <input style="width: 80%" id="oc-num-gdd" type="text" class="form-control" placeholder="¿Que busca?" tabindex="1">
+                        <button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+                        <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_gdd_rec()"><i class="glyphicon glyphicon-refresh"></i></button>
+                    </div>
+                </form>
+                <div class="page-container-guias">
+                    
+                    <h1 style="text-align: center; margin-top: 10px"> No hay GD registradas</h1>
+                </div>
+                
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="facturas">
+           
+                <div class="page-container-facturas">
+                    
+                </div>
+                
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="informacion">
+           
+                <div class="page-container-informacion">
+                    
+                </div>
+                
+            </div>
+
+        </div>
+</div>
+<div class="hidden"></div>
+
+<a class="descargarPDF" style="display: none;"></a>
+<script type="text/javascript">
+    
+    $('.nav-tabs a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    })
+
+
+    function verPdf(yo){   
+
+        /*$(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+$(yo).data('idoda')+"'></form>");
+            $(".hidden form").submit();*/
+        window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
+    }
+
+    function descargarPdf(yo){ 
+        $.ajax({
+            type: 'GET',
+            url: '/plan/download_pdf/'+$(yo).data('numoda'),
+            success: function(data){
+                $(".descargarPDF").attr("href",data);
+                $(".descargarPDF").attr("download","OCA"+$(yo).data('numoda')+".xlsx",function(){$(".descargarPDF").click()});
+                $(".descargarPDF").click();
+            }
+        });  
+    }
+
+    function render_all_gdd_rec(){
+        $.ajax({
+            type:'GET', 
+            url: '/abastecimiento/gdd_proveedores',
+            success: function(data){
+                $("#oc-num-gdd").val('');
+                $(".page-container-guias").html(data);
+            }
+        });
+    }
+
+
+    function render_all_fact(){
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/fact_view',
+            beforeSend: function(){
+                $(".page-container-facturas").addClass('fade');
+            },
+            success: function(data){
+                $(".page-container-facturas").removeClass('fade');
+                $(".page-container-facturas").html(data);
+            }
+        });
+    }
+
+    function render_all_info(){
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/info_view',
+            beforeSend: function(){
+                $(".page-container-informacion").addClass('fade');
+            },
+            success: function(data){
+                $(".page-container-informacion").removeClass('fade');
+                $(".page-container-informacion").html(data);
+            }
+        });
+    }
+
+
+    render_all_gdd_rec();
+    render_all_fact();
+    render_all_info();
+    var options = {
+            totalPages: <%=Math.ceil(largo/15)%>,
+            visiblePages: 5,
+            first:"Primero",
+            prev: '<span aria-hidden="true">&laquo;</span>',
+            next: '<span aria-hidden="true">&raquo;</span>',
+            last: "Ultimo",
+            loop: true,
+            onPageClick: function (event, page) {
+                $.ajax({
+                    type:'GET', 
+                    url: '/abastecimiento/rec_odc_page/'+page,
+                    success: function(data){
+                        $(".page-container").html(data);
+                    }
+                });
+            }
+        };
+        var options2 = {
+            totalPages: <%=Math.ceil(largo2/15)%>,
+            visiblePages: 5,
+            first:"Primero",
+            prev: '<span aria-hidden="true">&laquo;</span>',
+            next: '<span aria-hidden="true">&raquo;</span>',
+            last: "Ultimo",
+            loop: true,
+            onPageClick: function (event, page) {
+                $.ajax({
+                    type:'GET', 
+                    url: '/abastecimiento/view_odc_page/'+page,
+                    success: function(data){
+                        $(".page-container-recibidos").html(data);
+                    }
+                });
+            }
+        };
+
+    $(function(){
+        window.pagObj = $('.pagination').twbsPagination(options).on('page', function (event, page) {
+            console.info(page + ' (from event listening)');
+        });
+    });
+
+    $(function(){
+        window.pagObj = $('.paginationrec').twbsPagination(options2).on('page', function (event, page) {
+            console.info(page + ' (from event listening)');
+        });
+    });
+
+    $("#rec_form").submit(function(e){
+        e.preventDefault();
+        lista = $(this).serializeArray();
+        console.log(lista);
+        var data = {
+            idmat: [],
+            cant: [],
+            mat: [],
+            idoda: [],
+            uni: [],
+            rec: [],
+            numgdd: 0
+        };
+        for(var i =0;i<$(this).serializeArray().length;i++){
+            if(lista[i].name == 'numgdd'){
+                data[lista[i].name] = lista[i].value;
+            }
+            //else if(lista[i].name != 'hab'){
+
+            else if( !(lista[i].name ==  'rec' && lista[i].value == 0) ){
+                data[lista[i].name].push(lista[i].value);
+            
+            }
+            else{
+                i = i + 5;
+            }
+        }
+        if(data['rec'].length){
+            if(confirm("¿Está seguro que desea recibir la Guía de Despacho?")){
+                $.ajax({
+                    type:'POST',
+                    data: data, 
+                    url: '/abastecimiento/crear_ingreso',
+                    success: function(data){
+                        $('#receivedModal').modal('hide');
+                        $(".page-container").html(data);
+                        render_all_oc_rec();    
+                        render_all_gdd_rec();
+                    }
+                });
+            }
+        }
+        else{
+            alert("Debe ingresar al menos un producto.");
+        }
+        
+    });
+
+    function render_all_oc_prec(){
+                $.ajax({
+                    type:'GET', 
+                    url: '/abastecimiento/rec_odc_page/1',
+                    success: function(data){
+                        $("#oc-num-prec").val('');
+                        $(".page-container").html(data);
+                        $(".pagination").twbsPagination('destroy');
+                        $(".pagination").twbsPagination(options);
+                    }
+                });
+
+   }
+    function render_all_oc_rec(){
+                $.ajax({
+                    type:'GET', 
+                    url: '/abastecimiento/view_odc_page/1',
+                    success: function(data){
+                        $("#oc-num-dev").val('');
+                        $(".page-container-recibidos").html(data);
+                        $(".paginationrec").twbsPagination('destroy');
+                        $(".paginationrec").twbsPagination(options2);
+                    }
+                });
+
+   }
+   $("#form-oc-prec").on('submit', function(e){
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            data:{info: $("#oc-num-prec").val()},
+            url: '/abastecimiento/search_oc_prec',
+            success: function(data){
+                $(".page-container").html(data);
+            }
+        });
+
+    });
+   $("#form-oc-dev").on('submit', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            data:{info: $("#oc-num-dev").val()},
+            url: '/abastecimiento/search_oc_dev',
+            success: function(data){
+                $(".page-container-recibidos").html(data);
+            }
+        });
+
+    });
+
+   $("#form-oc-gdd").on('submit', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            data:{info: $("#oc-num-gdd").val()},
+            url: '/abastecimiento/search_gdd_proveedores',
+            success: function(data){
+                $(".page-container-guias").html(data);
+            }
+        });
+
+    });
+</script>

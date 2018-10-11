@@ -1,0 +1,109 @@
+
+  <input type="hidden" name="idoda" value="<%= oda[0].idoda%>">
+<div style="width: 100%;  text-align: center;">
+    <div style="width: 100%; display: flex;">    
+      <div class="panel panel-info" style="margin-right: 0%;width: 30%;margin-left: 3%;">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Proveedor: </div>
+        <div class="panel-body">
+          <%= oda[0].sigla%> - <%= oda[0].razon%>
+        </div>
+
+      </div>
+      <div class="panel panel-info" style="margin-right: 3%;width: 30%;margin-left: 3%;">
+        <!-- Default panel contents -->
+        <div class="panel-heading">Fecha Facturación:</div>
+        <div class="panel-body">
+          <input class="form-control" type="date" name="fecha-facturacion" required>
+        </div>
+      </div>
+      <div class="panel panel-info" style="margin-right: 0%;width: 30%;margin-left: 0%;">
+        <!-- Default panel contents -->
+        <div class="panel-heading">N° Factura:</div>
+        <div class="panel-body">
+          <input style="margin-left: 10%;width: 80%" type="text" name="numeroFactura" id="numeroFactura" class="form-control" required>
+        </div>
+
+      </div>
+
+    </div>
+    <div>
+    </div>
+    <input type="hidden" id="modalIdOda">
+</div>
+<div class="table-responsive" style="margin-top: 15px">
+  <table class="table table-bordered table-hover table-striped" >
+        <thead>
+          <tr>
+            <th>OK</th>
+            <th>Descripción</th>
+            <th style="text-align: center;">Cantidad</th>
+            <th style="text-align: center;">Precio OCA</th>
+            <th style="text-align: left;">Precio Factura</th>
+            <th>Moneda</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%
+          var select_money = [
+            {valor: 'Pesos Chilenos (CLP)',sgl: 'clp'},
+            {valor: 'Dolar (USD)',sgl: 'usd'},
+            {valor: 'Euro (EUR)',sgl: 'eur'},
+            {valor: 'Libra (GLP)',sgl: 'gbp'}
+          ];
+          for(var e=0; e < oda.length; e++){%>
+          <tr>
+            <td style="text-align: center;"><input type="checkbox" name="complete"></td>
+            <td style="width: 30%"><%= oda[e].detalle%></td>
+            <input type="hidden" name="idabast" value="<%= oda[e].idabast%>">
+            <td align="center"><%= oda[e].cantidad%></td>
+            <td align="center" style="width: 15%"><%= oda[e].odacosto%></td>
+            <td><input class="form-control" type="number" name="costo-real"></td>
+            <td>
+              <select class="form-control" name="moneda-factura">
+              <%for(var w=0; w < select_money.length; w++){
+                  if(oda[0].tokenoda.split('@')[6] == select_money[w].sgl){%>
+                    <option value="<%= select_money[w].sgl%>" selected><%= select_money[w].valor%></option>
+              <%}else{%>
+                    <option value="<%= select_money[w].sgl%>"><%= select_money[w].valor%></option>
+              <%}}%>
+              </select>
+            </td>
+          </tr>
+          <%}%>
+        </tbody>
+            <%  
+            var moneda = oda[0].tokenoda.split('@')[6]; 
+            %>
+        <tfoot>
+          <tr>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td align="center"><b>Moneda:</b> <%= moneda.toUpperCase()%></td>
+          </tr>
+        </tfoot>
+    
+  </table>
+</div>
+      <div class="panel panel-warning" style="margin-right: 5%;width: 90%;margin-left: 5%;">
+        <!-- Default panel contents -->
+        <div class="panel-heading" data-toggle="collapse" data-target="#comentPanel" style="cursor: pointer; text-align: center;">Comentario / Observación <i class="fa fa-caret-down desp-arrow"></i></div>
+        <div class="panel-body collapse" id="comentPanel">
+          <textarea style="width: 100%" type="textarea" class="form-control" name="comentario" placeholder="Ingresar comentario ..."></textarea>
+        </div>
+
+      </div>
+<div style="margin-top: 15px">
+    <!--<label for="avatar">Adjuntar PDF:</label>
+    <input type="file" id="pdffac" name="pdffac" accept=".pdf"/>
+    <button onclick="formSubmit()">click me</button>
+  -->
+</div>
+
+
+<script type="text/javascript">
+  
+</script>

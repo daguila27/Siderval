@@ -1,0 +1,125 @@
+<div class="row" style=" margin: 0 ;padding-top: 3%; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%; font-family: 'Oswald'">
+
+<!-- Modal -->
+<div id="opsModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header ops-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Ordenes de Producción: <b class="det-mat"></b></h4>
+      </div>
+      <div class="modal-body ops-body">
+        <p>Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<h1 class="page-header" style="margin: 0; padding-top: 5% ">Cuadro mensual:
+ <% 
+         function formatDate(date){
+             var meses = [
+             "Enero", "Febrero", "Marzo",
+             "Abril", "Mayo", "Junio", "Julio",
+             "Agosto", "Septiembre", "Octubre",
+             "Noviembre", "Diciembre"];
+              var dia = date.getDate();
+              var mes = date.getMonth();
+              var yyy = date.getFullYear();
+              return dia + ' de ' + meses[mes] + ' de ' + yyy;
+        }
+        console.log(formatDate(new Date()));%>
+<small><%= formatDate(new Date())%></small>
+    
+    </h1>
+
+    <h5>
+        <div class="form-group pull-right">
+      <label for="dateSelect">Seleccione periodo:</label>
+      <select class="form-control" id="dateSelect" onchange="chargeList(this)">
+        <option value="2018-01-01@2018-01-31">Enero - 2018</option>
+        <option value="2018-02-01@2018-02-28">Febrero - 2018</option>
+        <option value="2018-03-01@2018-03-31">Marzo - 2018</option>
+        <option value="2018-04-01@2018-04-30">Abril - 2018</option>
+        <option value="2018-05-01@2018-05-31">Mayo - 2018</option>
+        <option value="2018-06-01@2018-06-30">Junio - 2018</option>
+        <option value="2018-07-01@2018-07-31">Julio - 2018</option>
+        <option value="2018-08-01@2018-08-31" selected="selected">Agosto - 2018</option>
+        <option value="2018-09-01@2018-09-30">Septiembre - 2018</option>
+        <option value="2018-10-01@2018-10-31">Octubre - 2018</option>
+        <option value="2018-11-01@2018-11-30">Noviembre - 2018</option>
+        <option value="2018-12-01@2018-12-31">Diciembre - 2018</option>
+      </select>
+    </div>
+    </h5>
+<div class="container renderDiv">
+</div>
+</div>
+<div class="hidden" style="display: none;"></div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        chargeList("#dateSelect");
+    });
+    function ajaxColapse(yo){
+        /*if($(".scroll"+$(yo).data('idmat')).data('charge') == '0' ){*/
+            $.ajax({
+                type: 'POST',
+                data: {idmaterial: $(yo).data('idmat'), token: $("#dateSelect").val()},
+                url: '/abastecimiento/getOP_insu',
+                success: function(data){
+                    $(".det-mat").html($(yo).data('detalle'));
+                    $(".ops-body").html(data);    
+                }
+            });
+        //}
+    }
+
+    function infoProducto(yo){
+      $.ajax({
+          type: 'POST',
+          data: {idmaterial: $(yo).data('idmat'), token: $("#dateSelect").val()},
+          url: '/abastecimiento/getOP_fabricados',
+          success: function(data){
+              $(".det-mat").html($(yo).data('detalle'));
+              $(".ops-body").html(data);    
+          }
+      });
+    }
+
+    function cierreMensual(){
+        $.ajax({
+            type: 'POST',
+            data: {token: $("#dateSelect").val()},
+            url: '/abastecimiento/cerrar_op_mes',
+            beforeSend: function(xml){
+                alert("Descargando informe mensual");
+            },
+            success: function(data){
+                alert(data);
+                $(".hidden").html("<form method='GET' action='/abastecimiento/show_pdf_cierre/"+data+"' target='_blank'></form>");
+                $(".hidden form").submit();
+                chargeList("#dateSelect");
+            }
+        });
+
+    }
+
+    function chargeList(yo){
+        $.ajax({
+                type: 'GET',
+                url: '/abastecimiento/insumos_list/'+$(yo).val(),
+                success: function(data){ 
+                    $(".renderDiv").html(data); 
+                }
+            });
+    }
+
+
+</script>

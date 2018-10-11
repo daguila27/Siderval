@@ -1,0 +1,462 @@
+        </div>
+        <!-- /#page-wrapper -->
+
+
+        <!-- Modal -->
+        <!--<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Seleccione usuario:</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <label for="select-user">Seleccione un proceso: </label>
+                <select class="form-control" id="usuarioFaena">
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="make_faena()">Continuar</button>
+              </div>
+            </div>
+          </div>
+        </div>-->
+        <style type="text/css">
+            .b-number{
+                text-align: center;
+                padding: 0;
+            }
+
+            .b-number:hover{
+                cursor: pointer;
+            }
+            .b-number > div{
+                margin: 0;
+            }
+
+            .b-number h3{
+                margin: 0;
+                align-self: center;
+            }
+            .del-number{
+                text-align: center;
+                padding: 0;
+            }
+
+            .del-number:hover{
+                cursor: pointer;
+            }
+            .del-number > div{
+                margin: 0;
+            }
+
+            .del-number h3{
+                margin: 0;
+            }
+            .pin-input{
+                padding: 0;
+                margin: 2% 0;
+            }
+        </style>
+
+        <div class="modal fade" id="send_step" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form id="modalform">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Continuar Ruta</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group">
+                                <input id="sendnum" name="sendnum" type="number" class="form-control input-lg" min="1" placeholder="N° a enviar" value="1" required>
+                                <span class="input-group-addon totalSend">/100</span>
+                                <div class="input-group-btn">
+                                    <a class="btn btn-lg btn-success" onclick="update('#sendnum',1)"><i class="fa fa-caret-up"></i></a>
+                                    <a class="btn btn-lg btn-danger" onclick="update('#sendnum',-1)"><i class="fa fa-caret-down"></i></a>
+                                    <a class="btn btn-lg btn-default" data-toggle="collapse" data-target="#demo"><i class="fa fa-calculator"></i></a>
+                                    <!--<a class="btn btn-lg btn-default"><i class="fa fa-calculator"></i></a>-->
+                                </div>
+                            </div>
+                             <div class="row collapse" id="demo" style="padding: 0% 20%; margin: 1% 0;">
+                                <input type="hidden" name="username"  value="planta">
+                                <input type="hidden" name="password" value="sider">           
+                                <input type="hidden" name="etapa" id="etapa">
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="1">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>1</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="2">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>2</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="3">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>3</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="4">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>4</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="5">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>5</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="6">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>6</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="7">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>7</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="8">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>8</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-sm-4 col-md-4 b-number" data-valor="9">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>9</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            <div class="col-md-offset-4 col-sm-offset-4 col-sm-4 col-md-4 b-number" data-valor="0">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>0</h3></div>
+                                  </div>
+                                </div> 
+                            </div>
+                            <div class="col-sm-4 col-md-4 del-number" data-valor="9">
+                                <div class="panel-group">
+                                  <div class="panel panel-default">
+                                    <div class="panel-body"><h3>Borrar</h3></div>
+                                  </div>
+                                </div>   
+                            </div>
+                            
+                        </div>
+                            <input type="hidden" id="prod_id" value="">
+                            <input type="hidden" id="e_act" value="<%= proceso%>">
+                            <input type="hidden" id="sgt_etapa" value="">
+                            <p class="p-sigetp"></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" id="dism" data-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary" >Enviar</button>
+                        </div><!-- /.modal -->
+                    </form>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+<div class="modal fade" id="reportNotif" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">He recepcionado: </h4>
+                </div>
+                <div class="modal-body">
+                        <input type="hidden" id="totalEsperado">
+                        <input type="hidden" id="idprodModal">
+                        <input type="hidden" id="idnotifModal">
+                        <ul class="list-group">
+                          <li class="list-group-item">
+                            <h4 style="margin: 0; padding: 5% 5%; width: 100%" data-toggle="collapse" data-target="#opcion1">Menos material que el indicado</h4>
+                            <div id="opcion1" class="collapse">
+                                <label>Especifique cantidad recibida:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control input-lg" min="1" id="menMat" value="1">
+                                    <div class="input-group-btn">
+                                        <a class="btn btn-lg btn-success" onclick="update('#menMat',1)"><i class="fa fa-caret-up"></i></a>
+                                        <a class="btn btn-lg btn-danger" onclick="update('#menMat',-1)"><i class="fa fa-caret-down"></i></a>
+                                        <button type="submit" class="btn btn-primary btn-lg enviarError" id="mat-men" data-idinput="menMat" data-dismiss="modal" >Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="click-animado"></div>
+
+                          </li>
+                          <style type="text/css">
+                              #click-animado{
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                width: 50px;
+                                height: 50px;
+                                border: none;
+                                background-size: cover;
+                                background-image: url('../assets/img/clickup.png');
+                                animation: animacionclick 1.5s linear 0.3s;  
+                                animation-iteration-count: infinite;
+                              }
+                              @keyframes animacionclick{
+                                0% {background-image: url('../assets/img/clickup.png');}
+                                50% {background-image: url('../assets/img/clickdown.png');}
+                                100% {background-image: url('../assets/img/clickup.png');}
+                              }
+                          </style>
+                           
+                          <li class="list-group-item">
+                            <h4 style="margin: 0; padding: 5% 5%; width: 100%" data-toggle="collapse" data-target="#opcion2">Material dañado</h4>
+                            <div id="opcion2" class="collapse">
+                                <label>Especifique cantidad dañada:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control input-lg" min="1" value="1" id="danMat">
+                                    <div class="input-group-btn">
+                                        <a class="btn btn-lg btn-success" onclick="update('#danMat',1)"><i class="fa fa-caret-up"></i></a>
+                                        <a class="btn btn-lg btn-danger" onclick="update('#danMat',-1)"><i class="fa fa-caret-down"></i></a>
+                                        <button type="submit" data-dismiss="modal" class="btn btn-primary btn-lg enviarError" id="mat-dan" data-idinput="danMat">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                          </li>
+
+                          <li class="list-group-item">
+                            <h4 style="margin: 0; padding: 5% 5%; width: 100%" data-toggle="collapse" data-target="#opcion3">Otra razon</h4>
+                            <div id="opcion3" class="collapse">
+                                <label>Especifique cantidad con detalle:</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control input-lg" min="1" value="1" id="otroMat">
+                                    <div class="input-group-btn">
+                                        <a class="btn btn-lg btn-success" onclick="update('#otroMat',1)"><i class="fa fa-caret-up"></i></a>
+                                        <a class="btn btn-lg btn-danger" onclick="update('#otroMat',-1)"><i class="fa fa-caret-down"></i></a>
+                                        <button type="submit" data-dismiss="modal" class="btn btn-primary btn-lg enviarError" id="mat-otro" data-idinput="otroMat">Enviar</button>
+                                    </div>
+                                </div>
+                            </div>
+                          </li>
+                        </ul>  
+                </div>
+                <div class="modal-footer">
+                </div><!-- /.modal -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- jQuery -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="/vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="/vendor/raphael/raphael.min.js"></script>
+    <script src="/vendor/morrisjs/morris.min.js"></script>
+    <script src="/data/morris-data.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/dist/js/sb-admin-2.js"></script>
+    <input type="hidden" id="thisetapa" value="<%= proceso%>">
+
+</body>
+    <script type="text/javascript">
+
+        $(".b-number").on('click', function(e){
+            e.preventDefault();
+            $("#sendnum").val(''+$("#sendnum").val()+$(this).data('valor'));
+        });
+        $(".del-number").on('click', function(e){
+            e.preventDefault();
+            $("#sendnum").val(''+$("#sendnum").val().substring(0, $("#sendnum").val().length-1) );
+        });
+
+
+
+
+        function update(id,num){
+            $(id).val(parseInt($(id).val()) + num);
+        }
+        //$('#triggermodal').trigger('click');
+        function make_faena(){
+                
+                $.ajax({
+                    type: 'GET',
+                    url: 'faena/render_proceso/'+$("#thisetapa").val(),
+                    success: function(data){
+                        $("#page-wrapper").html(data);
+                        $.ajax({
+                            type: 'GET',
+                            url: 'faena/render_notificaciones/'+$("#thisetapa").val(),
+                            success: function(data){
+                                $(".notificaciones").html(data);
+                                //$(".badge-notificaciones").html($(".open-notif").data('cant'));
+                            }
+                        });
+                    }
+                });
+
+        }
+        function show_faena(){
+                $.ajax({
+                    type: 'GET',
+                    url: 'faena/render_proceso/'+$("#thisetapa").val(),
+                    success: function(data){
+                        $("#page-wrapper").html(data);
+                    }
+                });   
+        }
+
+        function add_notificacion(notif){
+            var key = "fa"+$("#thisetapa").val();
+            $.ajax({
+            type: 'GET',
+            url: 'faena/add_notificacion/'+notif.idproduccion+'/'+notif.cant+'/'+key,
+            success: function(data){
+                show_faena();
+                $(".notificaciones").html(data);
+                //$(".open-notif").data('cant', parseInt($(".open-notif").data('cant')) + 1);
+                //$(".badge-notificaciones").html($(".open-notif").data('cant'));
+                }
+            });
+        }
+
+
+        make_faena();
+        var io = io();
+        io.on('refreshfaena<%= etapaactual%>', function(){
+            //alert("Refrescar la pagina");
+
+            //add_notificacion(notif);
+            //show_faena();
+            make_faena();
+        });
+
+
+        
+        $("form#modalform").on('submit', function(e){
+            e.preventDefault();
+            var data = {};
+            console.log($("#sendnum").val());
+            data.idprod = $("#prod_id").val();
+            data.newetapa = $("#sgt_etapa").val();
+            data.sendnum = $("#sendnum").val();
+            data.etapa_act = $("#e_act").val();
+
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: 'faena/next_step',
+                success: function(data){
+                    if(data == "si"){
+                        var input = {
+                            idproduccion: $("#prod_id").val(),
+                            cantidad: $("#sendnum").val(),
+                            key: 'fa'+$("#sgt_etapa").val()
+                        };
+                        var info = {
+                            idproduccion: $("#prod_id").val(),
+                            enviado: $("#sendnum").val(),
+                            actual: $("#e_act").val(),
+                            sig: $("#sgt_etapa").val()
+                        };
+                        io.emit('addNotificacion', input);
+                        io.emit('refreshJefeprod', "prod"+$("#prod_id").val()+"-"+$("#sgt_etapa").val());
+                        show_faena();
+                        $("#dism").click();
+                    }
+                }
+            });
+            /*$("#idordenproduccion").val($(this).data('id'));
+            $("#idproducido").val($(this).data('idp'));
+            $("#detallesProducido").html("<b style='margin-left: 10px'>Detalles: </b> "+$(this).data('detalle'));
+            var next = $(this).data('ruta');
+            next = next.split(',')[1];
+            $("#nextEtapa").val(next);
+            $("#nextProccess").html("<b style='margin-left: 10px'>Proxima etapa: </b> "+ next);
+            $("#cantModal").html($(this).data('cantidad'));*/
+        });
+
+        
+
+    $(".enviarError").on('click', function(e){
+            e.preventDefault();
+            var inputid = $(this).data("idinput");
+            var datos = {};
+            var razon;
+            datos.error = $(this).attr('id');
+            if(inputid == 'menMat'){datos.standby = $("#totalEsperado").val() - $("#"+inputid).val(); razon="Menos";}
+            else if(inputid == 'otroMat'){datos.standby = $("#totalEsperado").val() - $("#"+inputid).val(); razon="Otro";}
+            else{datos.standby = $("#"+inputid).val();razon="Dañado(s)";}
+            datos.idproduccion = $("#idprodModal").val();
+            datos.idnotificacion = $("#idnotifModal").val();
+            datos.thisetapa = $("#thisetapa").val(); 
+            $.ajax({
+                type: 'POST',
+                data: datos,
+                url: 'faena/report_error',
+                success: function(data){
+                    show_faena();
+                    var input = {
+                        idproduccion: datos.idproduccion,
+                        cantidad: datos.standby,
+                        razon: razon,
+                        etapa: datos.thisetapa
+                    };
+                    io.emit('addError', input);
+                    $(".notificaciones").html(data);
+                    $(".collapse").collapse('hide');
+                }
+            });
+        });
+
+
+$(function(){
+    var curDown = false,
+        curYPos = 0,
+        curXPos = 0;
+    $(window).mousemove(function(m){
+      if(curDown === true){
+       $(window).scrollTop($(window).scrollTop() + (curYPos - m.pageY)); 
+       $(window).scrollLeft($(window).scrollLeft() + (curXPos - m.pageX));
+      }
+    });
+    
+    $(window).mousedown(function(m){
+      curDown = true;
+      curYPos = m.pageY;
+      curXPos = m.pageX;
+    });
+    
+    $(window).mouseup(function(){
+      curDown = false;
+    });
+  });
+
+    </script>
+
+</html>

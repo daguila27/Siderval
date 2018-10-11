@@ -1,0 +1,68 @@
+<h1 class="page-header" style="margin: 0; padding-top: 5%">OC's del Cliente:  <%= detail.razon%></h1>
+
+	
+
+<div class="row">
+	<form id="form-cliente">
+		<div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top:10px;display: flex;">
+	    	<input style="width: 80%" id="cl-detail" type="text" class="form-control" placeholder="Buscar N° OC" tabindex="1">
+	    	<button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+	    	<button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3"><i class="glyphicon glyphicon-refresh"></i></button>
+	  	</div>
+  	</form>
+	<nav aria-label="Page navigation">
+	        <ul class="pagination" id="paginationup">
+	        </ul>
+	    </nav>
+  	<div class="pagina" style="padding: 0 10%;">
+  		
+  	</div>
+  	<nav aria-label="Page navigation">
+	        <ul class="pagination" id="paginationdown">
+	        </ul>
+	    </nav>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+    
+
+    
+
+   var options = {
+            totalPages: <%=Math.ceil(largo/15)%>,
+            visiblePages: 5,
+            first:"Primero",
+            prev: '<span aria-hidden="true">&laquo;</span>',
+            next: '<span aria-hidden="true">&raquo;</span>',
+            last: "Ultimo",
+            loop: true,
+            onPageClick: function (event, page) {
+                $.ajax({
+                    type:'GET', 
+                    url: '/plan/odc_client_page/'+page+'/<%=idc%>',
+                    success: function(data){
+                        $(".pagina").html(data);
+                    }
+                });
+            }
+        };
+
+    $(function(){
+        window.pagObj = $('.pagination').twbsPagination(options).on('page', function (event, page) {
+            console.info(page + ' (from event listening)');
+        });
+    });
+
+
+</script>

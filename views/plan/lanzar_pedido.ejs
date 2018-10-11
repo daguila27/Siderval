@@ -1,0 +1,430 @@
+<div class="row" style=" margin: 0 ;padding-top: 3%;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<!--<button id="button-a">Crear EXCEL</button>-->
+<script type="text/javascript">
+    /*function s2ab(s) { 
+                var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+                var view = new Uint8Array(buf);  //create uint8array as viewer
+                for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+                return buf;    
+    }
+    var wb = XLSX.utils.book_new();
+    wb.Props = {
+                Title: "SheetJS Tutorial",
+                Subject: "Test",
+                Author: "Red Stapler",
+                CreatedDate: new Date(2017,12,19)
+        };
+        wb.SheetNames.push("Test Sheet");
+        var ws_data = [['hello' , 'world']];  //a row with 2 columns
+        var ws = XLSX.utils.aoa_to_sheet(ws_data);
+        wb.Sheets["Test Sheet"] = ws;
+        var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+
+        $("#button-a").click(function(){
+               saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+        });*/
+
+</script>
+<div class="col-md-10 col-md-offset-1 panel-creacion">
+        <div class="panel panel-primary cargando-panel" style="display: none;">
+            <div class="panel-heading">
+                <div style="width: 100%;text-align: center;">
+                    <img style="width: 25%" src="/loading.gif">
+                </div>
+            </div>
+        </div>
+        <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
+        <div class="panel panel-info panel-defecto" style="display: none;">
+
+            <div class="panel-heading">
+                    <div class="dropdown pull-right">
+                      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></button>
+                      <ul class="dropdown-menu">
+                        <li class="ped-option" onclick="saveState(this)"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                        <li class="ped-option" onclick="loadState(this)"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                        <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                        <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                      </ul>
+                    </div>
+                    <div style="display: flex;">
+                        <div style="width: 50%">
+                            <h3 style="width: 100%">Registrar Orden de Compra: </h3>
+                        <!--<div>
+                            <button class="btn btn-primary" onclick="saveState()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+                            <button class="btn btn-primary" onclick="loadState()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                        </div>-->
+                        </div>                
+                        <div style="width: 50%">
+                            <div style="width: 100%; display: flex;">
+                                <div style="width: 45%; margin-right: 5px">
+                                    <label for="setdates">
+                                        Ingresar fecha para todos: 
+                                    </label>
+                                    <div class="input-group"  style="width:30%;margin-left: 20%;margin-top: 5px">
+                                        <span class="input-group-addon" ><i class="fa fa-calendar-o"></i></span>
+                                        <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="width: 50%">
+                                  <label for="moneda">Seleccione Moneda:</label>
+                                  <select class="form-control" id="moneda">
+                                    <option value="usd">Dolares (USD)</option>
+                                    <option value="eur">Euros (EUR)</option>
+                                    <option value="clp" selected>Pesos Chilenos (CLP)</option>
+                                    <option value="gbp">Libra (GBP)</option>
+                                </select>
+                                </div>
+
+                            </div>
+                            <div class="form-group" style="width: 100%">
+                              <label for="cliente">Seleccione cliente:</label>
+                              <select class="form-control" id="cliente" onchange="compNum(this)">
+                              <%for(var t=0; t < cli.length; t++){%>
+                                <option value="<%=cli[t].idcliente%>"><%= cli[t].sigla%> - <%=cli[t].razon%></option>
+                              <%}%>  
+                              </select>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <form id="send_of">
+            <div style="overflow-y: scroll; max-height: 300px;">
+            <table class="table table-striped sectionSave" style="margin: 0">
+                <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Fabricación</th>
+                    <th>Aleación</th>
+                    <th>Fecha de Entrega</th>
+                    <th>Cantidad</th>
+                    <th>Stock</th>
+                    <th>Precio Unitario</th>
+                    <th>Bloquear</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="session_fabrs">
+
+                </tbody>
+            </table>
+            </div>
+            <div class="panel-footer">
+                <div class="form-inline">
+                    <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
+                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
+                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                </div>
+
+            </div>
+            </form>
+        </div>
+
+
+</div>
+<div class="col-md-10 col-md-offset-1">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>Selección de Productos</h3>
+        </div>
+        <div class="panel-body">
+            <form id="strimform">
+                <div class="form-inline">
+                    <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
+                    <select name="caract" class="form-control strim_input" id="caract">
+                        <option value="0">Cualquiera</option>
+                        <%for(var i = 0;i< caracts.length;i++){%>
+                            <option value="<%= caracts[i].idcaracteristica%>"><%= caracts[i].cnom%></option>
+                        <%}%>
+                    </select>
+                    <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Descripción</th>
+                <!--<th>Caracteristica</th>-->
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="prefabrs">
+            </tbody>
+        </table>
+
+    </div>
+</div>
+</div>
+<style type="text/css">
+    .predic_text div{  
+        background-color: white;
+        /*border: dotted 1px black;*/
+        position: absolute;
+        z-index: 10;
+    }
+</style>
+<script>
+    $(document).ready(function(){
+        loadState();
+    });
+    function refresh(){
+        var data ={};
+        data.caract = $("#caract").val();
+        data.det = $("#det").val();
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/buscar_mat',
+            success: function(data){
+                $("#prefabrs").html(data);
+                //$("#caract").val('0');
+            }
+        });
+
+    }
+    function add_prefabr(yo) {
+        $.ajax({
+            type: 'POST',
+            data: $(yo).data(),
+            url: '/plan/addsession_prepeds',
+            success: function(data){
+                $("#session_fabrs").append(data);
+                saveState();
+            }
+        });
+    }
+    function drop(yo){
+        $(yo).closest('tr').remove();
+    }
+    $("#strimform").on('submit',function(e){
+        e.preventDefault();
+        refresh();
+    });
+    $("#caract").on('change',function(){
+       refresh();
+    });
+    $("#setdates").on('change',function(){
+        var valor = $(this).val();
+        $("input[type=date]").each(function(e){
+            $(this).val(valor);
+        })
+    });
+    /*$(".strim_input").on("change",function(e){
+        var data ={};
+        data.caract = $("#caract").val();
+        data.det = $("#det").val();
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/producidos_stream',
+            success: function(data){
+                $("#prefabrs").html(data);
+            }
+        });
+
+    });*/
+    $("#num").on('keyup', function(e){
+            e.preventDefault();
+            if($(this).val() != ''){
+                $.ajax({
+                    type: 'GET',
+                    url: '/plan/found_num/'+$(this).val()+'/'+$("#cliente").val(),
+                    success: function(data){
+                        if(data == 'colapse'){
+                            $('.mensaje').html("Número No Disponible");
+                            $(".contenedor").css('height', '40px');
+                            $("#of_submit").prop('disabled', true);
+                        }
+                        else{
+                            $('.mensaje').html("Número Disponible");
+                            $(".contenedor").css('height', '40px');
+                            $("#of_submit").prop('disabled', false);    
+                        }
+                    }
+                });
+            }
+            else{
+                $(".contenedor").css('height', '0px');
+                $("#of_submit").prop('disabled', false);
+            }
+    });
+    function compNum(yo){
+        if($("#num").val() != ''){
+                $.ajax({
+                    type: 'GET',
+                    url: '/plan/found_num/'+$("#num").val()+'/'+$(yo).val(),
+                    success: function(data){
+                        if(data == 'colapse'){
+                            $('.mensaje').html("Número No Disponible");
+                            $(".contenedor").css('height', '40px');
+                            $("#of_submit").prop('disabled', true);
+                        }
+                        else{
+                            $('.mensaje').html("Número Disponible");
+                            $(".contenedor").css('height', '40px');
+                            $("#of_submit").prop('disabled', false);    
+                        }
+                    }
+                });
+            }
+            else{
+                $(".contenedor").css('height', '0px');
+                $("#of_submit").prop('disabled', false);
+            }
+    }
+
+
+     $("#send_of").submit(function(e){
+        e.preventDefault();
+        lista = $(this).serializeArray();
+        console.log(lista);
+        var data = {
+            idm: [],
+            idp: [],
+            fechas: [],
+            cants: [],
+            cliente: $("#cliente").val(),
+            moneda: $("#moneda").val(),
+            prov: [],
+            precio: [],
+            lock: []
+        }
+        for(var i =0;i<$(this).serializeArray().length;i++){
+            if(lista[i].name != 'nroordenfabricacion'){
+                data[lista[i].name].push(lista[i].value);
+            } else{
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        data.lock = [];
+        $("#send_of :checkbox").each(function(){
+           if($(this).is(':checked')){
+             data.lock.push('1');
+           }
+           else{
+             data.lock.push('0');  
+           }
+           //console.log($(this).val());
+        });
+        console.log(data);
+        if(confirm("¿Esta seguro que desea crear la OC?")){
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/plan/crear_odc',
+                success: function(data){
+                    if(data == 'error'){
+                        alert("La OC que intenta crear es inválida");
+                    } 
+                    else{
+                        var input = [$("#cliente").val(), $("#num").val()];
+                        io.emit('abastNotificacion', input);
+                        if(data != 'none'){
+                            data = [data, $("#cliente").val()];
+                            emitToast(data);
+                        }
+                        $.ajax({
+                            type: 'GET',
+                            url: '/plan/lanzar_of/pedido',
+                            success: function(html){    
+                                    $("#page-wrapper").html(html);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
+    /*$(".predic_text").keyup(function(){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/get_client_pred/'+$(this).children('input').val(),
+            success: function(data){
+                $(this).children('div').html();
+            }
+        });
+    });*/
+    function getPredictions(yo){
+        if($(yo).children('input').val()!=''){
+               $.ajax({
+                    type: 'GET',
+                    url: '/plan/get_client_pred/'+$(yo).children('input').val(),
+                    success: function(data){
+                        $(yo).children('div').css('width', $(yo).width()+"px");
+                        $(yo).children('div').html(data);
+                    }
+                }); 
+        }
+        else{
+            $(yo).children('div').html('');         
+        }
+    }
+
+    function saveState(){
+        var lista = $("#send_of").serializeArray();
+        console.log(lista);
+        var data = {
+            idm: [],
+            idp: [],
+            fechas: [],
+            cants: [],
+            cliente: $("#cliente").val(),
+            moneda: $("#moneda").val(),
+            prov: [],
+            precio: [],
+            lock: []
+        }
+        for(var i=0; i < $("#send_of").serializeArray().length; i++){
+            if(lista[i].name != 'nroordenfabricacion'){
+                data[lista[i].name].push(lista[i].value);
+            } else{
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        data.lock = [];
+        $("#send_of :checkbox").each(function(){
+           if($(this).is(':checked')){
+             data.lock.push('on');
+           }
+           else{
+             data.lock.push('off');  
+           }
+        });
+        //var html = $(".sectionSave").html();
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/saveStateOCBD',
+            beforeSend: function(xhr){
+                //alert("Guardando!!");
+
+                $(".guardado_automatico").text("Guardando estado de OC ...");
+            },
+            success: function(data){
+                //alert("Estado de OC guardado");
+                $(".guardado_automatico").text("Guardado por ultima vez: "+ new Date().toLocaleString());
+
+            }
+        });
+    }
+
+    function loadState(){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/loadStateOCBD',
+            beforeSend: function(xhr){
+                $(".guardado_automatico").css('display', 'none');
+                $(".panel-defecto").css('display', 'none');
+                $(".cargando-panel").css('display', 'block');
+                setTimeout(function(){  }, 1000);
+            },
+            success: function(data){
+                var text = $(".guardado_automatico").text();
+                $(".panel-creacion").html(data);
+                $(".guardado_automatico").text(text);
+            }
+        });
+    }
+</script>

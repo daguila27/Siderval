@@ -1,0 +1,105 @@
+.total td b{
+	display: flex;
+}
+.in_text b{
+	width: 100%;
+	display: flex;
+}
+.save button{
+	font-family: 'Oswald', sans-serif;
+}
+
+.bundles{
+	margin-bottom: 20px;
+}
+#input_tags input{
+	font-size: 25px;
+}
+.in_text{
+	width: 100px;
+	margin: 0;
+	padding: 0; 
+}
+.in_text div{
+	display: flex;
+}
+
+.table table-bordered tr td{
+	padding: 5px;
+	margin: 0;
+}
+
+#list_product tr{
+	width: 100%;
+}
+#list_product tr td{
+}
+#tabla_productos{
+	margin-top: 30px;
+}
+.input_product button{
+	margin-top: 10px;
+}
+
+#totalProduct{	
+	margin-top: 10px;
+}
+
+#head{
+	background-color: rgb(240, 240, 240);
+}
+#precio_unitario{
+	display: flex;
+}
+#precioCosto{
+	font-size: 20px;
+	padding: 15px; 
+}
+#add_tag{
+	font-family: 'Oswald', sans-serif;
+	margin-bottom: 20px;
+	border: solid 2px rgb(50, 200, 240);
+	cursor: pointer;
+	text-align: center; 
+	width: 100%; 
+	background-color: rgb(36, 173, 247); 
+	/*opacity: 0.25; 
+	filter: alpha(opacity=50);*/
+}
+#add_tag:hover{
+	background-color: rgb(100, 100, 100);
+}
+
+#add_tag h4{
+	color: white;
+	padding: 10px 0px; 
+	margin: 0;
+}
+.row{
+	margin: 0;
+	padding: 0;
+}
+.col-sm-2{
+	font-family: 'Oswald', sans-serif;
+	opacity: 1; 
+	filter: alpha(opacity=50);
+	cursor: pointer;
+	margin: 0;
+	padding: 0; 
+	background-color: rgb(36, 173, 247); 
+}
+.col-sm-2:hover{
+	background-color: rgb(100, 100, 100);
+}
+.col-sm-2 p{	
+	color: white;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	margin-left: 10px;
+	margin-right: 0;
+	padding: 0;
+}
+
+.buttons{
+	display: flex;
+}

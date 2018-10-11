@@ -1,0 +1,112 @@
+<h1 class="page-header">Materias Primas</h1>
+
+<%
+function letraMayus(string) {
+     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+} 
+function unidad_medida(un, cant){
+	switch(un){
+		case 'UN':
+			if(cant!=1){return 'unidades'}
+			else{return 'unidad'}
+			break;
+		case 'LT':
+			if(cant!=1){return 'litros'}
+			else{return 'litro'}
+			break;
+		case 'KG':
+			if(cant!=1){return 'kilogramos'}
+			else{return 'kilogramo'}
+			break;
+	}
+}
+%>
+
+<style type="text/css">
+	#tablaStock_wrapper{
+		padding: 1%;
+	}
+</style>
+
+<div class="panel panel-primary">
+	<div class="panel-heading">Stock de insumos y materias primas: <a class="btn btn-warning genguia" ><i class="fa fa-download"></i> Generar Excel</a>
+	</div>
+	<table id="tablaStock" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+
+
+	        <thead>
+	            <tr>
+	            	<!--<th>Codigo</th>-->
+	                <th rowspan="2" style="text-align: center;">Detalle</th>
+	                <th colspan="3" style="text-align: center;">Stock</th>
+	                <th rowspan="2" >Unidad</th>
+	                <th rowspan="2" >Estado</th>
+
+	            </tr>
+				  <tr>
+				    <th>Real</th>
+				    <th>Aviso</th>
+				    <th>Crítico</th>
+				  </tr>
+	        </thead>
+	        <tbody>
+	        <%if(mat.length > 0){
+	        	var estado;
+	        	for(var j=0; j < mat.length; j++){
+	        		if(mat[j].stock <= mat[j].stock_c){
+	        			estado = "Critico";
+	        		%>
+	        			<tr class="danger">
+	        		<%}else if(mat[j].stock > mat[j].stock_c && mat[j].stock <= mat[j].stock_i){
+	        			estado = "Abastecido";
+	        		%>
+	        			<tr class="warning">
+	        		<%}else{
+	        			estado = "Abastecido";
+	        		%>
+	        			<tr class="success">
+	        		<%}%>
+	        		<!--<td><%= mat[j].codigo%></td>-->
+	        		<td><%= mat[j].descripcion%></td>
+	        		<!--<td><%= mat[j].sigla%></td>-->
+	        		<td><%= mat[j].stock%></td>
+	        		<td><%= mat[j].stock_i%></td>
+	        		<td><%= mat[j].stock_c%></td>
+	        		<td><%= mat[j].u_medida%></td>
+	        		<td><%= estado%></td>
+	        	</tr>
+	        <%}
+	        }
+	        else{%>
+	        	<tr>
+	        		No hay materiales en bodega.
+	        	</tr>
+	        <%}%>	
+	        </tbody>
+	</table>
+</div>
+
+
+<script type="text/javascript">
+	setDataTable("#tablaStock");
+    $(".genguia").click(function(e){
+        //e.preventDefault();
+        var yo = $(this);
+
+        if($(yo).attr('class').split(" ")[2] == 'genguia'){
+            $.ajax({
+                type: 'GET',
+                url: 'abastecimiento/xlsx_stock',
+                success: function(data){
+                    console.log(data);
+                    yo.attr("href",data);
+                    yo.attr("download","stock_maestro.xlsx");
+                    yo.removeClass("genguia");
+                    yo.removeClass("btn-warning");
+                    yo.addClass("btn-success");
+                    yo.html("<i class='fa fa-download'></i> Descargar excel");
+                }
+            });
+        }
+    });
+</script>

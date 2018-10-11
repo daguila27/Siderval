@@ -1,0 +1,113 @@
+<h1 class="page-header">Ordenes de fabricación:</h1>
+
+
+
+<div class="row" style="align-content: center;">
+  <input type="hidden" id="data" value="<%= data.length%>">
+  <%
+    var id;
+    for(var i=0; i< data.length; i++){
+      if(i==0){%>
+          <div class="col-sm-12 col-md-12" style="border: solid 1px rgb(230,230,230); margin-bottom: 10px;box-shadow: 5px 5px 5px #888888;">
+
+              <h4>Orden de fabricación <b>#<%=data[i].numordenfabricacion%></b>:</h4>   
+             <%var entrega = data[i].f_entrega
+             entrega = entrega.getDay()+"/"+(1+entrega.getMonth())+"/"+entrega.getFullYear();%>
+             <p><b>Fecha de entrega: </b><%=entrega%></p>
+             <table class="table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Ruta Faena</th>
+                  <th>Restantes</th>
+                  <th>Enviar</th>
+                </tr>
+              </thead>
+              <tbody>
+      <% }
+      if(id != data[i].idorden_f && i!=0){ %>
+          </tbody>
+          </table>
+              <button type="button" class="btn btn-success sendtoQueue" data-id="<%= id%>" data-toggle="modal" data-target="#material-modal" style="margin: 10px">Enviar a cola</button>
+          </div><!--se cierra el col-sm-4 -->
+          <div class="col-sm-12 col-md-12" style="border: solid 1px rgb(230,230,230); margin-bottom: 10px;box-shadow: 5px 5px 5px #888888;">
+              <h4>Orden de fabricación <b>#<%=data[i].numordenfabricacion%></b>:</h4>
+             <%var entrega = data[i].f_entrega
+             entrega = entrega.getDay()+"/"+(1+entrega.getMonth())+"/"+entrega.getFullYear();%>
+             <p><b>Fecha de entrega: </b><%=entrega%></p>
+  
+             <table class="table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Ruta Faena</th>
+                  <th>Restantes</th>
+                  <th>Enviar</th>
+                </tr>
+              </thead>
+              <tbody>
+      <%}
+      id=data[i].idorden_f;%>
+          <tr class="info">
+            <td><%=data[i].detalle%></td>
+            <td><%=data[i].ruta%></td>
+            <td id="res<%=i%>"><input type="hidden" value="<%=data[i].restantes%>"><%=data[i].restantes%></td>
+            <td><input type="number"  min="0" max="<%=data[i].restantes%>" value="0" class="keyupQueue"  data-idof="<%=data[i].idordenfabricacion%>" data-idf="<%=data[i].idfabricaciones%>" id="input<%=i%>"></td>
+
+        </tr>
+      <%if(i == data.length-1){%>
+          </tbody>
+          </table>
+              <button type="button" class="btn btn-success sendtoQueue" data-id="<%=data[i].idordenfabricacion%>" data-toggle="modal" data-target="#material-modal" style="margin: 10px">Agregar a orden de producción</button>
+
+          </div>
+      <%}%>
+
+  <%}%>
+
+</div>
+
+<script type="text/javascript">
+    var data = $("#data").val();
+    var array = [];
+    for(var i=0; i<data; i++){
+          array[i] = {
+            id_ordenfabricacion: $("#input"+i).data('idof'),
+            id_fabricacion: $("#input"+i).data('idf'),
+            cantidad: $("#input"+i).val() 
+          };
+    }
+    $(".keyupQueue").on("keyup", function(e){
+          e.preventDefault();
+          var indice = $(this).attr('id').substring(5);
+          array[indice].cantidad = $(this).val();
+    });
+
+
+    $(".sendtoQueue").on('click', function(e){
+        e.preventDefault();
+        var idordenfabricacion = $(this).data('id');
+        var arrayAux = [];
+        var cuenta = 0;
+        for(var j=0; j< array.length; j++){
+            if(array[j].id_ordenfabricacion == idordenfabricacion){
+              arrayAux[cuenta] = array[j];
+              var res = $("#res"+j+" input").val();
+              res -= array[j].cantidad;
+              $("#res"+j).html("<input type='hidden' value='"+res+"'>"+res);
+              $("#input"+j).val(0);
+              cuenta++;
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            data: {'fabricaciones': arrayAux},
+            url: 'jefeprod/update_restantes',
+            success: function(data){
+              alert(data);
+            }
+        });
+    });
+</script>
+
+

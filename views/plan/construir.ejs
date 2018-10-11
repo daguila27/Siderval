@@ -1,0 +1,57 @@
+<h3 class="page-header">Construir Producto: </h3>
+<div class="col-md-8 col-md-offset-2">
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>N° Material</th>
+                <th>Descripción</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if(data.length){
+                for(var i = 0;i<data.length;i++){ %>
+            <tr>
+                <td><%= data[i].idmaterial%></td>
+                <td><%= data[i].detalle%></td>
+                <td><%= data[i].pdf%></td>
+            </tr>
+            <%
+                }
+            } else {%>
+            <tr>
+                <td>No Hay productos para mostrars</td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+<div class="col-md-10 col-md-offset-1">
+    <div class="form-inline">
+        <input name="det" placeholder="Descripción" class="form-control" onkeyup="table()">
+        <input name="caract" class="form-control" placeholder="Característica" onkeyup="table()">
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    function mostrar(){
+        $(function(){
+            var tipo_producto = $("#tipo_producto").val();
+            $.ajax({
+                type: 'POST',
+                data: {'tipo_producto': tipo_producto},
+                url: 'ficha_lanzamiento',
+                success: function(data){
+                    $(".ficha").html(data);
+                }
+            });
+        });
+
+    }
+
+</script>

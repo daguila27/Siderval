@@ -1,0 +1,512 @@
+
+<h1>
+    <!--<p class="pull-right ayuda" href="#help" data-toggle="collapse"  aria-expanded="true" aria-controls="help"><i class="fa fa-info-circle"></i></p>-->
+</h1>
+<style type="text/css">
+  .setCC{
+    cursor: pointer;
+  }
+</style>
+<%
+    function toFixed(num, fixed) {
+        var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+        return num.toString().match(re)[0];
+    }
+    %>
+<div id="help" class="panel-collapse collapse" role="tabpanel" aria-labelledby="help" style="margin: 0 5%;background-color: rgb(202,202,202);">
+              <p style="padding: 20px;font-style: italic;">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              </p> 
+            </div>
+
+
+
+<div class="col-md-10 col-md-offset-1 panel-creacion" style="margin-top: 20px">
+    <div class="panel panel-primary cargando-panel" style="display: none;">
+        <div class="panel-heading">
+            <div style="width: 100%;text-align: center;">
+                <img style="width: 25%" src="/loading.gif">
+            </div>
+        </div>
+    </div>
+    <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
+        <form id="send_of">
+    <div class="panel panel-primary panel-defecto">
+            <div class="panel-heading" style="display: flex">
+                <div style="width: 45%">
+                <h3>Lanzar Orden de Compra: #<%=last%></h3>
+                <div>
+                        <button class="btn btn-primary" onclick="saveState()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+                        <button class="btn btn-primary" onclick="loadState()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                    </div>
+                </div>
+                <div style="width: 20%">
+                        <label>Proveedor: </label>
+                        <div class='predic_text' onkeyup='getPredictions(this)'><input type='text' name='prov' autocomplete='off' required></input><div></div></div>         
+                </div>
+                <div style="width: 30%; margin-left: 2%">
+                        <label>Moneda: </label>
+                        <select class="form-control" name="money" id="money" onchange="conversor(this)">
+                          <option value="usd">Dolares (USD)</option>
+                          <option value="eur">Euro (EUR)</option>
+                          <option value="clp" selected>Pesos Chilenos (CLP)</option>
+                          <option value="gbp">Libra (GBP)</option>
+                        </select>
+                        <!--<label>
+                          <input type="checkbox" name="exento"> Exento de IVA
+                        </label>-->
+                </div>
+            </div>
+             <div style="overflow-y: scroll; max-height: 300px;">
+                
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Exento</th>
+                    <th>Descripción</th>
+                    <th>Mínimo de Compra</th>
+                    <th>Cantidad</th>
+                    <th>Precio x Unidad</th>
+                    <th>Total</th>
+                    <th>C.C.</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="session_fabrs">
+
+                </tbody>
+            </table>
+
+                </div>
+            <div class="panel-footer">
+                <h4 style="width: 100%;display: flex;">
+                  <div style="margin-left: 10%;width: 30%;text-align: left" class="total-neto"><small>Neto: </small></div> 
+                  <div style="margin-left: 0%;width: 30%;text-align: left" class="total-iva"><small>IVA: </small></div>  
+                  <div style="margin-left: 0%;width: 30%;text-align: left" class="total-total"><small>Total: </small></div> 
+                </h4>
+                <div style="width: 100%;text-align: center; cursor: pointer; margin-bottom: 5px"><a data-toggle="collapse" data-target="#generalInfo"><b>Información general <i class="fa fa-caret-down desp-arrow"></i></b></a></div>
+                <div class="collapse" id="generalInfo">
+                      <div class="form-group" style="display: flex; width: 100%">
+                        <div style="display: none;">
+                          <label for="cuent">Cuenta:</label>
+                          <!--<input type="text" class="form-control" id="cuent" name='cuent'>-->
+                          <select type="text" class="form-control" id="cuent" name="cuent">
+                            <%for(var e=0; e < subc.length; e++){%>
+                              <option value="<%=subc[e].subcuenta%>"><%=subc[e].subcuenta%></option>
+                            <%}%>
+                              <option value="pordefinir">Por Definir</option>
+                            </select>
+                        </div>
+                        <div style="width: 50%; display: none">
+                        <label for="dest">Destino:</label>
+                        <input type="text" class="form-control" id="dest" name='dest'>
+                        </div>
+                        <!--<div style="width: 50%">
+                        <label for="dest">Descuento (%):</label>
+                        <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()">
+                        </div>-->
+                    </div>
+                    <div class="form-group" style="display: flex; width: 100%">
+                      <div style="width: 33%">
+                      <label for="plae">Plazo de entrega:</label>
+                      <input type="date" class="form-control" id="plae" name="plae" required>
+                      </div>
+                      <div style="width: 33%">
+                      <label for="pag">Forma de pago:</label>
+                      <input type="text" class="form-control" id="pag" name="pag">
+                      </div>
+                      <div style="width: 33%">
+                      <label for="entr">Lugar de entrega:</label>
+                        <select type="text" class="form-control" id="entr" name="entr">
+                          <option value="siderval">Bodega Siderval</option>
+                          <option value="proveedor">Bodega Proveedor</option>
+                          <option value="Por definir">Por definir</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group" style="display: flex;">
+                        <div style="width: 50%">
+                          <label for="obs">Observaciones:</label>
+                          <input type="text" class="form-control" id="obs" name="obs">
+                        </div>                  
+                        <div style="width: 50%">
+                          <label for="dest">Descuento (%):</label>
+                          <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()">
+                        </div>
+                    </div>
+                  </div>  
+                <div class="form-inline">
+                    <input type="text" name="nroordenfabricacion" id="num" style="width:80%; display: none" placeholder="N° Orden de Compra / N° Orden de Venta" class="form-control" value="<%=last%>" required>
+                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
+                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                </div>
+
+            </div>
+    </div>
+        </form>
+</div>
+<div class="col-md-10 col-md-offset-1">
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3>Añadir Productos</h3><!--<button onclick="refreshAllCost()">Mostrar función</button>-->
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#buscador" aria-controls="home" role="tab" data-toggle="tab">Buscador</a></li>
+              <!--<li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Necesario para OF
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="#">Submenu 1-1</a></li>
+                  <li><a href="#">Submenu 1-2</a></li>
+                  <li><a href="#">Submenu 1-3</a></li> 
+                </ul>
+              </li>-->
+              <li><a href="#segunOF" aria-controls="home" role="tab" data-toggle="tab">Necesario para OF</a></li>
+            </ul>
+        </div>
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="buscador">
+                  <div class="panel-body">
+                      <form id="strimform">
+                          <div class="form-inline">
+                               
+                                <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
+                                <label style="font-weight: normal; margin-left: 20px; margin-right: 20px">
+                                  <input type="checkbox" name="showProd" id="showProd">
+                                  Mostrar Productos (Fundidos)
+                                </label>
+                              <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
+                          </div>
+                      </form>
+                  </div>
+
+                  <table class="table table-responsive">
+                      <thead>
+                      <tr>
+                          <th>Descripción</th>
+                          <th>Caracteristica</th>
+                          <th>Stock</th>
+                          <th></th>
+                      </tr>
+                      </thead>
+                      <tbody id="prefabrs">
+                      </tbody>
+                  </table>
+          </div>
+          <div role="tabpanel" class="tab-pane fade" id="segunOF">
+               <div class="panel panel-info">
+                  <div class="panel-heading">
+                      <div style="display: flex;">
+                          <div style="width: 45%; margin-right: 5%;">
+                              <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
+                              <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
+                          </div>
+                          <div style="width: 50%;" class="form-group">
+                                <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
+                                <div style="display: flex;">
+                                <select style="width: 40%" class="form-control" id="filtro" onchange="refreshGDList()">
+                                  <option value="odc.numoc">N° OC</option>
+                                  <option value="material.detalle">Detalle</option>
+                                  <option value="subaleacion.subnom">Aleación</option>
+                                  <option value="pedido.cantidad - pedido.despachados">Sin Despachar</option>
+                                  <option value="pedido.f_entrega" selected="selected">Fecha de Entrega</option>
+                                </select>
+                                <select style="width: 40%" class="form-control" id="orden" onchange="refreshGDList()">
+                                  <option value="ASC" selected="selected">Ascendente</option>
+                                  <option value="DESC">Descendente</option>
+                                </select>
+                                </div>
+                      </div>
+              </div>
+                  </div>
+                  <div class="panel-body">
+                     <div id="accordion" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+                        <%for(var i=0; i <  ofs.length; i++){%>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="h<%= ofs[i].idordenfabricacion%>" style="display: flex;">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#c<%= ofs[i].idordenfabricacion%>" aria-expanded="true" aria-controls="collapseOne" style="width: 98%; font-family: 'Oswald';" onclick="renderInsumos(<%= ofs[i].idordenfabricacion%>)">
+                                    <h3 style="width: 100%">OF N°<%= ofs[i].idordenfabricacion%>
+                                        <small>creada el <%= new Date(ofs[i].creacion).toLocaleDateString()%> 
+                                        </small>
+                                        <small class="pull-right">
+                                          <%=Math.trunc(ofs[i].porcentaje)%>% de OF vinculada a OP 
+                                        </small>
+                                    </h3>
+                                </a>
+
+
+                                
+                                </div>
+                            </div>
+                            <div id="c<%=ofs[i].idordenfabricacion%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= ofs[i].idordenfabricacion%>">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                      <th>Insumo</th>
+                                  <!--<th>Sin OP</th>
+                                      <th>Cantidad x pieza</th>-->
+                                      <th>Total</th>
+                                      <th>En Stock</th>
+                                      <th>Unidad</th>
+                                      <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="ins<%= ofs[i].idordenfabricacion%>">
+                                    
+                                    </tbody>
+                                </table>
+                            </div>
+                            <%}%>
+                        </div>
+                    </div>
+                      <!--<table class="table table-striped table-hover table-bordered">
+                          <thead>
+                          <tr>
+                              <th>N°OF</th>
+                              <th>Sin OP</th>
+                              <th>Insumo</th>
+                              <th>Cantidad x pieza</th>
+                              <th>Total</th>
+                              <th>En Stock</th>
+                              <th>Unidad</th>
+                              <th></th>
+                          </tr>
+                          </thead>
+                          <tbody id="tbody">
+                            
+                          </tbody>
+                      </table>-->
+                  </div>
+              </div>   
+          </div>
+        </div>
+    </div>
+</div>
+<div  class="hidden" style="display: none" ></div>
+
+<style type="text/css">
+    .predic_text div{  
+        background-color: white;
+        /*border: dotted 1px black;*/
+        position: absolute;
+        z-index: 10;
+        color: black;
+    }
+    .predic_text input{
+        color: black;
+        width: 100%;
+    }
+</style>
+<script>
+  
+  function moveArrow(){
+    $(".desp-arrow").css('transform', 'rotate(180deg)');  
+  }
+    function getPredictions(yo){
+        if($(yo).children('input').val()!=''){
+               $.ajax({
+                    type: 'GET',
+                    url: '/plan/get_client_pred/'+$(yo).children('input').val(),
+                    success: function(data){
+                        $(yo).children('div').css('width', $(yo).width()+"px");
+                        $(yo).children('div').html(data);
+                    }
+                }); 
+        }
+        else{
+            $(yo).children('div').html('');         
+        }
+    }
+    function refresh(){
+        var data ={};
+        data.det = $("#det").val();
+        data.prod = $("#showProd").is(':checked');
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/abastecimiento/buscar_matp',
+            success: function(data){
+                $("#prefabrs").html(data);
+                //$("#caract").val('0');
+            }
+        });
+
+    }
+    function add_prefabr(yo) {
+        var items = 0;
+        $("#session_fabrs tr").each(function(){
+          items++;
+        });
+        $(yo).data('items', items);
+        $.ajax({
+            type: 'POST',
+            data: $(yo).data(),
+            url: '/abastecimiento/addsession_prepeds',
+            success: function(data){
+                $("#session_fabrs").append(data);
+            }
+        });
+    }
+    function drop(yo){
+        $(yo).closest('tr').remove();
+         refreshAllCost();
+    }
+    
+
+     $("#send_of").submit(function(e){
+        e.preventDefault();
+        lista = $(this).serializeArray();
+        var data = {
+            idm: [],
+            idp: [],
+            fechas: [],
+            cants: [],
+            cliente: $("#cliente").val(),
+            prov: [],
+            costo: [],
+            ex_iva: [],
+            centroc: []
+        }
+        
+        console.log(lista);
+        for(var i =0;i<$(this).serializeArray().length;i++){
+            if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
+                //console.log(lista[i].name);
+                data[lista[i].name].push(lista[i].value);
+            } else{
+                //console.log(lista[i].name);
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        data.ex_iva = [];
+        $("#send_of :checkbox").each(function(){
+            if($(this).is(':checked')){
+              data.ex_iva.push('on');
+            }
+            else{
+              data.ex_iva.push('off');  
+            }
+            //console.log($(this).val());
+        });
+        console.log(data);
+        if(confirm("¿Esta segúro que desea crear la OC?")){
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/abastecimiento/crear_oda',
+            success: function(data){
+                if(data == 'error'){
+                    alert("La OC que esta intentando crear es inválida.");
+                } else {
+                    alert("La OC fue creada exitosamente.");
+                    $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+                    $(".hidden form").submit();
+                    $.ajax({
+                        type: 'GET',
+                        url: '/abastecimiento/abast_myself',
+                        success: function(data){
+                            $("#page-wrapper").html(data);
+                        }
+                    });
+                }
+            }
+        });
+        }
+    });
+
+     function renderInsumos(idof){
+      //alert("AJAX");
+      $.ajax({
+        type: 'GET',
+        url: '/abastecimiento/get_insumos_of/'+idof,
+        success: function(data){
+            if(data == 'err'){
+              alert("Ha ocurrido un error al obtener los insumos.");
+            }
+            else{
+              //alert(data);
+              $("#ins"+idof).html(data);
+            }
+        }
+      });
+     }
+
+     function selectCC(yo){
+        //alert($(yo).parent('td').children('input').val());
+        $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
+     }
+
+     
+    function saveState(){
+
+        var lista = $("#send_of").serializeArray();
+        var data = {
+            idm: [],
+            cants: [],
+            prov: [],
+            costo: [],
+            ex_iva: [],
+            centroc: []
+        }
+        
+        console.log(lista);
+        for(var i =0;i<lista.length;i++){
+            if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
+                //console.log(lista[i].name);
+                data[lista[i].name].push(lista[i].value);
+            } else{
+                //console.log(lista[i].name);
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        data.ex_iva = [];
+        $("#send_of :checkbox").each(function(){
+            if($(this).is(':checked')){
+              data.ex_iva.push('on');
+            }
+            else{
+              data.ex_iva.push('off');  
+            }
+            //console.log($(this).val());
+        });
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/abastecimiento/saveStateODABD',
+            beforeSend: function(xhr){
+                //alert("Guardando!!");
+
+                $(".guardado_automatico").text("Guardando estado de ODA ...");
+            },
+            success: function(data){
+                //alert("Estado de OC guardado");
+                $(".guardado_automatico").text("Guardado por ultima vez: "+ new Date().toLocaleString());
+
+            }
+        });
+    }
+
+    function loadState(){
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/loadStateODABD',
+            beforeSend: function(xhr){
+                $(".guardado_automatico").css('display', 'none');
+                $(".panel-defecto").css('display', 'none');
+                $(".cargando-panel").css('display', 'block');
+
+                setTimeout(function(){  }, 1000);
+            },
+            success: function(data){
+
+                var text = $(".guardado_automatico").text();
+                $(".panel-creacion").html(data);
+                $(".guardado_automatico").text(text);
+            }
+        });
+    }
+    $(document).ready(function(){
+      loadState();
+    });
+</script>

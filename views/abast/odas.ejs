@@ -1,0 +1,66 @@
+<h1 class="page-header">Ordenes de compra</h1>
+
+
+<div class="container" style="width: 100%; font-family: 'Oswald">
+
+    <form id="ped-search" >
+        <div class="form-group col-md-offset-2">
+            <div class="form-group col-md-6">
+                <label>N° OC</label>
+                <input class="form-control" name="num" type="text" placeholder="01-002">
+            </div>
+            <div class="form-group col-md-2 ">
+                <button class="btn btn-info" type="submit" href="#"><i class="fa fa-search"></i> Buscar</button>
+            </div>
+        </div>
+    </form>
+    <div class="col-md-10 col-md-offset-1">
+    <div id="accordion_of" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+        <%
+          function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+        if(data.length){
+            for(var i = 0; i< data.length;i++){
+                %>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="h<%= data[i].idoda%>" style="display: flex;">
+                <a role="button" href="#c<%= data[i].idoda%>" data-toggle="collapse" data-parent="#accordion_of"  aria-expanded="true" aria-controls="h<%= data[i].idoda%>" style="width: 100%">
+                    <h3>Pedido Cliente #<%= data[i].numoda%></h3>
+                    <p class="pull-right">Fecha de Creación: <%= new Date(data[i].creacion).toLocaleString()%></p>
+                    <p class="pull-left">Proveedor: <%= data[i].sigla%> - <%=data[i].razon%></p>
+                </a>
+            </div>
+            <div id="c<%= data[i].idoda%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= data[i].idoda%>">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Solicitados</th>
+                        <th>Recibidos</th>
+                    </tr>
+                    </thead>
+                    <tbody id="t<%= data[i].idoda%>">
+                    <% 
+                    if(data[i].token){
+                        data[i].token = data[i].token.split(',');
+                        for(var j = 0;j< data[i].token.length;j++){
+                            data[i].token[j] = data[i].token[j].split('@');%>
+                            <tr>
+                                <td><%= letraMayus(data[i].token[j][0])%></td>
+                                <td><%= data[i].token[j][1]%></td>
+                                <td><%= data[i].token[j][2]%></td>
+                            </tr>
+                        <%}
+                    }%>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+            <%}%>
+        <%}%>
+    </div>
+</div>
+</div>

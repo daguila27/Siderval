@@ -1,0 +1,91 @@
+<%
+	function fechaLatino(string){
+		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
+	}
+%>
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+		<thead>
+			<tr>
+				<th class="o_column_sortable order-column" data-order="ordenfabricacion.numordenfabricacion-ASC">Número de OF</th>
+				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">Número de OC</th>
+				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
+				<th class="o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
+				<th class="o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Sin Producción</th>
+				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
+				<th class="o_column_sortable order-column" style="text-align: center;" data-order="ordenfabricacion.creacion-ASC">Fecha de Creación</th>
+			</tr>
+		</thead>
+	<tbody class="ui-sortable">
+		<%for(var i=0; i < data.length; i++){%>
+				<tr class="o_data_row" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
+					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numordenfabricacion%></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
+					<td class="o_data_cell" style="text-align: center;"><%=data[i].restantes%></td>
+					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
+						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
+					</td>
+					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
+						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
+					</td>
+				</tr>
+		<%}%>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</tfoot>
+</table>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".order-column").removeClass('o-sort-up');
+		$(".order-column").removeClass('o-sort-down');
+		$(".order-column").each(function(){
+			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
+				if("<%= key.split('-')[1]%>" == "ASC"){
+					$(this).addClass('o-sort-up');
+					$(this).data('order', '<%= key.split("-")[0]%>-DESC');
+				}
+				else{
+					$(this).addClass('o-sort-down');
+					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
+					
+				}
+			}
+		});
+	});
+	$(".order-column").on('click', function(e){
+		e.preventDefault();
+		var item = this;
+		var orden = $(this).data('order');
+		$.ajax({
+			type: 'GET',
+			url: '/plan/table_fabricaciones/'+orden,
+			success: function(data){
+				$(".main-page").html(data);
+			}
+		});
+	});
+
+
+	function submit_form(yo){
+		//$("#form"+$(yo).data('idodc')).submit();
+		$.ajax({
+			type: 'GET',
+			url: '/plan/page_of/'+$(yo).data('idodc'),
+			success: function(data){
+				$(".main-page").html(data);	
+			}
+		});
+	}
+</script>

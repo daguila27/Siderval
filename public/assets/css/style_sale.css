@@ -1,0 +1,26 @@
+
+.buttons{
+	display: flex;
+}
+#list_product tr{
+	width: 100%;
+}
+#list_product{
+	width: 100%;
+}
+.table-responsive{
+	margin-top: 30px;
+}
+#head{
+	background-color: rgb(240, 240, 240);
+}
+
+
+#div_seller{
+	display: flex;
+}
+
+
+#div_client{
+	display: flex;
+}

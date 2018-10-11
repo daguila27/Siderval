@@ -1,0 +1,535 @@
+<style type="text/css">
+     /* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+    visibility: visible; /* Show the snackbar */
+
+/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+However, delay the fade out process for 2.5 seconds */
+    /*-webkit-animation: fadein 0.5s, fadeout 0.5s 29.5s;*/
+    animation: fadein 0.5s/*, fadeout 0.5s 29.5s*/;
+}
+#snackbar_newfab {
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar_newfab.show {
+    visibility: visible; /* Show the snackbar */
+
+/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+However, delay the fade out process for 2.5 seconds */
+    /*-webkit-animation: fadein 0.5s, fadeout 0.5s 29.5s;*/
+    animation: fadein 0.5s/*, fadeout 0.5s 29.5s*/;
+}
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+} 
+</style>
+<div class="row" style="margin: 0;padding: 0;">
+<%
+
+ function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+%>
+
+<h1 class="page-header">Crear Orden Producción:</h1>
+
+<div class="col-md-10 col-md-offset-1">
+    <form id="send_op">
+        <div class="panel panel-primary">
+            <div class="panel-heading" style="display: flex;">
+                <h3 style="width: 60%">Lanzar OP N° <%if(num){%><%= num.idordenproduccion + 1%><%} else {%><%= 1%><%}%>: </h3>
+                <div style="width: 40%">
+                    <label for="setdates">
+                        Programar fecha para todos: 
+                    </label>
+                    <div class="input-group"  style="width:30%;margin-left: 20%;margin-top: 5px">
+                        <span class="input-group-addon" ><i class="fa fa-calendar-o"></i></span>
+                        <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">
+                    </div>
+                </div>
+            </div>
+            <table class="table table-striped" id="session_prod">
+                <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Aleación</th>
+                    <th style="text-align: center;">Por enviar</th>
+                    <th>A Enviar</th>
+                    <th>Programar</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>No hay productos añadidos</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="panel-footer">
+                <div class="form-inline" style="display: flex;">
+                    <!--<button class="btn btn-info" style="width:12%;margin-left:75%;" id="op_program" data-toggle="modal" data-target="#programOPModal">Programar</button>-->
+                    <button class="btn btn-success" style="width:10%;margin-left:0%;" id="op_submit" >+ Crear</button>
+                    <!--<button class="btn btn-success comprobarItemsPrueba">+ Ver</button>-->
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<div class="col-md-10 col-md-offset-1">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+        <h4 style="width: 60%">Productos por Lanzar
+                
+            </h4>
+    <div style="display: flex;">
+        <div style="width: 45%; margin-right: 5%;">
+
+            <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
+            <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
+        </div>
+        <div style="width: 50%;" class="form-group">
+              <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
+              <div style="display: flex;">
+              <select style="width: 40%" class="form-control" id="filtro" onchange="refreshProdList()">
+                <option value="ordenfabricacion.idordenfabricacion">N° OF</option>
+                <option value="material.detalle">Descripción</option>
+                <option value="subaleacion.subnom">Aleación</option>
+                <option value="fabricaciones.restantes">Necesidad</option>
+                <option value="fabricaciones.f_entrega" selected="selected">Fecha de Entrega</option>
+              </select>
+              <select style="width: 40%" class="form-control" id="orden" onchange="refreshProdList()">
+                <option value="ASC" selected="selected">Ascendente</option>
+                <option value="DESC">Descendente</option>
+              </select>
+              </div>
+            </div>
+    </div>
+        </div>
+    <table id="tabla_producciones" class="table table-striped">
+        <thead>
+        <tr>
+            <th>N° PC</th>
+            <th>Detalle</th>
+            <th style="text-align: center">Aleación</th>
+            <th style="text-align: center">Necesitados</th>
+            <th style="text-align: center">Fecha de Entrega</th>
+        </tr>
+        </thead>
+        <tbody>
+            <%for(var i=0; i< data.length; i++){%>
+            <tr id="<%=data[i].idfabricaciones%>" style="transition: 0.5s;">
+                <td data-toggle="tooltip" data-placement="bottom" title="N° OF"><%=data[i].idordenfabricacion%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Producto"><%=data[i].detalle%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Aleación" style="text-align: center"><%=data[i].subnom%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Necesitados" style="text-align: center"><%=data[i].restantes%></td>
+                <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Entrega" style="text-align: center"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
+                <td><a data-aleacion="<%= data[i].subnom%>" data-restantes="<%= data[i].restantes%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" class="btn btn-success" onclick="sendtoQueue(this)"><i class="glyphicon glyphicon-plus"></i></a></td>
+            </tr>
+            <%}%>
+        </tbody>
+    </table>
+    </div>
+</div>
+
+    <div class="aux_formulario" style="display: none">
+        
+    </div>
+     <!-- Use a button to open the snackbar -->
+    <!--<button onclick="showToast()">Show Snackbar</button>-->
+
+    <div id="snackbar_newfab" data-count='0' onclick="clickSnackbarnewFab(this)" style="cursor: pointer;"><i class='glyphicon glyphicon-refresh'></i>  nuevas fabricaciones habilitadas</div> 
+    <!-- The actual snackbar -->
+    <div id="snackbar" data-newid="0" onclick="clickSnackbar(this)" style="cursor: pointer;">Se ha creado una nueva OF. <button class="btn btn-success">RECARGAR</button></div> 
+</div>
+
+
+<!-- Modal -->
+<div id="programOPModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Programar OP</h4>
+      </div>
+      <div class="modal-body">
+        <label for="programDate" style="width: 100%"> 
+            Ingresar fecha y hora de habilitación de OP:
+        </label>
+            <input class="form-control" type="datetime-local" name="programDate">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Programar</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function(){
+            $("#page-wrapper").css('height', $("#page-wrapper").children('div').height()+"px");
+            refreshProdList();
+            
+            //setDataTable("#tabla_producciones");
+    });
+    function clickSnackbar(yo){
+        var x = document.getElementById("snackbar");
+
+        x.className = "hidden";
+        $("#detProducto").val($(yo).data('newid'));
+        refreshProdList();
+    }
+
+    $("#setdates").on('change',function(){
+        var valor = $(this).val();
+        $("input[type=date]").each(function(e){
+            $(this).val(valor);
+        })
+    });
+
+    function clickSnackbarnewFab(yo){
+        var x = document.getElementById("snackbar_newfab");
+
+        x.className = "hidden";
+        //$("#detProducto").val($(yo).data('newid'));
+
+        $(yo).data('count', 0);
+        refreshProdList();
+    }
+/*    $(".sendtoQueue").on('click', function(e){
+        e.preventDefault();
+        var idfabricaciones = $(this).data('id');
+        $.ajax({
+                type: 'POST',
+                data: JSON.stringify({
+                    idfabricaciones: idfabricaciones,
+                    restantes: $(this).data('restantes'),
+                    detalle:$(this).data('detalle'),
+                    ruta:$(this).data('aleacion')
+                }),
+                contentType: 'application/json',
+                url: 'jefeprod/add_produccion',
+                success: function(data){
+                    $("#session_prod").html(data);
+                    $("#" + idfabricaciones).css('transform', 'scaleY(0)');
+                    $("#" + idfabricaciones).html("");
+                }
+        });
+        
+    });*/
+    function sendtoQueue(yo){
+            var idfabricaciones = $(yo).data('id');
+            $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify({
+                        idfabricaciones: idfabricaciones,
+                        restantes: $(yo).data('restantes'),
+                        detalle:$(yo).data('detalle'),
+                        ruta:$(yo).data('aleacion')
+                    }),
+                    contentType: 'application/json',
+                    url: 'jefeprod/add_produccion',
+                    success: function(data){
+                        $("#session_prod").html(data);
+                        //$("#" + idfabricaciones).css('transform', 'scaleY(0)');
+                        //$("#" + idfabricaciones).html("");
+                    }
+            });
+            
+    }
+
+    function refreshProdList(){
+        $.ajax({
+            type: 'POST',
+            data: {fill: $("#filtro").val(),  orden: $("#orden").val() , detalle: $("#detProducto").val()},
+            url: 'jefeprod/lanzar_op_fill',
+            success: function(data){  
+                $("#tabla_producciones").html(data);                    
+            }
+        });
+    }
+
+    $("#detProducto").on('keyup', function(e){
+        refreshProdList();
+    });
+    $("#op_program").on('click', function(e){
+        e.preventDefault();
+    });
+    $("#send_op").on('submit', function(e){
+            e.preventDefault();
+            if(comprobarItems()){    
+                var aux = [];
+                var aux2 = [];
+                var c = 0;
+                $("#send_op :input.form-control").each(function(e){
+                    if(c > 0){
+                        if(c%2!=0){     
+                            aux.push(this.value);
+                        }
+                        else{
+                            if(this.value == ""){
+                                aux2.push(null);
+                            }
+                            else{                    
+                                aux2.push(this.value);
+                            }
+                        }
+                    }
+                    c++;
+                });
+                console.log(aux);
+                console.log(aux2);
+                if(confirm("¿Está seguro que desea crear la OP?")){
+                    if(aux.length>0){
+                        $.ajax({
+                            type: 'POST',
+                            data: JSON.stringify({list: aux, dates: aux2}),
+                            contentType: 'application/json',
+                            url: 'jefeprod/save_op',
+                            success: function(data){  
+                                if(data == 'Error'){
+                                    alert("Ha ocurrido un error");
+                                }  
+                                else{
+
+                                    alert("Orden de producción creada. Desplegando Lista de Insumos.");
+                                    $(".aux_formulario").html("<form method='post' action='jefeprod/ficha_abastecimiento' target='_blank'><input type='hidden' name='idop' value='"+data+"'></form>");
+                                    $(".aux_formulario form").submit();
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: 'jefeprod/crear_op',
+                                        success: function(data){
+                                            $("#page-wrapper").html(data);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+                else{
+                    alert("Debes adjuntar al menos 1 producto a la OP.");
+                }
+            }
+            else{
+                alert("Alguno de los items excede la cantidad solicitada en OF.");
+            }
+    });
+
+    function comprobarItems(){
+        var aux = [];
+                var idf = [];
+                var cants = [];
+                var aux2 = [];
+                var c = 0;
+                $("#send_op :input.form-control").each(function(e){
+                    if(c > 0){
+                        if(c%2!=0){     
+                            aux.push(this.value);
+                            idf.push($(this).attr('id').substring(4, $(this).attr('id').length));
+                            cants.push($(this).data('cant'));
+                        }
+                        else{
+                            if(this.value == ""){
+                                aux2.push(null);
+                            }
+                            else{                    
+                                aux2.push(this.value);
+                            }
+                        }
+                    }
+                    c++;
+                });
+                var inf = [];
+                var max = [];
+                var sum = [];
+                for(var i=0; i < idf.length; i++){
+                    if(inf.indexOf(idf[i]) == '-1'){
+                        inf.push(idf[i]);
+                        max.push(cants[i]);
+                        sum.push(parseInt(aux[i]));
+                    }
+                    else{
+                        sum[inf.indexOf(idf[i])] += parseInt(aux[i]); 
+                    }
+                }
+                for(var i=0; i < idf.length; i++){
+                    if(max[i] < sum[i]){
+                        return false;
+                    }
+                    else{ 
+                        return true;
+                    }
+                }
+    }
+
+
+    $(".comprobarItemsPrueba").on('click', function(e){
+        e.preventDefault();
+                var aux = [];
+                var idf = [];
+                var cants = [];
+                var aux2 = [];
+                var c = 0;
+                $("#send_op :input.form-control").each(function(e){
+                    if(c > 0){
+                        if(c%2!=0){     
+                            aux.push(this.value);
+                            alert($(this).attr('id'));
+                            idf.push($(this).attr('id').substring(4, $(this).attr('id').length));
+                            cants.push($(this).data('cant'));
+                        }
+                        else{
+                            if(this.value == ""){
+                                aux2.push(null);
+                            }
+                            else{                    
+                                aux2.push(this.value);
+                            }
+                        }
+                    }
+                    c++;
+                });
+                console.log(aux);//cantidades
+                console.log(aux2);//fechas
+                console.log(idf);
+                console.log(cants);
+                var inf = [];
+                var max = [];
+                var sum = [];
+                for(var i=0; i < idf.length; i++){
+                    if(inf.indexOf(idf[i]) == '-1'){
+                        inf.push(idf[i]);
+                        max.push(cants[i]);
+                        sum.push(parseInt(aux[i]));
+                    }
+                    else{
+                        sum[inf.indexOf(idf[i])] += parseInt(aux[i]); 
+                    }
+                }
+                console.log(inf);
+                console.log(max);
+                console.log(sum);
+                for(var i=0; i < idf.length; i++){
+                    if(max[i] < sum[i]){
+                        return false;
+                    }
+                    else{ 
+                        return true;
+                    }
+                }
+/*        $.ajax({
+                type: 'POST',
+                data: {cants: aux, dates: aux2, idfab: idf},
+                url: '/jefeprod/view_produccion',
+                success: function(data){
+                    console.log(data);
+                }
+        });*/
+    });
+
+    function delProd(yo){
+        var idf = $(yo).data('idf');
+            $.ajax({
+                type: 'POST',
+                data: {idf: idf},
+                url: '/jefeprod/del_produccion',
+                success: function(data){
+                    $("#session_prod").html(data);
+                    /*$.ajax({
+                        type: 'POST',
+                        data: {idf: idf},
+                        url: '/jefeprod/restore_fab',
+                        success: function(htmlSend){
+                            //$("#" + idf).css('transform', 'scaleY(1)');
+                            
+                            //$("#" + idf).html(htmlSend);
+                        }
+                    });*/
+                    
+                }
+            });
+    }
+/*    $("#delProd").on('click', function(e){
+            e.preventDefault();
+            var idf = $(this).data('idf');
+            $.ajax({
+                type: 'POST',
+                data: {idf: idf},
+                url: '/jefeprod/del_produccion',
+                success: function(data){
+                    $("#session_prod").html(data);
+                    alert("¿CORRECTO?");*/
+                    /*$.ajax({
+                        type: 'POST',
+                        data: {idf: idf},
+                        url: '/jefeprod/restore_fab',
+                        success: function(data){
+                            $("#" + idfabricaciones).html("");
+                        }
+                    });*/
+                    
+                /*}
+            });      
+    });*/
+
+
+    
+
+
+  </script>  

@@ -1,0 +1,12 @@
+body{
+	color: rgb(186, 221, 15);
+	padding-top: 80px;
+	/*background-color: rgb(186, 221, 15);*/
+	/*background-color: rgb(7, 30, 53);*/
+	background-color: white;
+	font-family: 'Oswald', sans-serif;
+}
+.container{
+	border-radius: 2%;
+	background-color: rgb(7, 30, 53);
+}

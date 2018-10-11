@@ -1,0 +1,20 @@
+
+.form-group{
+	width: 100%;
+	display: flex;
+}
+.form-group div{
+}
+.proveedor{
+	width: 100%;
+	display: flex;
+}
+
+.buttons{
+	margin-left: 1%;
+	display: flex;
+}
+
+.buttons button{
+	margin-left: 20px;
+}

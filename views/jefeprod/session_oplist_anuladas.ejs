@@ -1,0 +1,104 @@
+<div id="accordion" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+    <%
+    if(data2.length){
+    var data = data2;
+    var inProceso = true;
+    var color = '';
+    for(var i = 0; i< data.length;i++){
+        if(data[i].atraso){
+            color = 'danger';
+        }
+        else if(data[i].activo){
+            color = 'warning';
+        }   
+        else{
+            color = 'success';
+        }   
+    %>
+    <div class="panel panel-<%= color%>">
+        <div class="panel-heading" role="tab" id="ha<%= data[i].idordenproduccion%>" style="display: flex;">
+            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#ca<%= data[i].idordenproduccion%>" aria-expanded="true" aria-controls="collapseOne" style="width: 98%; font-family: 'Oswald'">
+                <h3 style="width: 100%">OP N°<%= data[i].idordenproduccion%>
+                    <small>creada el <%= new Date(data[i].f_gen).toLocaleDateString()%> 
+                        <%if(data[i].finalizado){
+                            inProceso = false;%>
+                            (Finalizado)
+                        <%}else if(color == 'warning'){
+                            inProceso = true;%>
+                            (Aun en proceso)
+                        <%}else{
+                            inProceso = true;%>
+                            (Aun en proceso)
+                        <%}%>
+                    </small>
+                    <small class="pull-right" style="margin-top:15px">
+                        <%if(data[i].anulado){%>
+                            (Anulado el <%= new Date(data[i].f_anulado).toLocaleDateString()%>)
+                        <%}%>
+                    </small>
+                </h3>
+            </a>
+
+
+            
+            <!--<div style="position: relative; right: 0%; display: flex; width: 5%">
+                <form method="POST" action="/jefeprod/ficha_abastecimiento" target="_blank">
+                    <input type="hidden" name="idop" value="<%= data[i].idordenproduccion%>">
+                    <button  type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-list-alt"></i>Ficha</button>
+                </form>
+            </div>-->
+        </div>
+        <div id="ca<%= data[i].idordenproduccion%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="ha<%= data[i].idordenproduccion%>">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                    <th style="cursor: default;" data-toggle="tooltip" data-placement="bottom" title="N°OF">N° OF</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                    <!--<th data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center">Abastecidos</th>-->
+                    <!--<th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">MOL</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center">FUS</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center">QUI</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center">TER</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" style="text-align: center">BPT</th>
+                    <th class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center">TRA</th>
+                    <th data-toggle="tooltip" data-placement="bottom" title="Fecha prevista en OP" style="text-align: center">Fecha</th>-->
+                </tr>
+                </thead>
+                <tbody id="ta<% data[i].idordenproduccion%>">
+                <% for(var j = 0;j< data[i].oftoken.length;j++){
+                    data[i].oftoken[j] = data[i].oftoken[j].split('@');
+                    data[i].etapatoken[j] = data[i].etapatoken[j].split('@');
+                %>
+                <tr>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%= data[i].oftoken[j][0]%></td>
+                    <td style="text-align: left; cursor: default; align-content: center;" title="OP N°" data-content="<%= data[i].etapatoken[j][11]%>" data-toggle="popover" data-placement="top"><%= data[i].oftoken[j][1]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= data[i].oftoken[j][2]%></td>
+                    <!--<td data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center" style="text-align: center"><%= data[i].etapatoken[j][0]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center"><%= data[i].etapatoken[j][1]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center"><%= data[i].etapatoken[j][2]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center" style="text-align: center"><%= data[i].etapatoken[j][3]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Tratamiento Térmico" style="text-align: center"><%= data[i].etapatoken[j][4]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center"><%= data[i].etapatoken[j][5]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center"><%= data[i].etapatoken[j][6]%></td>
+                    <td data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" style="text-align: center"><%= data[i].etapatoken[j][7]%></td>
+                    <td class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= data[i].etapatoken[j][8]%></td>
+                    <%if(new Date(data[i].etapatoken[j][10]) < new Date() ){%>
+                        <td class="danger" data-toggle="tooltip" data-placement="bottom" title="Atrasado <%=data[i].etapatoken[j][9]%> días" style="text-align: center"><%= new Date(data[i].etapatoken[j][10]).toLocaleDateString()%></td>
+                    <%}else{%>
+                        <td class="success" data-toggle="tooltip" data-placement="bottom" title="Faltan <%=data[i].etapatoken[j][9]%> días para fecha prevista" style="text-align: center"><%= new Date(data[i].etapatoken[j][10]).toLocaleDateString()%></td>
+
+                    <%}%>-->
+                </tr>
+                <%}%>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <%}%>
+    <%}%>
+</div>

@@ -1,0 +1,181 @@
+<%
+var material;
+switch(tipo){
+	case "prod":
+	    material = "Producto";
+	    break;
+	case "recur":
+	    material = "Recurso";
+	    break;
+	default:
+	    material = "Otro";
+	    break;
+}%>
+<h2 class="page-header" style="margin: 0; padding-top: 5%">Registrar <%= material%>:</h2>
+<form id="saveform" method="post" action="/plan/save_mat">
+<div class="row" style="display: flex">
+	<div class="col-md-5 col-md-offset-1">
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+				<h4 class="text-center" >Detalles Generales</h4>
+			</div>
+			<div class="panel-body form-group">
+				<label for="detalle" style="margin-top:10px;margin-bottom: 5px;">Breve Descripción</label>
+				<textarea name="detalle" class="form-control" placeholder="Pieza 1" tabindex="2" required></textarea>
+				<label for="u_medida"style="margin-top:10px;margin-bottom: 5px;">Unidad de Medida</label>
+				<select id="tipo_producto" name="u_medida" class="form-control">
+					<option value="UN" class="form-control">Un: Unidad</option>
+					<option value="KG" class="form-control">Kg: Kilogramos</option>
+					<option value="LT" class="form-control">Lt: Litro</option>
+				</select>
+				<label for="precio" style="margin-top:10px;margin-bottom: 5px;">Precio</label>
+				<div class="input-group">
+					<span class="input-group-addon">$</span>
+					<input type="number" class="form-control" name="precio">
+				</div>
+				<input type="hidden" name="tipo" value="<%= tipo%>">
+			</div>
+		</div>
+		<% if(tipo == "otro"){%>
+		<input value="06" type="hidden" name="especificacion">
+		<input value="99" type="hidden" name="caracteristica">
+		<% } else {%>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="text-center">Detalles Material</h4>
+			</div>
+			<div class="panel-body">
+                <% if(tipo == "prod"){%>
+				<label for="especificacion">Especificacion</label>
+				<select name="especificacion"class="form-control">
+					<option value="00">Venta Directa</option>
+					<option value="01">Producto Producido</option>
+					<option value="02">Terceros</option>
+				</select>
+                <% } else if(tipo == "recur"){%>
+				<label for="especificacion">Especificacion</label>
+				<select name="especificacion"class="form-control">
+					<option value="03">Liquido</option>
+					<option value="04">Solido</option>
+					<option value="05">Polvo</option>
+				</select>
+                <% } else {%>
+				<input value="06" type="hidden" name="especificacion">
+                <%}%>
+				<label for="caracteristica">Modelo</label>
+				<select name="caracteristica" class="form-control">
+                    <% if(caracts.length){
+					for(var i = 0;i< caracts.length;i++){
+                    %>
+					<option value="<%= caracts[i].idcaracteristica%>"><%= caracts[i].cnom%></option>
+                    <%
+					}
+					}%>
+				</select>
+			</div>
+		</div>
+		<% } %>
+
+	</div>
+	<div class="col-md-5">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="text-center" >Detalles Inventario</h4>
+			</div>
+			<div class="panel-body">
+				<label for="f_aprov" style="margin-top:10px;margin-bottom: 5px;" >Fuente de Aprovisionamiento</label>
+				<select name="f_aprov" class="form-control">
+					<option value="1">Normal</option>
+					<option value="2">Consignación</option>
+					<option value="3">Reparovisionamiento</option>
+				</select>
+				<label for="leadtime" style="margin-top:10px;margin-bottom: 5px;">Leadtime | Plazo de entrega</label>
+				<div class="input-group">
+					<input type="number" class="form-control" placeholder="5" name="leadtime" required>
+					<span class="input-group-addon">Días</span>
+				</div>
+				<label for="abc" style="margin-top:10px;margin-bottom: 5px;">Clasificación ABC</label>
+				<select name="abc" class="form-control">
+					<option value="A">A</option>
+					<option value="B">B</option>
+					<option value="C">C</option>
+				</select>
+			</div>
+		</div>
+		<% if(tipo != "otro"){%>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="text-center" >Detalle Tipo Producto</h4>
+			</div>
+			<div class="panel-body">
+                <% if(tipo == "prod"){
+					var aux = [];%>
+				<label for="aleacion" style="margin-top:10px;margin-bottom: 5px;">Aleación</label>
+				<select name="aleacion" class="form-control">
+					<% if(data.length){
+						for(i = 0;i<data.length;i++){%>
+					<option value="<%= data[i].idaleacion%>"><%= data[i].nom%></option>
+					<%
+						if(data[i].subs){
+						    aux.push(data[i].subs.split(","));
+						}
+						}
+					} else {%>
+					<option value="1">Sin Aleación</option>
+					<%}%>
+				</select>
+				<label for="subaleacion" style="margin-top:10px;margin-bottom: 5px;">Subaleación</label>
+				<select name="subaleacion"class="form-control">
+                    <% if(aux.length){
+					for(i = 0;i< aux.length;i++){
+					%>
+					<option value="<%= aux[i][0]%>"><%= aux[i][1]%></option>
+                    <%	}
+					} else {%>
+					<option value="65">Estructuras?</option>
+                    <%}%>
+				</select>
+                <%} else if(tipo == "recur"){%>
+				<label for="u_pedido" style="margin-top:10px;margin-bottom: 5px;">Unidad de pedido</label>
+				<select name="u_pedido" class="form-control">
+					<option value="CJ">Cajas</option>
+					<option value="UN">Unidades</option>
+					<option value="TB">Tambor</option>
+					<option value="BIN">Bins</option>
+				</select>
+				<label for="cod_proveedor" style="margin-top:10px;margin-bottom: 5px;">Código de proveedor</label>
+				<input type="text" name="cod_proveedor" class="form-control">
+				<label for="punto_pedido" style="margin-top:10px;margin-bottom: 5px;">Punto de pedido</label>
+				<input type="text" name="punto_pedido" class="form-control">
+				<%} else {%>
+				<input value="06" type="hidden" name="especificacion">
+                <%}%>
+			</div>
+		</div>
+		<%}%>
+
+
+
+	</div>
+</div>
+	<div style="width: 10%;margin-left:90%">
+		<button type="submit" class="btn btn-primary" id="save_mat" >Registrar</button>
+	</div>
+</form>
+<script type="text/javascript">
+    console.log(JSON.stringify($("#saveform").serialize()));
+
+    $("#save_mat").on('submit', function(e){
+        e.preventDefault();
+        console.log($("#saveform").serialize());
+
+        //$.ajax({
+        //  type: 'GET',
+        // url: 'render_informes',
+        //success: function(data){
+        //   $("#page-wrapper").html(data);
+        //}
+        //});
+    });
+</script>
+<div class="table_ficha"></div>

@@ -1,0 +1,63 @@
+<h1 class="page-header">Cuentas de usuario:</h1>
+
+ <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre de Usuario</th>
+                                        <th>Contraseña</th>
+                                        <th>Fecha y Hora de creación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <%for(var i=0; i < data.length; i++){%>
+                                	<tr>
+                                       <td><%=data[i].username%></td>
+                                	   <td><%=data[i].password%></td>
+                                	   <td><%=new Date(data[i].creacion).toLocaleString()%></td>
+                                    </tr>
+                                <%}%>
+                                </tbody>
+  </table>
+        <div class="input-group" id="fail" style="display: flex; width: 100%">
+            <input type="file" name="filetoupload" onchange="upload(this)">
+            <a class="btn btn-success">Subir <i class="glyphicon glyphicon-upload"></i></a>
+        </div>
+
+        <div class="archive-list">
+            
+        </div>
+        <script type="text/javascript">
+        $.ajax({
+            type: 'GET',
+            url: '/list_dir',
+            success: function(data){
+                $(".archive-list").html(data);
+            }
+        });
+        function upload(e){
+            if (!e.files) {
+                alert("This browser doesn't seem to support the `files` property of file inputs.");
+            }
+            else if (!e.files[0]) {
+                alert("Porfavor seleccione algún archivo");
+            }
+            else {
+                var formData = new FormData();
+                formData.append("filetoupload", e.files[0]);
+                $(function (){
+                    $.ajax({
+                        url: '/subir_pic',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        type: 'POST',
+                        success: function(data){
+                            //$("#path_input").val(data);
+                            $(".archive-list").html(data);
+                        }
+                    })
+                });
+            }
+        }
+</script>

@@ -1,0 +1,28 @@
+#container_provider{
+	width: 100%;
+}
+#container_provider li{
+	position: relative;
+	display: flex;
+} 
+.dib{
+	width: 40%;
+}
+
+
+.buttons{
+	display: flex;
+	position: absolute;
+	right: 20px;
+}
+.new_provider{
+	transition-duration: 1s;
+	background-color: white;
+	z-index: 10;
+	padding: 20px; 
+	position: absolute;
+	width: 500px;
+	top: -500px;
+	border: solid 1px rgb(210, 210, 210);
+	box-shadow: 5px 5px 5px #888888;
+}

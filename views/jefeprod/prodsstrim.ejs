@@ -1,0 +1,25 @@
+<%
+if(datalen.length){
+for(var i = 0; i< datalen.length;i++){
+%>
+<tr>
+    <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%= datalen[i].detalle %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="N° OF"><%= datalen[i].numordenfabricacion %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Cantidad"><%= datalen[i].cantidad %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Moldeo"><%= datalen[i]['1'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Fusion"><%= datalen[i]['2'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Quiebre"><%= datalen[i]['3'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Terminación"><%= datalen[i]['4'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico"><%= datalen[i]['5'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Maestranza"><%= datalen[i]['6'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Control de Calidad"><%= datalen[i]['7'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Producto Terminado"><%= datalen[i]['8'] %></td>
+    <td data-toggle="tooltip" data-placement="bottom" title="Tratados"><%= datalen[i].trats %></td>                
+</tr>
+<%  }
+} else {
+%>
+<tr><td>No hay producciones</td></tr>
+<%
+}
+%>

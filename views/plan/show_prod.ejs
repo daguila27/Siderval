@@ -1,0 +1,291 @@
+<div class="row" style=" margin: 0 ;padding-top: 3%; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<h2 class="page-header">Productos según OC: <a class="btn btn-info pull-right getcsv" data-tipo="prod" href="#"><i class="fa fa-download"></i> Generar csv</a></h2>
+
+<%function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }%>
+<div class="container" style="width: 100%">
+    <!--<div class="col-md-9 col-md-offset-3">
+        <ul class="pagination" style="margin: 0;">
+          <%if(thispag == 1){%>
+            <li class="disabled" data-pag='-1'><a>Anterior</a></li>
+          <%}
+          else{%>
+            <li class="nextsig-pag" data-pag='-1'><a>Anterior</a></li>
+          <%}
+          for(var u=0; u < paginas; u++){
+            if(u+1 == thispag){%>
+                <li class="disabled" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+          <%}else{%>
+                <li class="pag-prod" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+          <%}
+          }
+          if(thispag == paginas){%>
+            <li class="disabled" data-pag='1'><a>Siguiente</a></li>
+          <%}
+          else{%>
+            <li class="nextsig-pag" data-pag='1'><a>Siguiente</a></li>
+          <%}%>  
+        </ul>
+
+    </div>-->
+    <style type="text/css">
+        .pag-prod{
+            cursor: pointer;
+        }
+        .nextsig-pag{
+            cursor: pointer;
+        }
+    </style>
+    <div>
+       <form id="prod-search" >
+
+        <div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;display: flex;">
+            <input style="width: 80%" name="detalle" type="text" class="form-control" placeholder="Detalle / Codigo / Cliente / N° OC" tabindex="1">
+            <input type="hidden" class="form-control" name="codigo">
+            <button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+            <button style="width: 10%" type="button" class="btn input-group-addon actualizar" tabindex="3"><i class="glyphicon glyphicon-refresh"></i></button>
+        </div>
+        <!--<div class="form-group col-md-offset-2">
+            <div class="form-group col-md-6">
+                <label>Detalle</label>
+                <input class="form-control" name="detalle" type="text" placeholder="Detalle">
+            </div>
+                <input type="hidden" class="form-control" name="codigo" placeholder="P01020704VVV">
+            
+            <div class="form-group col-md-2 ">
+                <button class="btn btn-info" type="submit" href="#" style="margin-top: 0px;"><i class="fa fa-search"></i> Buscar</button>
+            </div>
+            <div class="form-group col-md-2 ">
+                <button class="btn btn-success actualizar" href="#"><i class="fa fa-refresh"></i> Restaurar</button>
+            </div>
+        </div>-->
+    </form>
+    </div>
+    <%if(thispag != 0){%>
+    <div class="col-md-5 col-md-offset-6">
+        <ul class="pagination" style="margin: 0px 0px 20px 0px;">  
+          <%if(thispag == 1){%>
+            <li class="disabled" data-pag='-1'><a>Anterior</a></li>
+          <%}
+          else{%>
+            <li class="nextsig-pag" data-pag='-1'><a>Anterior</a></li>
+          <%}
+          for(var u=0; u < paginas; u++){
+            if(u+1 == parseInt(thispag) ){%>
+                <li class="disabled" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+          <%}if(u+1 == parseInt(thispag)+1 ){%>
+                <li class="pag-prod" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+          <%}if(u+1 == parseInt(thispag)+2){%>
+                <li class="pag-prod" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+            <%}if(u+1 == parseInt(thispag)+3){%>
+                <li class="pag-prod" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+            <%}
+          }
+          if(thispag == paginas){%>
+            <li class="disabled" data-pag='1'><a>Siguiente</a></li>
+          <%}
+          else{%>
+            <li class="nextsig-pag" data-pag='1'><a>Siguiente</a></li>
+          <%}%> 
+        </ul>
+    </div>
+    <%}%>
+    <div class="col-md-10 col-md-offset-1">
+    <div id="accordion_of" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+        <% 
+
+          function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+
+        if(productos.length){
+            for(var i = 0; i< productos.length;i++){
+                %>
+        <div class="panel panel-default">
+            <div class="panel-heading" role="tab" >
+                <h4 class="panel-title" style="display: flex; padding: 10px; font-family: 'Oswald'">
+                    <div style="margin-left: 2%;margin-right: 2%, width: 48%">
+                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#colap<%=productos[i].idmaterial%>" aria-expanded="true" aria-controls="collapseOne"
+                        style="position: relative;">
+                            <h3><%= productos[i].detalle%></h3>
+                            <p class="pull-right" style="left: 10px; width: 100%">
+                                <b>Cantidad de apariciones: </b> 
+                                    <% if(productos[i].content){%>
+                                            <%= productos[i].content.split(',').length%>
+                                    <%}
+                                    else{%>
+                                            0
+                                    <%}%>
+                            </p>
+                        </a>
+                    </div>
+                </h4>
+            </div>
+            <div id="colap<%=productos[i].idmaterial%>" class="panel-collapse collapse" role="tabpanel" >
+                <table class="table table-striped" style="font-family: 'Oswald'; ">
+                    <thead>
+                    <tr>
+                        <th>N° OC</th>
+                        <th>Cliente</th>
+                        <th>Solicitados</th>
+                        <th>Despachados</th>
+                        <th>Sin producir</th>
+                        <th>Planta</th>
+                        <th>PT</th>
+                        <th>Fecha entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <%
+                    if(productos[i].content){
+                    productos[i].content = productos[i].content.split(',');
+                    for(var j = 0;j< productos[i].content.length;j++){
+                        productos[i].content[j] = productos[i].content[j].split('@');
+                        <!--FAENA =  SOLICITADO - restantes - PROD_TERM -->
+                        var faena = productos[i].content[j][1] - productos[i].content[j][2] - productos[i].content[j][4];
+                        %>
+                    <tr>
+                        <td><%= productos[i].content[j][0]%></td>
+                        <td><%= productos[i].content[j][6]%></td>
+                        <td><%= numberFormat(productos[i].content[j][1].toString())%></td>
+                        <td><%= numberFormat(productos[i].content[j][5].toString())%></td>
+                        <td><%= numberFormat(productos[i].content[j][2].toString())%></td>
+                        <td><%= numberFormat(faena.toString())%></td>
+                        <td><%= numberFormat(productos[i].content[j][4].toString())%></td>
+                        <td><%= productos[i].content[j][3]%></td>
+                    </tr>
+                    <%}}%>	
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <%}
+        }%>
+    </div>
+</div>
+  <%if(thispag != 0){%>
+    <div class="col-md-5 col-md-offset-6">
+        <ul class="pagination" style="margin: 0px 0px 20px 0px;">  
+          <%if(thispag == 1){%>
+            <li class="disabled" data-pag='-1'><a>Anterior</a></li>
+          <%}
+          else{%>
+            <li class="nextsig-pag" data-pag='-1'><a>Anterior</a></li>
+          <%}
+          for(var u=0; u < paginas; u++){
+            if(u+1 == parseInt(thispag) ){%>
+                <li class="disabled" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+          <%}if(u+1 == parseInt(thispag)+1 ){%>
+                <li class="pag-prod" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+          <%}if(u+1 == parseInt(thispag)+2){%>
+                <li class="pag-prod" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+            <%}if(u+1 == parseInt(thispag)+3){%>
+                <li class="pag-prod" data-pag="<%= u+1%>" ><a><%=u+1%></a></li>
+            <%}
+          }
+          if(thispag == paginas){%>
+            <li class="disabled" data-pag='1'><a>Siguiente</a></li>
+          <%}
+          else{%>
+            <li class="nextsig-pag" data-pag='1'><a>Siguiente</a></li>
+          <%}%> 
+        </ul>
+    </div>
+    <%}%>
+</div>
+<script type="text/javascript">
+    $(".getcsv").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/csv_' + $(this).data('tipo'),
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","prods hasta ~ " + new Date().toLocaleDateString() + ".csv");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar csv");
+                console.log(data);
+            }
+        });
+
+    });
+
+
+    $(".pag-prod").on('click', function(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/plan/show_prod/'+$(this).data('pag'),
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                }
+            });
+    });
+
+    $(".nextsig-pag").on('click', function(e){
+            e.preventDefault();
+            var topag = parseInt('<%= thispag%>') + parseInt($(this).data('pag'));
+            $.ajax({
+                type: 'GET',
+                url: '/plan/show_prod/'+topag,
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                }
+            });
+    });
+
+    $("#prod-search").submit(function(e){
+        e.preventDefault();
+        var formArray = $(this).serializeArray();
+        var returnArray = {};
+        for (var i = 0; i < formArray.length; i++){
+            returnArray[formArray[i]['name']] = formArray[i]['value'];
+        }
+        console.log(returnArray);
+        $.ajax({
+            type: 'POST',
+            data: returnArray,
+            url: '/plan/buscar_prod',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+    });
+
+
+    $(".actualizar").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+          type: 'GET',
+          url: '/plan/show_prod/1',
+          success:function(data){
+            $("#page-wrapper").html(data);
+          }
+        });
+    });
+
+</script>
+</div>

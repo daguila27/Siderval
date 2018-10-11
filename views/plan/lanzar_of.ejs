@@ -1,0 +1,311 @@
+<div class="col-md-10 col-md-offset-1 panel-creacionOF">
+        <div class="panel panel-primary cargando-panel" style="display: block;">
+            <div class="panel-heading">
+                <div style="width: 100%;text-align: center;">
+                    <img style="width: 25%" src="/loading.gif">
+                </div>
+            </div>
+        </div>
+        <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
+        <div class="panel panel-primary panel-defecto" style="display: none;">
+            <div class="panel-heading" style="width: 100%">
+                 <div class="dropdown pull-right">
+                      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></button>
+                      <ul class="dropdown-menu">
+                        <li class="ped-option" onclick="saveState(this)"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                        <li class="ped-option" onclick="loadState(this)"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                        <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                        <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                      </ul>
+                    </div>
+                <div style="display: flex;">
+                    <div style="width: 50%">
+                        <h3>Crear Orden de Fabricación: </h3>
+                       <!-- <div>
+                            <button class="btn btn-primary" onclick="saveStateOF()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+                            <button class="btn btn-primary" onclick="loadStateOF()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                        </div>-->
+                    </div>
+                    <div style="width: 50%">
+                        <label for="setdates">
+                            Ingresar fecha para todos: 
+                        </label>
+                        <div class="input-group"  style="width:30%;margin-left: 20%;margin-top: 5px"> 
+                                <span class="input-group-addon" ><i class="fa fa-calendar-o"></i></span>
+                                <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">   
+                        </div>   
+                    </div>
+                </div>
+            </div>       
+            <form id="send_of">
+            <div style="overflow-y: scroll; max-height: 300px;">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Fecha de entrega</th>
+                        <th>Cantidad</th>
+                        <th style="text-align: center;">Bloquear</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="session_fabrs">
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-footer">
+                <div class="form-inline">
+                    <input type="hidden" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Fabricación" class="form-control" value='1' required>
+                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
+                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                </div>
+
+            </div>
+            </form>
+        </div>
+
+
+</div>
+<div class="col-md-10 col-md-offset-1">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3>Añadir Productos</h3>
+        </div>
+        <div class="panel-body">
+            <form id="strimform">
+                <div class="form-inline">
+                    <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
+                    <select name="caract" class="form-control strim_input" id="caract">
+                        <option value="0">Cualquiera</option>
+                        <% for(var i = 0;i< caracts.length;i++){%>
+                        <option value="<%= caracts[i].idcaracteristica%>"><%= caracts[i].cnom%></option>
+                        <%}%>
+                    </select>
+                    <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Descripción</th>
+                <!--<th>Caracteristica</th>-->
+                <th>Aleacion</th>
+                <!--<th>Subaleacion</th>-->
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="prefabrs">
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function(){
+        loadStateOF();
+    });
+    function refresh(){
+        var data ={};
+        data.caract = $("#caract").val();
+        data.det = $("#det").val();
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/producidos_stream',
+            success: function(data){
+                $("#prefabrs").html(data);
+                //$("#caract").val('0');
+            }
+        });
+
+    }
+    function add_prefabr(yo) {
+        $.ajax({
+            type: 'POST',
+            data: $(yo).data(),
+            url: '/plan/addsession_prefabr',
+            success: function(data){
+                saveStateOF();
+                $("#session_fabrs").append(data);
+            }
+        });
+    }
+    function drop(yo){
+        $(yo).closest('tr').remove();
+    }
+    $("#strimform").on('submit',function(e){
+        e.preventDefault();
+        refresh();
+    });
+    $("#caract").on('change',function(){
+       refresh();
+    });
+    $("#setdates").on('change',function(){
+        var valor = $(this).val();
+        $("input[type=date]").each(function(e){
+            $(this).val(valor);
+        })
+    })
+    /*$(".strim_input").on("change",function(e){
+        var data ={};
+        data.caract = $("#caract").val();
+        data.det = $("#det").val();
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/producidos_stream',
+            success: function(data){
+                $("#prefabrs").html(data);
+            }
+        });
+
+    });*/
+    $("#num").on('keyup', function(e){
+            e.preventDefault();
+            if($(this).val() != ''){
+                $.ajax({
+                    type: 'GET',
+                    url: '/plan/found_num_of/'+$(this).val(),
+                    success: function(data){
+                        if(data == 'colapse'){
+                            $('.mensaje').html("Numero no disponible");
+                            $(".contenedor").css('height', '40px');
+                            $("#of_submit").prop('disabled', true);
+                        }
+                        else{
+                            $('.mensaje').html("Numero disponible");
+                            $(".contenedor").css('height', '40px');
+                            $("#of_submit").prop('disabled', false);    
+                        }
+                    }
+                });
+            }
+            else{
+                $(".contenedor").css('height', '0px');
+                $("#of_submit").prop('disabled', false);
+            }
+    });
+    $("#send_of").submit(function(e){
+        e.preventDefault();
+        lista = $(this).serializeArray();
+        var data = {
+            idm: [],
+            idp: [],
+            fechas: [],
+            cants: [],
+            lock: [],
+            cliente: $("#cliente").val()
+        }
+        for(var i =0;i<$(this).serializeArray().length;i++){
+            if(lista[i].name != 'nroordenfabricacion'){
+                data[lista[i].name].push(lista[i].value);
+            } else{
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        data.lock = [];
+        $("#send_of :checkbox").each(function(){
+           if($(this).is(':checked')){
+             data.lock.push('1');
+           }
+           else{
+             data.lock.push('0');  
+           }
+           //console.log($(this).val());
+        });
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/crear_of',
+            success: function(data){
+                if(data == 'error'){
+                    alert("El pedido es inválido");
+                } else {
+                    alert("La OF fue creada exitosamente");
+                    emitToast([data,0]);
+                    loadStateOF();
+                    //$("#page-wrapper").html(data);
+                }
+            }
+        });
+    });
+
+
+    $(".modalOption").on('click', function(e){
+        e.preventDefault();
+        alert("Creando");
+    });
+
+
+    function saveStateOF(){
+        var lista = $("#send_of").serializeArray();
+        console.log(lista);
+        var data = {
+            idm: [],
+            idp: [],
+            fechas: [],
+            cants: [],
+            lock: [],
+            nroordenfabricacion: ''
+        }
+        for(var i =0;i<$("#send_of").serializeArray().length;i++){
+            if(lista[i].name != 'nroordenfabricacion'){
+                data[lista[i].name].push(lista[i].value);
+            } else{
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        data.lock = [];
+        $("#send_of :checkbox").each(function(){
+           if($(this).is(':checked')){
+             data.lock.push('1');
+           }
+           else{
+             data.lock.push('0');  
+           }
+           //console.log($(this).val());
+        });
+        console.log(data);
+        var html = $(".sectionSave").html();
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/saveStateOFBD',
+            beforeSend: function(xhr){
+                //alert("Guardando!!");
+
+                $(".guardado_automatico").text("Guardando estado de OF ...");
+            },
+            success: function(data){
+                //alert("Estado de OC guardado");
+                $(".guardado_automatico").text("Guardado por ultima vez: "+ new Date().toLocaleString());
+
+            }
+        });
+    }
+
+    function loadStateOF(){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/loadStateOFBD',
+            beforeSend: function(xhr){
+                $(".guardado_automatico").css('display', 'none');
+                $(".panel-defecto").css('display', 'none');
+                $(".cargando-panel").css('display', 'block');
+
+                setTimeout(function(){  }, 1000);
+            },
+            success: function(data){
+                var text = $(".guardado_automatico").text();
+                $(".panel-creacionOF").html(data);
+                $(".guardado_automatico").text(text);
+            }
+        });
+    }
+</script>

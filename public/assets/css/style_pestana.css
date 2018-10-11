@@ -1,0 +1,29 @@
+.pestanas{
+	margin-bottom: 10px;
+	display: flex;
+}
+
+.active{
+	background-color: rgb(30, 144, 255);
+}
+.active a{
+	color: white;
+}
+.pestanas li{
+	border: solid 1px rgb(230, 230, 230);
+	padding: 20px;
+	display: block;
+	border-radius: 5%;
+	margin-right: 10px;
+	cursor: pointer;
+}
+.pestanas li a{
+	text-decoration-line: none;
+	padding: 20px;
+}
+.pestanas li:hover{
+	background-color: rgb(30, 144, 255);
+}
+.pestanas li:hover a{
+	color: white;
+}

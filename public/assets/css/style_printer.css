@@ -1,0 +1,25 @@
+body{
+	margin: 0;
+}
+.dad{
+	margin: 0;
+	padding: 0; 
+	display: flex; 
+	height: 430px;
+	width: 1000px;
+}
+.dad div{
+	/*border: solid 1px;*/ 
+	width: 50%; 
+	height: 425px;
+}
+.dad div p{
+	margin: 0;
+	font-family: 'Oswald', sans-serif;
+	font-size: 40px;
+}
+
+.dad div img{
+	margin-left: 60px;
+	width: 70%
+}

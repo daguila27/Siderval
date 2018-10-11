@@ -1,0 +1,88 @@
+    <%if(notif.length > 0){
+        for(var u=0; u < notif.length; u++){
+            var desc = notif[u].descripcion.split('@');
+            var hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];
+            
+            if(desc[0] == 'aoc'){%>
+            <li style="cursor: pointer;">
+                <a class="notificacion" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-idoc="<%= desc[1]%>">
+                    <div>
+                            <strong>Creación de OC</strong>
+                            <span class="pull-right text-muted">
+                            <em><%= hora%></em>
+                            </span>
+                    </div>                    
+                    <div>Es necesaria la creación de una nueva OC para Pedido # <%= notif[u].numoc%></div>
+                </a>
+            </li>
+            <li class="divider"></li>
+        <%}else{%>
+            <li style="cursor: pointer;">
+                <a class="notificacion-of" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-idof="<%= desc[1]%>">
+                    <div>
+                            <strong>Nueva OF</strong>
+                            <span class="pull-right text-muted">
+                            <em><%= hora%></em>
+                            </span>
+                    </div>                    
+                    <div>Se ha creado la OF # <%= desc[1].split('-')[0]%> - <%= desc[1].split('-')[1].substring(0,1).toUpperCase() + desc[1].split('-')[1].substring(1, desc[1].split('-')[1].length).toLowerCase()%></div>
+                </a>
+            </li>
+            <li class="divider"></li>
+        <%}
+    }%>
+    <%}
+    else{%>
+        <li>
+            <a href="#">
+                <div>
+                        <strong>No hay notificaciones</strong>
+                        <span class="pull-right text-muted">
+                        <em>Ahora mismo</em>
+                        </span>
+                </div>
+                <div>No tiene notificaciones.</div>
+            </a>
+        </li>
+    <%}%>
+
+
+
+
+
+
+
+<script type="text/javascript">
+    var cantNotif = parseInt("<%= notif.length%>");
+    $(".open-notif").data('cant',cantNotif);
+    $(".badge-notificaciones").html($(".open-notif").data('cant')); 
+    
+    if(cantNotif == 0)
+        $(".badge-notificaciones").css('display', 'none');
+    else
+        $(".badge-notificaciones").css('display', 'block');
+
+    $(".notificacion").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_dataodc/'+$(this).data('idoc'),
+            success: function(data){
+                $("#crearocModal div div form").html(data);
+                $("#crearocModal").modal('show');
+            }
+        });
+    });
+
+
+    $(".notificacion-of").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/drop_notifof/'+$(this).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    });
+</script>

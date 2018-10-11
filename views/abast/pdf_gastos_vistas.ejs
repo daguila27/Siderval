@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<title>Cierre de gastos mensual #<%=mes%></title>
+		<link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+	    <!-- MetisMenu CSS -->
+	    <link href="/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+	    <!-- Custom CSS -->
+	    <link href="/dist/css/sb-admin-2.css" rel="stylesheet">
+
+	    <!-- Morris Charts CSS -->
+	    <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+	    
+
+
+	    <!-- Advance Table CSS -->
+	    <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">
+
+	    <!-- Custom Fonts -->
+	    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	    
+	    
+	    
+
+
+
+	</head>
+	<style type='text/css'>
+
+		body{
+			height: 100%;
+			background-color: white;
+			margin: 0 5%;
+			padding: 0;
+		}
+		.header{
+			display: flex;
+		}
+		.fecha{
+			text-align: right;
+		}
+		.info{
+			border: 1px solid;
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			padding-left:1%; 
+		}
+		.cab_table th{
+			padding-left: 1%;
+			border: 1px solid;
+		}
+		.tabla tbody > tr td{
+			border: 1px solid;
+			text-align: center;
+		}
+
+
+		
+		.tabla tfoot{
+			border: 1px solid;
+			text-align: center;
+		}
+		.fund{
+			border: 1px solid;
+		}
+		.obs{
+			margin-top: 2%;
+		}
+		.obs div{
+			border: 1px solid;
+		}
+		.component_item{
+			display: flex;
+		}
+		.div-tabla{
+			margin: 0;
+			padding: 20px;
+			width: 70%;
+		}
+		.material{
+			margin-top: 10px;
+			border: 1px solid;
+			text-align: center;
+			vertical-align: center;
+			width: 30%;
+		}
+	</style>
+	<body>
+		<%function trunc (x, posiciones = 0) {
+		  	var s = x.toString()
+		  	var l = s.length
+		  	if(s.indexOf('.') == -1){
+		  		return x;
+		  	}
+		  	else{
+				var decimalLength = s.indexOf('.') + 1;
+		  		var numStr = s.substr(0, decimalLength + posiciones);
+		  		return Number(numStr);
+		  	}
+		  	
+		}
+		function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }
+		%>
+		<div class='header' style="float: left; width: 100%; align-content: center; margin-top: 10px; padding: 0">
+			<img style='width: 33%;float: left' src='/assets/img/logo.png'>
+			<p style='text-align: center; width: 33%; font-size: 6px;float: left'>
+				Fundicion y Maestranza<br> Calle Decima - Parcela N° 474 <br> Placilla - Valparaiso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
+			</p>
+			<div style='padding: 0% 10%; padding-top: 2%;float: left;'>
+			</div>
+		</div>
+		<div style="font-size: 10px; float: left; width: 100%; margin-top: 5px;margin-bottom: 5px">
+			<div style="float: left;">Cuadro de gastos mensual: <%= mes.split('@')[0].split('-')[0]%>-<%= mes.split('@')[0].split('-')[1]%></div>	   
+		</div>
+		<div class='body' style="font-size: 8px; float: left; width: 100%; margin-bottom: 5px">
+			<div class='fecha' style="float: right;">Valparaiso, <%= new Date().toLocaleDateString();%></div>
+			   
+		</div>
+			   <div style="width: 100%; float: left; font-size: 8px; align-content: center; padding: 0">
+			   <table class="tabla" style="width: 100%">
+                        <thead class='cab_table'>
+                        <tr>
+                            <th>Detalle</th>
+                            <th>Salidas</th>
+                            <th>Devoluciones</th>
+                            <th> Usados </th>
+                            <th> Unidad </th>
+                            <th> Precio </th>
+                            <th> Total </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% var total = 0;
+                            for(var i = 0;i< data.length;i++){%>
+                                <tr>
+                                    <td><%= data[i].detalle%></td>
+                                    <td><%= numberFormat(data[i].sum_sal.toString())%></td>
+                                    <td><%= numberFormat(data[i].sum_ing.toString())%></td>
+                                    <td><%= numberFormat( (data[i].sum_sal - data[i].sum_ing).toString() )%></td>
+                                    <td><%= data[i].u_medida%></td>
+                                    <td>$<%= numberFormat(data[i].precio.toString())%></td>
+                                    <td>$<%= numberFormat((data[i].precio*(data[i].sum_sal - data[i].sum_ing)).toString()) %></td>
+                                    <% total += data[i].precio*(data[i].sum_sal - data[i].sum_ing);%>
+                                </tr>
+                              
+                            <%}%>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td><b>Total:</b></td>
+                              <td>$<%=numberFormat(total.toString())%></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+    <!-- jQuery -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Metis Menu Plugin JavaScript -->
+    <script src="/vendor/metisMenu/metisMenu.min.js"></script>
+
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+    <!-- Morris Charts JavaScript -->
+    <script src="/vendor/raphael/raphael.min.js"></script>
+    <script src="/vendor/morrisjs/morris.min.js"></script>
+    <script src="/data/morris-data.js"></script>
+    <!-- DataTables JavaScript -->
+    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="/dist/js/sb-admin-2.js"></script>
+    
+    <script src="/vendor/jquery/jquery.twbsPagination.js" type="text/javascript"></script>
+	</body>
+
+	</html>	

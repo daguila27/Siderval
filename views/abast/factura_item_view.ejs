@@ -1,0 +1,45 @@
+<%
+if(data.length){
+    for(var i = 0; i< data.length;i++){
+        %>
+<div class="col-md-6 col-md-offset-1 list-group factura" style="margin: 0; padding: 1%">
+    <div class="dropdown" style="position: absolute; top: 15px; right: 15px; z-index: 10">
+      <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
+      <ul class="dropdown-menu dropdown-menu-right">
+         <li><a>Ver PDF</a></li>  
+      </ul>
+    </div>
+  <a href="#" class="list-group-item factura-item" data-idfactura='<%= data[i].idfactura%>' data-numfac='<%= data[i].numfac%>' data-sigla='<%= data[i].sigla%>'  data-razon='<%= data[i].razon%>' data-coment='<%= data[i].coment%>' data-numoda = '<%= data[i].numoda%>' data-fecha='<%= data[i].fecha%>'>
+    <h4 class="list-group-item-heading">Factura #<%= data[i].numfac%></h4>
+    <p class="list-group-item-text"><b>OCA:</b> <%= data[i].numoda%></p>
+    <p class="list-group-item-text"><b>Proveedor:</b> <%= data[i].sigla%></p>
+    <p class="list-group-item-text">Facturado el <%= [new Date(data[i].fecha).toLocaleDateString().split('-')[2],new Date(data[i].fecha).toLocaleDateString().split('-')[1],new Date(data[i].fecha).toLocaleDateString().split('-')[0] ].join('/')%></p>
+  </a>
+</div>
+    <%}%>
+<%}else{%>
+    <h1 style="text-align: center; margin-top: 10px"> No hay OC registradas</h1>
+<%}%>
+
+<script type="text/javascript">
+  $(".factura-item").on('click', function(e){
+        e.preventDefault();
+        var idfactura = $(this).data('idfactura');
+        var numfac = $(this).data('numfac');
+        var coment = $(this).data('coment');
+        var numoda = $(this).data('numoda');
+        var razon = $(this).data('razon');
+        var sigla = $(this).data('sigla');
+        var fecha = $(this).data('fecha');
+        $.ajax({
+          type: 'GET',
+          url: '/abastecimiento/fact_info_view/'+idfactura,
+          success: function(data){
+                $(".well-coment").html('Proveedor: '+sigla+' - '+razon+' <br> <span>'+coment+'</span>');
+                $(".factura-numero").html("Factura #"+numfac+" <small>OCA N°"+numoda+" - Facturado el "+new Date(fecha).toLocaleDateString()+"</small><i class='glyphicon glyphicon-chevron-left pull-right' onclick='desplazar_izquierda()'  style='size: 50%; cursor: pointer;'></i>");
+                $(".info-factura").html(data);
+                desplazar_derecha();
+          }
+        });
+    });
+</script>

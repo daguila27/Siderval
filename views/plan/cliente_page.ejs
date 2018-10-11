@@ -1,0 +1,91 @@
+<div class="row" style="padding: 0;margin: 0; width: 100%">
+
+<%
+function primeraMayuscula(string){
+  string = string.split(' ');
+  for(var e=0; e < string.length; e++){
+    string[e] = string[e].substring(0,1).toUpperCase() + string[e].substring(1,string[e].length).toLowerCase();
+  }
+  return string.join(" ");
+}
+for(var t=0; t < data.length; t++ ){%> 
+  <div class="col-sm-6 col-md-4">
+    <div class="alert alert-success thumbnail">
+      <img src="" alt="">
+      <div class="caption">
+      		<div class="dropdown" style="position: absolute; top: 15px; right: 30px;">
+      		  <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
+      		  <ul class="dropdown-menu dropdown-menu-right">
+      		  	<li><a class="editClient" data-idcl="<%=data[t].idcliente%>">Editar</a></li>
+			    <li><a class="odcClient" data-idcl="<%=data[t].idcliente%>">Ver Ordenes de Compra</a></li>
+			  </ul>
+			</div>
+	        <%if(data[t].sigla.length>20){%>
+	        	<h4><a title="<%=data[t].sigla%>  -  <%=data[t].rut%>" data-content="<%=data[t].razon%>" data-toggle="popover" data-placement="top"><%=primeraMayuscula(data[t].sigla.substring(0,20))%>...</a></h4>
+	        <%}else{%>
+	        	<h4><a title="<%=data[t].sigla%>  -  <%=data[t].rut%>" data-content="<%=data[t].razon%>" data-toggle="popover" data-placement="top"><%=primeraMayuscula(data[t].sigla)%></a></h4>
+	        <%}%>
+	    <div>
+			<%if(data[t].giro){
+			if(data[t].giro.length>30){%>
+        		<h5><a data-content="<%=data[t].giro%>" data-toggle="popover" data-placement="top"><%=primeraMayuscula(data[t].giro.substring(0,30))%>...</a></h5>
+	        <%}else{%>
+        		<h5><a data-content="<%=data[t].giro%>" data-toggle="popover" data-placement="top"><%=primeraMayuscula(data[t].giro)%></a></h5>
+	        <%}}
+	        else{%>
+        		<h5><a data-toggle="popover" data-placement="top">Sin giro especificado</a></h5>
+	        <%}%>
+
+
+        	<%if(data[t].direccion.length>25){%>
+        		<p><a title="<%=data[t].ciudad%>" data-content="<%=data[t].direccion%>" data-toggle="popover" data-placement="top"><i class="glyphicon glyphicon-map-marker"></i> <%=primeraMayuscula(data[t].direccion.substring(0,25))%>...</a></p>
+	        <%}else{%>
+        		<p><a title="<%=data[t].ciudad%>" data-content="<%=data[t].direccion%>" data-toggle="popover" data-placement="top"><i class="glyphicon glyphicon-map-marker"></i> <%=primeraMayuscula(data[t].direccion)%></a></p>
+	        <%}%>        
+	        <a title="Contacto: " data-content="<%=data[t].contacto%>" data-toggle="popover" data-placement="top"><i class="glyphicon glyphicon-earphone"></i> <%=data[t].telefono%></a>
+			<p style="margin-top: 10px">
+				<i class="fa fa-truck"></i>  <span class="label label-primary"><%=data[t].odcs%> OC en curso</span>
+			</p>
+		</div>
+      </div>
+     </div>
+  </div> 
+  <%}%>
+</div>  
+  <script type="text/javascript">
+  	$(document).ready(function(){
+    	$('[data-toggle="popover"]').popover({ trigger: "hover" }); 
+	});
+
+  	$(".odcClient").on('click', function(e){
+  		e.preventDefault();
+
+  		$.ajax({
+        	type:'GET', 
+        	url: '/plan/odc_client/'+$(this).data('idcl'),
+        	success: function(data){
+        		$("#page-wrapper").html(data);
+        	}
+        });
+  	});
+
+    $(".editClient").on('click', function(e){
+      e.preventDefault();
+      $.ajax({
+          type:'GET', 
+          url: '/plan/info_client/'+$(this).data('idcl'),
+          success: function(data){
+                  console.log(data);
+                  $("#rut").val(data.rut);
+                  $("#sigla").val(data.sigla);
+                  $("#razon").val(data.razon);
+                  $("#dir").val(data.direccion);
+                  $("#city").val(data.ciudad);
+                  $("#telefono").val(data.telefono);
+                  $("#contacto").val(data.contacto);
+                  $("#giro").val(data.giro);
+                  $("#editCliente").modal();
+          }
+        });
+    });
+  </script>

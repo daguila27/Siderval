@@ -1,0 +1,35 @@
+
+<% 
+function letraMayus(string) {
+     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+} 
+
+if(data.length){
+for(var i = 0;i<data.length;i++){
+    %>
+<tr>
+    <td><%= data[i].detalle%></td>
+    <!--<td><%# data[i].cnom%></td>-->
+    <td>
+        <div class="btn-group" style="margin-left: 40%">        
+            <% if(data[i].idproducido != null){%>
+            <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducido%>" data-tipo="producido" class="btn btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Fabricar</a>
+            <%}%>
+            <% if(data[i].idproducto != null){%>
+            <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducto%>" data-tipo="producto" class="btn btn-info" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Externo</a>
+            <%}%>
+            <% if(typeof data[i].idotro != 'object'){%>
+            <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idotro%>" data-tipo="otro" class="btn btn-warning" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Otro</a>
+            <%}%>
+        </div>
+    </td>
+</tr>
+
+
+<%
+}
+} else {%>
+<tr>
+    <td>No Hay productos para mostrar</td>
+</tr>
+<%}%>

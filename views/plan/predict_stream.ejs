@@ -1,0 +1,41 @@
+<ul class="predicciones">
+	<style type="text/css">
+		.predicciones{
+			margin: 0;
+			padding: 0;
+			z-index: 10;
+		}
+		.predicciones li{
+			padding: 0;
+			padding-left: 5%;
+			list-style: none;
+			text-decoration: none;
+			margin: 0;
+			border-bottom: solid 1px rgba(0,0,0,10);
+			border-left: dotted 1px rgb(0,0,0);
+			border-right: dotted 1px rgb(0,0,0);
+		}
+		.predicciones li:hover{
+			background-color: black;
+			color: white;
+			cursor: pointer;
+		}
+		.predicciones li:focus{
+			background-color: black;
+			color: white;
+			cursor: pointer;
+		}
+	</style>
+	<!--data-pago=" info[t].tokenoda.split('@')[3]"-->
+	<%for(var t=0; t < info.length; t++){%>
+		<li tabindex="<%=t%>" data-id="<%= info[t].idcliente%>" data-sigla="<%=info[t].sigla.substring(0,1).toUpperCase()+info[t].sigla.substring(1,info[t].sigla.length).toLowerCase()%>" data-pago="<%= info[t].pago%>"  onclick="pull_info(this)"><%=info[t].sigla.substring(0,1).toUpperCase()%><%=info[t].sigla.substring(1,info[t].sigla.length).toLowerCase()%></li>
+	<%}%>
+</ul>
+<script type="text/javascript">
+	function pull_info(yo){
+		console.log($(yo).parent().parent().parent());
+		$(yo).parent().parent().parent().children('input').val($(yo).data('id')+" - "+$(yo).data('sigla'));
+		$(yo).parent().parent().html('');
+		$("#send_of #pag").val($(yo).data('pago')+'');
+	}
+</script>

@@ -1,0 +1,56 @@
+    <%if(notif.length > 0){
+        for(var u=0; u < notif.length; u++){
+            var desc = notif[u].descripcion.split('@');
+            var hora = desc[3].split(' ')[1].split(':')[0] +":"+desc[3].split(' ')[1].split(':')[1];
+            %>
+            <li>
+                <a href="#" data-toggle="modal" data-target="#notifModal" class="notificacion" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
+                    <div>
+                            <strong>Material entrante</strong>
+                            <span class="pull-right text-muted">
+                            <em><%= hora%></em>
+                            </span>
+                    </div>
+                    <div>Ha recibido <%= desc[2]%> unidades de <%=notif[u].detalle%></div>
+                </a>
+            </li>
+            <li class="divider"></li>
+        <%}%>
+                    <li>
+                                <a class="text-center" href="#">
+                                    <strong>Read All Messages</strong>
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            </li>
+    <%}
+    else{%>
+        <li>
+            <a href="#">
+                <div>
+                        <strong>No hay notificaciones</strong>
+                        <span class="pull-right text-muted">
+                        <em>Ahora mismo</em>
+                        </span>
+                </div>
+                <div>No tiene notificaciones.</div>
+            </a>
+        </li>
+    <%}%>
+
+<script type="text/javascript">
+    var cantNotif = parseInt("<%= notif.length%>");
+    $(".open-notif").data('cant',cantNotif);
+    $(".badge-notificaciones").html($(".open-notif").data('cant')); 
+    
+    if(cantNotif == 0)
+        $(".badge-notificaciones").css('display', 'none');
+    else
+        $(".badge-notificaciones").css('display', 'block');
+
+    $(".notificacion").on('click', function(e){
+        e.preventDefault();
+        $(".matModal").html($(this).data('detalle'));
+        $("#idNotif").val($(this).data('id'));
+        $("#sendcant").val($(this).data('cant'));
+    });
+</script>
