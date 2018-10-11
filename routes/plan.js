@@ -1263,47 +1263,54 @@ router.get('/parsecsv_fase1testeo_5', function(req, res, next){
                             for(var r=0; r < fabs.length; r++){
                                 if(fabs[r][0] == mats[e].codigo){
                                     fabs[r][0] = mats[e].idmaterial;
-                                    fabs[r][5] = mats[e].idproducto;
-
+                                    //fabs[r][5] = mats[e].idproducto;
                                 }
                             }
                         }
 
                         console.log(fabs.length);
-
-                        connection.query("INSERT INTO ordenfabricacion (`numordenfabricacion`,`idodc`) VALUES ?", [of], function(err, inOF){
+                        connection.query("SELECT * FROM producido", function(err, producido){
                             if(err) throw err;
-                            console.log(inOF);
-                            for(var r=0; r < fabs.length; r++){
-                                fabs[r][1] = inOF.insertId;
-                            }
-
-                            connection.query("INSERT INTO fabricaciones (`idmaterial`,`idorden_f`,`cantidad`,`despachados`,`idpedido`, `idproducto`) VALUES ?", [fabs], function(err, inFabs){
-                                if(err) throw err;
-                                console.log(inFabs);
-
-                                for(var e=0; e < prods.length; e++){
-                                    prods[e][0] = inFabs.insertId + e; 
+                            for(var e=0; e < producido.length; e++){
+                                for(var r=0; r < fabs.length; r++){
+                                    if(fabs[r][0] == producido[e].idmaterial){
+                                        fabs[r][5] = producido[e].idproducto;
+                                    }
                                 }
-                                connection.query("INSERT INTO ordenproduccion (`f_gen`) VALUES ?", [op], function(err, inOP){
-                                    if(err) throw err;
+                            }                                                
+                            connection.query("INSERT INTO ordenfabricacion (`numordenfabricacion`,`idodc`) VALUES ?", [of], function(err, inOF){
+                                if(err) throw err;
+                                console.log(inOF);
+                                for(var r=0; r < fabs.length; r++){
+                                    fabs[r][1] = inOF.insertId;
+                                }
 
-                                    console.log(inOP);
+                                connection.query("INSERT INTO fabricaciones (`idmaterial`,`idorden_f`,`cantidad`,`despachados`,`idpedido`, `idproducto`) VALUES ?", [fabs], function(err, inFabs){
+                                    if(err) throw err;
+                                    console.log(inFabs);
+
                                     for(var e=0; e < prods.length; e++){
-                                        prods[e][1] = inOP.insertId; 
-                                    }   
-                                    connection.query("INSERT INTO produccion (`idfabricaciones`,`idordenproduccion`,`cantidad`,`abastecidos`,`1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `standby`, `f_gen`) VALUES ?", [prods], function(err, inProds){
+                                        prods[e][0] = inFabs.insertId + e; 
+                                    }
+                                    connection.query("INSERT INTO ordenproduccion (`f_gen`) VALUES ?", [op], function(err, inOP){
                                         if(err) throw err;
 
-                                        console.log(inProds);
-                                        res.redirect('/plan');
+                                        console.log(inOP);
+                                        for(var e=0; e < prods.length; e++){
+                                            prods[e][1] = inOP.insertId; 
+                                        }   
+                                        connection.query("INSERT INTO produccion (`idfabricaciones`,`idordenproduccion`,`cantidad`,`abastecidos`,`1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `standby`, `f_gen`) VALUES ?", [prods], function(err, inProds){
+                                            if(err) throw err;
+
+                                            console.log(inProds);
+                                            res.redirect('/plan');
+                                        });
                                     });
                                 });
+
+
                             });
-
-
                         });
-
                     });
                     
                 });
