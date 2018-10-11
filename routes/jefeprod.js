@@ -379,6 +379,7 @@ router.get('/list_ops', function(req, res, next){
                         console.log("Select Error: %s",err);
                     }
                     var aux = [];
+                    console.log(ofs);
                     for(var i = 0;i< ofs.length;i++){
                     	if(typeof ofs[i].oftoken != 'null'){
                 			ofs[i].oftoken = ofs[i].oftoken.split(',');
