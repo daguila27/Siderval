@@ -136,7 +136,6 @@ router.get('/item_ofs', function(req, res, next){
                 connection.query("SELECT * FROM ordenfabricacion LEFT JOIN odc ON odc.idodc=ordenfabricacion.idodc",
                     function (err,of){
                     if(err) console.log("Select Error: %s",err);
-                    console.log(of);
                     res.render('plan/item_ofs',{data: of });
                 });});
             });
@@ -212,15 +211,19 @@ router.get('/page_of/:idodc', function(req, res, next){
             var idodc = req.params.idodc;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("select ordenfabricacion.*, group_concat(fabricaciones.cantidad) as cantidad"
-                    +",group_concat(coalesce(fabricaciones.restantes,fabricaciones.cantidad) ) as restantes,"
-                    +"group_concat(material.detalle separator '@') as detalle,group_concat(fabricaciones.f_entrega separator '@') "
-                    +"as f_entrega from fabricaciones left join material on material.idmaterial=fabricaciones.idmaterial left join"
-                    +" ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f where fabricaciones.idorden_f=? group by ordenfabricacion.idordenfabricacion",[idodc], function(err ,rows){
-                        if(err) console.log("Select Error: %s",err);
-                        
-                        //res.redirect('/plan');
-                        res.render('plan/page_of', {data:rows[0]});
+                connection.query("SET SESSION group_concat_max_len = 1000000", function(err, len){
+                    if(err) console.log("Select Error: %s",err);
+                    console.log(len);        
+                    connection.query("select ordenfabricacion.*,cliente.*, group_concat(fabricaciones.cantidad) as cantidad"
+                        +",group_concat(coalesce(fabricaciones.restantes,fabricaciones.cantidad) ) as restantes,"
+                        +"group_concat(material.detalle separator '@') as detalle,group_concat(material.u_medida) as u_medida,group_concat(to_days(fabricaciones.f_entrega)-to_days(now()))  as dias,group_concat(fabricaciones.f_entrega separator '@') "
+                        +"as f_entrega from fabricaciones left join material on material.idmaterial=fabricaciones.idmaterial left join"
+                        +" ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join odc on odc.idodc=ordenfabricacion.idodc left join cliente on cliente.idcliente=odc.idcliente where fabricaciones.idorden_f=? group by ordenfabricacion.idordenfabricacion",[idodc], function(err ,rows){
+                            if(err) console.log("Select Error: %s",err);
+                            
+                            //res.redirect('/plan');
+                            res.render('plan/page_of', {data:rows[0]});
+                    });
                 });
             });
         } else res.redirect("/bad_login");
@@ -1436,7 +1439,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                     
                 });
             });
-        var input = fs.createReadStream('csvs/OC.csv');
+        var input = fs.createReadStream('csvs/OC2.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
@@ -1568,8 +1571,13 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                             for(var w=0; w < fabs.length; w++){
                                                 for(var t=0; t < mats1.length; t++){
                                                     if(mats1[t].codigo == fabs[w][3]){
-                                                        fabs[w][3] = mats1[t].idmaterial;           
+                                                        fabs[w][3] = mats1[t].idmaterial;
+                                                        if(mats1[t].idproducto==null || mats1[t].idproducto == ''){
+                                                            console.log(mats1[t].idmaterial);
+                                                            console.log(mats1[t].idproducto);
+                                                        }           
                                                         fabs[w][5] = mats1[t].idproducto;
+
                                                         break;           
                                                     }
                                                     else if(t == mats1.length-1){
@@ -1606,7 +1614,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                         
                 });
             });
-        var input = fs.createReadStream('csvs/OF.csv');
+        var input = fs.createReadStream('csvs/OF2.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
@@ -1739,7 +1747,7 @@ router.get('/parsecsv_fase1testeo_3', function(req, res, next){
                                         
                 });
             });
-        var input = fs.createReadStream('csvs/GD.csv');
+        var input = fs.createReadStream('csvs/GD2.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
