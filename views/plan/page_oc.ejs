@@ -27,7 +27,7 @@
                     </div>
                     <div class="oe_title">
                         <h1>
-                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Fabricación N°<%=data.numordenfabricacion%></span>
+                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=data.numoc%></span>
                         </h1>
                     </div>
                     <div class="o_group">
@@ -151,7 +151,7 @@
                                                     <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
                                                     <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                     <th class="o_column_sortable">Cantidad</th>
-                                                    <th class="o_column_sortable" style="text-align: center;">Restantes</th>
+                                                    <th class="o_column_sortable" style="text-align: center;">Despachados</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Días restantes</th>
@@ -164,7 +164,7 @@
                                                 data.detalle = data.detalle.split('@');
                                                 data.f_entrega = data.f_entrega.split('@');
                                                 data.cantidad = data.cantidad.split(',');
-                                                data.restantes = data.restantes.split(',');
+                                                data.despachados = data.despachados.split(',');
                                                 data.u_medida = data.u_medida.split(',');
                                                 data.dias = data.dias.split(',');
                                                 for(var e=0; e < data.detalle.length; e++){
@@ -178,7 +178,7 @@
                                                         </td>
                                                         <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=data.detalle[e]%></td>
                                                         <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=data.cantidad[e]%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=data.restantes[e]%></td>
+                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=data.despachados[e]%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=data.u_medida[e]%></td>
                                                         <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(data.f_entrega[e]).toLocaleDateString())%></td>
                                                         <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=data.dias[e]%></td>

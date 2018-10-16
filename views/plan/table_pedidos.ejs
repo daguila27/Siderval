@@ -17,7 +17,7 @@
 		</thead>
 	<tbody class="ui-sortable">
 		<%for(var i=0; i < data.length; i++){%>
-			<tr class="o_data_row">
+			<tr class="o_data_row" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
@@ -76,4 +76,15 @@
 			}
 		});
 	});
+
+	function submit_form(yo){
+		//$("#form"+$(yo).data('idodc')).submit();
+		$.ajax({
+			type: 'GET',
+			url: '/plan/page_oc/'+$(yo).data('idodc'),
+			success: function(data){
+				$(".main-page").html(data);	
+			}
+		});
+	}
 </script>

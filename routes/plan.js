@@ -232,6 +232,34 @@ router.get('/page_of/:idodc', function(req, res, next){
 
 });
 
+router.get('/page_oc/:idodc', function(req, res, next){
+    if(verificar(req.session.userData)){
+        if(req.session.isUserLogged){
+            console.log(req.params.idodc);
+            var idodc = req.params.idodc;
+            req.getConnection(function(err,connection){
+                if(err) console.log("Connection Error: %s",err);
+                connection.query("SET SESSION group_concat_max_len = 1000000", function(err, len){
+                    if(err) console.log("Select Error: %s",err);
+                    console.log(len);        
+                    connection.query("select odc.*,cliente.*, group_concat(pedido.cantidad) as cantidad"
+                        +",group_concat(coalesce(pedido.despachados,0) ) as despachados,"
+                        +"group_concat(material.detalle separator '@') as detalle,group_concat(material.u_medida) as u_medida,group_concat(to_days(pedido.f_entrega)-to_days(now()))  as dias,group_concat(pedido.f_entrega separator '@') "
+                        +"as f_entrega from pedido left join material on material.idmaterial=pedido.idmaterial left join"
+                        +" odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente where pedido.idodc=? group by odc.idodc",[idodc], function(err ,rows){
+                            if(err) console.log("Select Error: %s",err);
+                            
+                            //res.redirect('/plan');
+                            res.render('plan/page_oc', {data:rows[0]});
+                    });
+                });
+            });
+        } else res.redirect("/bad_login");
+    }
+    else{res.redirect('bad_login');}
+
+});
+
 
 
 router.get('/all_clientes', function(req, res, next){
@@ -1223,6 +1251,316 @@ router.get('/parsecsv_bomBD', function(req, res, next){
                 });
             });
         var input = fs.createReadStream('csvs/bomBD.csv');
+        input.pipe(parser);
+
+        /*input.pipe(parse(function(err, rows){
+            if(err) throw err;
+            console.log(rows);
+        }));*/
+
+    } else res.redirect("/bad_login");
+});
+router.get('/parsecsv_procesado', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+        var parser = parse(
+            function(err,rows){
+                if(err) throw err;
+                var array = [];
+                var names = [];
+                var suma = 0;
+                var codes = "(";
+                for(var i=1; i<rows.length; i++){
+                    suma = parseInt(rows[i][4])+parseInt(rows[i][5])+parseInt(rows[i][6])+
+                        parseInt(rows[i][7])+parseInt(rows[i][8])+parseInt(rows[i][9])+parseInt(rows[i][10]);
+                    if(names.indexOf(rows[i][3]) == -1){
+                        array.push({   
+                                nombre: rows[i][3],
+                                cantidad:  suma,
+                                procesado: 0,
+                                diferencia: 0,
+                                molIni: parseInt(rows[i][4]),
+                                fusIni: parseInt(rows[i][5]),
+                                quiIni: parseInt(rows[i][6]),
+                                terIni: parseInt(rows[i][8]),
+                                ttoIni: parseInt(rows[i][7]),
+                                calIni: parseInt(rows[i][9]),
+                                bptIni: parseInt(rows[i][10]),
+                                mol: parseInt(rows[i][4]),
+                                fus: parseInt(rows[i][5]),
+                                qui: parseInt(rows[i][6]),
+                                ter: parseInt(rows[i][8]),
+                                tto: parseInt(rows[i][7]),
+                                cal: parseInt(rows[i][9]),
+                                bpt: parseInt(rows[i][10]),
+                                codigo: rows[i][2]
+                            });
+                        names.push(rows[i][3]);
+                        codes += "'"+rows[i][2]+"',";
+                    }
+                    else{
+                        //if(req.params.dia == rows[i][1]){
+                            array[names.indexOf(rows[i][3])].procesado += suma;
+                            /*
+                            array[names.indexOf(rows[i][3])].mol -= parseInt(rows[i][4]);                        
+                            array[names.indexOf(rows[i][3])].fus -= parseInt(rows[i][5]);                        
+                            array[names.indexOf(rows[i][3])].qui -= parseInt(rows[i][6]);                        
+                            array[names.indexOf(rows[i][3])].ter -= parseInt(rows[i][8]);                        
+                            array[names.indexOf(rows[i][3])].tto -= parseInt(rows[i][7]);                        
+                            array[names.indexOf(rows[i][3])].cal -= parseInt(rows[i][9]);
+                            
+                            array[names.indexOf(rows[i][3])].fus += parseInt(rows[i][4]);
+                            array[names.indexOf(rows[i][3])].qui += parseInt(rows[i][5]);
+                            array[names.indexOf(rows[i][3])].ter += parseInt(rows[i][6]);
+                            array[names.indexOf(rows[i][3])].tto += parseInt(rows[i][8]);
+                            array[names.indexOf(rows[i][3])].cal += parseInt(rows[i][7]);                        
+                            array[names.indexOf(rows[i][3])].bpt += parseInt(rows[i][9]);
+                            Moldeo  1 [4]
+                            Fusión  2 [5]  
+                            Quiebre 3 [6] 
+                            Tratamiento Térmico 5 [7]
+                            Terminación 4 [8]
+                            Control de Calidad  7 [9]
+                            Producto Terminado  8 [10]
+                                
+                                1,2,3,5,4,7,8
+                         */    
+                            
+                            array[names.indexOf(rows[i][3])].mol -= parseInt(rows[i][4]);                        
+                            array[names.indexOf(rows[i][3])].fus += parseInt(rows[i][4]);
+                            
+                            array[names.indexOf(rows[i][3])].fus -= parseInt(rows[i][5]);                        
+                            array[names.indexOf(rows[i][3])].qui += parseInt(rows[i][5]);
+                            
+                            array[names.indexOf(rows[i][3])].qui -= parseInt(rows[i][6]);                        
+                            array[names.indexOf(rows[i][3])].tto += parseInt(rows[i][6]);
+                            
+                            array[names.indexOf(rows[i][3])].tto -= parseInt(rows[i][7]);                        
+                            array[names.indexOf(rows[i][3])].ter += parseInt(rows[i][7]);
+                            
+                            array[names.indexOf(rows[i][3])].ter -= parseInt(rows[i][8]);                        
+                            array[names.indexOf(rows[i][3])].cal += parseInt(rows[i][8]);                        
+                            
+                            array[names.indexOf(rows[i][3])].cal -= parseInt(rows[i][9]);
+                            array[names.indexOf(rows[i][3])].bpt += parseInt(rows[i][9]);
+                        //}
+                    }
+                }
+                /*array[names.indexOf(rows[i][3])].mol -= parseInt(rows[i][4]);                        
+                array[names.indexOf(rows[i][3])].fus += parseInt(rows[i][4]);
+                array[names.indexOf(rows[i][3])].fus -= parseInt(rows[i][5]);                        
+                array[names.indexOf(rows[i][3])].qui += parseInt(rows[i][5]);
+
+                array[names.indexOf(rows[i][3])].qui -= parseInt(rows[i][6]);                        
+                array[names.indexOf(rows[i][3])].ter += parseInt(rows[i][6]);
+
+                array[names.indexOf(rows[i][3])].ter -= parseInt(rows[i][8]);                        
+                array[names.indexOf(rows[i][3])].tto += parseInt(rows[i][8]);
+
+                array[names.indexOf(rows[i][3])].tto -= parseInt(rows[i][7]);                        
+                array[names.indexOf(rows[i][3])].cal += parseInt(rows[i][7]);                        
+                
+                
+                array[names.indexOf(rows[i][3])].cal -= parseInt(rows[i][9]);
+                array[names.indexOf(rows[i][3])].bpt += parseInt(rows[i][9]);
+                Moldeo  1
+                Fusión  2
+                Quiebre 3
+                Tratamiento Térmico 5
+                Terminación 4
+                Control de Calidad  7
+                Maestranza  6
+                Producto Terminado  8
+
+                    1,2,3,5,4,7,8
+                */
+                codes = codes.substring(0,codes.length-1) + ")";
+                //moldeo = [];
+                for(var j=0; j<array.length; j++){
+                    array[j].diferencia = array[j].cantidad - array[j].procesado;
+                    if(array[j].mol < 0){
+                        array[j].molIni += (array[j].mol*-1);
+                    }
+                    if(array[j].fus < 0){
+                        array[j].fusIni += (array[j].fus*-1);
+                    }
+                    if(array[j].qui < 0){
+                        array[j].quiIni += (array[j].qui*-1);
+                    }
+                    if(array[j].ter < 0){
+                        array[j].terIni += (array[j].ter*-1);
+                    }
+                    if(array[j].cal < 0){
+                        array[j].calIni += (array[j].cal*-1);
+                    }
+                    //moldeo.push(array[j].molIni);
+
+                }
+                //names = [];
+                //array = [];
+               /* for(var i=1; i<rows.length; i++){
+                    suma = parseInt(rows[i][4])+parseInt(rows[i][5])+parseInt(rows[i][6])+
+                        parseInt(rows[i][7])+parseInt(rows[i][8])+parseInt(rows[i][9])+parseInt(rows[i][10]);
+                    if(names.indexOf(rows[i][3]) == -1){
+                        array.push({   
+                                nombre: rows[i][3],
+                                cantidad:  suma,
+                                procesado: 0,
+                                diferencia: 0,
+                                molIni: moldeo[i-1],
+                                mol: moldeo[i-1],
+                                fus: parseInt(rows[i][5]),
+                                qui: parseInt(rows[i][6]),
+                                ter: parseInt(rows[i][8]),
+                                tto: parseInt(rows[i][7]),
+                                cal: parseInt(rows[i][9]),
+                                maes: 0,
+                                bpt: parseInt(rows[i][10]),
+                                codigo: rows[i][2]
+                            });
+                        names.push(rows[i][3]);
+                    }
+                    else{
+                        if(req.params.dia == rows[i][1]){
+                            array[names.indexOf(rows[i][3])].procesado += suma;
+            
+                            
+
+                            array[names.indexOf(rows[i][3])].mol -= parseInt(rows[i][4]);                        
+                            array[names.indexOf(rows[i][3])].tto += parseInt(rows[i][4]);
+                            
+                            array[names.indexOf(rows[i][3])].tto -= parseInt(rows[i][7]);                        
+                            array[names.indexOf(rows[i][3])].qui += parseInt(rows[i][7]);
+                            
+                            array[names.indexOf(rows[i][3])].qui -= parseInt(rows[i][6]);                        
+                            array[names.indexOf(rows[i][3])].ter += parseInt(rows[i][6]);
+
+                            array[names.indexOf(rows[i][3])].ter -= parseInt(rows[i][8]);                        
+                            array[names.indexOf(rows[i][3])].fus += parseInt(rows[i][8]);
+                            
+                            array[names.indexOf(rows[i][3])].fus -= parseInt(rows[i][5]);                        
+                            array[names.indexOf(rows[i][3])].cal += parseInt(rows[i][5]);                        
+                            
+                            array[names.indexOf(rows[i][3])].cal -= parseInt(rows[i][9]);                        
+                            array[names.indexOf(rows[i][3])].maes += parseInt(rows[i][9]);                        
+
+                            array[names.indexOf(rows[i][3])].maes -= parseInt(rows[i][9]);
+                            array[names.indexOf(rows[i][3])].bpt += parseInt(rows[i][9]);
+                        }
+                    }
+                }
+                */
+                req.getConnection(function(err, connection){
+                    if(err) throw err;
+                    connection.query("SELECT idmaterial, codigo FROM material WHERE codigo in "+codes, function(err, mats){
+                        if(err) throw err;
+                        for(var w=0; w < mats.length; w++){
+                            for(var q=0; q<array.length; q++){
+                                if(mats[w].codigo == array[q].codigo){
+                                    array[q].idmat = mats[w].idmaterial;
+                                    break;
+                                }
+                            }
+                        }
+                        connection.query("SELECT produccion.idproduccion, fabricaciones.idfabricaciones, fabricaciones.idmaterial FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones=produccion.idfabricaciones",
+                            function(err, fabs){
+                                if(err) throw err;
+                                
+                                for(var p=0; p < fabs.length; p++){
+                                    for(var u=0; u < array.length; u++){
+                                        if(array[u].idmat == fabs[p].idmaterial){
+                                            array[u].idfab = fabs[p].idfabricaciones;
+                                            break;
+                                        }
+                                    }
+                                }
+                                console.log(array);
+                                /*
+                                UPDATE `table` SET `uid` = CASE
+                                    WHEN id = 1 THEN 2952
+                                    WHEN id = 2 THEN 4925
+                                    WHEN id = 3 THEN 1592
+                                    ELSE `uid`
+                                    END
+                                WHERE id  in (1,2,3)
+                                
+                                Moldeo  1 [4]
+                                Fusión  2 [5]  
+                                Quiebre 3 [6] 
+                                Tratamiento Térmico 5 [7]
+                                Terminación 4 [8]
+                                Control de Calidad  7 [9]
+                                Producto Terminado  8 [10]
+                                */
+                                var ids = "(";
+                                var queryF = "UDPATE fabricaciones SET cantidad = CASE";
+                                var queryP = "UDPATE produccion SET cantidad = CASE";
+                                var queryMol = "UPDATE produccion SET produccion.`1` = CASE";
+                                var queryFus = "UPDATE produccion SET produccion.`2` = CASE";
+                                var queryQui = "UPDATE produccion SET produccion.`3` = CASE";
+                                var queryTto = "UPDATE produccion SET produccion.`5` = CASE";
+                                var queryTer = "UPDATE produccion SET produccion.`4` = CASE";
+                                var queryCal = "UPDATE produccion SET produccion.`7` = CASE";
+                                var queryBpt = "UPDATE produccion SET produccion.`8` = CASE";
+                                for(var e=0; e<array.length; e++){
+                                        queryF += " WHEN idfabricaciones = "+array[e].idfab+" THEN cantidad+"+(-1*parseInt(array[e].diferencia));
+                                        queryP += " WHEN idfabricaciones = "+array[e].idfab+" THEN cantidad+"+(-1*parseInt(array[e].diferencia));
+                                        queryMol += " WHEN idfabricaciones = "+array[e].idfab+" THEN "+parseInt(array[e].molIni);
+                                        queryFus += " WHEN idfabricaciones = "+array[e].idfab+" THEN "+parseInt(array[e].fusIni);
+                                        queryQui += " WHEN idfabricaciones = "+array[e].idfab+" THEN "+parseInt(array[e].quiIni);
+                                        queryTto += " WHEN idfabricaciones = "+array[e].idfab+" THEN "+parseInt(array[e].ttoIni);
+                                        queryTer += " WHEN idfabricaciones = "+array[e].idfab+" THEN "+parseInt(array[e].terIni);
+                                        queryCal += " WHEN idfabricaciones = "+array[e].idfab+" THEN "+parseInt(array[e].calIni);
+                                        queryBpt += " WHEN idfabricaciones = "+array[e].idfab+" THEN "+parseInt(array[e].bptIni);
+                                        ids += array[e].idfab+",";
+                                }
+                                ids = ids.substring(0, ids.length-1)+")";
+                                queryF += " ELSE cantidad END WHERE idfabricaciones IN "+ids; 
+                                queryP += " ELSE cantidad END WHERE idfabricaciones IN "+ids;
+
+                                queryMol += " ELSE produccion.`1` END WHERE idfabricaciones IN "+ids; 
+                                queryFus += " ELSE produccion.`2` END WHERE idfabricaciones IN "+ids; 
+                                queryQui += " ELSE produccion.`3` END WHERE idfabricaciones IN "+ids; 
+                                queryTto += " ELSE produccion.`5` END WHERE idfabricaciones IN "+ids; 
+                                queryTer += " ELSE produccion.`4` END WHERE idfabricaciones IN "+ids; 
+                                queryCal += " ELSE produccion.`7` END WHERE idfabricaciones IN "+ids; 
+                                queryBpt += " ELSE produccion.`8` END WHERE idfabricaciones IN "+ids; 
+                                console.log(queryMol);
+                                console.log(queryFus);
+                                console.log(queryQui);
+                                console.log(queryTto);
+                                connection.query(queryMol, function(err, upCase){
+                                    if(err) throw err;
+                                    connection.query(queryFus, function(err, upCase){
+                                        if(err) throw err;
+                                        connection.query(queryQui, function(err, upCase){
+                                            if(err) throw err;
+                                            connection.query(queryTto, function(err, upCase){
+                                                if(err) throw err;
+                                                connection.query(queryTer, function(err, upCase){
+                                                    if(err) throw err;
+                                                    connection.query(queryCal, function(err, upCase){
+                                                        if(err) throw err;
+                                                        
+                                                        connection.query(queryBpt, function(err, upCase){
+                                                            if(err) throw err;
+
+                                                            console.log(queryF);
+                                                            console.log(queryP);
+                                                            res.redirect('/plan');
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                    });
+                });
+            });
+        var input = fs.createReadStream('csvs/PROCESADO.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
