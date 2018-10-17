@@ -9,7 +9,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
-//var Service = require('node-windows').Service;
+var Service = require('node-windows').Service;
 
 var index = require('./routes/index');
 var users = require('./routes/users');
