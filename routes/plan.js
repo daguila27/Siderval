@@ -83,6 +83,32 @@ router.get('/table_pedidos/:orden', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
+
+router.post('/buscar_pedido_list', function(req, res, next){
+  if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var orden = input.orden;
+        console.log(clave);
+        orden = orden.replace('-', ' ');
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
+                +" ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
+                +" WHERE pedido.cantidad > pedido.despachados and"
+                +" (material.detalle like '%"+clave+"%' or odc.idodc like '%"+clave+"%' or pedido.cantidad"
+                +" like '%"+clave+"%' or cliente.razon like '%"+clave+"%' or cliente.sigla like '%"+clave+"%')",
+                function(err, odc){
+                    if(err) throw err;
+
+                    res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-')});
+                
+            });
+        });
+    }
+  else{res.redirect('bad_login');}  
+});
+
 router.get('/table_fabricaciones/:orden', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;

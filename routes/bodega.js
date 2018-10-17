@@ -63,6 +63,23 @@ router.get('/crear_gdd', function(req, res, next){
 });
 
 
+router.get('/buscar_insumos/:detalle', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            connection.query("select * from material where (material.tipo='M'"+/* OR material.tipo='I'*/") AND detalle like ?",
+                ["%"+req.params.detalle+"%"],
+                function(err, insum){
+                    if(err)
+                        console.log("Error Selecting :%s", err);
+                    res.render('bodega/tabla_insumos', {insum: insum});
+            });         
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+
 router.post('/saveStateGDBD', function(req, res, next){
     if(verificar(req.session.userData)){
         var data = JSON.parse(JSON.stringify(req.body));
@@ -244,6 +261,7 @@ router.post('/save_gdd', function(req, res, next){
     var tokenid = "";
     var tokenidf = "";
     var input = JSON.parse(JSON.stringify(req.body));
+    var boolinsumo = input.insu;
     var ope;
     var ope2;
     switch(input.estado){
@@ -309,42 +327,48 @@ router.post('/save_gdd', function(req, res, next){
                     console.log("es blanco!");
                 }
 				req.session.arraydespacho = [];
-                /*SETEANDO ESTADO FINAL DE OC*/
-                connection.query("SELECT * FROM (select odc.idodc,sum(pedido.cantidad) = sum(pedido.despachados) as completo, max(pedido.f_entrega) as ult_fecha from odc left join pedido on pedido.idodc= odc.idodc "
-                        +"left join material on material.idmaterial = pedido.idmaterial left join cliente on odc.idcliente=cliente.idcliente group by odc.idodc) as group_odc left join (select "
-                        +"max(despacho.fecha) as ult_desp,despacho.idorden_f from despacho group by despacho.idorden_f) as despachos on (despachos.idorden_f=group_odc.idodc) where group_odc.idodc = ?",[idof],
-                        function (err,odc){
-                            if(err) console.log("Select Error: %s",err);
-                            if(odc[0].completo){
-                                console.log(odc);
-                                /*SI SE HA COMPLETADO LA ODC SE MARCA COMO ATRASO O A TIEMPO*/
-                                if(odc[0].ult_desp > odc[0].ult_fecha){
-                                    /*SE MARCA ATRASADO*/
-                                    connection.query("UPDATE odc SET estado = 'atraso' WHERE idodc = ?", [idof], function(err, upOdc){
-                                        if(err)
-                                            console.log("Error Selecting : %s", err);
+                if(boolinsumo == '0'){
+                    /*SETEANDO ESTADO FINAL DE OC*/
+                    connection.query("SELECT * FROM (select odc.idodc,sum(pedido.cantidad) = sum(pedido.despachados) as completo, max(pedido.f_entrega) as ult_fecha from odc left join pedido on pedido.idodc= odc.idodc "
+                            +"left join material on material.idmaterial = pedido.idmaterial left join cliente on odc.idcliente=cliente.idcliente group by odc.idodc) as group_odc left join (select "
+                            +"max(despacho.fecha) as ult_desp,despacho.idorden_f from despacho group by despacho.idorden_f) as despachos on (despachos.idorden_f=group_odc.idodc) where group_odc.idodc = ?",[idof],
+                            function (err,odc){
+                                if(err) console.log("Select Error: %s",err);
+                                if(odc[0].completo){
+                                    console.log(odc);
+                                    /*SI SE HA COMPLETADO LA ODC SE MARCA COMO ATRASO O A TIEMPO*/
+                                    if(odc[0].ult_desp > odc[0].ult_fecha){
+                                        /*SE MARCA ATRASADO*/
+                                        connection.query("UPDATE odc SET estado = 'atraso' WHERE idodc = ?", [idof], function(err, upOdc){
+                                            if(err)
+                                                console.log("Error Selecting : %s", err);
 
-                                        console.log(upOdc);
-                                        res.redirect('/bodega/show_despachos');
+                                            console.log(upOdc);
+                                            res.redirect('/bodega/show_despachos');
 
-                                    });
+                                        });
+                                    }
+                                    else{
+                                        /*SE MARCA ok*/
+                                        connection.query("UPDATE odc SET estado = 'ok' WHERE idodc = ?", [idof], function(err, upOdc){
+                                            if(err)
+                                                console.log("Error Selecting : %s", err);
+
+                                            console.log(upOdc);
+                                            res.redirect('/bodega/show_despachos');
+                                        });
+                                    }
                                 }
                                 else{
-                                    /*SE MARCA ok*/
-                                    connection.query("UPDATE odc SET estado = 'ok' WHERE idodc = ?", [idof], function(err, upOdc){
-                                        if(err)
-                                            console.log("Error Selecting : %s", err);
-
-                                        console.log(upOdc);
-                                        res.redirect('/bodega/show_despachos');
-                                    });
-                                }
-                            }
-                            else{
-                                console.log("ODC NO COMPLETADA!!");
-                                res.redirect('/bodega/show_despachos');
-                            } 
+                                    console.log("ODC NO COMPLETADA!!");
+                                    res.redirect('/bodega/show_despachos');
+                                } 
                     });
+                }
+                else{
+                    res.redirect('/bodega/show_despachos');
+                }
+
 			}
 		});
 	});

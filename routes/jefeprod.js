@@ -337,9 +337,6 @@ router.post('/lanzar_op_fill', function(req, res, next){
 
 router.get('/ordenes_fabricacion', function(req, res, next){
 	if(verificar(req.session.userData)){
-
-
-
 		req.getConnection(function(err, connection){
 		connection.query("select ordenproduccion.*, producido.ruta,material.detalle  from ordenproduccion "
 			+"left join fabricaciones on (ordenproduccion.idordenproduccion=fabricaciones.idorden_f) "

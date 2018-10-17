@@ -1,0 +1,35 @@
+<%for(var e=0; e < insum.length; e++){%>
+	<tr>
+        <td><%= insum[e].detalle%></td>
+        <td><%= insum[e].stock%></td>
+        <td><%= insum[e].u_medida%></td>
+        <td style="width: 8%; text-align: center;"><a onclick="send_insum(this)" data-notstock="<%= 1%>" data-num="NN" data-idmat="<%= insum[e].idmaterial%>" data-stock="<%= insum[e].stock%>" data-sinenviar="<%= 1000%>" data-cantidad="<%= 0%>" data-detalle="<%=insum[e].detalle%>" data-id="<%= 0%>" data-idof="0" data-insu="1" class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
+    </tr>
+<%}%>
+
+<script type="text/javascript">
+	function send_insum(e){
+		$(".pestana_xdespachar").css('display', 'none');
+        obj = $(e).data();
+        if(obj.notstock){
+            $.ajax({
+                type: 'POST',
+                data: obj,
+                url: 'bodega/add_despacho',
+                success: function(data){
+                    $("#session_prod").html(data);
+                    if($("#only_one_odc").prop('checked') ){
+                        $("#tbody tr a.addqq").each(function(e){
+                            auxer = $(this).data();
+                            if(parseInt(auxer.idof) != parseInt(obj.idof)){
+                                $("#" + auxer.id).remove();
+                            }
+                        });
+                        selection.push(obj);
+                        $("#" + obj.id).remove();
+                    }
+                }
+            });
+        }
+    }
+</script>

@@ -4,7 +4,7 @@
 			<li class="active">Orden de Compra</li>
 		</ol>
 		<div style="width: 40%;">			
-			<input type="text" name="" class="form-control pull-right" placeholder="Buscar...">
+			<input type="text" id="buscar_pedido" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 	    
@@ -41,6 +41,29 @@
 		});
 		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
 	});
+	$("#buscar_pedido").on('keyup', function(e){
+		e.preventDefault();
+		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+			$.ajax({
+				type: 'POST',
+				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view')},
+				url: '/plan/buscar_pedido_list',
+				success: function(data){
+					$(".main-page").html(data);
+				}
+			});
+		}
+		else{
+			$.ajax({
+				type: 'GET',
+				url: '/plan/buscar_pedido_item/'+$(this).val(),
+				success: function(data){
+					$(".main-page").html(data);
+				}
+			});		
+		}
+	});
+
 
 	$('.view-option').on('click', function(e){
 		e.preventDefault();

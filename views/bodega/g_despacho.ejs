@@ -85,13 +85,13 @@ function letraMayus(string) {
                 </tbody>
             </table>
             <div class="panel-footer">
-                <div class="form-inline" style="margin-left: 70%;">
+                <div class="form-inline divSelect" style="margin-left: 70%;">
                     <select name="estado" id="estadoselect" class="form-control">
-                        <option value="Venta">Venta</option>
+                        <option value="Venta" class="notT">Venta</option>
                         <option value="Traslado">Traslado</option>
-                        <option value="Devolucion">Devolución</option>
-                        <option value="Otro">Otro</option>
-                        <option value="Blanco">Blanco</option>
+                        <option value="Devolucion" class="notT">Devolución</option>
+                        <option value="Otro" class="notT">Otro</option>
+                        <option value="Blanco" class="notT">Blanco</option>
                     </select>
                     <button type="button" class="btn btn-info" data-target="#gddobs" data-toggle="collapse">+ <i class="fa fa-comment"></i></button>
                     <button class="btn btn-success" type="submit">+ Crear</button>
@@ -111,81 +111,150 @@ function letraMayus(string) {
     }
 </style>
 
-<div class="col-sm-12 col-md-10 col-md-offset-1">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4>Productos por Despachar</h4>
-                
-            <div style="display: flex;">
-                <div style="width: 45%; margin-right: 5%;">
-                    <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
-                    <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
-                </div>
-                <div style="width: 50%;" class="form-group">
-                      <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
-                      <div style="display: flex;">
-                      <select style="width: 40%" class="form-control" id="filtro" onchange="refreshGDList()">
-                        <option value="odc.numoc">N° OC</option>
-                        <option value="material.detalle">Detalle</option>
-                        <option value="subaleacion.subnom">Aleación</option>
-                        <option value="pedido.cantidad - pedido.despachados">Sin Despachar</option>
-                        <option value="pedido.f_entrega" selected="selected">Fecha de Entrega</option>
-                      </select>
-                      <select style="width: 40%" class="form-control" id="orden" onchange="refreshGDList()">
-                        <option value="ASC" selected="selected">Ascendente</option>
-                        <option value="DESC">Descendente</option>
-                      </select>
-                         <div class="checkbox">
-                             <label><input type="checkbox" id="only_one_odc">Solo una OC</label>
-                         </div>
-                            
-                      </div>
-            </div>
-    </div>
-        </div>
-        <div class="panel-body">
-            <table class="table table-striped table-hover table-bordered" id="nolanzados">
-                <thead>
-                <tr>
-                    <th>N°OC</th>
-                    <th>N°OF</th>
-                    <th>Detalle</th>
-                    <th>Aleación</th>
-                    <th>Sin Despachar</th>
-                    <th>En Stock</th>
-                    <th>Fecha de Entrega</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody id="tbody">
-          <%
-            var stateButton;
-            for(var i=0; i< data.length; i++){
-                stateButton = 'true';
-                if(data[i].stock <= 0){
-                    stateButton = 'false';
-                }
-              %>
-                <tr id="<%=data[i].idfabricaciones%>">
-                    <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
-                    <td><%= largeID(data[i].numof, 6)%></td>
-                    <td><%= letraMayus(data[i].detalle)%></td>
-                    <td style="text-align: center;"><%=data[i].anom%></td>
-                    <td style="text-align: center;"><%=numberFormat(data[i].cantidad - data[i].despachados)%></td>
-                    <td style="text-align: center;"><%=numberFormat(data[i].stock)%></td>
-                    <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
-                    <td><a onclick="send_queue(this)" data-notstock="<%=stateButton%>" data-num="<%=data[i].numordenfabricacion%>" data-idmat="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>" data-sinenviar="<%= data[i].cantidad - data[i].despachados%>" data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" data-idof="<%= data[i].idordenfabricacion%>" class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
-                    <!--idordenfabricacion ES REALMENTE idodc-->
-                </tr>
+<div class="col-sm-12 col-md-12 col-md-offset-0">
+        
+            <ul class="nav nav-tabs" style="box-shadow: 0 0px 0px;">
+              <li class="pestana_xdespachar active"><a data-toggle="tab" href="#prodxdeps">Productos por Despachar</a></li>
+              <li class="pestana_insumos"><a data-toggle="tab" href="#insum">Insumos</a></li>
+            </ul>   
+    <div class="tab-content">     
+        <div class="tab-pane fade in active" id="prodxdeps">                
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                        <div style="display: flex;">
+                            <div style="width: 45%; margin-right: 5%;">
+                                <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
+                                <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
+                            </div>
+                            <div style="width: 50%;" class="form-group">
+                                  <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
+                                  <div style="display: flex;">
+                                  <select style="width: 40%" class="form-control" id="filtro" onchange="refreshGDList()">
+                                    <option value="odc.numoc">N° OC</option>
+                                    <option value="material.detalle">Detalle</option>
+                                    <option value="subaleacion.subnom">Aleación</option>
+                                    <option value="pedido.cantidad - pedido.despachados">Sin Despachar</option>
+                                    <option value="pedido.f_entrega" selected="selected">Fecha de Entrega</option>
+                                  </select>
+                                  <select style="width: 40%" class="form-control" id="orden" onchange="refreshGDList()">
+                                    <option value="ASC" selected="selected">Ascendente</option>
+                                    <option value="DESC">Descendente</option>
+                                  </select>
+                                  
+                                        
+                                  </div>
+                                  <div class="checkbox">
+                                    <label><input type="checkbox" id="only_one_odc">Solo una OC</label>
+                                  </div>
+                            </div>
 
-          <%}%>
-                </tbody>
-            </table>
+                        </div>
+
+                </div>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped table-hover table-bordered" id="nolanzados">
+                    <thead>
+                    <tr>
+                        <th>N°OC</th>
+                        <th>N°OF</th>
+                        <th>Detalle</th>
+                        <th>Aleación</th>
+                        <th>Sin Despachar</th>
+                        <th>En Stock</th>
+                        <th>Fecha de Entrega</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody">
+              <%
+                var stateButton;
+                for(var i=0; i< data.length; i++){
+                        stateButton = 'true';
+                        if(data[i].stock <= 0){
+                            stateButton = 'false';
+                        }
+                      %>
+                        <tr id="<%=data[i].idfabricaciones%>">
+                            <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
+                            <td><%= largeID(data[i].numof, 6)%></td>
+                            <td><%= letraMayus(data[i].detalle)%></td>
+                            <td style="text-align: center;"><%=data[i].anom%></td>
+                            <td style="text-align: center;"><%=numberFormat(data[i].cantidad - data[i].despachados)%></td>
+                            <td style="text-align: center;"><%=numberFormat(data[i].stock)%></td>
+                            <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
+                            <td><a onclick="send_queue(this)" data-notstock="<%=stateButton%>" data-num="<%=data[i].numordenfabricacion%>" data-idmat="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>" data-sinenviar="<%= data[i].cantidad - data[i].despachados%>" data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" data-idof="<%= data[i].idordenfabricacion%>" data-insu='0' class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
+                            <!--idordenfabricacion ES REALMENTE idodc-->
+                        </tr>
+
+              <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade in active" id="insum">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                        <div style="display: flex;">
+                            <div style="width: 45%; margin-right: 5%;">
+                                <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
+                                <div style="display: flex;">
+                                    <input placeholder="Ej: Arena Cromita" class="form-control" style="width: 100%" id="detInsumo">
+                                    <button class="btn btn-primary buscar_insumo">Buscar <i class="fa fa-search"></i></button>
+                                </div>
+                            </div>
+                            <h3 style="width: 55%">
+                                <small class="pull-right">¡Guia de Despacho solo para Traslado!</small>
+                            </h3>
+                        </div>
+
+                </div>
+                <div class="panel-body">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th>Detalle</th>
+                        <th>Stock</th>
+                        <th>Unidad</th>
+                        <th>Añadir</th>
+                    </tr>
+                    </thead>
+                    <tbody class="tabla_insumos" id="tbody">
+
+                    </tbody>
+                </table>
+            </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
+
+    $('.nav-tabs a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+      if($(this).attr('href') == "#insum"){
+        $('.divSelect option[value="Traslado"]').prop('selected', true);
+        $(".notT").css('display', 'none');
+      }
+      else{
+        $('.divSelect option[value="Venta"]').prop('selected', true);
+        $(".notT").css('display', 'block');
+      }
+    });
+
+    $(".buscar_insumo").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/buscar_insumos/'+$("#detInsumo").val(),
+            success: function(data){
+                $(".tabla_insumos").html(data);
+            }
+        });
+    });
+
 
     var obj = undefined;
     var auxer;
@@ -273,6 +342,13 @@ function letraMayus(string) {
                             }
                         }
                     }
+                }
+                var c=0;
+                $("#session_prod tr").each(function(){
+                    c++;
+                })
+                if(c==0){
+                    $(".pestana_xdespachar").css('display', 'block');
                 }
                 refreshGDList();
             }
