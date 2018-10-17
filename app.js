@@ -80,19 +80,19 @@ app.use(function(err, req, res, next) {
 // Create a new service object
 
 /*var svc = new Service({
-  name:'Siderval Aplicacion',
-  description: 'Servicio creado por nodejs.',
+  name:'Siderval SGP',
+  description: 'Servicio creado por nodejs para nuevo repositorio git.',
   script: '/app.js'
-});
-*/
+});*/
+
 // Listen for the "install" event, which indicates the
 // process is available as a service.
 /*svc.on('install',function(){
   svc.start();
 });
 
-svc.install();
-*/
+svc.install();*/
+
 var server  = http.createServer(app);
 
 server.listen(app.get('port'), function(){
