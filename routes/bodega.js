@@ -41,7 +41,7 @@ router.get('/crear_gdd', function(req, res, next){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 num = num[0].id+1;
-                connection.query("select fabricaciones.idorden_f as numof, pedido.idpedido as idfabricaciones,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                connection.query("select fabricaciones.idorden_f as numof, pedido.idpedido as idfabricaciones,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                     +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
                     +" left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
                     +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
@@ -225,7 +225,7 @@ router.post('/crear_gdd_fill', function(req, res, next){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 num = num[0].id+1;
-                connection.query("SELECT * FROM (select fabricaciones.idorden_f as numof,pedido.idpedido as idfabricaciones,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                connection.query("SELECT * FROM (select fabricaciones.idorden_f as numof,pedido.idpedido as idfabricaciones,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                     +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
                     +" left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
                     +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) left join fabricaciones on fabricaciones.idpedido = pedido.idpedido where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by "+input.fill+" "+input.orden+") as internalquery "+where,
