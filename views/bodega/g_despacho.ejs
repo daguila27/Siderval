@@ -158,6 +158,7 @@ function letraMayus(string) {
                     <tr>
                         <th>N°OC</th>
                         <th>N°OF</th>
+                        <th>Item</th>
                         <th>Detalle</th>
                         <th>Aleación</th>
                         <th>Sin Despachar</th>
@@ -178,6 +179,7 @@ function letraMayus(string) {
                         <tr id="<%=data[i].idfabricaciones%>">
                             <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
                             <td><%= largeID(data[i].numof, 6)%></td>
+                            <td><%= data[i].numitem%></td>
                             <td><%= letraMayus(data[i].detalle)%></td>
                             <td style="text-align: center;"><%=data[i].anom%></td>
                             <td style="text-align: center;"><%=numberFormat(data[i].cantidad - data[i].despachados)%></td>
