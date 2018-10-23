@@ -1952,7 +1952,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                         of[i][7] = of[i][7].split('-')[1]+'-'+of[i][7].split('-')[0]+'-'+of[i][7].split('-')[2];
                         if(of[i][2] == '' || of[i][2] == null){
                             //OF       numordenfabricacion   creacion  idodc   
-                            orden.push([of[i][1],       new Date(of[i][7]).toLocaleString(),  0 ]);
+                            orden.push([of[i][1],       new Date(of[i][7]).toLocaleString(),  0,of[i][1] ]);
                             numofs.push(of[i][1]);
                         }
                         else{
@@ -1976,22 +1976,22 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                         for(var e=0; e < orden.length; e++){
                             for(var o=0; o < odc.length; o++){
                                 if(orden[e][2] == odc[o].numoc){
-                                    orden[e][3] = orden[e][2];
+                                    orden[e][4] = orden[e][2];
                                     orden[e][2] = odc[o].idodc;
                                 }
                             }
                         }
                         for(var e=0; e < orden.length; e++){
                             for(var o=0; o < fabs.length; o++){
-                                if(orden[e][3] == fabs[o][0]){
+                                if(orden[e][4] == fabs[o][0]){
                                     fabs[e][5] = orden[e][2];
                                 }
                             }
                         }
                         for(var e=0; e < orden.length; e++){
-                            orden[e].splice(3,1);
+                            orden[e].splice(4,1);
                         }                        
-                        connection.query("INSERT INTO ordenfabricacion (`idordenfabricacion`,`numordenfabricacion`,`creacion`,`idodc`) VALUES ?", [orden], function(err, inOF){
+                        connection.query("INSERT INTO ordenfabricacion (`numordenfabricacion`,`creacion`,`idodc`,`idordenfabricacion`) VALUES ?", [orden], function(err, inOF){
                             if(err) throw err;
                             
                             console.log(inOF);
