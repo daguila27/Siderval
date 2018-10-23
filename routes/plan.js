@@ -1957,7 +1957,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                         }
                         else{
                             //OF       numordenfabricacion   creacion  idodc   
-                            orden.push([of[i][1],        new Date(of[i][7]).toLocaleString(),  of[i][2] ]);
+                            orden.push([of[i][1],        new Date(of[i][7]).toLocaleString(),  of[i][2],of[i][1]]);
                             numofs.push(of[i][1]);
                         }
                     }
@@ -1991,7 +1991,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                         for(var e=0; e < orden.length; e++){
                             orden[e].splice(3,1);
                         }                        
-                        connection.query("INSERT INTO ordenfabricacion (`numordenfabricacion`,`creacion`,`idodc`) VALUES ?", [orden], function(err, inOF){
+                        connection.query("INSERT INTO ordenfabricacion (`idordenfabricacion`,`numordenfabricacion`,`creacion`,`idodc`) VALUES ?", [orden], function(err, inOF){
                             if(err) throw err;
                             
                             console.log(inOF);
