@@ -314,18 +314,22 @@ router.post('/lanzar_op_fill', function(req, res, next){
         req.getConnection(function(err, connection){
             connection.query("select * from (select fabricaciones.*,ordenfabricacion.idordenfabricacion, ordenfabricacion.numordenfabricacion,aleacion.nom as anom,coalesce(subaleacion.subnom,'Sin') as subnom , material.detalle from fabricaciones "
                 + "left join ordenfabricacion on (ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f)"
-                + " left join producido on (fabricaciones.idproducto=producido.idproducto)"
-                + " left join material on (material.idmaterial=producido.idmaterial)" +
+                + " left join material on (material.idmaterial=fabricaciones.idmaterial)" 
+                + " left join producido on (fabricaciones.idproducto=producido.idproducto)"+
                 " left join subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
                 " left join aleacion ON aleacion.idaleacion = subaleacion.idsubaleacion left join pedido on pedido.idpedido = fabricaciones.idpedido WHERE fabricaciones.restantes > 0 and coalesce(pedido.externo, false) = false AND fabricaciones.lock = false"
                 + " GROUP BY fabricaciones.idfabricaciones ORDER BY "+input.fill+" "+input.orden+") as internalquery "+where,
                 function(err, rows){
                     if(err)
                         console.log("Error Selecting :%s", err);
-                    //res.render('jefeprod/lanzar_op', {data: rows,num:idord[0]},function(err,html){if(err)console.log(err); res.send(html)});
-                    //console.log(rows);
-                    res.render('jefeprod/lanzar_op_table', {data: rows},function(err,html){if(err)console.log(err); res.send(html)});
-                    //res.render('jefeprod/ordenes_produccion', {data: rows});
+                    connection("UPDATE fabricaciones SET restantes = 0 WHERE (restantes IS null || restantes < 0) AND idfabricaciones > 0", function(err, upNull){
+                        if(err)
+                            console.log("Error Selecting :%s", err);
+                        //res.render('jefeprod/lanzar_op', {data: rows,num:idord[0]},function(err,html){if(err)console.log(err); res.send(html)});
+                        //console.log(rows);
+                        res.render('jefeprod/lanzar_op_table', {data: rows},function(err,html){if(err)console.log(err); res.send(html)});
+                        //res.render('jefeprod/ordenes_produccion', {data: rows});
+                    });
 
                 });
         });

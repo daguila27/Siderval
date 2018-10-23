@@ -80,6 +80,30 @@ router.get('/buscar_insumos/:detalle', function(req, res, next){
 });
 
 
+
+router.get('/view_despachos', function(req, res, next){
+    if(verificar(req.session.userData)){
+        res.render('bodega/view_despachos');
+    }
+    else{res.redirect('bad_login');}
+
+});
+router.get('/table_despachos/:orden', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            connection.query("SELECT * FROM despacho",function(err, desp){
+                if(err)
+                    console.log("Error Selecting :%s", err);
+
+                res.render('bodega/table_despachos', {desp: desp});
+            });         
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+
 router.post('/saveStateGDBD', function(req, res, next){
     if(verificar(req.session.userData)){
         var data = JSON.parse(JSON.stringify(req.body));

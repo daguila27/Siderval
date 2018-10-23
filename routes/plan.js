@@ -96,7 +96,7 @@ router.post('/buscar_pedido_list', function(req, res, next){
             connection.query("SELECT * FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
                 +" ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 +" WHERE pedido.cantidad > pedido.despachados and"
-                +" (material.detalle like '%"+clave+"%' or odc.idodc like '%"+clave+"%' or pedido.cantidad"
+                +" (material.detalle like '%"+clave+"%' or odc.numoc like '%"+clave+"%' or pedido.cantidad"
                 +" like '%"+clave+"%' or cliente.razon like '%"+clave+"%' or cliente.sigla like '%"+clave+"%')",
                 function(err, odc){
                     if(err) throw err;
@@ -109,17 +109,22 @@ router.post('/buscar_pedido_list', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
-router.get('/table_fabricaciones/:orden', function(req, res, next){
+router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
         orden = orden.replace('-', ' ');
+        console.log(req.params.showPend);
+        var where = " ";
+        if(req.params.showPend == 'true'){
+            where = " WHERE fabricaciones.restantes>0 ";
+        }
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select fabricaciones.*, ordenfabricacion.*, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc left join material "
-                +"on material.idmaterial=fabricaciones.idmaterial ORDER BY "+orden,
+                +"on material.idmaterial=fabricaciones.idmaterial"+where+"ORDER BY "+orden,
                 function(err, of){
                     if(err) throw err;
 
@@ -151,15 +156,19 @@ router.get('/construir', function(req, res, next){
   else{res.redirect('bad_login');}
 
 });
-router.get('/item_ofs', function(req, res, next){
+router.get('/item_ofs/:showPend', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
+            var where = " ";
+            if(req.params.showPend){
+                where = " WHERE fabricaciones.restantes > 0 "
+            }
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
                 connection.query("SET SESSION group_concat_max_len = 10000000", function(err ,rows){
                     if(err) console.log("Select Error: %s",err);
                    //console.log(rows);
-                connection.query("SELECT * FROM ordenfabricacion LEFT JOIN odc ON odc.idodc=ordenfabricacion.idodc",
+                connection.query("SELECT * FROM ordenfabricacion LEFT JOIN odc ON odc.idodc=ordenfabricacion.idodc LEFT JOIN fabricaciones ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"+where,
                     function (err,of){
                     if(err) console.log("Select Error: %s",err);
                     res.render('plan/item_ofs',{data: of });
@@ -1722,7 +1731,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                     }
                     odc[i][6] = odc[i][6].split('-')[1]+'-'+odc[i][6].split('-')[0]+'-'+odc[i][6].split('-')[2];
                     //PEDIDOS  cantidad    f_entrega  despachados idmaterial  externo  numoc
-                    peds.push([odc[i][4], new Date(odc[i][6]).toLocaleString(),  odc[i][5],  odc[i][2],  odc[i][7], odc[i][0]]);
+                    peds.push([odc[i][4], new Date(odc[i][6]).toLocaleString(),  odc[i][5],  odc[i][2],  odc[i][7], odc[i][0], odc[i][1] ]);
                 }
 //                console.log(orden);
 //                console.log(peds);
@@ -1783,7 +1792,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                                     }
 
 
-                                    connection.query("INSERT INTO pedido (`cantidad`,`f_entrega`,`despachados`,`idmaterial`,`externo`,`idodc`) VALUES  ?", [peds], function(err, inPeds){
+                                    connection.query("INSERT INTO pedido (`cantidad`,`f_entrega`,`despachados`,`idmaterial`,`externo`,`idodc`, `numitem`) VALUES  ?", [peds], function(err, inPeds){
                                         if(err)
                                             console.log("Error Inserting : %s", err);
 
@@ -1816,7 +1825,114 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
 
 
 
+router.get('/parsecsv_fixrestantes', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
 
+        var parser = parse(
+            function(err,of){
+                if(err) throw err;
+                var item = [];
+                var data =[];
+                var datasi = [];
+                var datani = [];
+                for(var e=1; e < of.length; e++){
+                    //if(of[e][1] != '' && of[e][1] != null){
+                        if(item.indexOf(of[e][0]+of[e][1]+of[e][5]) == -1 ){
+                            data.push({
+                                numof: of[e][0],
+                                item: of[e][1],
+                                codigo: of[e][5],
+                                detalle: of[e][2],
+                                cantidad: of[e][3],
+                                restantes: parseInt(of[e][4]),
+                                menor: parseInt(of[e][4]),
+                                idfabricaciones: ''
+                            });
+                            item.push(of[e][0]+of[e][1]+of[e][5]);
+                        }
+                        else{
+                            if(data[item.indexOf(of[e][0]+of[e][1]+of[e][5])].menor > parseInt(of[e][4]) ){
+                                data[item.indexOf(of[e][0]+of[e][1]+of[e][5])].menor = parseInt(of[e][4]);
+                            }
+                            //data[item.indexOf(of[e][0]+of[e][1])].restantes -= parseInt(of[e][4]);
+                        }
+                    //}
+                }
+                var cuenta = 0;
+                for(var w=0; w < data.length; w++){
+                    if(data[w].menor != 0 ){
+                        cuenta++;
+                        if(data[w].item == '' || data[w].item == null){
+                            datani.push(data[w]);
+                        }   
+                        else{
+                            datasi.push(data[w]);
+                        } 
+                    }
+                }
+                //console.log(data);
+                //console.log(datani);
+                req.getConnection(function(err, connection){
+                    if(err) console.log("Error Connection : %s", err);
+
+                    connection.query("SELECT * FROM fabricaciones left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f", function(err, fabs){
+                        if(err) console.log("Error Selecting : %s", err);
+                        console.log(fabs);
+                        var c = 0;
+                        for(var b=0; b < datasi.length; b++){
+                            for(var a=0; a < fabs.length; a++){
+                                if(fabs[a].numitem == datasi[b].item && fabs[a].numordenfabricacion == datasi[b].numof){
+                                    c++;
+                                    datasi[b].numof = fabs[a].idordenfabricacion;
+                                    datasi[b].idfabricaciones = fabs[a].idfabricaciones;
+                                    break;
+                                }
+                            }
+
+                        }
+                        console.log("ENCONTRADOS : "+c);
+                        console.log(datasi.length);
+                        /*
+                        UPDATE `table` SET `uid` = CASE
+                            WHEN id = 1 THEN 2952
+                            WHEN id = 2 THEN 4925
+                            WHEN id = 3 THEN 1592
+                            ELSE `uid`
+                            END
+                        WHERE id  in (1,2,3)
+                        console.log(datasi);
+                        */
+                        var query = "UPDATE fabricaciones SET restantes = CASE";
+                        var ids = "";
+                        for(var w=0; w < datasi.length; w++){
+                            if(datasi[w].idfabricaciones != ''){
+                                query += " WHEN idfabricaciones = "+datasi[w].idfabricaciones+" THEN "+datasi[w].menor;
+                                ids += datasi[w].idfabricaciones+",";
+                            }
+                        }
+                        query += " ELSE restantes END WHERE idfabricaciones IN ("+ids.substring(0, ids.length-1)+")";
+                        console.log(query);
+                        connection.query(query, function(err, upOF){
+                            if(err) console.log("Error Updating : %s", err);
+                            console.log(upOF); 
+                            res.redirect('/plan');
+                        });
+                        //console.log(datasi);
+                    });
+                });
+            });
+        var input = fs.createReadStream('csvs/Restantes.csv');
+        input.pipe(parser);
+
+        /*input.pipe(parse(function(err, rows){
+            if(err) throw err;
+            console.log(rows);
+        }));*/
+
+    } else res.redirect("/bad_login");
+});
 
 
 
@@ -1847,7 +1963,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                     }
                     of[i][5] = of[i][5].split('-')[1]+'-'+of[i][5].split('-')[0]+'-'+of[i][5].split('-')[2];
                     //FABS    idorden_f-cant-f_entrega-idmaterial-idpedido-idodc
-                    fabs.push([of[i][1], 0, new Date(of[i][5]).toLocaleString() , of[i][3], of[i][0],  of[i][2] ]);
+                    fabs.push([of[i][1], 0, new Date(of[i][5]).toLocaleString() , of[i][3], of[i][0],  of[i][2] , of[i][0]]);
                 }
                 console.log(orden);
                 console.log(fabs);
@@ -1891,7 +2007,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                 }
 
                                 //PETICION PARA ENLAZAR LOS ITEMS DE LA OF CON SU SIMILAR DE LA OC
-                                connection.query("select odc.idodc,odc.numoc, group_concat(material.codigo separator '@') as codigo , group_concat(pedido.f_entrega separator '@') as f_entrega , group_concat(pedido.cantidad separator '@') as cantidad,group_concat(pedido.idpedido separator '@') as idpedido from pedido left join odc on odc.idodc = pedido.idodc left join material on material.idmaterial=pedido.idmaterial group by odc.idodc",
+                                connection.query("select odc.idodc,odc.numoc, group_concat(material.codigo separator '@') as codigo , group_concat(pedido.f_entrega separator '@') as f_entrega ,group_concat(pedido.numitem separator '@') as numitem, group_concat(pedido.cantidad separator '@') as cantidad,group_concat(pedido.idpedido separator '@') as idpedido from pedido left join odc on odc.idodc = pedido.idodc left join material on material.idmaterial=pedido.idmaterial group by odc.idodc",
                                     function(err, token){
                                         if(err) throw err;
                                         var min;
@@ -1905,12 +2021,13 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                                     token[t].idpedido = token[t].idpedido.split('@');
                                                     token[t].cantidad = token[t].cantidad.split('@');
                                                     token[t].f_entrega = token[t].f_entrega.split('@');
+                                                    token[t].numitem = token[t].numitem.split('@');
                                                     token[t].codigo = token[t].codigo.split('@');
                                                     min = token[t].idpedido[0];
                                                     for(var p=0; p < token[t].idpedido.length; p++){
                                                         //if(fabs[w][4] == parseInt(token[t].idpedido[p]) - min + 1){
-                                                        if(new Date(fabs[w][2]).toLocaleString() == new Date(token[t].f_entrega[p]).toLocaleString() && fabs[w][3] == token[t].codigo[p] ){
-                                                            console.log("ITEM ENCONTRADO");
+                                                        if(fabs[w][6] == token[t].numitem[p] ){
+                                                            //console.log("ITEM ENCONTRADO");
                                                             fabs[w][4] = token[t].idpedido[p];
                                                             fabs[w][1] = parseInt(token[t].cantidad[p]);
                                                             break;
@@ -1920,13 +2037,14 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                                     token[t].cantidad = token[t].cantidad.join('@');
                                                     token[t].f_entrega = token[t].f_entrega.join('@');
                                                     token[t].codigo = token[t].codigo.join('@');
+                                                    token[t].numitem = token[t].numitem.join('@');
                                                 }
                                             }
                                         }
                                         //console.log("PEDIDOS INSERTADOS");
 
                                         for(var e=0; e < fabs.length; e++){
-                                            fabs[e].splice(5, 1);
+                                            //fabs[e].splice(5, 1);
                                         }
                                         connection.query("SELECT * FROM material",function(err, mats1){
                                             if(err) throw err;
@@ -1953,9 +2071,9 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                                 }
                                             }
 
-                                            //console.log("INSERTANDO FABRICACIONES");
-                                            //console.log(fabs);
-                                            connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`, `idpedido`, `idproducto`) VALUES ?", [fabs], function(err, inFabs){
+                                            console.log("INSERTANDO FABRICACIONES");
+                                            console.log(fabs);
+                                            connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`, `idpedido`, `idproducto`, `numitem`) VALUES ?", [fabs], function(err, inFabs){
                                                 if(err) throw err;
                                                 
                                                 console.log(inFabs);

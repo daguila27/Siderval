@@ -3,7 +3,7 @@
         <td><%= insum[e].detalle%></td>
         <td><%= insum[e].stock%></td>
         <td><%= insum[e].u_medida%></td>
-        <td style="width: 8%; text-align: center;"><a onclick="send_insum(this)" data-notstock="<%= 1%>" data-num="NN" data-idmat="<%= insum[e].idmaterial%>" data-stock="<%= insum[e].stock%>" data-sinenviar="<%= 1000%>" data-cantidad="<%= 0%>" data-detalle="<%=insum[e].detalle%>" data-id="<%= 0%>" data-idof="0" data-insu="1" class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
+        <td style="width: 8%; text-align: center;"><a onclick="send_insum(this)" data-notstock="<%= 1%>" data-num="NN" data-idmat="<%= insum[e].idmaterial%>" data-stock="<%= insum[e].stock%>" data-sinenviar="<%= Number.POSITIVE_INFINITY%>" data-cantidad="<%= 0%>" data-detalle="<%=insum[e].detalle%>" data-id="<%= 0%>" data-idof="0" data-insu="1" class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
     </tr>
 <%}%>
 
