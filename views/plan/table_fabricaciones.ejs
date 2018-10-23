@@ -18,7 +18,7 @@
 	<tbody class="ui-sortable">
 		<%for(var i=0; i < data.length; i++){%>
 				<tr class="o_data_row" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
-					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numordenfabricacion%></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].idordenfabricacion%></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
@@ -68,9 +68,10 @@
 		e.preventDefault();
 		var item = this;
 		var orden = $(this).data('order');
+		var showPend = $("#pend").is(':checked'); 
 		$.ajax({
 			type: 'GET',
-			url: '/plan/table_fabricaciones/'+orden,
+			url: '/plan/table_fabricaciones/'+orden+'/'+showPend,
 			success: function(data){
 				$(".main-page").html(data);
 			}

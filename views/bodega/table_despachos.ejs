@@ -1,0 +1,72 @@
+<%
+	function fechaLatino(string){
+		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
+	}
+%>
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%">
+		<thead>
+			<tr>
+				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">Número de GD</th>
+				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
+				<th class="o_column_sortable order-column" data-order="pedido.cantidad-ASC">Despachados</th>
+				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="pedido.f_entrega-DESC">Fecha de Creación</th>
+				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Tipo</th>
+			</tr>
+		</thead>
+	<tbody class="ui-sortable">
+		<%for(var i=0; i < desp.length; i++){
+			desp[i].cant_token = desp[i].cant_token.split(',');
+			desp[i].mat_token = desp[i].mat_token.split('@@');
+			for(var j=0; j < desp[i].cant_token.length; j++){%>
+			<tr class="o_data_row" onclick="submit_form(this)" data-idodc="">
+				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].iddespacho%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].mat_token[j]%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].cant_token[j]%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
+			</tr>
+			<%}
+		}%>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</tfoot>
+</table>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+	});
+	$(".order-column").on('click', function(e){
+		e.preventDefault();
+		var item = this;
+		var orden = $(this).data('order');
+		$.ajax({
+			type: 'GET',
+			url: '/plan/table_pedidos/'+orden,
+			success: function(data){
+				$(".main-page").html(data);
+			}
+		});
+	});
+
+	function submit_form(yo){
+		//$("#form"+$(yo).data('idodc')).submit();
+		$.ajax({
+			type: 'GET',
+			url: '/plan/page_oc/'+$(yo).data('idodc'),
+			success: function(data){
+				$(".main-page").html(data);	
+			}
+		});
+	}	
+</script>
