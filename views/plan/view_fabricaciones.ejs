@@ -7,7 +7,7 @@
 	        </div>
 		</ol>
 		<div style="width: 40%;">			
-			<input type="text" name="" class="form-control pull-right" placeholder="Buscar...">
+			<input type="text" id="buscar_fabricaciones" name="" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 	    
@@ -16,7 +16,7 @@
 	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 		    	<label style="margin-left: 100px">
 		    		<input type="checkbox" id="pend" style="margin-left: 10px" checked>
-			   		Mostrar Pendientes
+			   		Mostrar Pendientes Solamente
 				</label>
 	       		<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
 	    	
@@ -47,6 +47,29 @@
 		});
 		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
 	});
+	$("#buscar_fabricaciones").on('keyup', function(e){
+		e.preventDefault();
+		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+			$.ajax({
+				type: 'POST',
+				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
+				url: '/plan/buscar_fabricaciones_list',
+				success: function(data){
+					$(".main-page").html(data);
+				}
+			});
+		}
+		else{
+			$.ajax({
+				type: 'GET',
+				url: '/plan/buscar_fabricaciones_item/'+$(this).val(),
+				success: function(data){
+					$(".main-page").html(data);
+				}
+			});		
+		}
+	});
+
 
 	$('.view-option').on('click', function(e){
 		e.preventDefault();

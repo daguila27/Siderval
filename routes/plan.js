@@ -109,6 +109,38 @@ router.post('/buscar_pedido_list', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
+router.post('/buscar_fabricaciones_list', function(req, res, next){
+  if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var orden = input.orden;
+        var showPend = input.showPend;
+        var where = " ";
+        if(showPend == 'true'){
+            where = " fabricaciones.restantes>0 and "; 
+        }
+        console.log(clave);
+        orden = orden.replace('-', ' ');
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("select fabricaciones.*, ordenfabricacion.*, material.detalle, odc.numoc"
+                +" from fabricaciones left join ordenfabricacion on"
+                +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
+                +"odc on odc.idodc=ordenfabricacion.idodc left join material "
+                +"on material.idmaterial=fabricaciones.idmaterial WHERE"+where
+                +" (material.detalle like '%"+clave+"%' or ordenfabricacion.idordenfabricacion like '%"+clave+"%' or fabricaciones.cantidad"
+                +" like '%"+clave+"%')",
+                function(err, odc){
+                    if(err) throw err;
+
+                    res.render('plan/table_fabricaciones', {data: odc, key: orden.replace(' ', '-')});
+                
+            });
+        });
+    }
+  else{res.redirect('bad_login');}  
+});
+
 router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
@@ -666,6 +698,7 @@ router.post('/crear_odc', function(req, res, next){
         };
         var cliente = JSON.parse(JSON.stringify(req.body)).cliente;
         var moneda = JSON.parse(JSON.stringify(req.body)).moneda;
+        var factor_item = JSON.parse(JSON.stringify(req.body)).factor_item;
         console.log(req.body);
         var list = [];
         var listp = [];
@@ -681,14 +714,14 @@ router.post('/crear_odc', function(req, res, next){
                             bolfab = true;
                             console.log("prov[]:" + req.body['prov[]']);
                             console.log("bolfab:" + bolfab);
-                            listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0]);
+                            listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
                         }
                         else{
                             bolfab = true;
                             bolabast = true;
                             console.log("prov[]:" + req.body['prov[]']);
                             console.log("bolfab:" + bolfab);
-                            listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], true, 0]);
+                            listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], true, 0, (1)*factor_item]);
                         }
                     } else {
                         for(var i = 0;i<req.body['idm[]'].length;i++){
@@ -696,14 +729,14 @@ router.post('/crear_odc', function(req, res, next){
                                 bolfab = true;
                                 console.log("prov[]:" + req.body['prov[]'][i]);
                                 console.log("bolfab:" + bolfab);
-                                listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], false, 0]);
+                                listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], false, 0, (i+1)*factor_item]);
                             }
                             else{
                                 bolabast = true;
                                 bolfab = true;
                                 console.log("prov[]:" + req.body['prov[]'][i]);
                                 console.log("bolfab:" + bolfab);
-                                listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], true, 0]);
+                                listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], true, 0,(i+1)*factor_item]);
                             }
                         }
                     }
@@ -712,7 +745,7 @@ router.post('/crear_odc', function(req, res, next){
                                     "(`idodc`,`despachados`," +
                                     "`f_entrega`," +
                                     "`idmaterial`," +
-                                    "`cantidad`,`precio`, `externo`, `idproveedor`) " +
+                                    "`cantidad`,`precio`, `externo`, `idproveedor`,`numitem`) " +
                                     "VALUES ?",[listp],function(err,Peds){
                                     if(err)throw err;
                                     if(bolfab){
@@ -724,18 +757,18 @@ router.post('/crear_odc', function(req, res, next){
                                             var idof = rows.insertId;
                                             if(typeof req.body['idm[]'] == 'string'){
                                                     //if(req.body['prov[]']=='-1'){
-                                                        list.push([rows.insertId,req.body['cants[]'],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],req.body['cants[]'], req.body['lock[]'], Peds.insertId]);
+                                                        list.push([rows.insertId,req.body['cants[]'],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],req.body['cants[]'], req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                     //}
                                             } else {
                                                 for(var i = 0;i<req.body['idm[]'].length;i++){
                                                     //if(req.body['prov[]'][i] == '-1'){
-                                                        list.push([rows.insertId,req.body['cants[]'][i],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i],req.body['cants[]'][i], req.body['lock[]'][i], Peds.insertId]);
+                                                        list.push([rows.insertId,req.body['cants[]'][i],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i],req.body['cants[]'][i], req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                         Peds.insertId++;
                                                     //}
                                                 }
                                             }
                                             console.log(list);
-                                            connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`,`idproducto`,`restantes`, `lock`, `idpedido`) VALUES ?",[list],function(err,fabrs){
+                                            connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`,`idproducto`,`restantes`, `lock`, `idpedido`, `numitem`) VALUES ?",[list],function(err,fabrs){
                                                 if(err)throw err;
 
                                                 //req.session.estadoAlm = { cliente: '6331', nroordenfabricacion: '' };
@@ -803,6 +836,7 @@ router.post('/crear_of', function(req, res, next){
           estado: "incompleto"
         };
         var cliente = JSON.parse(JSON.stringify(req.body)).cliente;
+        var factor_item = JSON.parse(JSON.stringify(req.body)).factor_item;
         var list = [];
         var listp = [];
         var abast = [];
@@ -815,15 +849,15 @@ router.post('/crear_of', function(req, res, next){
                         console.log("Error Selecting : %s ",err );
 
                     if(typeof req.body['idm[]'] == 'string'){
-                                list.push([rows.insertId,req.body['cants[]'],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],req.body['cants[]'], req.body['lock[]']]);
+                                list.push([rows.insertId,req.body['cants[]'],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],req.body['cants[]'], req.body['lock[]'], (1)*factor_item]);
                             
                     } else {
                         for(var i = 0;i<req.body['idm[]'].length;i++){
-                                list.push([rows.insertId,req.body['cants[]'][i],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i],req.body['cants[]'][i], req.body['lock[]'][i] ]);
+                                list.push([rows.insertId,req.body['cants[]'][i],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i],req.body['cants[]'][i], req.body['lock[]'][i], (i+1)*factor_item ]);
                             
                         }
                     }
-                    connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`,`idproducto`,`restantes`, `lock`) VALUES ?",[list],function(err,fabrs){
+                    connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`,`idproducto`,`restantes`, `lock`,`numitem`) VALUES ?",[list],function(err,fabrs){
 
                         if(err) console.log(err);
                         connection.query("INSERT INTO save (llave,token) VALUES ?",[[['of', '1']]],function(err,inSave){

@@ -32,6 +32,13 @@
                             <button class="btn btn-primary" onclick="saveStateOF()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
                             <button class="btn btn-primary" onclick="loadStateOF()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
                         </div>-->
+                        <p style="margin-top: 1%; margin-left: 10px">
+                          <label>
+                            Numeración de Items:<br>  
+                            <input type="radio" name="factor_item" value="1" checked> De 1 en 1<br>
+                            <input type="radio" name="factor_item" value="10"> De 10 en 10
+                           </label>    
+                        </p>
                     </div>
                     <div style="width: 50%">
                         <label for="setdates">
@@ -100,8 +107,10 @@
             fechas: [],
             cants: [],
             lock: [],
+            factor_item: $("input[name='factor_item']:checked").val(),
             cliente: $("#cliente").val()
         }
+        alert($("input[name='factor_item']:checked").val());
         for(var i =0;i<$(this).serializeArray().length;i++){
             if(lista[i].name != 'nroordenfabricacion'){
                 data[lista[i].name].push(lista[i].value);
