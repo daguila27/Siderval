@@ -26,11 +26,19 @@
                     </div>
                     <div style="display: flex;">
                     <div style="width: 50%">
-                            <h3 style="width: 100%">Registrar Orden de Compra: </h3>
+                            <h3 style="width: 100%">Registrar Orden de Compra: 
                         <!--<div>
                             <button class="btn btn-primary" onclick="saveState(this)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
                             <button class="btn btn-primary" onclick="loadState(this)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
                         </div>-->
+                            </h3>
+                            <p style="margin-top: 7%; margin-left: 10px">
+                              <label>
+                                Numeración de Items:<br>  
+                                <input type="radio" name="factor_item" value="1" checked> De 1 en 1<br>
+                                <input type="radio" name="factor_item" value="10"> De 10 en 10
+                              </label>    
+                            </p>
                     </div>
                     <div style="width: 50%;">
                         <div style="width: 100%; display: flex;">
@@ -201,6 +209,7 @@
             cants: [],
             cliente: $("#cliente").val(),
             moneda: $("#moneda").val(),
+            factor_item: $("input[name='factor_item']:checked").val(),
             prov: [],
             precio: [],
             lock: []
