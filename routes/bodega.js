@@ -88,14 +88,34 @@ router.get('/view_despachos', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
+router.post('/buscar_despacho_list', function(req, res, next){
+  if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var orden = input.orden;
+        var tipo = input.tipo;
+        console.log(clave);
+        orden = orden.replace('-', ' ');
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM despacho WHERE despacho.iddespacho LIKE '%"+clave+"%' AND despacho.estado LIKE '"+tipo+"'",
+                function(err, desp){
+                    if(err) throw err;
+                    res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
+            });
+        });
+    }
+  else{res.redirect('bad_login');}  
+});
+
 router.get('/table_despachos/:orden', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
             connection.query("SELECT * FROM despacho",function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
+                res.render('bodega/table_despachos', {desp: desp, key: req.params.orden.replace(' ', '-')});
 
-                res.render('bodega/table_despachos', {desp: desp});
             });         
         });
     }
