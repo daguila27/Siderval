@@ -9,7 +9,7 @@
 				<th class="o_column_sortable order-column" data-order="despacho.iddespacho-ASC">Número de GD</th>
 				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
 				<th class="o_column_sortable order-column" data-order="pedido.cantidad-ASC">Despachados</th>
-				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="despachos.fecha-DESC">Fecha de Creación</th>
+				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="despachos.fecha-DESC">Fecha de Despacho</th>
 				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Tipo</th>
 			</tr>
 		</thead>
@@ -20,7 +20,11 @@
 			for(var j=0; j < desp[i].cant_token.length; j++){%>
 			<tr class="o_data_row" onclick="submit_form(this)" data-idodc="">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].iddespacho%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].mat_token[j]%></td>
+				<%if(desp[i].mat_token[j] == '' || desp[i].mat_token[j] == null){%>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier">Nulo</td>
+				<%}else{%>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].mat_token[j]%></td>
+				<%}%>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].cant_token[j]%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
