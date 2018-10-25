@@ -2275,6 +2275,62 @@ router.get('/parsecsv_fase1testeo_3', function(req, res, next){
 });
 
 
+router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+
+        var parser = parse(
+            function(err,gd){
+                if(err) throw err;
+                /*
+                UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+                */
+                var query = "UPDATE despacho SET fecha = CASE ";
+                var id = '';
+                var ids = [];
+                for(var e=1; e < gd.length; e++){
+                    if(ids.indexOf(gd[e][0]) == -1 && gd[e][0] != '-' && gd[e][0] != 'A1618' ){
+                        ids.push(gd[e][0]);
+                        id += ""+gd[e][0]+",";
+                        if(new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[0], gd[e][6].split('-')[2]].join('-')).toLocaleString()  != 'Invalid Date'){
+                            query += "WHEN iddespacho = "+gd[e][0]+" THEN '"+new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[0], gd[e][6].split('-')[2]].join('-')).toLocaleString()+"' ";
+                            
+                        }
+                    }
+                }
+                id = "("+id.substring(0,id.length-1)+")";
+                query = query + "ELSE fecha END WHERE iddespacho IN "+id;
+                //console.log(query);
+                req.getConnection(function(err, connection){
+                    if(err) console.log("Error Connection : %s", err);
+                    connection.query(query, function(err, upGD){
+                        if(err) console.log("Error Selecting : %s", err);
+                        console.log(upGD);
+                        res.redirect('/plan');
+                    });
+                });
+
+
+            });
+        var input = fs.createReadStream('csvs/GD3.csv');
+        input.pipe(parser);
+
+        /*input.pipe(parse(function(err, rows){
+            if(err) throw err;
+            console.log(rows);
+        }));*/
+
+    } else res.redirect("/bad_login");
+});
+
+
 
 
 router.get('/parsecsv_fase1testeo_4', function(req, res, next){
