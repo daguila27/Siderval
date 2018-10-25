@@ -214,6 +214,7 @@ function fechaLatino(string){
                                             <% for(var j = 0;j< data[i].oftoken.length;j++){
                                                 data[i].oftoken[j] = data[i].oftoken[j].split('@');
                                                 data[i].etapatoken[j] = data[i].etapatoken[j].split('@');
+                                                console.log(data[i].etapatoken[j].lenght);
                                             %>
                                             <tr>
                                                 <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%= data[i].oftoken[j][0]%></td>
