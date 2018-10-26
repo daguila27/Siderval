@@ -27,7 +27,7 @@ function verificar(usr){
 /* GET users listing. */
 router.get('/', function(req, res, next) {
 	if(verificar(req.session.userData)){
-    	res.render('matprimas/indx', {page_title: "Materias Primas", username: req.session.userData.nombre});
+    	res.render('matprimas/indx_new', {page_title: "Materias Primas", username: req.session.userData.nombre});
 	}
 	else{res.redirect('bad_login');}	
 });

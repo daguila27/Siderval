@@ -1760,14 +1760,20 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                     odc[i][10] = odc[i][10].split('-')[1]+'-'+odc[i][10].split('-')[0]+'-'+odc[i][10].split('-')[2];
                     //ODC      numoc       idcliente  moneda     creacion
                     if(numocs.indexOf(odc[i][0]) == -1){
+                        if(new Date(odc[i][10]).toLocaleString() == 'Invalid Date'){
+                            odc[i][10] = '01-01-2018';
+                        }
                         orden.push([odc[i][0], odc[i][9],  'clp',  new Date(odc[i][10]).toLocaleString()]);            
                         numocs.push(odc[i][0]);
                     }
                     odc[i][6] = odc[i][6].split('-')[1]+'-'+odc[i][6].split('-')[0]+'-'+odc[i][6].split('-')[2];
+                    if(new Date(odc[i][6]).toLocaleString() == 'Invalid Date'){
+                        odc[i][6] = '01-01-2018';
+                    }
                     //PEDIDOS  cantidad    f_entrega  despachados idmaterial  externo  numoc
                     peds.push([odc[i][4], new Date(odc[i][6]).toLocaleString(),  odc[i][5],  odc[i][2],  odc[i][7], odc[i][0], odc[i][1] ]);
                 }
-//                console.log(orden);
+                //console.log(orden);
 //                console.log(peds);
                 req.getConnection(function(err,connection){
                     if(err) throw err;
@@ -1805,7 +1811,6 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                                 }
                             }
 
-
                             connection.query("INSERT INTO odc (`numoc`,`idcliente`,`moneda`,`creacion`) VALUES  ?", [orden], function(err, inODC){
                                 if(err)
                                     console.log("Error Inserting : %s", err);
@@ -1825,7 +1830,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                                         }
                                     }
 
-
+                                    console.log(peds);
                                     connection.query("INSERT INTO pedido (`cantidad`,`f_entrega`,`despachados`,`idmaterial`,`externo`,`idodc`, `numitem`) VALUES  ?", [peds], function(err, inPeds){
                                         if(err)
                                             console.log("Error Inserting : %s", err);
@@ -1846,7 +1851,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                     
                 });
             });
-        var input = fs.createReadStream('csvs/OC2.csv');
+        var input = fs.createReadStream('csvs/OC3.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
@@ -1982,25 +1987,31 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                 var orden = [];
                 var numofs = [];
                 for(var i=1; i<of.length; i++){
-                    if(numofs.indexOf(of[i][1]) == -1){
+                    if(numofs.indexOf(parseInt(of[i][1])) == -1){
                         of[i][7] = of[i][7].split('-')[1]+'-'+of[i][7].split('-')[0]+'-'+of[i][7].split('-')[2];
+                        if(new Date(of[i][7]).toLocaleString() == 'Invalid Date'){
+                            of[i][7] = '01-01-2018';
+                        }
                         if(of[i][2] == '' || of[i][2] == null){
                             //OF       numordenfabricacion   creacion  idodc   
                             orden.push([of[i][1],       new Date(of[i][7]).toLocaleString(),  0,of[i][1] ]);
-                            numofs.push(of[i][1]);
+                            numofs.push(parseInt(of[i][1]));
                         }
                         else{
                             //OF       numordenfabricacion   creacion  idodc   
                             orden.push([of[i][1],        new Date(of[i][7]).toLocaleString(),  of[i][2],of[i][1]]);
-                            numofs.push(of[i][1]);
+                            numofs.push(parseInt(of[i][1]));
                         }
                     }
                     of[i][5] = of[i][5].split('-')[1]+'-'+of[i][5].split('-')[0]+'-'+of[i][5].split('-')[2];
+                    if(new Date(of[i][5]).toLocaleString() == 'Invalid Date'){
+                        of[i][5] = '01-01-2018';
+                    }
                     //FABS    idorden_f-cant-f_entrega-idmaterial-idpedido-idodc
-                    fabs.push([of[i][1], 0, new Date(of[i][5]).toLocaleString() , of[i][3], of[i][0],  of[i][2] , of[i][0]]);
+                    fabs.push([parseInt(of[i][1]), 0, new Date(of[i][5]).toLocaleString() , of[i][3], of[i][0],  of[i][2] , of[i][0]]);
                 }
-                console.log(orden);
-                console.log(fabs);
+                //console.log(orden);
+                //console.log(fabs);
                 req.getConnection(function(err,connection){
                     if(err) throw err;
 
@@ -2016,6 +2027,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                             }
                         }
                         for(var e=0; e < orden.length; e++){
+                            orden[e][3] = parseInt(orden[e][3]);
                             for(var o=0; o < fabs.length; o++){
                                 if(orden[e][4] == fabs[o][0]){
                                     fabs[e][5] = orden[e][2];
@@ -2024,7 +2036,8 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                         }
                         for(var e=0; e < orden.length; e++){
                             orden[e].splice(4,1);
-                        }                        
+                            console.log(orden[e]);
+                        }
                         connection.query("INSERT INTO ordenfabricacion (`numordenfabricacion`,`creacion`,`idodc`,`idordenfabricacion`) VALUES ?", [orden], function(err, inOF){
                             if(err) throw err;
                             
@@ -2091,8 +2104,13 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                                         if(mats1[t].idproducto==null || mats1[t].idproducto == ''){
                                                             console.log(mats1[t].idmaterial);
                                                             console.log(mats1[t].idproducto);
-                                                        }           
-                                                        fabs[w][5] = mats1[t].idproducto;
+                                                        }
+                                                        if( mats1[t].idproducto == null || mats1[t].idproducto == 'null' ){
+                                                            fabs[w][5] = 0;
+                                                        }   
+                                                        else{
+                                                            fabs[w][5] = mats1[t].idproducto;
+                                                        }        
 
                                                         break;           
                                                     }
@@ -2107,6 +2125,11 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
 
                                             console.log("INSERTANDO FABRICACIONES");
                                             console.log(fabs);
+                                            for(var w=0; w < fabs.length; w++){
+                                                if(w == 1197 || w-1 == 1197 || w+1 == 1197){
+                                                    console.log(fabs[w]);
+                                                }
+                                            }
                                             connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`, `idpedido`, `idproducto`, `numitem`) VALUES ?", [fabs], function(err, inFabs){
                                                 if(err) throw err;
                                                 
@@ -2130,7 +2153,7 @@ router.get('/parsecsv_fase1testeo_2', function(req, res, next){
                                         
                 });
             });
-        var input = fs.createReadStream('csvs/OF2.csv');
+        var input = fs.createReadStream('csvs/OF3.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
@@ -2263,7 +2286,7 @@ router.get('/parsecsv_fase1testeo_3', function(req, res, next){
                                         
                 });
             });
-        var input = fs.createReadStream('csvs/GD2.csv');
+        var input = fs.createReadStream('csvs/GD4.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
@@ -2319,7 +2342,7 @@ router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
 
 
             });
-        var input = fs.createReadStream('csvs/GD3.csv');
+        var input = fs.createReadStream('csvs/GD4.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
@@ -2333,7 +2356,7 @@ router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
 
 
 
-router.get('/parsecsv_fase1testeo_4', function(req, res, next){
+router.get('/parsecsv_fase1testeo_4000', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
         var parse = require('csv-parse');

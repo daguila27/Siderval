@@ -111,6 +111,7 @@
                         
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
+                                    
                                 </span>
                             </a>
                     
@@ -120,10 +121,11 @@
                         </ul>
 
                         <%function show_user(usename){
-                            if(username == 'abastecimiento'){
-                                return "Abastecimiento";
+                            if(username == 'matprimas'){
+                                return "Bodega Materias Primas";
                             }
                         }%>
+
                         <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
                                 <li>
                                     <div style="font-family: 'Lobster'; font-size: 15px; color: white;">Bienvenido <%=show_user(username)%></div>
@@ -136,6 +138,7 @@
                         <!--<ul class="nav navbar-nav navbar-right oe_user_menu_placeholder"></ul>
                         <ul class="nav navbar-nav navbar-right oe_systray"></ul>-->
 
+                        <!--
                         <ul class="nav navbar-right o_mail_navbar_item open">
                             <li class="dropdown">
                                 <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
@@ -146,10 +149,9 @@
                                 <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
                                     
                                 </ul>
-                                <!-- /.dropdown-messages -->
                             </li>
-                            <!-- /.dropdown -->
                         </ul> 
+                            /.dropdown -->
 
                     
                     </div>
@@ -177,68 +179,17 @@
                                         
                             
                             </div>
-                                
-                                
-                            <div class="oe_secondary_menu_section">
-                                Orden de Compra
-                            </div>
-                                            
-                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                                
-                                <li class="active" onclick="ajax(this)" data-link="/abastecimiento/abast_myself">
-                                    
-                                    
-                                    <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Crear OC
-                                        </span>
-                                    </a>
-                                
-                                            
-                            
-                        
-                                </li>
-                                <li onclick="ajax(this)" data-link="/abastecimiento/rec_odc">
-                                    
-                                    
-                                    <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Todas
-                                        </span>
-                                    </a>
-                                
-                                    
-                            
-                        
-                                </li>
-
-                                <li onclick="ajax(this)" data-link="/abastecimiento/all_odc">
-                                    
-                                    
-                                    <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Todas 2    
-                                        </span>
-                                    </a>
-                                
-                                    
-                            
-                        
-                                </li>
-                                
-
-
-                            </ul>
+                               
                             <div class="oe_secondary_menu_section">
                                 Stock
                             </div>
                                             
                             <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                                 
-                                <li onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
+                                <li class="active" onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
                                     
                                     
-                                    <a class="oe_menu_leaf">
+                                    <a class="oe_menu_leaf active">
                                         <span class="oe_menu_text">
                                             Materias Primas
                                         </span>
@@ -248,19 +199,7 @@
                             
                         
                                 </li>
-                                <!--<li  onclick="ajax(this)" data-link="/abastecimiento/abast_ops">
-                                    
-                                    
-                                    <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Abastecer OP
-                                        </span>
-                                    </a>
-                                
-                                    
-                            
-                        
-                                </li>-->
+
                                 <li onclick="ajax(this)" data-link="/abastecimiento/bom_mat_uni">
                                     
                             
@@ -276,32 +215,32 @@
                                 </li>
 
 
+                                
+
+
                             </ul>
 
 
 
                             <div class="oe_secondary_menu_section">
-                                Proveedores
+                                Producción
                             </div>
                                             
                             <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                                 
-                                <li>
+                                <li  onclick="ajax(this)" data-link="/abastecimiento/abast_ops">
                                     
                                     
-                                    <a class="oe_menu_leaf"  onclick="ajax(this)" data-link="/abastecimiento/all_proveedores">
+                                    <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
-                                            Ver Todos
+                                            Abastecer OP
                                         </span>
                                     </a>
                                 
-                                            
+                                    
                             
                         
                                 </li>
-                                
-
-
                             </ul>
                         
                                         
