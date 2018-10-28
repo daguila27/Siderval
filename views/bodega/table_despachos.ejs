@@ -25,10 +25,11 @@
 				<%}else{%>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].mat_token[j]%></td>
 				<%}%>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].cant_token[j]%></td>
 				<%if(desp[i].mat_token[j] == '' || desp[i].mat_token[j] == null){%>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"> - </td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">Anulado</td>
 				<%}else{%>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].cant_token[j]%></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<%}%>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>

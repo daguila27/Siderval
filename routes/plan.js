@@ -123,10 +123,10 @@ router.post('/buscar_fabricaciones_list', function(req, res, next){
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select fabricaciones.*, ordenfabricacion.*, material.detalle, odc.numoc"
+            connection.query("select fabricaciones.*, ordenfabricacion.*, pedido.externo,material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
-                +"odc on odc.idodc=ordenfabricacion.idodc left join material "
+                +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
                 +"on material.idmaterial=fabricaciones.idmaterial WHERE"+where
                 +" (material.detalle like '%"+clave+"%' or ordenfabricacion.idordenfabricacion like '%"+clave+"%' or fabricaciones.cantidad"
                 +" like '%"+clave+"%')",
@@ -152,10 +152,10 @@ router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         }
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select fabricaciones.*, ordenfabricacion.*, material.detalle, odc.numoc"
+            connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.externo, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
-                +"odc on odc.idodc=ordenfabricacion.idodc left join material "
+                +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
                 +"on material.idmaterial=fabricaciones.idmaterial"+where+"ORDER BY "+orden,
                 function(err, of){
                     if(err) throw err;
@@ -167,8 +167,6 @@ router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
     }
   else{res.redirect('bad_login');}  
 });
-
-
 
 router.get('/construir', function(req, res, next){
   if(verificar(req.session.userData)){
@@ -805,9 +803,6 @@ router.post('/crear_odc', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
 router.post('/habilitar_fabricacion', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -824,10 +819,6 @@ router.post('/habilitar_fabricacion', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
-
-
-
 
 router.post('/crear_of', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -878,6 +869,7 @@ router.post('/crear_of', function(req, res, next){
         }
     } else res.redirect("/bad_login");
 });
+
 router.get('/csv_of', function(req,res){
     if(verificar(req.session.userData)){
         var csvWriter = require('csv-write-stream');
@@ -1751,7 +1743,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                 var orden = [];
                 var numocs = [];
                 for(var i=1; i<odc.length; i++){
-                    if(odc[i][7] == 'Interno'){
+                    if(odc[i][7] == 'Interna'){
                         odc[i][7] = false;
                     }
                     else{
@@ -1771,6 +1763,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                         odc[i][6] = '01-01-2018';
                     }
                     //PEDIDOS  cantidad    f_entrega  despachados idmaterial  externo  numoc
+
                     peds.push([odc[i][4], new Date(odc[i][6]).toLocaleString(),  odc[i][5],  odc[i][2],  odc[i][7], odc[i][0], odc[i][1] ]);
                 }
                 //console.log(orden);
@@ -1850,7 +1843,8 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
                     });
                     
                 });
-            });
+            }
+        );
         var input = fs.createReadStream('csvs/OC3.csv');
         input.pipe(parser);
 
@@ -1861,6 +1855,7 @@ router.get('/parsecsv_fase1testeo_1', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });
+
 
 
 
@@ -2319,17 +2314,18 @@ router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
                 var id = '';
                 var ids = [];
                 for(var e=1; e < gd.length; e++){
-                    if(ids.indexOf(gd[e][0]) == -1 && gd[e][0] != '-' && gd[e][0] != 'A1618' ){
+                    if(ids.indexOf(gd[e][0]) == -1 && gd[e][0] != '-' && gd[e][0].indexOf('A')==-1 ){
                         ids.push(gd[e][0]);
                         id += ""+gd[e][0]+",";
-                        if(new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[0], gd[e][6].split('-')[2]].join('-')).toLocaleString()  != 'Invalid Date'){
-                            query += "WHEN iddespacho = "+gd[e][0]+" THEN '"+new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[0], gd[e][6].split('-')[2]].join('-')).toLocaleString()+"' ";
+                        if(new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()  != 'Invalid Date'){
+                            query += "WHEN iddespacho = "+gd[e][0]+" THEN '"+new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()+"' ";
                             
                         }
                     }
                 }
                 id = "("+id.substring(0,id.length-1)+")";
                 query = query + "ELSE fecha END WHERE iddespacho IN "+id;
+                console.log(query);
                 //console.log(query);
                 req.getConnection(function(err, connection){
                     if(err) console.log("Error Connection : %s", err);

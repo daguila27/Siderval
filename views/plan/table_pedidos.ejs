@@ -2,6 +2,11 @@
 	function fechaLatino(string){
 		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
 	}
+	function diff_indays(date1){
+		dt1 = new Date();
+		dt2 = new Date(date1);
+		return Math.floor((Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate()) ) /(1000 * 60 * 60 * 24));
+		}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
 		<thead>
@@ -16,20 +21,26 @@
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
-		<%for(var i=0; i < data.length; i++){%>
-			<tr class="o_data_row" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>">
-				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
-				<td class="o_data_cell" style="text-align: center;"><%=data[i].despachados%></td>
-				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
-					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
-				</td>
-				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
-					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
-				</td>
-				<td class="o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
-			</tr>
+		<%for(var i=0; i < data.length; i++){
+			if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 10 && diff_indays(data[i].f_entrega)>=0 ){%>
+				<tr class="o_data_row warning" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>">
+			<%}else if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 0 ){%>
+				<tr class="o_data_row danger" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>">
+			<%}else{%>
+				<tr class="o_data_row success" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>">
+			<%}%>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
+					<td class="o_data_cell" style="text-align: center;"><%=data[i].despachados%></td>
+					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
+						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
+					</td>
+					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
+						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
+					</td>
+					<td class="o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
+				</tr>
 		<%}%>
 	</tbody>
 	<tfoot>
