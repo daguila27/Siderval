@@ -148,7 +148,7 @@ router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         console.log(req.params.showPend);
         var where = " ";
         if(req.params.showPend == 'true'){
-            where = " WHERE fabricaciones.restantes>0 ";
+            where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
         }
         req.getConnection(function(err, connection){
             if(err) throw err;

@@ -1,6 +1,11 @@
 <%
 	function fechaLatino(string){
-		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
+	    if(string.split('-').length == 3){
+			return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+		}
+		else{
+			return [string.split('/')[2],string.split('/')[1],string.split('/')[0]].join('/');
+		}
 	}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
@@ -25,7 +30,7 @@
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].cantidad%></td>
 					<td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].restantes%></td>
 					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
-						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
+						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%></span>
 					</td>
 					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
 						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
