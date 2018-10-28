@@ -109,11 +109,13 @@ router.post('/buscar_despacho_list', function(req, res, next){
 
 router.get('/table_despachos/:orden', function(req, res, next){
     if(verificar(req.session.userData)){
+        var orden = req.params.orden.replace('-', ' ');
+        console.log(orden);
         req.getConnection(function(err, connection){
-            connection.query("SELECT * FROM despacho",function(err, desp){
+            connection.query("SELECT * FROM despacho ORDER BY "+orden,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
-                res.render('bodega/table_despachos', {desp: desp, key: req.params.orden.replace(' ', '-')});
+                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
 
             });         
         });
