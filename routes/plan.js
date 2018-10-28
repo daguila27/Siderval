@@ -168,8 +168,6 @@ router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
-
-
 router.get('/construir', function(req, res, next){
   if(verificar(req.session.userData)){
     if(req.session.isUserLogged){
@@ -805,9 +803,6 @@ router.post('/crear_odc', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
 router.post('/habilitar_fabricacion', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -824,10 +819,6 @@ router.post('/habilitar_fabricacion', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
-
-
-
 
 router.post('/crear_of', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -878,6 +869,7 @@ router.post('/crear_of', function(req, res, next){
         }
     } else res.redirect("/bad_login");
 });
+
 router.get('/csv_of', function(req,res){
     if(verificar(req.session.userData)){
         var csvWriter = require('csv-write-stream');

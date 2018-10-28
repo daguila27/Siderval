@@ -61,16 +61,16 @@ router.get('/crear_gdd', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
-
+//Buscador de materiales para traslado en vista Crear GDD (pestaña insumos)
 router.get('/buscar_insumos/:detalle', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("select * from material where (material.tipo='M'"+/* OR material.tipo='I'*/") AND detalle like ?",
+            connection.query("select * from material where (material.tipo='M' OR material.tipo='I' OR material.tipo='O' OR material.tipo='X') AND detalle like ? ORDER BY idmaterial",
                 ["%"+req.params.detalle+"%"],
                 function(err, insum){
                     if(err)
                         console.log("Error Selecting :%s", err);
+
                     res.render('bodega/tabla_insumos', {insum: insum});
             });         
         });
@@ -79,8 +79,6 @@ router.get('/buscar_insumos/:detalle', function(req, res, next){
 
 });
 
-
-
 router.get('/view_despachos', function(req, res, next){
     if(verificar(req.session.userData)){
         res.render('bodega/view_despachos');
@@ -88,6 +86,7 @@ router.get('/view_despachos', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
+
 router.post('/buscar_despacho_list', function(req, res, next){
   if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -122,7 +121,6 @@ router.get('/table_despachos/:orden', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
 
 router.post('/saveStateGDBD', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -272,7 +270,6 @@ router.post('/add_despacho', function(req, res, next){
     res.render('bodega/session_stream',{data:req.session.arraydespacho});
 });
 
-
 router.post('/drop_despacho', function(req,res,next){
     var idfab = JSON.parse(JSON.stringify(req.body)).idfab;
     console.log(idfab);
@@ -294,8 +291,6 @@ router.post('/drop_despacho', function(req,res,next){
     }
     
 });
-
-
 
 router.post('/save_gdd', function(req, res, next){
     var arrayDBP = [];
@@ -418,10 +413,6 @@ router.post('/save_gdd', function(req, res, next){
 	});
 });
 
-
-
-
-
 router.post('/act_gdd', function(req, res, next){
     var arrayDBP = [];
     var query = '';
@@ -502,9 +493,6 @@ router.post('/act_gdd', function(req, res, next){
     });
 });
 
-
-
-
 router.post('/anular_gdd', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     var iddespacho = input.id;
@@ -555,10 +543,6 @@ router.post('/anular_gdd', function(req, res, next){
     });
 });
 
-
-
-
-
 router.get('/insert/:idmaterialbodega/:cantidad', function(req, res, next){
 	if(verificar(req.session.userData)){
 		var input = req.params;
@@ -572,7 +556,6 @@ router.get('/insert/:idmaterialbodega/:cantidad', function(req, res, next){
 	else{res.redirect('bad_login');}
 });
 
-
 router.get('/show_despachos', function(req, res ,next){
     req.getConnection(function(err, connection){
         connection.query("SELECT despacho.*,odc.numoc as numordenfabricacion FROM despacho LEFT JOIN odc ON despacho.idorden_f = odc.idodc GROUP BY despacho.iddespacho ORDER BY despacho.fecha DESC", function(err, mat){
@@ -581,7 +564,6 @@ router.get('/show_despachos', function(req, res ,next){
         });
     });
 });
-
 
 router.post('/render_gdd', function(req, res ,next){
     var input = JSON.parse(JSON.stringify(req.body));
@@ -592,7 +574,6 @@ router.post('/render_gdd', function(req, res ,next){
         });
     });
 });
-
 
 router.get('/csv_desp', function(req,res){
     if(verificar(req.session.userData)){
@@ -674,6 +655,7 @@ router.get('/csv_stock', function(req,res){
     }
     else res.redirect('/bad_login');
 });
+
 router.get('/show_stock', function(req, res ,next){
 	req.getConnection(function(err, connection){
 		connection.query("SELECT * FROM (SELECT material.idmaterial, material.stock,material.tipo, material.codigo,material.detalle,SUM(Coalesce(produccion.1,0) + Coalesce(produccion.2,0) + Coalesce(produccion.3,0) + Coalesce(produccion.4,0) + Coalesce(produccion.5,0) + Coalesce(produccion.6,0) + Coalesce(produccion.7,0) ) as infaena"
@@ -714,7 +696,6 @@ router.get('/add_notificacion/:idproduccion/:cantidad', function(req,res,next){
 	else{res.redirect('bad_login');}
 });
 
-
 router.get('/render_notificaciones', function(req, res, next){
 	req.getConnection(function(err,connection){
 		connection.query("select notificacion.*,material.detalle from notificacion LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial WHERE SUBSTRING(notificacion.descripcion,1,3) = 'idm' AND notificacion.active = true", function(err, notif){
@@ -723,7 +704,6 @@ router.get('/render_notificaciones', function(req, res, next){
 		});
 	});
 });
-
 
 router.get('/confirm_notificacion/:idnotificacion/:cantidad', function(req,res,next){
 		var idnotificacion = req.params.idnotificacion;
@@ -747,8 +727,6 @@ router.get('/confirm_notificacion/:idnotificacion/:cantidad', function(req,res,n
 			});	
 		});
 });
-
-
 
 router.post('/activar_gdd', function(req,res,next){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -804,7 +782,6 @@ router.post('/activar_gdd', function(req,res,next){
             }); 
         });
 });
-
 
 router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
     if(verificar(req.session.userData)){
@@ -898,7 +875,6 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
     }
     else res.redirect('/bad_login');
 });
-
 
 router.get("/search_gdd/:numgdd", function(req, res, next){
    if(verificar(req.session.userData)){
