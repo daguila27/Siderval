@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8c1f3a88-f7bb-4107-a0d9-506355a16ca3" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/routes/plan.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/plan.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/plan/page_oc.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/page_oc.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -58,13 +56,13 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="ejs" value="121" />
+          <entry key="ejs" value="124" />
           <entry key="js" value="34" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="EJS" value="121" />
+          <entry key="EJS" value="124" />
           <entry key="JavaScript" value="34" />
         </counts>
       </usages-collector>
@@ -127,7 +125,7 @@
         <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="102">
-              <caret line="6" column="35" selection-start-line="6" selection-start-column="35" selection-end-line="6" selection-end-column="35" />
+              <caret line="6" column="39" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -233,12 +231,12 @@
       <option name="presentableId" value="Default" />
       <updated>1539364691999</updated>
       <workItem from="1539364700244" duration="1840000" />
-      <workItem from="1540760070370" duration="1846000" />
+      <workItem from="1540760070370" duration="1962000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3686000" />
+    <option name="totallyTimeSpent" value="3802000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -253,7 +251,7 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17336309" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17336309" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -267,7 +265,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="10" visible="true" weight="0.23114754" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.23114754" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -339,7 +337,7 @@
     <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
-          <caret line="6" column="35" selection-start-line="6" selection-start-column="35" selection-end-line="6" selection-end-column="35" />
+          <caret line="6" column="39" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="39" />
         </state>
       </provider>
     </entry>
