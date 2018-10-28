@@ -41,25 +41,27 @@
                             </p>
                     </div>
                     <div style="width: 50%;">
-                        <div style="width: 100%; display: flex;">
-                            <div style="width: 45%; margin-right: 5px">
-                                <label for="setdates">
-                                    Ingresar fecha para todos: 
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
-                                    <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">
+                        <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="setdates">
+                                            Ingresar fecha para todos: 
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
+                                            <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos" style="height: 32px">
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group" style="width: 50%">
-                              <label for="moneda">Seleccione Moneda:</label>
-                              <select class="form-control" id="moneda">
-                                <option value="usd">Dolares (USD)</option>
-                                <option value="eur">Euros (EUR)</option>
-                                <option value="clp" selected>Pesos Chilenos (CLP)</option>
-                                <option value="gbp">Libra (GBP)</option>
-                            </select>
-                            </div>
+                                <div class="form-group col-md-4" style="width: 50%">
+                                    <label for="moneda">Seleccione Moneda:</label>
+                                    <select class="form-control" id="moneda">
+                                        <option value="usd">Dolares (USD)</option>
+                                        <option value="eur">Euros (EUR)</option>
+                                        <option value="clp" selected>Pesos Chilenos (CLP)</option>
+                                        <option value="gbp">Libra (GBP)</option>
+                                    </select>
+                                </div>
                         </div>
                         <div class="form-group" style="width: 100%">
                           <label for="cliente">Seleccione cliente:</label>
