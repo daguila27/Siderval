@@ -148,7 +148,7 @@ router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         console.log(req.params.showPend);
         var where = " ";
         if(req.params.showPend == 'true'){
-            where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
+            where = " WHERE fabricaciones.restantes>0 ";
         }
         req.getConnection(function(err, connection){
             if(err) throw err;
@@ -2344,6 +2344,29 @@ router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
 
             });
         var input = fs.createReadStream('csvs/GD4.csv');
+        input.pipe(parser);
+
+        /*input.pipe(parse(function(err, rows){
+            if(err) throw err;
+            console.log(rows);
+        }));*/
+
+    } else res.redirect("/bad_login");
+});
+
+router.get('/parsecsv_fabricaciones_fixexterno', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+
+        var parser = parse(
+            function(err,gd){
+                if(err) throw err;
+
+
+
+            });
+        var input = fs.createReadStream('csvs/OF3.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
