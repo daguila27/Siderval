@@ -315,6 +315,7 @@ router.get('/page_oc/:idodc', function(req, res, next){
                             if(err) console.log("Select Error: %s",err);
                             
                             //res.redirect('/plan');
+                            console.log(rows[0]);
                             res.render('plan/page_oc', {data:rows[0]});
                     });
                 });
@@ -2317,15 +2318,19 @@ router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
                     if(ids.indexOf(gd[e][0]) == -1 && gd[e][0] != '-' && gd[e][0].indexOf('A')==-1 ){
                         ids.push(gd[e][0]);
                         id += ""+gd[e][0]+",";
+
                         if(new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()  != 'Invalid Date'){
                             query += "WHEN iddespacho = "+gd[e][0]+" THEN '"+new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()+"' ";
-                            
+                        }
+                        else{
+                            console.log(gd[e][0]);
+                            console.log([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-'));
+
                         }
                     }
                 }
                 id = "("+id.substring(0,id.length-1)+")";
                 query = query + "ELSE fecha END WHERE iddespacho IN "+id;
-                console.log(query);
                 //console.log(query);
                 req.getConnection(function(err, connection){
                     if(err) console.log("Error Connection : %s", err);

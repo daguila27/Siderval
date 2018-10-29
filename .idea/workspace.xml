@@ -2,6 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8c1f3a88-f7bb-4107-a0d9-506355a16ca3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/plan.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/plan.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/plan/page_oc.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/page_oc.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/plan/ped_list.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/ped_list.ejs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -50,30 +54,34 @@
     <session id="-1322842182">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
+          <entry key="project.closed" value="1" />
+          <entry key="project.open.time.28" value="1" />
           <entry key="project.open.time.3" value="1" />
-          <entry key="project.opened" value="1" />
+          <entry key="project.opened" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="ejs" value="124" />
-          <entry key="js" value="34" />
+          <entry key="ejs" value="828" />
+          <entry key="js" value="144" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="EJS" value="124" />
-          <entry key="JavaScript" value="34" />
+          <entry key="EJS" value="828" />
+          <entry key="JavaScript" value="144" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="ejs" value="2" />
+          <entry key="csv" value="1" />
+          <entry key="ejs" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="EJS" value="2" />
+          <entry key="EJS" value="4" />
+          <entry key="PLAIN_TEXT" value="1" />
         </counts>
       </usages-collector>
     </session>
@@ -94,11 +102,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/plan.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-94">
-              <caret line="299" column="20" selection-start-line="299" selection-start-column="13" selection-end-line="299" selection-end-column="20" />
+            <state relative-caret-position="220">
+              <caret line="2325" column="50" selection-start-line="2325" selection-start-column="50" selection-end-line="2325" selection-end-column="50" />
               <folding>
                 <element signature="n#style#0;n#td#3;n#tr#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
@@ -110,22 +118,46 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/plan/page_oc.ejs">
+        <entry file="file://$PROJECT_DIR$/csvs/GD4.csv">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
-              <caret line="27" column="86" selection-start-line="27" selection-start-column="86" selection-end-line="27" selection-end-column="86" />
-              <folding>
-                <element signature="n#style#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-              </folding>
+            <state relative-caret-position="187">
+              <caret line="11" column="35" lean-forward="true" selection-start-line="11" selection-start-column="35" selection-end-line="11" selection-end-column="35" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/plan/page_oc.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="49" column="65" selection-start-line="49" selection-start-column="65" selection-end-line="49" selection-end-column="65" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/plan/header_new.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1360">
+              <caret line="80" column="24" selection-start-line="80" selection-start-column="24" selection-end-line="80" selection-end-column="24" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/plan/ped_list.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="153">
+              <caret line="9" selection-start-line="9" selection-end-line="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="6" column="39" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="39" />
+            <state relative-caret-position="714">
+              <caret line="42" column="39" selection-start-line="42" selection-start-column="39" selection-end-line="42" selection-end-column="59" />
             </state>
           </provider>
         </entry>
@@ -136,6 +168,7 @@
     <findStrings>
       <find>parsecsv_fase1testeo_1</find>
       <find>page_oc</find>
+      <find>parsecsv_despacho</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -144,9 +177,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/routes/plan.js" />
-        <option value="$PROJECT_DIR$/views/plan/page_oc.ejs" />
         <option value="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" />
+        <option value="$PROJECT_DIR$/views/plan/ped_list.ejs" />
+        <option value="$PROJECT_DIR$/views/plan/header_new.ejs" />
+        <option value="$PROJECT_DIR$/views/plan/page_oc.ejs" />
+        <option value="$PROJECT_DIR$/routes/plan.js" />
       </list>
     </option>
   </component>
@@ -189,13 +224,12 @@
             <path>
               <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
               <item name="Siderval" type="462c0819:PsiDirectoryNode" />
-              <item name="views" type="462c0819:PsiDirectoryNode" />
+              <item name="csvs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
               <item name="Siderval" type="462c0819:PsiDirectoryNode" />
-              <item name="views" type="462c0819:PsiDirectoryNode" />
-              <item name="plan" type="462c0819:PsiDirectoryNode" />
+              <item name="routes" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -231,12 +265,13 @@
       <option name="presentableId" value="Default" />
       <updated>1539364691999</updated>
       <workItem from="1539364700244" duration="1840000" />
-      <workItem from="1540760070370" duration="1962000" />
+      <workItem from="1540760070370" duration="5166000" />
+      <workItem from="1540823765925" duration="3744000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3802000" />
+    <option name="totallyTimeSpent" value="10750000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -265,7 +300,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.23114754" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.45409837" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -311,33 +346,51 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/views/plan/header_new.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1360">
+          <caret line="80" column="24" selection-start-line="80" selection-start-column="24" selection-end-line="80" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/plan/ped_list.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="714">
+          <caret line="42" column="39" selection-start-line="42" selection-start-column="39" selection-end-line="42" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/plan/page_oc.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="49" column="65" selection-start-line="49" selection-start-column="65" selection-end-line="49" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/csvs/GD4.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="35" lean-forward="true" selection-start-line="11" selection-start-column="35" selection-end-line="11" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/routes/plan.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-94">
-          <caret line="299" column="20" selection-start-line="299" selection-start-column="13" selection-end-line="299" selection-end-column="20" />
+        <state relative-caret-position="220">
+          <caret line="2325" column="50" selection-start-line="2325" selection-start-column="50" selection-end-line="2325" selection-end-column="50" />
           <folding>
             <element signature="n#style#0;n#td#3;n#tr#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#4;n#!!top" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/plan/page_oc.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="27" column="86" selection-start-line="27" selection-start-column="86" selection-end-line="27" selection-end-column="86" />
-          <folding>
-            <element signature="n#style#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="39" selection-start-line="6" selection-start-column="39" selection-end-line="6" selection-end-column="39" />
         </state>
       </provider>
     </entry>
