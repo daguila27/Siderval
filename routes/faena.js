@@ -165,6 +165,7 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 						console.log("Error Selecting : %s", err);
 					}
                     var nextstep;
+                    console.log(rows);
 					
 					for(var i = 0;i<rows.length;i++){
                         rows[i].ruta = rows[i].ruta.split(",");
