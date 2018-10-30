@@ -382,8 +382,7 @@ router.get('/list_ops', function(req, res, next){
                         console.log("Select Error: %s",err);
                     }
                     var aux = [];
-                    console.log("ofs");
-                    console.log(ofs);
+                    /*El error del etapatoken nulo se debe por lo general a que hay fabricaciones sin fecha de entrega*/
                     for(var i = 0;i< ofs.length;i++){
                     	if(typeof ofs[i].oftoken != 'null'){
                 			ofs[i].oftoken = ofs[i].oftoken.split(',');
