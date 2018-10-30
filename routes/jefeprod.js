@@ -35,7 +35,7 @@ router.get('/', function(req, res, next){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 
-                res.render('jefeprod/indx', {page_title: "Jefe de Produccion", username: req.session.userData.nombre, etapas: etp});
+                res.render('jefeprod/indx_new', {page_title: "Jefe de Produccion", username: req.session.userData.nombre, etapas: etp});
             });
         });
     }
