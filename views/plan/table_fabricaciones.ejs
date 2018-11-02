@@ -9,55 +9,55 @@
 	}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
-		<thead>
+		<thead style="/*position: fixed; width: 100%*/">
 			<tr>
-				<th class="o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">Número de OF</th>
-				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">Número de OC</th>
-				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
-				<th class="o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
-				<th class="o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Sin Producción</th>
-				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
-				<th class="o_column_sortable order-column" style="text-align: center;" data-order="ordenfabricacion.creacion-ASC">Fecha de Creación</th>
-				<th class="o_column_sortable" style="text-align: center;">Habilitar</th>
+                <th id="numof" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
+                <th id="numoc" class="cabecera o_column_sortable order-column" data-order="odc.numoc-ASC">N° OC</th>
+                <th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
+				<th id="solicitados" class="cabecera o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
+				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Sin Producción</th>
+				<th id="f_entrega" class="cabecera o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
+				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="ordenfabricacion.creacion-ASC">Fecha de Creación</th>
+				<th id="habilitar_cand" class="cabecera o_column_sortable" style="text-align: center;">Habilitar</th>
 			</tr>
 		</thead>
-	<tbody class="ui-sortable">
+	<tbody class="ui-sortable" style="margin-top: 10px">
 		<%for(var i=0; i < data.length; i++){%>
-				<tr class="o_data_row">
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].idordenfabricacion%></td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numoc%></td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].detalle%></td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].cantidad%></td>
-					<td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].restantes%></td>
-					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
-						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%></span>
+			<tr class="o_data_row">
+					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].idordenfabricacion%></td>
+					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numoc%></td>
+					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].detalle%></td>
+					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].cantidad%></td>
+					<td class="sin_produccion o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].restantes%></td>
+					<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
+						<span cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%></span>
 					</td>
-					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
+					<td class="f_creacion o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
 						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString())%></span>
 					</td>
 					<%
 					if(data[i].externo == '0'){
 						if(data[i].lock == '0'){%>
-							<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 								<button class="btn btn-xs btn-primary" onclick="habFabricacion(this)" data-state="0" data-id="<%= data[i].idfabricaciones%>">
 									<i class="fa fa-unlock"></i>
 								</button>
 							</td>
 						<%}else{%>
-							<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 								<button class="btn btn-xs btn-primary"  onclick="habFabricacion(this)" data-state="1" data-id="<%= data[i].idfabricaciones%>">
 									<i class="fa fa-lock"></i>
 								</button>
 							</td>
 						<%}
 					}else{%>
-							<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 								<button class="btn btn-xs btn-danger">
 									<i class="fa fa-ban"></i>
 								</button>
 							</td>
 					<%}%>
-				</tr>
+            </tr>
 		<%}%>
 	</tbody>
 	<tfoot>
@@ -76,22 +76,27 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		$(".order-column").removeClass('o-sort-up');
-		$(".order-column").removeClass('o-sort-down');
-		$(".order-column").each(function(){
-			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
-				if("<%= key.split('-')[1]%>" == "ASC"){
-					$(this).addClass('o-sort-up');
-					$(this).data('order', '<%= key.split("-")[0]%>-DESC');
-				}
+        $(".order-column").removeClass('o-sort-up');
+        $(".order-column").removeClass('o-sort-down');
+        $(".order-column").each(function(){
+            //$(this).css("width", $("."+$(this).attr('id')).css('width'));
+
+            if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
+                if("<%= key.split('-')[1]%>" == "ASC"){
+                    $(this).addClass('o-sort-up');
+                    $(this).data('order', '<%= key.split("-")[0]%>-DESC');
+                }
 				else{
-					$(this).addClass('o-sort-down');
-					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
-					
-				}
-			}
-		});
-	});
+                    $(this).addClass('o-sort-down');
+
+                    $(this).data('order', '<%= key.split("-")[0]%>-ASC');
+                }
+            }
+            /*$(".cabecera").each(function(){
+                $(this).css("width", ("."+$(this).attr('id')).css('width')+"px");
+            });*/
+        });
+    });
 	$(".order-column").on('click', function(e){
 		e.preventDefault();
 		var item = this;

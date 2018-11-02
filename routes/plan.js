@@ -279,7 +279,7 @@ router.get('/page_of/:idodc', function(req, res, next){
                 connection.query("SET SESSION group_concat_max_len = 1000000", function(err, len){
                     if(err) console.log("Select Error: %s",err);
                     console.log(len);        
-                    connection.query("select ordenfabricacion.*,cliente.*, group_concat(fabricaciones.cantidad) as cantidad"
+                    connection.query("select ordenfabricacion.*,cliente.*,group_concat(fabricaciones.numitem) as numitem, group_concat(fabricaciones.cantidad) as cantidad"
                         +",group_concat(coalesce(fabricaciones.restantes,fabricaciones.cantidad) ) as restantes,"
                         +"group_concat(material.detalle separator '@') as detalle,group_concat(material.u_medida) as u_medida,group_concat(to_days(fabricaciones.f_entrega)-to_days(now()))  as dias,group_concat(fabricaciones.f_entrega separator '@') "
                         +"as f_entrega from fabricaciones left join material on material.idmaterial=fabricaciones.idmaterial left join"
@@ -352,8 +352,6 @@ router.get('/search_client/:key', function(req, res, next){
         if(req.session.isUserLogged){
             console.log(req.params);
             var key = req.params.key;
-
-            console.log(key);
             var where = " WHERE cliente.sigla LIKE '%"+key+"%' OR cliente.razon LIKE '%"+key+"%' OR cliente.giro LIKE '%"+key+"%' OR cliente.rut LIKE '%"+key+"%'";
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);

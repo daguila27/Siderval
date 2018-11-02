@@ -1,8 +1,17 @@
+<style>
+    .factura{
+        margin: 0px;
+        padding: 0px;
+        -webkit-box-shadow: 9px 7px 25px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 9px 7px 25px 0px rgba(0,0,0,0.75);
+        box-shadow: 9px 7px 25px 0px rgba(0,0,0,0.75);
+    }
+</style>
 <%
 if(data.length){
     for(var i = 0; i< data.length;i++){
         %>
-<div class="col-md-4 list-group factura" style="margin: 0; padding: 5px" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
+<div class="col-md-4 list-group factura" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
     <div class="dropdown" style="position: absolute; top: 15px; right: 15px; z-index: 10">
       <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
       <ul class="dropdown-menu dropdown-menu-right">

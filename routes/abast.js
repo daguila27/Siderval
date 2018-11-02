@@ -71,11 +71,11 @@ router.get('/view_abastecimiento', function(req, res, next) {
 	if(verificar(req.session.userData)){
 			req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT * FROM abastecimiento LEFT JOIN oda ON oda.idoda=abastecimiento.oda", function(err ,rows){
+                connection.query("SELECT * FROM abastecimiento LEFT JOIN oda ON oda.idoda=abastecimiento.idoda", function(err ,rows){
                     if(err) console.log("Select Error: %s",err);
                    
-                    console.log(rows);
-                    //res.render('abast/odas', {data: ped});
+
+                    res.render('abast/view_abastecimiento');
     
                    
                 });
@@ -975,8 +975,7 @@ router.get('/fact_info_view/:idfactura', function(req, res, next){
 					 function(err, money){
 					 	if(err)
 					 		console.log("Error Selecting : %s", err);	
-					console.log(facts);
-					console.log(money);
+
 					res.render('abast/factura_info', {data: facts, mon: money[0].mon});
 				});
 			});
@@ -1448,7 +1447,6 @@ router.get('/get_databom/:idop', function(req, res, next){
 			        				for(var x=0; x < array.length; x++){
 			        					if(array[x][5] == ab[y].idmaterial){
 			        						if(ab[y].ingreso){
-			        							console.log(ab[y].cantidad);
 			        							array[x][2] = array[x][2] + ab[y].cantidad;
 			        						}
 			        						else{
@@ -1457,7 +1455,6 @@ router.get('/get_databom/:idop', function(req, res, next){
 			        					}
 			        				}
 			        			}
-			        			console.log(array);	        				
 				        		res.render('abast/modal_bom_op', {data: array, idop: idop, abast: true});
 			        		});
 			        		//res.render('abast/modal_bom_op', {data: array, idop: idop, abast: true});
