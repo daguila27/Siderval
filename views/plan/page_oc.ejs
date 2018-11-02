@@ -1,8 +1,11 @@
 <%
     function fechaLatino(string){
-        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
     }
 %>
+
+
+
 <div class="o_view_manager_content">
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
@@ -29,7 +32,34 @@
                         <h1>
                             <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=data.numoc%></span>
                         </h1>
-                        <button><i>HOLA</i></button>
+
+                        <style>
+                            .edit-icon:hover{
+                                background-color: #d4d4d4;
+                            }
+                        </style>
+                        <!--<div class="panel panel-primary">
+                            <div class="panel-heading" style="margin: 0; padding: 5px 5px; text-align: center;">
+                                Editar
+                            </div>
+                            <div class="panel-body edit-icon" style="text-align: center; padding: 5px; cursor:pointer;" >
+                                <i class="glyphicon glyphicon-pencil" style="font-size: 20px"></i>
+                            </div>
+                        </div>-->
+
+                        <div class="dropdown" style="height: 100%">
+                            <button type="button" class="btn dropdown-toggle button-option" type="button" data-toggle="dropdown" style="align-content: center; width: 100%">
+                                <i class="glyphicon glyphicon-option-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu" style="margin: 0;">
+                                <!--LA OPCION EDITAR:
+                                    - Solo permite editar cantidades solicitadas ,fechas de entrega y precio.
+                                    - Solo se pueden editar las cantidades que no hayan sido lanzadas a produccion (No producidos)-->
+                                <li class="ped-option" id="edit<%= data.idodc%>" onclick="transformBodyPanel(this)" data-id="<%= data.idodc%>"><a><i class="glyphicon glyphicon-pencil"></i> Editar</a></li>
+                                <li class="ced-option" id="cloedit<%= data.idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= data.idodc%>" style="display: none;" ><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion</a></li>
+                                <li id="cloeditde<%= data.idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= data.idodc%>" style="display: none;"><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion(DE)</a></li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="o_group">
                         <table class="o_group o_inner_group o_group_col_6">
@@ -137,8 +167,8 @@
                                                     <span class="o_pager_value"></span> / <span class="o_pager_limit"></span>
                                                 </span>
                                                 <span class="btn-group btn-group-sm">
-                                        
-                                        
+
+
                                                     <button aria-label="Previous" class="fa fa-chevron-left btn btn-icon o_pager_previous" type="button"></button>
                                                     <button aria-label="Next" class="fa fa-chevron-right btn btn-icon o_pager_next" type="button"></button>
                                                 </span>
@@ -296,7 +326,7 @@
                                                 <label class="o_form_label o_form_label_empty" for="o_field_input_1085">Etiquetas</label>
                                             </td>
                                             <td style="width: 100%;">
-                                                <div class="o_field_many2manytags o_field_widget o_field_empty" name="tag_ids"> 
+                                                <div class="o_field_many2manytags o_field_widget o_field_empty" name="tag_ids">
                                                 </div>
                                             </td>
                                         </tr>
@@ -423,7 +453,7 @@
             </div>
         </div>
         <div class="o_chatter oe_chatter">
-           
+
             <div class="o_mail_activity o_field_widget" name="activity_ids"></div>
             <div class="o_mail_thread"></div>
         </div>

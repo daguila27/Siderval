@@ -315,6 +315,7 @@ router.get('/page_oc/:idodc', function(req, res, next){
                             if(err) console.log("Select Error: %s",err);
                             
                             //res.redirect('/plan');
+                            console.log(rows[0]);
                             res.render('plan/page_oc', {data:rows[0]});
                     });
                 });
@@ -2317,15 +2318,19 @@ router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
                     if(ids.indexOf(gd[e][0]) == -1 && gd[e][0] != '-' && gd[e][0].indexOf('A')==-1 ){
                         ids.push(gd[e][0]);
                         id += ""+gd[e][0]+",";
+
                         if(new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()  != 'Invalid Date'){
                             query += "WHEN iddespacho = "+gd[e][0]+" THEN '"+new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()+"' ";
-                            
+                        }
+                        else{
+                            console.log(gd[e][0]);
+                            console.log([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-'));
+
                         }
                     }
                 }
                 id = "("+id.substring(0,id.length-1)+")";
                 query = query + "ELSE fecha END WHERE iddespacho IN "+id;
-                console.log(query);
                 //console.log(query);
                 req.getConnection(function(err, connection){
                     if(err) console.log("Error Connection : %s", err);
@@ -2339,6 +2344,141 @@ router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
 
             });
         var input = fs.createReadStream('csvs/GD4.csv');
+        input.pipe(parser);
+
+        /*input.pipe(parse(function(err, rows){
+            if(err) throw err;
+            console.log(rows);
+        }));*/
+
+    } else res.redirect("/bad_login");
+});
+
+
+router.get('/parsecsv_despachos_fixfechas', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+
+        var parser = parse(
+            function(err,gd){
+                if(err) throw err;
+                /*
+                UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+                */
+                var query = "UPDATE despacho SET fecha = CASE ";
+                var id = '';
+                var ids = [];
+                for(var e=1; e < gd.length; e++){
+                    if(ids.indexOf(gd[e][0]) == -1 && gd[e][0] != '-' && gd[e][0].indexOf('A')==-1 ){
+                        ids.push(gd[e][0]);
+                        id += ""+gd[e][0]+",";
+
+                        if(new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()  != 'Invalid Date'){
+                            query += "WHEN iddespacho = "+gd[e][0]+" THEN '"+new Date([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-')).toLocaleString()+"' ";
+                        }
+                        else{
+                            console.log(gd[e][0]);
+                            console.log([gd[e][6].split('-')[1], gd[e][6].split('-')[2], gd[e][6].split('-')[0]].join('-'));
+
+                        }
+                    }
+                }
+                id = "("+id.substring(0,id.length-1)+")";
+                query = query + "ELSE fecha END WHERE iddespacho IN "+id;
+                //console.log(query);
+                req.getConnection(function(err, connection){
+                    if(err) console.log("Error Connection : %s", err);
+                    connection.query(query, function(err, upGD){
+                        if(err) console.log("Error Selecting : %s", err);
+                        console.log(upGD);
+                        res.redirect('/plan');
+                    });
+                });
+
+
+            });
+        var input = fs.createReadStream('csvs/GD4.csv');
+        input.pipe(parser);
+
+        /*input.pipe(parse(function(err, rows){
+            if(err) throw err;
+            console.log(rows);
+        }));*/
+
+    } else res.redirect("/bad_login");
+});
+
+router.get('/parsecsv_fabricaciones_fixexterno', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+
+        var parser = parse(
+            function(err,oc){
+                if(err) throw err;
+                /*
+                UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+                */
+                var ocs = [];
+                for(var e=1; e < oc.length; e++){
+                    if(oc[e][0] != 'S/MAIL'){
+                        //0 - Orden de Compra, 7 - Tipo de Fabricaci�n,9 - RUT Cliente
+                        ocs.push([oc[e][0], oc[e][7]]);
+                    }
+                }
+                console.log(ocs);
+                req.getConnection(function(err, connection){
+                    if(err) throw err;
+                    connection.query("SELECT * FROM odc", function(err, odc){
+                        if(err) throw err;
+                        var cuenta = 0;
+                        for(var b=0; b < ocs.length; b++){
+                            for(var a=0; a < odc.length; a++){
+                                if(odc[a].numoc.replace(' ', '') == ocs[b][0].replace(' ', '')){
+                                    ocs[b][0] = odc[a].idodc;
+                                    cuenta++;
+                                    break;
+                                }
+                            }
+                        }
+                        console.log(cuenta + " ids encontrados");
+                        console.log("Largo del arreglo " + ocs.length);
+                        var query = "UPDATE pedido SET externo = CASE";
+                        var nums = '';
+                        for(var e=0; e < ocs.length; e++){
+                            if(ocs[e][1] == 'Externa'){
+                                query += " WHEN idodc = '"+ocs[e][0]+"' THEN '1'";
+                            }
+                            else{
+                                query += " WHEN idodc = '"+ocs[e][0]+"' THEN '0'";
+                            }
+                            nums += "'"+ocs[e][0]+"',";
+                        }
+                        query = query + " ELSE externo END WHERE idodc IN ("+nums.substring(0, nums.length-1)+")";
+                        connection.query(query, function(err, inCase){
+                            if(err) throw  err;
+                            console.log(inCase);
+                            res.redirect('/plan');
+                        });
+
+                    });
+                });
+
+            });
+        var input = fs.createReadStream('csvs/OC3.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){

@@ -35,7 +35,7 @@ router.get('/', function(req, res, next){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 
-                res.render('jefeprod/indx', {page_title: "Jefe de Produccion", username: req.session.userData.nombre, etapas: etp});
+                res.render('jefeprod/indx_new', {page_title: "Jefe de Produccion", username: req.session.userData.nombre, etapas: etp});
             });
         });
     }
@@ -382,8 +382,7 @@ router.get('/list_ops', function(req, res, next){
                         console.log("Select Error: %s",err);
                     }
                     var aux = [];
-                    console.log("ofs");
-                    console.log(ofs);
+                    /*El error del etapatoken nulo se debe por lo general a que hay fabricaciones sin fecha de entrega*/
                     for(var i = 0;i< ofs.length;i++){
                     	if(typeof ofs[i].oftoken != 'null'){
                 			ofs[i].oftoken = ofs[i].oftoken.split(',');

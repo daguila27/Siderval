@@ -57,7 +57,7 @@ function letraMayus(string) {
         <form id="send_gdd" type="post">
     <%}%>    
         <div class="panel panel-primary panel-defecto" >
-            <div class="panel-heading">
+            <div class="panel-heading" style="display: flex;">
                 <div style="width: 50%">
                     <h3>Crear Guía de Despacho N° <%=num%></h3>
                     <!--<div>
@@ -65,10 +65,21 @@ function letraMayus(string) {
                         <button class="btn btn-primary loadStateButton"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
                     </div>-->
                 </div>
+
+                    <label style="width: 30%">
+                        Cliente: 
+                        <select name="cliente_gd" class="form-control">
+                            <%for(var w=0; w < cli.length; w++){%>
+                                <option value="<%= cli[w].idcliente%>" id="cli<%= cli[w].idcliente%>"><%= cli[w].sigla%> - <%= cli[w].razon%></option>
+                            <%}%>
+                        </select>
+                    </label>
             </div>
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th>N° OC</th>
+                        <th>Item</th>
                         <th>Detalle</th>
                         <th>Sin Enviar</th>
                         <th>En Stock</th>
@@ -84,8 +95,9 @@ function letraMayus(string) {
                     </tr>
                 </tbody>
             </table>
-            <div class="panel-footer">
+            <div class="panel-footer" style="display: flex;">
                 <div class="form-inline divSelect" style="margin-left: 70%;">
+
                     <select name="estado" id="estadoselect" class="form-control">
                         <option value="Venta" class="notT">Venta</option>
                         <option value="Traslado">Traslado</option>
@@ -93,6 +105,7 @@ function letraMayus(string) {
                         <option value="Otro" class="notT">Otro</option>
                         <option value="Blanco" class="notT">Blanco</option>
                     </select>
+
                     <button type="button" class="btn btn-info" data-target="#gddobs" data-toggle="collapse">+ <i class="fa fa-comment"></i></button>
                     <button class="btn btn-success" type="submit">+ Crear</button>
                 </div>
@@ -185,7 +198,7 @@ function letraMayus(string) {
                             <td style="text-align: center;"><%=numberFormat(data[i].cantidad - data[i].despachados)%></td>
                             <td style="text-align: center;"><%=numberFormat(data[i].stock)%></td>
                             <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
-                            <td><a onclick="send_queue(this)" data-notstock="<%=stateButton%>" data-num="<%=data[i].numordenfabricacion%>" data-idmat="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>" data-sinenviar="<%= data[i].cantidad - data[i].despachados%>" data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" data-idof="<%= data[i].idordenfabricacion%>" data-insu='0' class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
+                            <td><a onclick="send_queue(this)" data-notstock="<%=stateButton%>" data-num="<%=data[i].numordenfabricacion%>" data-idmat="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>" data-sinenviar="<%= data[i].cantidad - data[i].despachados%>" data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" data-idof="<%= data[i].idordenfabricacion%>" data-numitem="<%= data[i].numitem%>" data-idcli="<%= data[i].idcliente%>" data-insu='0' class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
                             <!--idordenfabricacion ES REALMENTE idodc-->
                         </tr>
 
@@ -264,6 +277,9 @@ function letraMayus(string) {
     function send_queue(e){
         obj = $(e).data();
         if(obj.notstock){
+            if($(e).data('idcli')){
+                //alert($(e).data('idcli') );
+            }
             //console.log(obj);
             $.ajax({
                     type: 'POST',
@@ -271,6 +287,7 @@ function letraMayus(string) {
                     url: 'bodega/add_despacho',
                     success: function(data){
                         $("#session_prod").html(data);
+                        console.log(data);
                         if($("#only_one_odc").prop('checked') ){
                             $("#tbody tr a.addqq").each(function(e){
                                 auxer = $(this).data();

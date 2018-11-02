@@ -67,6 +67,26 @@ router.get('/odcs', function(req, res, next) {
 
 
 
+router.get('/view_abastecimiento', function(req, res, next) {
+	if(verificar(req.session.userData)){
+			req.getConnection(function(err,connection){
+                if(err) console.log("Connection Error: %s",err);
+                connection.query("SELECT * FROM abastecimiento LEFT JOIN oda ON oda.idoda=abastecimiento.oda", function(err ,rows){
+                    if(err) console.log("Select Error: %s",err);
+                   
+                    console.log(rows);
+                    //res.render('abast/odas', {data: ped});
+    
+                   
+                });
+            });
+
+    }
+	else{res.redirect('bad_login');}	
+});
+
+
+
 
 
 router.get('/sol_odc', function(req, res, next) {
@@ -94,7 +114,6 @@ router.get('/sol_odc', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
-
 
 router.get('/bom_sol_uni_page/:page', function(req, res, next) {
 	if(verificar(req.session.userData)){
