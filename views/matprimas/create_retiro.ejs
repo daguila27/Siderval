@@ -1,0 +1,97 @@
+<style type="text/css">
+	#tablaStock_wrapper{
+		padding: 1%;
+	}
+</style>
+<h2>Registrar Retiro</h2>
+<div class="panel panel-primary">
+	<form id="seesion_form">
+		<div class="panel-heading">Retiro Actual:</div>
+		<div class="panel-body form-group">
+			<label for="receptor">Nombre del receptor</label>
+			<input type="text" class="form-control" name="receptor">
+			<label for="receptor">Etapa</label>
+			<select class="form-control"  name="etapa">
+				<option disabled selected>-- Selecciona una etapa --</option>
+				<option value="1">Moldeo</option>
+				<option value="2">Fusión</option>
+				<option value="3">Quiebre</option>
+				<option value="4">Terminación</option>
+				<option value="5">Tratamiento Térmico</option>
+				<option value="6">Maestranza</option>
+				<option value="7">Control De Calidad</option>
+			</select>
+		</div>
+		<table id="tabla_session" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+			<thead>
+			<tr>
+				<th>Detalle</th>
+				<th>Stock</th>
+			</tr>
+			</thead>
+			<tbody id="session_rows">
+			</tbody>
+		</table>
+	</form>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">Registrar Retiro:</div>
+	<table id="tablaStock" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+		<thead>
+		<tr>
+			<th>Código</th>
+			<th>Detalle</th>
+			<th>Stock</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+        <%if(mat.length > 0){
+		for(var j=0; j < mat.length; j++){%>
+		<tr id="row<%= mat[j].idmaterial%>">
+			<td><%= mat[j].codigo%></td>
+			<td><%= mat[j].detalle%></td>
+			<td><%= mat[j].stock%></td>
+			<td><a href="#" onclick="add_session(<%= mat[j].idmaterial%>)"><i class="fa fa-plus"></i></a></td>
+		</tr>
+        <%}
+		}
+		else{%>
+		<tr>
+			No hay materiales registrados.
+		</tr>
+        <%}%>
+		</tbody>
+	</table>
+</div>
+<script type="text/javascript">
+    //setDataTable("#tablaStock");
+    $('#tablaStock').DataTable( {
+        "scrollY":        "300px",
+        "scrollCollapse": true,
+        "paging":         false
+
+    } );
+    //  mat[Math.floor((Math.random()*mat.length)+1) - 1].detalle"
+    function add_session(idmaterial){
+        $("#tabla_session").append("<tr>" + $("#row" + idmaterial.toString()).html() + "</tr>");
+        $("#row" + idmaterial.toString()).addClass("hidden");
+    }
+    $("#session_form").submit(function (e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/bodega/save_retiro',
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","stock hasta ~ " + new Date().toLocaleDateString() + ".csv");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar csv");
+                console.log(data);
+            }
+        });
+	})
+</script>
