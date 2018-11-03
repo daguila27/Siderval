@@ -37,8 +37,10 @@
             resultado+=numero.substring(numero.indexOf(","));
         if(numero[0]=="-")
         {
+			console.log("-"+resultado);
             return "-"+resultado;
         }else{
+			console.log(resultado);
             return resultado;
         }
     }
@@ -93,9 +95,9 @@
 								<tr class="<%= clase%>">
 							<%
 								if(abast){%><!--<td><%=data[r][0]%></td>-->
-									<td><%=data[r][1].substring(0,1).toUpperCase() + data[r][1].substring(1, data[r][1].length).toLowerCase()%></td>
-									<td><%=data[r][2]%></td>
-									<td><%=data[r][4]%></td>
+									<td><%=data[r][1]%></td>
+									<td><%= data[r][2]%></td>
+									<td><%= data[r][4]%></td>
 									<td>
 									  <div class="form-group">
 									    	<input type="number" class="form-control" name="despach<%=data[r][5]%>" min="0" max="<%=data[r][4]%>" value="0" required>
@@ -104,7 +106,7 @@
 									<td><%=data[r][3]%></td>
 								<%}else{%>
 								<!--<td><%=data[r][0]%></td>-->
-									<td><%=data[r][1].substring(0,1).toUpperCase() + data[r][1].substring(1, data[r][1].length).toLowerCase()%></td>
+									<td><%=data[r][1]%></td>
 									<td><%=data[r][2]%></td>
 									<td><%=trunc(data[r][6],1)%></td>
 									<td>
