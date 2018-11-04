@@ -41,7 +41,6 @@ router.get('/', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-
 router.get('/odcs', function(req, res, next) {
 	if(verificar(req.session.userData)){
 			req.getConnection(function(err,connection){
@@ -129,7 +128,6 @@ router.get('/bom_sol_uni_page/:page', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-
 router.get('/bom_mat_uni_page/:page', function(req, res, next) {
 	if(verificar(req.session.userData)){
 		var pagina = req.params.page-1;
@@ -168,8 +166,6 @@ router.get('/bom_mat_uni', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
-
-
 
 router.post('/data_bom', function(req, res, next) {
 	if(verificar(req.session.userData)){
@@ -254,7 +250,6 @@ router.post('/abast_ped', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-
 router.post('/search_of_sol', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var info = JSON.parse(JSON.stringify(req.body)).info;
@@ -289,7 +284,6 @@ router.post('/search_of_sol', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-
 router.post('/search_bom', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var info = JSON.parse(JSON.stringify(req.body)).info;
@@ -308,9 +302,6 @@ router.post('/search_bom', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
-
-
-
 
 router.get('/abast_myself', function(req, res, next) {
 	if(verificar(req.session.userData)){
@@ -379,8 +370,6 @@ router.get('/get_insumos_of/:idof', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-
-
 router.get('/stock_matp', function(req, res, next) {
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
@@ -423,9 +412,6 @@ router.get('/stock_matp', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });*/
-
-
-
 
 // Stream lanzar pedido cliente
 router.post('/buscar_matp', function(req, res, next){
@@ -613,9 +599,6 @@ router.get('/loadStateODABD', function(req,res,next){
     });
 });
 
-
-
-
 router.post('/addsession_prepeds', function(req, res, next){
     if(verificar(req.session.userData)){
     	console.log(req.body)
@@ -675,8 +658,6 @@ router.get('/found_subcuentas/:idcuenta', function(req, res, next){
 
 });
 
-
-
 router.post('/crear_oda', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -734,8 +715,6 @@ router.post('/crear_oda', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
 router.post('/tbody_bom', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -764,7 +743,6 @@ router.post('/tbody_bom', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.get('/notif_abast', function(req, res, next){
         req.getConnection(function(err,connection){
         	if(err){
@@ -781,8 +759,6 @@ router.get('/notif_abast', function(req, res, next){
         });
 });
 
-
-
 router.get('/drop_notifof/:idnotif', function(req, res, next){
         req.getConnection(function(err,connection){
         	if(err){
@@ -798,8 +774,6 @@ router.get('/drop_notifof/:idnotif', function(req, res, next){
         		});
         });
 });
-
-
 
 router.get('/rec_odc', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -830,7 +804,6 @@ router.get('/rec_odc', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
 
 router.get('/rec_odc_page/:page', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -875,7 +848,6 @@ router.get('/view_odc_page/:page', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.get('/fact_view', function(req, res, next){
     if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
@@ -899,7 +871,6 @@ router.get('/fact_view', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.get('/info_view', function(req, res, next){
     if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
@@ -915,7 +886,6 @@ router.get('/info_view', function(req, res, next){
 		});
     } else res.redirect("/bad_login");
 });
-
 
 router.post('/search_fact', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -958,6 +928,7 @@ router.get('/fact_info_view/:idfactura', function(req, res, next){
 		});
     } else res.redirect("/bad_login");
 });
+
 router.post('/get_table_fact', function(req, res, next){
     if(verificar(req.session.userData)){
         var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
@@ -977,7 +948,6 @@ router.post('/get_table_fact', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
 
 router.post('/save_factura', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1058,8 +1028,6 @@ router.post('/save_factura', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
 router.get('/get_dataoda/:idoda', function(req, res, next){
     if(verificar(req.session.userData)){
 		var idodc = req.params.idoda;
@@ -1080,7 +1048,6 @@ router.get('/get_dataoda/:idoda', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
 
 router.get('/get_dataodc/:idodc', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1209,8 +1176,6 @@ router.post('/crear_ingreso', function(req, res, next){
 	 } else res.redirect("/bad_login");
 });
 
-
-
 router.get('/abast_ops', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
@@ -1240,7 +1205,6 @@ router.get('/abast_ops', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.get('/abast_ops_page/:page', function(req, res, next){
     if(verificar(req.session.userData)){
 		var pagina = req.params.page-1;
@@ -1263,8 +1227,6 @@ router.get('/abast_ops_page/:page', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
 router.get('/ops_close', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
@@ -1281,7 +1243,6 @@ router.get('/ops_close', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
 
 router.get('/insumos_list/:token', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1304,6 +1265,7 @@ router.get('/insumos_list/:token', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
+
 
 /*  Funcion que renderiza la cabecera que posee un buscador de abastecimientos*/
 router.get('/view_abastecimiento', function(req, res, next) {
@@ -1400,7 +1362,6 @@ router.get('/buscar_abastecimientos_list', function(req, res, next){
 });
 
 
-
 router.post('/getOP_insu', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -1420,7 +1381,6 @@ router.post('/getOP_insu', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.post('/getOP_fabricados', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -1437,7 +1397,6 @@ router.post('/getOP_fabricados', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
 
 router.get('/dev_ops_page/:page', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1462,12 +1421,6 @@ router.get('/dev_ops_page/:page', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
-
-
-
 router.get('/get_databom/:idop', function(req, res, next){
     if(verificar(req.session.userData)){
 		var idop = req.params.idop;
@@ -1476,7 +1429,7 @@ router.get('/get_databom/:idop', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	connection.query("select  material.idmaterial, material.detalle, material.codigo,produccion.cantidad,group_concat(billof.idmaterial) as idmaterial_token,group_concat(billof.abast) as abast_token," +
 						" group_concat(billof.stock) as stock, group_concat(billof.stock_i) as stocki, group_concat(billof.stock_c) as stockc, group_concat(billof.codigo separator '@') as code_token,group_concat(billof.detalle separator '@') as componentes, group_concat(billof.cantidad) as cant_bom, group_concat(billof.u_medida) as u_bom from produccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join ("+
-                        "select bom.idmaterial_master,material.idmaterial,material.stock_i,material.stock_c, material.detalle, material.stock,material.codigo,bom.cantidad,material.u_medida,bom.abast from bom left join material on material.idmaterial=bom.idmaterial_slave where bom.abast = false AND material.notbom=false order by bom.idmaterial_master)"+
+                        "select bom.idmaterial_master,material.idmaterial,material.stock_i,material.stock_c, material.detalle, material.stock,material.codigo,bom.cantidad,material.u_medida,bom.abast from bom left join material on material.idmaterial=bom.idmaterial_slave where bom.abast = false AND material.notbom=true order by bom.idmaterial_master)"+
                         "as billof on billof.idmaterial_master=fabricaciones.idmaterial left join material on material.idmaterial=fabricaciones.idmaterial where produccion.idordenproduccion=? group by produccion.idproduccion", [idop], 
                         function(err, mats){
 			        		if(err)
@@ -1531,7 +1484,6 @@ router.get('/get_databom/:idop', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
 
 router.get('/get_databomdev/:idop', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1594,8 +1546,6 @@ router.get('/get_databomdev/:idop', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
-
 
 router.post('/desp_matp', function(req, res, next) {
 	if(verificar(req.session.userData)){
@@ -1687,7 +1637,6 @@ router.post('/desp_matp', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-
 router.get('/close_op/:idop', function(req,res,next){
 	if(verificar(req.session.userData)){
 		var id = req.params.idop;
@@ -1710,7 +1659,6 @@ router.get('/close_op/:idop', function(req,res,next){
 		res.redirect('bad_login');
 	}
 });
-
 
 router.post('/cerrar_op_mes', function(req,res,next){
 	if(verificar(req.session.userData)){
@@ -1752,8 +1700,6 @@ router.post('/cerrar_op_mes', function(req,res,next){
 	}
 });
 
-
-
 router.get('/update_opsabastecidas/:token', function(req,res,next){
 	if(verificar(req.session.userData)){
 		var token = req.params.token;
@@ -1779,6 +1725,7 @@ router.get('/update_opsabastecidas/:token', function(req,res,next){
 		res.redirect('bad_login');
 	}
 });
+
 router.get('/show_pdf_cierre/:token', function(req,res,next){
       var fs = require('fs');
       var token = req.params.token;
@@ -1790,7 +1737,6 @@ router.get('/show_pdf_cierre/:token', function(req,res,next){
       });
                      
 });
-
 
 router.get('/view_gastopdf_get/:token', function(req,res,next){
 		var token = req.params.token;
@@ -1810,8 +1756,6 @@ router.get('/view_gastopdf_get/:token', function(req,res,next){
 		});
 	
 });
-
-
 
 router.post('/dev_matp', function(req, res, next) {
 	if(verificar(req.session.userData)){
@@ -1957,7 +1901,6 @@ router.post('/dev_matp', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-
 router.get("/xlsx_stock", function(req, res, next){
     if(verificar(req.session.userData)){
         var Excel = require('exceljs');
@@ -2101,8 +2044,6 @@ router.get('/setear_bom', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
 router.get('/parsecsv_bom', function(req, res, next){
     if(req.session.isUserLogged){
         var parse = require('csv-parse');
@@ -2168,9 +2109,6 @@ router.get('/parsecsv_bom', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
 router.get('/fix_unidades', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -2232,8 +2170,6 @@ router.get('/fix_unidades', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
 router.post('/search_oc_prec', function(req, res, next){
     if(req.session.isUserLogged){
         var num = JSON.parse(JSON.stringify(req.body)).info;
@@ -2255,6 +2191,7 @@ router.post('/search_oc_prec', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
+
 router.post('/search_oc_dev', function(req, res, next){
     if(req.session.isUserLogged){
         var num = JSON.parse(JSON.stringify(req.body)).info;
@@ -2293,7 +2230,6 @@ router.post('/set_factura', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.post('/stock_info', function(req, res, next){
     if(req.session.isUserLogged){
         var num = JSON.parse(JSON.stringify(req.body)).info;
@@ -2313,7 +2249,6 @@ router.post('/stock_info', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
 
 router.get('/gdd_proveedores', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -2352,8 +2287,6 @@ router.post('/search_gdd_proveedores', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
-
 
 router.get('/virtual_bd', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -2438,7 +2371,6 @@ router.get('/search_proveedor/:key', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
 
 router.post('/newoc_ped', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -2530,9 +2462,6 @@ router.post('/newoc_ped', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
 router.get('/comprobar_notificaciones/:idorden', function(req, res, next){
 	req.getConnection(function(err, connection){
 		if(err)
@@ -2574,6 +2503,7 @@ router.get('/comprobar_notificaciones/:idorden', function(req, res, next){
 		
 	});
 });
+
 
 
 module.exports = router;

@@ -75,9 +75,6 @@ router.get('/procesos', function(req, res, next){
 	
 });
 
-
-
-
 router.get('/add_notificacion/:idproduccion/:cantidad/:key', function(req,res,next){
 		var input = req.params;
 		var userf = input.key.substring(2,3);
@@ -103,11 +100,6 @@ router.get('/add_notificacion/:idproduccion/:cantidad/:key', function(req,res,ne
 			});
 		});
 });
-
-
-
-
-
 
 router.post("/next_step",function(req,res,next){
 	if(verificar(req.session.userData)){
@@ -141,6 +133,7 @@ router.post("/next_step",function(req,res,next){
 		})
 	} else res.send("no");
 });
+
 router.get('/render_proceso/:proceso', function(req, res, next){
 	if(verificar(req.session.userData)){
 		var input = req.params;
@@ -184,7 +177,6 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 	else{res.redirect('bad_login');}
 	
 });
-
 
 router.post('/startProduccion', function(req, res, next){
 	if(verificar(req.session.userData)){
@@ -236,10 +228,6 @@ router.post('/startProduccion', function(req, res, next){
 		
 });
 
-
-
-
-
 router.get('/render_notificaciones/:uservalue', function(req, res, next){
 	var uv = req.params.uservalue;
 	var key = "fa"+uv;
@@ -252,10 +240,6 @@ router.get('/render_notificaciones/:uservalue', function(req, res, next){
 		});
 	});
 });
-
-
-
-
 
 router.get('/confirm_notificacion/:idnotificacion', function(req,res,next){
 		var idnotificacion = req.params.idnotificacion;
@@ -272,9 +256,6 @@ router.get('/confirm_notificacion/:idnotificacion', function(req,res,next){
 					});	
 		});
 });
-
-
-
 
 router.post('/report_error', function(req, res, next){
 	if(verificar(req.session.userData)){
