@@ -1,21 +1,57 @@
+<%function textFormat(string){
+    string = string.split(' ');
+    for(var a=0; a < string.length; a++){
+        string[a] = string[a].substring(0,1).toUpperCase() + string[a].substring(1,string[a].length).toLowerCase();
+	}
+	return string.join(' ');
+}%>
 <div class="row" style="margin: 0; padding: 0;">
 	<div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%">
 		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra</li>
+
+
 		</ol>
-		<div style="width: 50%;">			
+
+		<div style="width: 50%;">
 			<input type="text" id="buscar_abastecimiento" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-				
 		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-
 	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
+	    		<div class="search-option-list" style="display: flex;">
+					<label style="margin-left: 20px;margin-right: 20px">
+						<input type="checkbox" id="pend" style="margin-left: 10px" onchange="buscar_oda(true)" checked>
+						Mostrar Pendientes Solamente
+					</label>
+					<div class="dropdown fill_cc">
+						<button class="btn btn-primary dropdown-toggle dropdown_btn_ccfill" type="button" data-toggle="dropdown">Filtrar por CC<span class="caret"></span></button>
+						<ul class="dropdown-menu" style="max-height: 300px;  padding: 4px 10px;>
+							<spam class="pull-right">
+								<button class="btn btn-xs btn-default" style="margin: 10px 2px;" onclick="fill_oda_cc(this)">Aplicar</button>
+								<button class="btn btn-xs btn-danger" style="margin: 10px 0px;" onclick="$('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');">Revertir</button>
+							</spam>
+							<div class="form-group" style="height: 300px;">
+								<!--
+									Un SELECT MULTIPLE para filtrar los item de ODA según CC (centro de costo).
+									En la función buscar_oda() (script de abajo) se obtiene mediante $(".select_cc").val()
+									 lo cual entrega una lista con los identificadores de CC. (EJ : [ '120307','310102', '310103','310104'])
+								-->
 
-	    		<label style="margin-left: 100px">
-		    		<input type="checkbox" id="pend" style="margin-left: 10px" checked>
-			   		Mostrar Pendientes Solamente
-				</label>
+								<select multiple class="form-control select_cc" style="height: 250px" onchange="change_mulselected(this)" data-allbeforecheck="0">
+									<option value="all" id="all_option_cc" class="option_multiple_select"> Todos</option>
+									<%for(var e=0; e < cc.length; e++){%>
+										<option value="<%= cc[e].cuenta%>" class="option_multiple_select"> <%= textFormat(cc[e].detalle)%></option>
+									<%}%>
+
+								</select>
+							</div>
+
+
+
+						</ul>
+					</div>
+				</div>
 	        </div>
 		</div>
 	</div>
@@ -25,6 +61,7 @@
 </div>
 
 <script type="text/javascript">
+	var cc_fill = [];
 	$(document).ready(function(){
 		$.ajax({
 			type: 'GET',
@@ -33,36 +70,68 @@
 				$(".main-page").html(data);
 			}
 		});
-		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
-	});
-	
-	$("#buscar_abastecimiento").on('keyup', function(e){
+        $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+    });
+    $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+	function saveinSession(option){
+		if(cc_fill.indexOf($(option).val()) == -1 ){
+            alert( $(option).val() );
+		}
+	}
+    $("#buscar_abastecimiento").on('keyup', function(e){
 		e.preventDefault();
-		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
-			$.ajax({
-				type: 'POST',
-				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
-				url: '/abastecimiento/buscar_abastecimiento_list',
-				success: function(data){
-					$(".main-page").html(data);
-				}
-			});
-		}
-		else{
-			$.ajax({
-				type: 'GET',
-				url: '/abastecimiento/buscar_abastecimiento_item/'+$(this).val(),
-				success: function(data){
-					$(".main-page").html(data);
-				}
-			});		
-		}
+		buscar_oda(false);
 	});
+
+
+
+	function buscar_oda(onlylist){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista'){
+			$.ajax({
+                type: 'POST',
+                data: {
+                    clave: $("#buscar_abastecimiento").val(),
+					orden: $(".o_cp_switch_buttons .active").data('view'),
+					showPend: $("#pend").is(':checked'),
+					cc_selected: $(".select_cc").val().join(',')
+				},
+                url: '/abastecimiento/buscar_abastecimientos_list',
+                success: function(data){
+                    $(".main-page").html(data);
+                }
+            });
+        }
+        else{
+            if(!onlylist){
+				$.ajax({
+					type: 'POST',
+					data: {
+						clave: $("#buscar_abastecimiento").val(),
+                        cc_selected: $(".select_cc").val()
+					},
+					url: '/abastecimiento/buscar_abastecimiento_item',
+					success: function(data){
+						$(".main-page").html(data);
+					}
+				});
+
+            }
+        }
+	}
 
 	$('.view-option').on('click', function(e){
 		e.preventDefault();
+
 		$('.view-option').removeClass('active');
 		$(this).addClass('active');
+		if($(this).data('original-title') == 'Lista'){
+            $(".search-option-list").css('display', 'flex');
+		}
+		else{
+            $(".search-option-list").css('display', 'none');
+		}
 		$.ajax({
 			type: 'GET',
 			url: '/abastecimiento/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
@@ -71,6 +140,22 @@
 			}
 		});
 	});
-	
+
+	function fill_oda_cc(yo){
+        $('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');
+        buscar_oda(false);
+    }
+
+    function change_mulselected(yo){
+	    var beforeCheck = $(yo).data('allbeforecheck');
+	    if($("#all_option_cc").is(':selected') && !beforeCheck){
+	        $(yo).data('allbeforecheck', 1);
+            $(".option_multiple_select").prop("selected", true);
+		}
+		else if(!$("#all_option_cc").is(':selected')){
+            $(yo).data('allbeforecheck', 0);
+		}
+	}
+
 
 </script>

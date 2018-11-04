@@ -62,7 +62,7 @@ router.post("/save_retiro",function(req,res,next){
 						};
                         connection.query("INSERT INTO retiro_detalle SET ?",[data],function(err,rows){// Crear el detalle del retiro
                             if(err)console.log(err);
-                            connection.query("UPDATE material SET stock = stock - ? WHERE idmaterial = ?",[req.body['lista_v[]'],req.body['lista_m[]']],function(err,rows) //cambia el stock del único material seleccionado
+                            connection.query("UPDATE material SET stock = stock - ? WHERE idmaterial = ?",[req.body['lista_v[]'],req.body['lista_m[]']],function(err,rows){ //cambia el stock del único material seleccionado
                                 if(err)console.log(err);
                                 res.send({err:false,msg:"El retiro se registró exitosamente"});
                             });
