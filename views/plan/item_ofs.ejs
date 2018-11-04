@@ -19,10 +19,13 @@ if(data.length){
       </ul>
     </div>
   <a href="#" class="list-group-item factura-item">
-    <h4 class="list-group-item-heading">OF #<%= data[i].numordenfabricacion%></h4>
-    <small class="list-group-item-text"><b>OC:</b> <%= data[i].numoc%></small>
-    <br>
-    <small class="list-group-item-text">Creado el: <%= [new Date(data[i].creacion).toLocaleDateString().split('-')[2],new Date(data[i].creacion).toLocaleDateString().split('-')[1],new Date(data[i].creacion).toLocaleDateString().split('-')[0] ].join('/')%></small>
+    <h1 class="list-group-item-heading"><small>OF #<%= data[i].numordenfabricacion%></small></h1>
+    <h2 style="margin: 0;">
+        <small class="list-group-item-text"><b>OC:</b> <%= data[i].numoc%></small>
+        <br>
+        <small class="list-group-item-text">Creado el: <%= [new Date(data[i].creacion).toLocaleDateString().split('-')[2],new Date(data[i].creacion).toLocaleDateString().split('-')[1],new Date(data[i].creacion).toLocaleDateString().split('-')[0] ].join('/')%></small>
+    </h2>
+
   </a>
 </div>
     <%}%>
