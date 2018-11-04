@@ -62,7 +62,6 @@ router.get('/calendar_peds', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
-
 router.get('/table_pedidos/:orden', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
@@ -109,6 +108,26 @@ router.post('/buscar_pedido_list', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
+router.post('/buscar_odcs_item', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var clave = JSON.parse(JSON.stringify(req.body)).clave;
+        var where = '';
+        console.log(clave);
+        if(clave != '' || clave != null){
+            where = " WHERE odc.numoc LIKE '%"+clave+"%'";
+        }
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("select odc.*, coalesce(cliente.razon, 'No Definido') as cliente from odc left join cliente on cliente.idcliente=odc.idcliente"+where,function(err, odc){
+                if(err) throw err;
+
+                res.render('plan/item_odcs', {data: odc});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
 router.post('/buscar_fabricaciones_list', function(req, res, next){
   if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -152,7 +171,7 @@ router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         }
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.externo, material.detalle, odc.numoc"
+            connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,pedido.externo, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
@@ -186,6 +205,23 @@ router.get('/construir', function(req, res, next){
   else{res.redirect('bad_login');}
 
 });
+
+router.get('/item_odcs', function(req, res, next){
+    if(verificar(req.session.userData)){
+        if(req.session.isUserLogged){
+            req.getConnection(function(err, connection){
+                if(err) throw err;
+                connection.query("select odc.*, coalesce(cliente.razon, 'No Definido') as cliente from odc left join cliente on cliente.idcliente=odc.idcliente", function(err, odc){
+                    if(err) throw err;
+                    console.log(odc);
+                    res.render('plan/item_odcs', {data: odc});
+                });
+            });
+        } else res.redirect("/bad_login");
+    }
+    else{res.redirect('/bad_login');}
+});
+
 router.get('/item_ofs/:showPend', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
@@ -201,6 +237,7 @@ router.get('/item_ofs/:showPend', function(req, res, next){
                 connection.query("SELECT * FROM ordenfabricacion LEFT JOIN odc ON odc.idodc=ordenfabricacion.idodc LEFT JOIN fabricaciones ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"+where,
                     function (err,of){
                     if(err) console.log("Select Error: %s",err);
+                    console.log(of);
                     res.render('plan/item_ofs',{data: of });
                 });});
             });
@@ -315,7 +352,6 @@ router.get('/page_oc/:idodc', function(req, res, next){
                             if(err) console.log("Select Error: %s",err);
                             
                             //res.redirect('/plan');
-                            console.log(rows[0]);
                             res.render('plan/page_oc', {data:rows[0]});
                     });
                 });
