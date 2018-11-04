@@ -1,0 +1,95 @@
+<%
+	function fechaLatino(string){
+		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
+	}
+	function diff_indays(date1){
+		dt1 = new Date();
+		dt2 = new Date(date1);
+		return Math.floor((Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate()) ) /(1000 * 60 * 60 * 24));
+		}
+%>
+
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+	<thead>
+		<tr>
+			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.idabast-ASC">Número de OC</th>
+			<th class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Nombre</th>
+			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.cantidad-ASC">Solicitados</th>
+			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.recibidos-ASC">Recibidos</th>
+			<th class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
+			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.costo-ASC">Costo</th>
+			<th class="cabecera o_column_sortable order-column" data-order="oda.creacion-ASC">Fecha de creación</th>
+		</tr>
+	</thead>
+	<tbody class="ui-sortable">
+		<%for(var i=0; i < data.length; i++){ %>
+			<tr class="o_data_row">
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].idabast%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].detalle%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].cantidad%></td>
+				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].recibidos%></td>
+				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].u_medida%></td>
+				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].costo%></td>
+				
+				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" onclick="submit_form(this)" style="text-align: center;" data-idoda="<%= data[i].idoda%>">
+					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
+				</td>
+			</tr>
+		<%}%>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</tfoot>
+</table>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".order-column").removeClass('o-sort-up');
+		$(".order-column").removeClass('o-sort-down');
+		$(".order-column").each(function(){
+			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
+				if("<%= key.split('-')[1]%>" == "ASC"){
+					$(this).addClass('o-sort-up');
+					$(this).data('order', '<%= key.split("-")[0]%>-DESC');
+				}
+				else{
+					$(this).addClass('o-sort-down');
+					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
+					
+				}
+			}
+		});
+	});
+	$(".order-column").on('click', function(e){
+		e.preventDefault();
+		var item = this;
+		var orden = $(this).data('order');
+		var showPend = $("#pend").is(':checked');
+		$.ajax({
+			type: 'GET',
+			url: '/abastecimiento/table_abastecimientos/'+orden+'/'+showPend,
+			success: function(data){
+				$(".main-page").html(data);
+			}
+		});
+	});
+	
+	function submit_form(yo){
+		$.ajax({
+			type: 'GET',
+			url: '/abastecimiento/page_of/'+$(yo).data('idoda'),
+			success: function(data){
+				$(".main-page").html(data);	
+			}
+		});
+	}
+</script>

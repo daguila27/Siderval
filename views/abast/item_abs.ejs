@@ -1,0 +1,45 @@
+<style>
+    .factura{
+        margin: 0px;
+        padding: 0px;
+        -webkit-box-shadow: 9px 7px 25px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 9px 7px 25px 0px rgba(0,0,0,0.75);
+        box-shadow: 9px 7px 25px 0px rgba(0,0,0,0.75);
+    }
+</style>
+<%
+if(data.length){
+    for(var i = 0; i< data.length;i++){
+        %>
+<div class="col-md-4 list-group factura" onclick="submit_form(this)" data-idoda="<%= data[i].idoda%>">
+    <div class="dropdown" style="position: absolute; top: 15px; right: 15px; z-index: 10">
+      <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
+      <ul class="dropdown-menu dropdown-menu-right">
+         <li><a>Ver PDF</a></li>  
+      </ul>
+    </div>
+  <a href="#" class="list-group-item factura-item">
+    <h4 class="list-group-item-heading">OC #<%= data[i].idoda%></h4>
+    <small class="list-group-item-text"><b>Proveedor:</b> <%= data[i].sigla%></small>
+    <br>
+    <small class="list-group-item-text">Creado el: <%= [new Date(data[i].creacion).toLocaleDateString().split('-')[2],new Date(data[i].creacion).toLocaleDateString().split('-')[1],new Date(data[i].creacion).toLocaleDateString().split('-')[0] ].join('/')%></small>
+  </a>
+</div>
+    <%}%>
+<%}else{%>
+    <h1 style="text-align: center; margin-top: 10px"> No hay OF registradas</h1>
+<%}%>
+
+<script type="text/javascript">
+  
+
+  function submit_form(yo){
+    $.ajax({
+      type: 'GET',
+      url: '/abastecimiento/page_of/'+$(yo).data('idoda'),
+      success: function(data){
+        $(".main-page").html(data); 
+      }
+    });
+  }
+</script>

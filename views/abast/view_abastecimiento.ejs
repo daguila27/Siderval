@@ -1,1 +1,76 @@
-<h1>ALEXIS AQUI TIENES QUE PONER LO DE ODOO</h1>
+<div class="row" style="margin: 0; padding: 0;">
+	<div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%">
+		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
+			<li class="active">Orden de Compra</li>
+		</ol>
+		<div style="width: 50%;">			
+			<input type="text" id="buscar_abastecimiento" class="form-control pull-right" placeholder="Buscar...">
+			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
+				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+				
+		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
+
+	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
+
+	    		<label style="margin-left: 100px">
+		    		<input type="checkbox" id="pend" style="margin-left: 10px" checked>
+			   		Mostrar Pendientes Solamente
+				</label>
+	        </div>
+		</div>
+	</div>
+</div>
+<div class="row row-main" style="margin: 0; padding: 0;">
+	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5;"></div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$.ajax({
+			type: 'GET',
+			url: '/abastecimiento/table_abastecimientos/abastecimiento.idabast-ASC/true',
+			success: function(data){
+				$(".main-page").html(data);
+			}
+		});
+		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+	});
+	
+	$("#buscar_abastecimiento").on('keyup', function(e){
+		e.preventDefault();
+		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+			$.ajax({
+				type: 'POST',
+				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
+				url: '/abastecimiento/buscar_abastecimiento_list',
+				success: function(data){
+					$(".main-page").html(data);
+				}
+			});
+		}
+		else{
+			$.ajax({
+				type: 'GET',
+				url: '/abastecimiento/buscar_abastecimiento_item/'+$(this).val(),
+				success: function(data){
+					$(".main-page").html(data);
+				}
+			});		
+		}
+	});
+
+	$('.view-option').on('click', function(e){
+		e.preventDefault();
+		$('.view-option').removeClass('active');
+		$(this).addClass('active');
+		$.ajax({
+			type: 'GET',
+			url: '/abastecimiento/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
+			success: function(data){
+				$(".main-page").html(data);
+			}
+		});
+	});
+	
+
+</script>
