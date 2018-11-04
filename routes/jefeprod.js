@@ -41,6 +41,7 @@ router.get('/', function(req, res, next){
     }
 	else{res.redirect('bad_login');}	
 });
+
 router.post('/serchprods', function(req, res, next) {
     if(verificar(req.session.userData)){
         req.getConnection(function(err,connection){
@@ -63,7 +64,6 @@ router.post('/serchprods', function(req, res, next) {
     }
     else{res.redirect('bad_login');}
 });
-
 
 router.post('/serchprogress', function(req, res, next) {
     if(verificar(req.session.userData)){
@@ -93,8 +93,6 @@ router.post('/serchprogress', function(req, res, next) {
     }
     else{res.redirect('bad_login');}
 });
-
-
 
 router.post('/cerrar_op', function(req, res, next) {
     if(verificar(req.session.userData)){
@@ -274,7 +272,6 @@ router.get('/itemprod/:val', function(req, res, next) {
     else{res.redirect('bad_login');}
 });
 
-
 router.get('/crear_op', function(req, res, next){
 	if(verificar(req.session.userData)){
 		req.session.arrayProduccion = [];
@@ -303,6 +300,7 @@ router.get('/crear_op', function(req, res, next){
 	else{res.redirect('bad_login');}	
 	
 });
+
 router.post('/lanzar_op_fill', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -337,7 +335,6 @@ router.post('/lanzar_op_fill', function(req, res, next){
     else{res.redirect('bad_login');}    
     
 });
-
 
 router.get('/ordenes_fabricacion', function(req, res, next){
 	if(verificar(req.session.userData)){
@@ -445,8 +442,6 @@ router.get('/list_ops', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
-
 
 router.get('/list_prod', function(req, res, next){
     if(verificar(req.session.userData)){
