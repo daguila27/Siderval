@@ -9,7 +9,12 @@
 	}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
-		<thead style="/*position: fixed; width: 100%*/">
+	<style>
+		.order-column:hover{
+			cursor: pointer;
+		}
+	</style>
+	<thead style="/*position: fixed; width: 100%*/">
 			<tr>
                 <th id="numof" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
                 <th id="numoc" class="cabecera o_column_sortable order-column" data-order="odc.numoc-ASC">N° OC</th>
@@ -20,7 +25,7 @@
 				<th id="planta" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">Planta</th>-->
 				<th id="f_entrega" class="cabecera o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
 				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="ordenfabricacion.creacion-ASC">Fecha de Creación</th>
-				<th id="habilitar_cand" class="cabecera o_column_sortable" style="text-align: center;">Habilitar</th>
+				<th id="habilitar_cand" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC">Habilitar</th>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable" style="margin-top: 10px">

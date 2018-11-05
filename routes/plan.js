@@ -317,7 +317,7 @@ router.get('/page_of/:idof', function(req, res, next){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT fabricaciones.*, material.*, (to_days(fabricaciones.f_entrega)-to_days(now())) as dias "
                         +"FROM fabricaciones LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial "
-                        +"WHERE fabricaciones.idorden_f = ? ORDER BY fabricaciones.numitem",[idof], function(err ,fabs){
+                        +"WHERE fabricaciones.idorden_f = ? ORDER BY (fabricaciones.numitem*1)",[idof], function(err ,fabs){
                         if(err) console.log("Select Error: %s",err);
 
                         //res.redirect('/plan');
@@ -341,7 +341,7 @@ router.get('/page_oc/:idodc', function(req, res, next){
                 connection.query("SELECT * FROM odc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente WHERE odc.idodc = ?",[idodc], function(err, odc){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT pedido.*, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
-                        +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial WHERE pedido.idodc = ? ORDER BY pedido.numitem",[idodc], function(err ,ped){
+                        +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial WHERE pedido.idodc = ? ORDER BY (pedido.numitem*1)",[idodc], function(err ,ped){
                             if(err) console.log("Select Error: %s",err);
                             
                             //res.redirect('/plan');
