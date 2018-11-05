@@ -30,7 +30,7 @@
                     </div>
                     <div class="oe_title" style="display: flex; margin: 0; width: 100%">
                         <h1>
-                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=data.numoc%></span>
+                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=odc.numoc%></span>
                         </h1>
 
                         <style>
@@ -55,9 +55,9 @@
                                 <!--LA OPCION EDITAR:
                                     - Solo permite editar cantidades solicitadas ,fechas de entrega y precio.
                                     - Solo se pueden editar las cantidades que no hayan sido lanzadas a produccion (No producidos)-->
-                                <li class="ped-option" id="edit<%= data.idodc%>" onclick="transformBodyPanel(this)" data-id="<%= data.idodc%>"><a><i class="glyphicon glyphicon-pencil"></i> Editar</a></li>
-                                <li class="ced-option" id="cloedit<%= data.idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= data.idodc%>" style="display: none;" ><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion</a></li>
-                                <li id="cloeditde<%= data.idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= data.idodc%>" style="display: none;"><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion(DE)</a></li>
+                                <li class="ped-option" id="edit<%= odc.idodc%>" onclick="transformBodyPanel(this)" data-id="<%= odc.idodc%>"><a><i class="glyphicon glyphicon-pencil"></i> Editar</a></li>
+                                <li class="ced-option" id="cloedit<%= odc.idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= odc.idodc%>" style="display: none;" ><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion</a></li>
+                                <li id="cloeditde<%= odc.idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= odc.idodc%>" style="display: none;"><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion(DE)</a></li>
                             </ul>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                                         <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Cliente</label>
                                     </td>
                                     <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=data.sigla%><br><%=data.razon%>
+                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=odc.sigla%><br><%=odc.razon%>
                                         </a>
                                     </td>
                                 </tr>
@@ -111,7 +111,7 @@
                                         </label>
                                     </td>
                                     <td style="width: 100%;">
-                                        <span class="o_field_date o_field_widget o_readonly_modifier" name="confirmation_date"><%=fechaLatino(new Date(data.creacion).toLocaleDateString())%></span>
+                                        <span class="o_field_date o_field_widget o_readonly_modifier" name="confirmation_date"><%=fechaLatino(new Date(odc.creacion).toLocaleDateString())%></span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -180,39 +180,39 @@
                                             <thead>
                                                 <tr>
                                                     <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
+                                                    <th class="o_column_sortable" style="text-align: left;">Item</th>
+
                                                     <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                     <th class="o_column_sortable">Cantidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Despachados</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
-                                                    <th class="o_column_sortable" style="text-align: center;">Días restantes</th>
+                                                    <th class="o_column_sortable" style="text-align: center;">Días Restantes</th>
+
                                                     <!--<th class="o_column_sortable">Impuestos</th>
                                                     <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
                                                 </tr>
                                             </thead>
                                             <tbody class="ui-sortable">
-                                                <%
-                                                data.detalle = data.detalle.split('@');
-                                                data.f_entrega = data.f_entrega.split('@');
-                                                data.cantidad = data.cantidad.split(',');
-                                                data.despachados = data.despachados.split(',');
-                                                data.u_medida = data.u_medida.split(',');
-                                                data.dias = data.dias.split(',');
-                                                for(var e=0; e < data.detalle.length; e++){
-                                                    if(data.dias[e] < 0 ){%>
+                                                <%for(var e=0; e < ped.length; e++){
+                                                    if(ped[e].dias < 0 && ped[e].cantidad > ped[e].despachados){%>
                                                         <tr class="o_data_row text-info danger">
+                                                    <%}else if((ped[e].dias >= 0 && ped[e].dias <= 10) && ped[e].cantidad>ped[e].despachados ){%>
+                                                        <tr class="o_data_row text-info warning">
                                                     <%}else{%>
                                                         <tr class="o_data_row text-info success">
                                                     <%}%>
+
                                                         <td class="o_data_cell o_list_number o_handle_cell">
                                                             <span class="o_row_handle fa fa-arrows o_field_widget ui-sortable-handle" name="sequence"></span>
                                                         </td>
-                                                        <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=data.detalle[e]%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=data.cantidad[e]%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=data.despachados[e]%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=data.u_medida[e]%></td>
-                                                        <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(data.f_entrega[e]).toLocaleDateString())%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=data.dias[e]%></td>
+                                                        <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=ped[e].numitem%></td>
+                                                        <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=ped[e].detalle%></td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=ped[e].cantidad%></td>
+                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].despachados%></td>
+                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].u_medida%></td>
+                                                        <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(ped[e].f_entrega).toLocaleDateString())%></td>
+                                                        <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=ped[e].dias%></td>
                                                         <!--<td class="o_data_cell o_many2many_tags_cell">
                                                             <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
                                                         </td>

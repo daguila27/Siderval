@@ -6,22 +6,30 @@
 		      	
 	        </div>
 		</ol>
-		<div style="width: 40%;">			
+		<div style="width: 40%;">
 			<input type="text" id="buscar_fabricaciones" name="" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-	    
-		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='/item_ofs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-	    
-	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
-		    	<label style="margin-left: 100px">
-		    		<input type="checkbox" id="pend" style="margin-left: 10px" checked>
-			   		Mostrar Pendientes Solamente
-				</label>
-	       		<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
-	    	
-	        	<button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
-	        </div>
+
+				<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_ofs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
+
+				<button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
+				<div style="display: flex">
+                    <select class="form-control" style="width: 25%;margin-left: 80px; margin-right: 10px;">
+                        <option value="todos">Todos</option>
+                        <option value="conoc">Con OC</option>
+                        <option value="sinoc">Sin OC</option>
+                    </select>
+                    <label class="check_pendientes" style="display: block;">
+						<input type="checkbox" id="pend" style="margin-left: 10px" checked> Mostrar Solo Pendientes
+					</label>
+
+				</div>
+
+					<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
+
+                 <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
+			</div>
 		</div>
 	</div>
 </div>
@@ -74,6 +82,12 @@
 	$('.view-option').on('click', function(e){
 		e.preventDefault();
 		$('.view-option').removeClass('active');
+		if($(this).data('original-title') == 'Lista'){
+			$("#check_pendientes").css('display', 'inline');
+		}
+		else{
+            $("#check_pendientes").css('display', 'none');
+		}
 		$(this).addClass('active');
 		$.ajax({
 			type: 'GET',

@@ -80,6 +80,7 @@ router.post("/save_movimiento",function(req,res,next){
                             connection.query("UPDATE material SET stock = stock " + inventario_char + " ? WHERE idmaterial = ?",[req.body['lista_v[]'],req.body['lista_m[]']],function(err,rows){ //cambia el stock del único material seleccionado
                                 if(err) console.log(err);
                                 res.send({err:false,msg:"El movimiento se registró exitosamente"});
+
                             });
                         });
 					} else { // sis se seleccionaron mas de uno

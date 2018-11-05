@@ -1,5 +1,5 @@
 <div class="row" style="margin: 0; padding: 0;">
-	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 90%;">
+	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%;">
 		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra</li>
 		</ol>
@@ -8,7 +8,7 @@
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 	    
-		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='/list_peds' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
+		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_odcs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 	    
 	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 	    
@@ -55,8 +55,9 @@
 		}
 		else{
 			$.ajax({
-				type: 'GET',
-				url: '/plan/buscar_pedido_item/'+$(this).val(),
+				type: 'POST',
+				data: {clave: $(this).val()},
+				url: '/plan/buscar_odcs_item',
 				success: function(data){
 					$(".main-page").html(data);
 				}

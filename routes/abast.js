@@ -64,24 +64,29 @@ router.get('/odcs', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-router.get('/view_abastecimiento', function(req, res, next) {
-	if(verificar(req.session.userData)){
-			req.getConnection(function(err,connection){
+router.get('/page_oda/:idoda', function(req, res, next){
+    if(verificar(req.session.userData)){
+        if(req.session.isUserLogged){
+            console.log(req.params.idoda);
+            var idoda = req.params.idoda;
+            req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT * FROM abastecimiento LEFT JOIN oda ON oda.idoda=abastecimiento.idoda", function(err ,rows){
+                connection.query("SELECT * FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor WHERE idoda = ?",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
-                   
+                    console.log(oda);
+                    connection.query("SELECT * FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial WHERE abastecimiento.idoda=?",[idoda], function(err ,abast){
+                        if(err) console.log("Select Error: %s",err);
 
-                    res.render('abast/view_abastecimiento');
-    
-                   
+                        //res.redirect('/plan');
+                        res.render('abast/page_oda', {oda:oda[0], abast: abast});
+                    });
                 });
             });
-
+        } else res.redirect("/bad_login");
     }
-	else{res.redirect('bad_login');}	
-});
+    else{res.redirect('bad_login');}
 
+});
 router.get('/sol_odc', function(req, res, next) {
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
@@ -1283,6 +1288,125 @@ router.get('/insumos_list/:token', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
+
+
+/*  Funcion que renderiza la cabecera que posee un buscador de abastecimientos*/
+router.get('/view_abastecimiento', function(req, res, next) {
+	if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            connection.query("SELECT * FROM cuenta", function(err, cc){
+				if(err) throw err;
+
+                res.render('abast/view_abastecimiento', {cc: cc});
+			});
+        });
+    }
+	else{res.redirect('bad_login');}	
+});
+
+/*  Funcion que busca los abastecimientos y los ordena segun paramentro orden en la url, muestra solo pendiente si showPend es true
+	Renderiza una tabla con los abastecimientos solicitados
+*/
+router.get('/table_abastecimientos/:orden/:showPend', function(req, res, next){
+	if(verificar(req.session.userData)){
+    	console.log(req.params.token);
+    	var orden = req.params.orden;
+        orden = orden.replace('-', ' ');
+        var where = " ";
+        if(req.params.showPend == 'true'){
+            where = " WHERE abastecimiento.cantidad > abastecimiento.recibidos ";
+        }
+        req.getConnection(function(err, connection){
+        	if(err) { console.log("Error Connection : %s", err);
+        	} else {
+	        	connection.query("select abastecimiento.*, coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle "+
+	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left " +
+	        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) " + where + " ORDER BY "+orden, function(err, abs){
+	        		if(err) { console.log("Error Selecting : %s", err);
+	        		}else {
+		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-')});
+		        	}
+	        	});
+	        }
+        });
+    } else res.redirect("/bad_login");
+});
+
+/*  Funcion que renderiza las ordenes de compra de abastecimiento en forma de items
+*/
+router.get('/item_abs/:showPend', function(req, res, next){
+	if(verificar(req.session.userData)){
+    	console.log(req.params.token);
+    	var where = " ";
+        if(req.params.showPend == 'true'){
+            where = " WHERE abastecimiento.cantidad > abastecimiento.recibidos ";
+        }
+        req.getConnection(function(err, connection){
+        	if(err) { console.log("Error Connection : %s", err);
+        	} else {
+	        	connection.query("select abastecimiento.*, oda.numoda, oda.creacion, cliente.sigla "+
+	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda " +
+	        		"left join cliente on cliente.idcliente=oda.idproveedor " + where + "GROUP BY abastecimiento.idoda", function(err, abs){
+	        		if(err) { console.log("Error Selecting : %s", err);
+	        		}else {
+	        			console.log(abs);
+		        		res.render('abast/item_abs', {data: abs});
+		        	}
+	        	});
+	        }
+        });
+    } else res.redirect("/bad_login");
+});
+
+/*  Funcion que renderiza las ordenes de compra de abastecimiento buscadas por el filtro
+	 ESTA ESTA INCOMPLETA,HAY QUE ARREGLAR LA QUERI !!!!!!!!!!!!!!!!!!
+*/
+router.post('/buscar_abastecimientos_list', function(req, res, next){
+	if(verificar(req.session.userData)){
+    	var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+    	var clave = input.clave;
+        var orden = input.orden;
+        var showPend = input.showPend;
+        var cc_selected = input.cc_selected.split(',');
+        console.log(cc_selected);
+        var where = " WHERE material.detalle LIKE '%"+clave+"%' ";
+        var cc_cond = " ";
+        if(showPend == 'true'){
+            where += " AND abastecimiento.cantidad > abastecimiento.recibidos ";
+        }
+        if(cc_selected.length>0){
+            for(var cc=0; cc <  cc_selected.length ; cc++){
+            	if(cc_selected[cc] == 'all'){
+                    cc_cond = " abastecimiento.cc LIKE '%%' OR";
+                    break;
+				}
+				else{
+                    cc_cond += " abastecimiento.cc LIKE '%"+cc_selected[cc]+"%' OR";
+                }
+            }
+            cc_cond = cc_cond.substring(0, cc_cond.length-2);
+            where = where +" AND ("+cc_cond+") ";
+		}
+
+        console.log(where);
+        orden = orden.replace('-', ' ');
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("select abastecimiento.*, coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta, material.*,oda.numoda, oda.creacion, cliente.sigla "+
+	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left join material on material.idmaterial=abastecimiento.idmaterial " +
+					"left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) "+
+	        		"left join cliente on cliente.idcliente=oda.idproveedor " + where + "GROUP BY abastecimiento.idoda",
+                function(err, abs){
+                    if(err) {throw err;}
+                    else{
+                    	res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-')});
+                    }
+            });
+        });
+    } else res.redirect("/bad_login");
+});
+
 
 router.post('/getOP_insu', function(req, res, next){
     if(verificar(req.session.userData)){

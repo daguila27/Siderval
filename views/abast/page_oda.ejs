@@ -1,7 +1,7 @@
 <%
-    function fechaLatino(string){
-        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
-    }
+function fechaLatino(string){
+    return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
+}
 %>
 <div class="o_view_manager_content">
     <div>
@@ -27,98 +27,98 @@
                     </div>
                     <div class="oe_title">
                         <h1>
-                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Fabricación N°<%=of.numordenfabricacion%></span>
+                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span>
                         </h1>
                     </div>
                     <div class="o_group">
                         <table class="o_group o_inner_group o_group_col_6">
                             <tbody>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Cliente</label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=of.sigla%><br><%=of.razon%>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1067" data-original-title="" title="">Dirección factura</label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=36&amp;model=res.partner" name="partner_invoice_id" id="o_field_input_1067">China Export, Jacob Taylor
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1068" data-original-title="" title="">Dirección de entrega
-                                        </label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=36&amp;model=res.partner" name="partner_shipping_id" id="o_field_input_1068">China Export, Jacob Taylor
-                                        </a>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Proveedor</label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=oda.sigla%><br><%=oda.razon%>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1067" data-original-title="" title="">Dirección factura</label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=36&amp;model=res.partner" name="partner_invoice_id" id="o_field_input_1067">China Export, Jacob Taylor
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1068" data-original-title="" title="">Dirección de entrega
+                                    </label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=36&amp;model=res.partner" name="partner_shipping_id" id="o_field_input_1068">China Export, Jacob Taylor
+                                    </a>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                         <table class="o_group o_inner_group o_group_col_6">
                             <tbody>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_invisible_modifier o_readonly_modifier o_form_label_empty" for="o_field_input_1069" data-original-title="" title="">Fecha de caducidad
-                                        </label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <span class="o_field_date o_field_widget o_invisible_modifier o_readonly_modifier o_field_empty" name="validity_date"></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_readonly_modifier" for="o_field_input_1070" data-original-title="" title="">Fecha de Creación
-                                        </label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <span class="o_field_date o_field_widget o_readonly_modifier" name="confirmation_date"><%=fechaLatino(new Date(of.creacion).toLocaleDateString())%></span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1071" data-original-title="" title="">Tarifa
-                                        </label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=1&amp;model=product.pricelist" name="pricelist_id" id="o_field_input_1071">Tarifa pública (CLP)
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1072">Moneda
-                                        </label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=46&amp;model=res.currency" name="currency_id" id="o_field_input_1072">CLP
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="o_td_label">
-                                        <label class="o_form_label o_form_label_empty" for="o_field_input_1073">Plazos de pago
-                                        </label>
-                                    </td>
-                                    <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_field_empty" href="#" name="payment_term_id" id="o_field_input_1073"></a>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_invisible_modifier o_readonly_modifier o_form_label_empty" for="o_field_input_1069" data-original-title="" title="">Fecha de caducidad
+                                    </label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <span class="o_field_date o_field_widget o_invisible_modifier o_readonly_modifier o_field_empty" name="validity_date"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_readonly_modifier" for="o_field_input_1070" data-original-title="" title="">Fecha de Creación
+                                    </label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <span class="o_field_date o_field_widget o_readonly_modifier" name="confirmation_date"><%=fechaLatino(new Date(oda.creacion).toLocaleDateString())%></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1071" data-original-title="" title="">Tarifa
+                                    </label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=1&amp;model=product.pricelist" name="pricelist_id" id="o_field_input_1071">Tarifa pública (CLP)
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1072">Moneda
+                                    </label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=46&amp;model=res.currency" name="currency_id" id="o_field_input_1072">CLP
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_form_label_empty" for="o_field_input_1073">Plazos de pago
+                                    </label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <a class="o_form_uri o_field_widget o_field_empty" href="#" name="payment_term_id" id="o_field_input_1073"></a>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="o_notebook">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a data-toggle="tab" disable_anchor="true" href="#notebook_page_1074" role="tab">Líneas del pedido
+                                <a data-toggle="tab" disable_anchor="true" href="#notebook_page_1074" role="tab">Pedidos
                                 </a>
                             </li>
                             <li>
@@ -136,8 +136,8 @@
                                                     <span class="o_pager_value"></span> / <span class="o_pager_limit"></span>
                                                 </span>
                                                 <span class="btn-group btn-group-sm">
-                                        
-                                        
+
+
                                                     <button aria-label="Previous" class="fa fa-chevron-left btn btn-icon o_pager_previous" type="button"></button>
                                                     <button aria-label="Next" class="fa fa-chevron-right btn btn-icon o_pager_next" type="button"></button>
                                                 </span>
@@ -147,99 +147,92 @@
                                     <div class="table-responsive">
                                         <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
-                                                <tr>
-                                                    <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
-                                                    <th class="o_column_sortable" style="text-align: left;">Item</th>
-                                                    <th class="o_column_sortable" style="text-align: left;">Descripción</th>
-                                                    <th class="o_column_sortable">Cantidad</th>
-                                                    <th class="o_column_sortable" style="text-align: center;">Restantes</th>
-                                                    <th class="o_column_sortable" style="text-align: center;">Unidad</th>
-                                                    <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
-                                                    <th class="o_column_sortable" style="text-align: center;">Días restantes</th>
-                                                    <!--<th class="o_column_sortable">Impuestos</th>
-                                                    <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
-                                                </tr>
+                                            <tr>
+                                                <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
+                                                <th class="o_column_sortable" style="text-align: left;">Descripción</th>
+                                                <th class="o_column_sortable">Cantidad</th>
+                                                <th class="o_column_sortable" style="text-align: center;">Recibidos</th>
+                                                <th class="o_column_sortable" style="text-align: center;">Costo Unitario</th>
+                                                <th class="o_column_sortable" style="text-align: center;">Unidad</th>
+                                                <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
+                                                <!--<th class="o_column_sortable">Impuestos</th>
+                                                <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
+                                            </tr>
                                             </thead>
                                             <tbody class="ui-sortable">
-                                                <%
-                                                for(var e=0; e < fabs.length; e++){
-                                                    if(fabs[e].dias < 0 ){%>
-                                                        <tr class="o_data_row text-info danger">
-                                                    <%}else{%>
-                                                        <tr class="o_data_row text-info success">
-                                                    <%}%>
-                                                        <td class="o_data_cell o_list_number o_handle_cell">
-                                                            <span class="o_row_handle fa fa-arrows o_field_widget ui-sortable-handle" name="sequence"></span>
-                                                        </td>
-                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].numitem%></td>
-                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].detalle%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=fabs[e].cantidad%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].restantes%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].u_medida%></td>
-                                                        <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(fabs[e].f_entrega).toLocaleDateString())%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=fabs[e].dias%></td>
-                                                        <!--<td class="o_data_cell o_many2many_tags_cell">
-                                                            <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
-                                                        </td>
-                                                        <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier">
-                                                            <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="price_subtotal">7.290,00&nbsp;$</span>
-                                                        </td>-->
-                                                    </tr>
-                                                <%}%>
+                                            <%for(var e=0; e < abast.length; e++){%>
+                                            <tr class="o_data_row text-info danger">
+                                                <td class="o_data_cell o_list_number o_handle_cell">
+                                                    <span class="o_row_handle fa fa-arrows o_field_widget ui-sortable-handle" name="sequence"></span>
+                                                </td>
+                                                <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
+                                                <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
+                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].recibidos%></td>
+                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].costo%></td>
+                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
+                                                <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date().toLocaleDateString())%></td>
+                                                <!--<td class="o_data_cell o_many2many_tags_cell">
+                                                    <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
+                                                </td>
+                                                <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier">
+                                                    <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="price_subtotal">7.290,00&nbsp;$</span>
+                                                </td>-->
+                                            </tr>
+                                            <%}%>
                                             </tbody>
                                             <tfoot>
-                                                <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
                                             </tfoot>
                                         </table>
                                     </div>
-                            </div>
-                            <!--<table class="o_group o_inner_group oe_subtotal_footer oe_right">
-                                <tbody>
-                                    <tr>
-                                        <td class="o_td_label">
-                                            <label class="o_form_label o_readonly_modifier" for="o_field_input_1076">Base imponible</label>
-                                        </td>
-                                        <td style="width: 100%;">
-                                            <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_untaxed">7.315,00&nbsp;$</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="o_td_label">
-                                            <label class="o_form_label o_readonly_modifier" for="o_field_input_1077">Impuestos</label>
-                                        </td>
-                                        <td style="width: 100%;">
-                                            <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_tax">0,00&nbsp;$</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 50%;">
-                                            <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                                                <label class="o_form_label" for="o_field_input_1078">Total</label>
-                                            </div>
-                                        </td>
-                                        <td style="width: 50%;">
-                                            <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier oe_subtotal_footer_separator" name="amount_total">7.315,00&nbsp;$</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>-->
-                            <span class="o_field_text o_field_widget o_field_empty oe_inline" name="note"></span>
-                            <div class="oe_clear"></div>
-                        </div>
-                        <div class="tab-pane" id="notebook_page_1080">
-                            <div class="o_group">
-                                <table class="o_group o_inner_group o_group_col_6">
+                                </div>
+                                <!--<table class="o_group o_inner_group oe_subtotal_footer oe_right">
                                     <tbody>
+                                        <tr>
+                                            <td class="o_td_label">
+                                                <label class="o_form_label o_readonly_modifier" for="o_field_input_1076">Base imponible</label>
+                                            </td>
+                                            <td style="width: 100%;">
+                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_untaxed">7.315,00&nbsp;$</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="o_td_label">
+                                                <label class="o_form_label o_readonly_modifier" for="o_field_input_1077">Impuestos</label>
+                                            </td>
+                                            <td style="width: 100%;">
+                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_tax">0,00&nbsp;$</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 50%;">
+                                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                                    <label class="o_form_label" for="o_field_input_1078">Total</label>
+                                                </div>
+                                            </td>
+                                            <td style="width: 50%;">
+                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier oe_subtotal_footer_separator" name="amount_total">7.315,00&nbsp;$</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>-->
+                                <span class="o_field_text o_field_widget o_field_empty oe_inline" name="note"></span>
+                                <div class="oe_clear"></div>
+                            </div>
+                            <div class="tab-pane" id="notebook_page_1080">
+                                <div class="o_group">
+                                    <table class="o_group o_inner_group o_group_col_6">
+                                        <tbody>
                                         <tr>
                                             <td colspan="2" style="width: 100%;">
                                                 <div class="o_horizontal_separator">Información de envio</div>
@@ -269,10 +262,10 @@
                                                 <span name="picking_policy" class="o_field_widget o_readonly_modifier o_required_modifier">Despachar cada producto cuando se encuentre disponible</span>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                                <table class="o_group o_inner_group o_group_col_6">
-                                    <tbody>
+                                        </tbody>
+                                    </table>
+                                    <table class="o_group o_inner_group o_group_col_6">
+                                        <tbody>
                                         <tr>
                                             <td colspan="2" style="width: 100%;">
                                                 <div class="o_horizontal_separator">Información de ventas</div>
@@ -291,7 +284,7 @@
                                                 <label class="o_form_label o_form_label_empty" for="o_field_input_1085">Etiquetas</label>
                                             </td>
                                             <td style="width: 100%;">
-                                                <div class="o_field_many2manytags o_field_widget o_field_empty" name="tag_ids"> 
+                                                <div class="o_field_many2manytags o_field_widget o_field_empty" name="tag_ids">
                                                 </div>
                                             </td>
                                         </tr>
@@ -327,10 +320,10 @@
                                                 <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_field_empty" href="#" name="analytic_account_id" id="o_field_input_1089"></a>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                                <table class="o_group o_inner_group o_group_col_6">
-                                    <tbody>
+                                        </tbody>
+                                    </table>
+                                    <table class="o_group o_inner_group o_group_col_6">
+                                        <tbody>
                                         <tr>
                                             <td colspan="2" style="width: 100%;">
                                                 <div class="o_horizontal_separator">Facturando</div>
@@ -360,10 +353,10 @@
                                                 <span name="invoice_status" class="o_field_widget o_readonly_modifier">Para facturar</span>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                </table>
-                                <table class="o_group o_inner_group o_invisible_modifier o_group_col_6">
-                                    <tbody>
+                                        </tbody>
+                                    </table>
+                                    <table class="o_group o_inner_group o_invisible_modifier o_group_col_6">
+                                        <tbody>
                                         <tr>
                                             <td colspan="2" style="width: 100%;">
                                                 <div class="o_horizontal_separator">Informes</div>
@@ -409,19 +402,19 @@
                                                 <a class="o_form_uri o_field_widget o_invisible_modifier o_field_empty" href="#" name="opportunity_id" id="o_field_input_1097"></a>
                                             </td>
                                         </tr>
-                                    </tbody>
-                                </table>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="o_chatter oe_chatter">
-           
-            <div class="o_mail_activity o_field_widget" name="activity_ids"></div>
-            <div class="o_mail_thread"></div>
+            <div class="o_chatter oe_chatter">
+
+                <div class="o_mail_activity o_field_widget" name="activity_ids"></div>
+                <div class="o_mail_thread"></div>
+            </div>
         </div>
     </div>
-</div>
 </div>
