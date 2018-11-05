@@ -587,24 +587,24 @@ ENGINE = InnoDB
 AUTO_INCREMENT = 10
 DEFAULT CHARACTER SET = utf8;
 
-CREATE TABLE IF NOT EXISTS `siderval`.`retiro` (
-  `idretiro` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `siderval`.`movimiento` (
+  `idmovimiento` INT NOT NULL AUTO_INCREMENT,
   `etapa` INT NULL,
   `receptor` VARCHAR(50) NULL,
-  `f_gen` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`idretiro`))
+  `f_gen` DATETIME NULL,
+  `tipo` INT NULL DEFAULT 0,
+  PRIMARY KEY (`idmovimiento`))
 ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `siderval`.`retiro_detalle` (
-  `idretiro` INT NOT NULL,
+CREATE TABLE IF NOT EXISTS `siderval`.`movimiento_detalle` (
+  `idmovimiento` INT NOT NULL,
   `idmaterial` INT(11) NOT NULL,
   `cantidad` VARCHAR(45) NULL,
-  PRIMARY KEY (`idretiro`, `idmaterial`),
-  INDEX `fk_retiro_detalle_retiro_idx` (`idretiro` ASC),
+  PRIMARY KEY (`idmovimiento`, `idmaterial`),
   INDEX `fk_retiro_detalle_material1_idx` (`idmaterial` ASC),
   CONSTRAINT `fk_retiro_detalle_retiro`
-    FOREIGN KEY (`idretiro`)
-    REFERENCES `siderval`.`retiro` (`idretiro`)
+    FOREIGN KEY (`idmovimiento`)
+    REFERENCES `siderval`.`movimiento` (`idmovimiento`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_retiro_detalle_material1`
