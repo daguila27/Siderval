@@ -148,7 +148,7 @@ router.post('/buscar_fabricaciones_list', function(req, res, next){
                 +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
                 +"on material.idmaterial=fabricaciones.idmaterial WHERE"+where
                 +" (material.detalle like '%"+clave+"%' or ordenfabricacion.idordenfabricacion like '%"+clave+"%' or fabricaciones.cantidad"
-                +" like '%"+clave+"%')",
+                +" like '%"+clave+"%' OR odc.numoc like '%"+clave+"%')",
                 function(err, odc){
                     if(err) throw err;
 
@@ -306,25 +306,22 @@ router.get('/list_peds', function(req, res, next){
 });
 
 
-router.get('/page_of/:idodc', function(req, res, next){
+router.get('/page_of/:idof', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
-            console.log(req.params.idodc);
-            var idodc = req.params.idodc;
+            console.log(req.params.idof);
+            var idof = req.params.idof;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SET SESSION group_concat_max_len = 1000000", function(err, len){
+                connection.query("SELECT ordenfabricacion.*, cliente.* FROM ordenfabricacion LEFT JOIN odc ON odc.idodc = ordenfabricacion.idodc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente WHERE ordenfabricacion.idordenfabricacion = ?",[idof], function(err, of){
                     if(err) console.log("Select Error: %s",err);
-                    console.log(len);        
-                    connection.query("select ordenfabricacion.*,cliente.*,group_concat(fabricaciones.numitem) as numitem, group_concat(fabricaciones.cantidad) as cantidad"
-                        +",group_concat(coalesce(fabricaciones.restantes,fabricaciones.cantidad) ) as restantes,"
-                        +"group_concat(material.detalle separator '@') as detalle,group_concat(material.u_medida) as u_medida,group_concat(to_days(fabricaciones.f_entrega)-to_days(now()))  as dias,group_concat(fabricaciones.f_entrega separator '@') "
-                        +"as f_entrega from fabricaciones left join material on material.idmaterial=fabricaciones.idmaterial left join"
-                        +" ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join odc on odc.idodc=ordenfabricacion.idodc left join cliente on cliente.idcliente=odc.idcliente where fabricaciones.idorden_f=? group by ordenfabricacion.idordenfabricacion",[idodc], function(err ,rows){
-                            if(err) console.log("Select Error: %s",err);
-                            
-                            //res.redirect('/plan');
-                            res.render('plan/page_of', {data:rows[0]});
+                    connection.query("SELECT fabricaciones.*, material.*, (to_days(fabricaciones.f_entrega)-to_days(now())) as dias "
+                        +"FROM fabricaciones LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial "
+                        +"WHERE fabricaciones.idorden_f = ? ORDER BY fabricaciones.numitem",[idof], function(err ,fabs){
+                        if(err) console.log("Select Error: %s",err);
+
+                        //res.redirect('/plan');
+                        res.render('plan/page_of', {of:of[0], fabs: fabs});
                     });
                 });
             });
@@ -341,18 +338,14 @@ router.get('/page_oc/:idodc', function(req, res, next){
             var idodc = req.params.idodc;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SET SESSION group_concat_max_len = 1000000", function(err, len){
+                connection.query("SELECT * FROM odc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente WHERE odc.idodc = ?",[idodc], function(err, odc){
                     if(err) console.log("Select Error: %s",err);
-                    console.log(len);        
-                    connection.query("select odc.*,cliente.*, group_concat(pedido.cantidad) as cantidad"
-                        +",group_concat(coalesce(pedido.despachados,0) ) as despachados,"
-                        +"group_concat(material.detalle separator '@') as detalle,group_concat(material.u_medida) as u_medida,group_concat(to_days(pedido.f_entrega)-to_days(now()))  as dias,group_concat(pedido.f_entrega separator '@') "
-                        +"as f_entrega from pedido left join material on material.idmaterial=pedido.idmaterial left join"
-                        +" odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente where pedido.idodc=? group by odc.idodc",[idodc], function(err ,rows){
+                    connection.query("SELECT pedido.*, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
+                        +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial WHERE pedido.idodc = ? ORDER BY pedido.numitem",[idodc], function(err ,ped){
                             if(err) console.log("Select Error: %s",err);
                             
                             //res.redirect('/plan');
-                            res.render('plan/page_oc', {data:rows[0]});
+                            res.render('plan/page_oc', {odc: odc[0], ped: ped});
                     });
                 });
             });

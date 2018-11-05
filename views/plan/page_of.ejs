@@ -27,7 +27,7 @@
                     </div>
                     <div class="oe_title">
                         <h1>
-                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Fabricación N°<%=data.numordenfabricacion%></span>
+                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Fabricación N°<%=of.numordenfabricacion%></span>
                         </h1>
                     </div>
                     <div class="o_group">
@@ -38,7 +38,7 @@
                                         <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Cliente</label>
                                     </td>
                                     <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=data.sigla%><br><%=data.razon%>
+                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=of.sigla%><br><%=of.razon%>
                                         </a>
                                     </td>
                                 </tr>
@@ -80,7 +80,7 @@
                                         </label>
                                     </td>
                                     <td style="width: 100%;">
-                                        <span class="o_field_date o_field_widget o_readonly_modifier" name="confirmation_date"><%=fechaLatino(new Date(data.creacion).toLocaleDateString())%></span>
+                                        <span class="o_field_date o_field_widget o_readonly_modifier" name="confirmation_date"><%=fechaLatino(new Date(of.creacion).toLocaleDateString())%></span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -149,6 +149,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
+                                                    <th class="o_column_sortable" style="text-align: left;">Item</th>
                                                     <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                     <th class="o_column_sortable">Cantidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Restantes</th>
@@ -161,14 +162,8 @@
                                             </thead>
                                             <tbody class="ui-sortable">
                                                 <%
-                                                data.detalle = data.detalle.split('@');
-                                                data.f_entrega = data.f_entrega.split('@');
-                                                data.cantidad = data.cantidad.split(',');
-                                                data.restantes = data.restantes.split(',');
-                                                data.u_medida = data.u_medida.split(',');
-                                                data.dias = data.dias.split(',');
-                                                for(var e=0; e < data.detalle.length; e++){
-                                                    if(data.dias[e] < 0 ){%>
+                                                for(var e=0; e < fabs.length; e++){
+                                                    if(fabs[e].dias < 0 ){%>
                                                         <tr class="o_data_row text-info danger">
                                                     <%}else{%>
                                                         <tr class="o_data_row text-info success">
@@ -176,12 +171,13 @@
                                                         <td class="o_data_cell o_list_number o_handle_cell">
                                                             <span class="o_row_handle fa fa-arrows o_field_widget ui-sortable-handle" name="sequence"></span>
                                                         </td>
-                                                        <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=data.detalle[e]%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=data.cantidad[e]%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=data.restantes[e]%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=data.u_medida[e]%></td>
-                                                        <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(data.f_entrega[e]).toLocaleDateString())%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=data.dias[e]%></td>
+                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].numitem%></td>
+                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].detalle%></td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=fabs[e].cantidad%></td>
+                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].restantes%></td>
+                                                        <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].u_medida%></td>
+                                                        <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(fabs[e].f_entrega).toLocaleDateString())%></td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=fabs[e].dias%></td>
                                                         <!--<td class="o_data_cell o_many2many_tags_cell">
                                                             <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
                                                         </td>
