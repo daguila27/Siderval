@@ -1,3 +1,11 @@
+
+<%
+function numberWithCommas(x){
+	var parts = x.toString().split(".");
+	parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+	return parts.join(",");
+}
+ %>
 <style type="text/css">
 	#tablaStock_wrapper{
 		padding: 1%;
@@ -44,29 +52,29 @@
 	<div class="panel-heading">Registrar Retiro:</div>
 	<table id="tablaStock" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
 		<thead>
-		<tr>
-			<th>Código</th>
-			<th>Detalle</th>
-			<th>Stock</th>
-			<th></th>
-		</tr>
+			<tr>
+				<th>Código</th>
+				<th>Detalle</th>
+				<th>Stock</th>
+				<th></th>
+			</tr>
 		</thead>
 		<tbody>
-        <%if(mat.length > 0){
-		for(var j=0; j < mat.length; j++){%>
-		<tr id="row<%= mat[j].idmaterial%>">
-			<td><%= mat[j].codigo%></td>
-			<td><%= mat[j].detalle%></td>
-			<td><%= mat[j].stock%></td>
-			<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>)"><i class="fa fa-plus"></i></a></td>
-		</tr>
-        <%}
-		}
-		else{%>
-		<tr>
-			No hay materiales registrados.
-		</tr>
-        <%}%>
+			<%if(mat.length > 0){
+			for(var j=0; j < mat.length; j++){%>
+			<tr id="row<%= mat[j].idmaterial%>">
+				<td><%= mat[j].codigo%></td>
+				<td><%= mat[j].detalle%></td>
+				<td><%= numberWithCommas(mat[j].stock)%></td>
+				<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>)"><i class="fa fa-plus"></i></a></td>
+			</tr>
+			<%}
+			}
+			else{%>
+			<tr>
+				No hay materiales registrados.
+			</tr>
+			<%}%>
 		</tbody>
 	</table>
 </div>
