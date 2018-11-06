@@ -11,6 +11,7 @@
 				<th class="o_column_sortable" data-order="pedido.cantidad-ASC">Despachados</th>
 				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="despacho.fecha-DESC">Fecha de Despacho</th>
 				<th class="o_column_sortable" data-order="cliente.razon-ASC">Tipo</th>
+				<th class="o_column_sortable" data-order="" style="width:80px" ></th>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
@@ -18,7 +19,7 @@
 			desp[i].cant_token = desp[i].cant_token.split(',');
 			desp[i].mat_token = desp[i].mat_token.split('@@');
 			for(var j=0; j < desp[i].cant_token.length; j++){%>
-			<tr class="o_data_row" onclick="submit_form(this)" data-idodc="">
+			<tr class="o_data_row" onclick="submit_form(this)" data-idodc="" <%if(j+1 == desp[i].cant_token.length){%>style="border-bottom: 2px dashed grey"<%}%>>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].iddespacho%></td>
 				<%if(desp[i].mat_token[j] == '' || desp[i].mat_token[j] == null){%>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier">Nulo</td>
@@ -33,9 +34,21 @@
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<%}%>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+					<%if(desp[i].estado != 'Anulado' && j+1 == desp[i].cant_token.length){%>
+							<a class="btn btn-xs btn-success" onclick="habFabricacion(this)" data-state="0" data-id="26019">GD</a>
+							<a class="btn btn-xs btn-warning" onclick="drop(this)"><i class="fa fa-ban"></i></a>
+					<%} %>
+				</td>
+					
+					
+
+				<% %>
 			</tr>
-			<%}
-		}%>
+						
+			<%
+		}
+	}%>
 	</tbody>
 	<tfoot>
 		<tr>
@@ -82,7 +95,7 @@
 		});
 	});
 
-	/*function submit_form(yo){
+	function datos_despacho(yo){
 		//$("#form"+$(yo).data('idodc')).submit();
 		$.ajax({
 			type: 'GET',
@@ -91,5 +104,5 @@
 				$(".main-page").html(data);	
 			}
 		});
-	}*/	
+	}
 </script>

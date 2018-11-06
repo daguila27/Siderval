@@ -33,25 +33,25 @@
             var pcolor;
             var color;
             for(var i = 0; i< data.length;i++){
-                    data[i].fecha = new Date(data[i].fecha).toLocaleDateString();
-                    switch(data[i].estado){
-                        case "Anulado":
-                            color = "danger";
-                            break;
-                        case "Devolucion":
-                            color = "warning";
-                            break;
-                        case "Blanco":
-                        case "Otro":
-                            color = "info";
-                            break;
-                        case "Venta":
-                        case "Traslado":
-                        default:
-                            color = "success";
-                            break;
-                    }
-                %>
+                data[i].fecha = new Date(data[i].fecha).toLocaleDateString();
+                switch(data[i].estado){
+                    case "Anulado":
+                        color = "danger";
+                        break;
+                    case "Devolucion":
+                        color = "warning";
+                        break;
+                    case "Blanco":
+                    case "Otro":
+                        color = "info";
+                        break;
+                    case "Venta":
+                    case "Traslado":
+                    default:
+                        color = "success";
+                        break;
+                }
+        %>
         <div class="panel panel-<%=color%>" style="border-top-right-radius: 4px;border-top-left-radius: 4px;border-bottom-right-radius: 0%;border-bottom-left-radius: 0%;">
             <!--"alert alert-danger-->
             <div class="alert alert-<%=color%>" role="tab" id="h<%= data[i].iddespacho%>" style="/*box-shadow: 5px 5px 5px;*/ display: flex; position:relative; margin: 0; border-radius: 0;">

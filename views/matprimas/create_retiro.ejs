@@ -11,26 +11,33 @@ function numberWithCommas(x){
 		padding: 1%;
 	}
 </style>
-<h2>Registrar Retiro</h2>
-<div class="panel panel-primary">
+<div class="panel panel-info" id="sess_panel">
 	<form id="session_form">
-		<div class="panel-heading">Retiro Actual:</div>
+		<div class="panel-heading">
+			<h1 id="sess_titulo" >Registrar Retiro de Materiales: </h1>
+			<button type="button" class="btn btn-danger pull-right" onclick="set_movimiento(this)" name="tipo"  value="0">Cambiar a Devolución</button>
+		</div>
 		<div class="panel-body">
-			<label for="receptor">Nombre del receptor</label>
-			<input type="text" class="form-control" id="receptor_r" name="receptor" required>
-			<label for="etapa">Etapa</label>
-			<select class="form-control" id="etapa_r" name="etapa" required>
-				<option disabled selected>-- Selecciona una etapa --</option>
-				<option value="1">Moldeo</option>
-				<option value="2">Fusión</option>
-				<option value="3">Quiebre</option>
-				<option value="4">Terminación</option>
-				<option value="5">Tratamiento Térmico</option>
-				<option value="6">Maestranza</option>
-				<option value="7">Control De Calidad</option>
-			</select>
-			<div class="form-group" style="margin-top: 10px">
-				<button class="btn btn-success pull-right" type="submit">Registrar</button>
+			<div class="col-sm-12 col-md-6">
+				<label for="receptor" id="sess_recep">Nombre del receptor</label>
+				<input type="text" class="form-control" id="receptor_r" name="receptor" required>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<label for="etapa">Etapa</label>
+				<select class="form-control" id="etapa_r" name="etapa" required>
+					<option disabled selected>-- Selecciona una etapa --</option>
+					<option value="0">Jefe de Producción</option>
+					<option value="1">Moldeo</option>
+					<option value="2">Fusión</option>
+					<option value="3">Quiebre</option>
+					<option value="4">Terminación</option>
+					<option value="5">Tratamiento Térmico</option>
+					<option value="6">Maestranza</option>
+					<option value="7">Control De Calidad</option>
+				</select>
+				<div class="form-group" style="margin-top: 10px">
+					<button class="btn btn-success pull-right" type="submit">Registrar</button>
+				</div>
 			</div>
 		</div>
 		<table id="tabla_session" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
@@ -41,6 +48,7 @@ function numberWithCommas(x){
 				<th>Stock</th>
 				<th></th>
 				<th>A Enviar</th>
+				<th></th>
 			</tr>
 			</thead>
 			<tbody id="session_rows">
@@ -60,6 +68,7 @@ function numberWithCommas(x){
 			</tr>
 		</thead>
 		<tbody>
+<<<<<<< HEAD
 			<%if(mat.length > 0){
 			for(var j=0; j < mat.length; j++){%>
 			<tr id="row<%= mat[j].idmaterial%>">
@@ -75,6 +84,23 @@ function numberWithCommas(x){
 				No hay materiales registrados.
 			</tr>
 			<%}%>
+=======
+        <%if(mat.length > 0){
+		for(var j=0; j < mat.length; j++){%>
+		<tr id="row<%= mat[j].idmaterial%>">
+			<td><%= mat[j].codigo%></td>
+			<td><%= mat[j].detalle%></td>
+			<td><%= mat[j].stock%></td>
+			<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
+		</tr>
+        <%}
+		}
+		else{%>
+		<tr>
+			No hay materiales registrados.
+		</tr>
+        <%}%>
+>>>>>>> ddbc93f217df742a791ca32d06111d3e024acffd
 		</tbody>
 	</table>
 </div>
@@ -87,13 +113,35 @@ function numberWithCommas(x){
 
     } );
     //  mat[Math.floor((Math.random()*mat.length)+1) - 1].detalle"
+	// Función para cambiar estilos de panel y el tipo de movimiento (alternar entre retiro y devolución)
+	function set_movimiento(esto){
+		var valor = $(esto).val();
+		if(valor != 0){
+		    $(esto).val(0);
+		    $(esto).attr("class","btn btn-danger pull-right");
+            $("#sess_panel").attr("class","panel panel-info");
+		    $("#sess_titulo").html("Registrar Retiro de materiales");
+            $("#sess_recep").html("Nombre del Receptor");
+		    $(esto).html("Cambiar a Devolución");
+		} else {
+            $(esto).val(1);
+            $(esto).attr("class","btn btn-info pull-right");
+            $("#sess_panel").attr("class","panel panel-danger");
+            $("#sess_titulo").html("Registrar Devolución de materiales");
+            $("#sess_recep").html("Nombre del Emisor");
+            $(esto).html("Cambiar a Retiro");
+		}
+	}
+	// Quitar de la sesión
     function drop_session(idmaterial){
         $("#row" + idmaterial.toString()).removeClass("hidden");
         $("#sess" + idmaterial.toString()).remove();
     }
-    function add_session(idmaterial,stock){
+	// Agregar sesión 
+    function add_session(idmaterial,stock,u_medida){
         var string_idm = idmaterial.toString();
-        $("#tabla_session").append("<tr id='sess" + string_idm +"'>" + $("#row" + string_idm).html() + "<td><input type='number' class='material-form form-control' data-idmaterial='" + string_idm + "'></td></tr>");
+        $("#tabla_session").append("<tr id='sess" + string_idm +"'>" + $("#row" + string_idm).html()
+			+ "<td><input type='number' class='material-form form-control' min='1' max='" + stock + "' data-idmaterial='" + string_idm + "'></td><td>" + u_medida + "</td></tr>");
 		$("#sess" + string_idm + " > td > .selector").attr("onclick","drop_session(" + string_idm + ")");
         $("#sess" + string_idm + " > td > .selector > i").attr("class","fa fa-remove");
         $("#row" + idmaterial.toString()).addClass("hidden");
@@ -112,10 +160,11 @@ function numberWithCommas(x){
 				data: {
                     lista_m: lista_m,
 					lista_v: lista_v,
+					tipo: $("button[name='tipo']").val(),
 					etapa: $("#etapa_r").val(),
 					receptor: $("#receptor_r").val()
 				},
-                url: '/matprimas/save_retiro',
+                url: '/matprimas/save_movimiento',
                 success: function(data) {
                     if(!data.err){
                         alert(data.msg);
