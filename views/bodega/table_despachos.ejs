@@ -11,7 +11,7 @@
 				<th class="o_column_sortable" data-order="pedido.cantidad-ASC">Despachados</th>
 				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="despacho.fecha-DESC">Fecha de Despacho</th>
 				<th class="o_column_sortable" data-order="cliente.razon-ASC">Tipo</th>
-				<th class="o_column_sortable" data-order="" style="width:80px" ></th>
+				<th class="o_column_sortable" data-order="" style="width:80px" >Accion</th>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
@@ -19,7 +19,7 @@
 			desp[i].cant_token = desp[i].cant_token.split(',');
 			desp[i].mat_token = desp[i].mat_token.split('@@');
 			for(var j=0; j < desp[i].cant_token.length; j++){%>
-			<tr class="o_data_row" onclick="submit_form(this)" data-idodc="" <%if(j+1 == desp[i].cant_token.length){%>style="border-bottom: 2px dashed grey"<%}%>>
+			<tr class="o_data_row" onclick="" data-idodc="" <%if(j+1 == desp[i].cant_token.length){%>style="border-bottom: 2px dashed grey"<%}%>>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].iddespacho%></td>
 				<%if(desp[i].mat_token[j] == '' || desp[i].mat_token[j] == null){%>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier">Nulo</td>
@@ -33,11 +33,13 @@
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].cant_token[j]%></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<%}%>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
+				<td id="est<%=desp[i].iddespacho+"-"+j%>" <%if(j==0){%>data-id=<%=desp[i].cant_token.length%><%}%> class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 					<%if(desp[i].estado != 'Anulado' && j+1 == desp[i].cant_token.length){%>
-							<a class="btn btn-xs btn-success" onclick="habFabricacion(this)" data-state="0" data-id="26019">GD</a>
-							<a class="btn btn-xs btn-warning" onclick="drop(this)"><i class="fa fa-ban"></i></a>
+						<div id="btns<%=desp[i].iddespacho%>">
+							<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].iddespacho%>">GD</a>
+							<a class="btn btn-xs btn-warning anular" onclick="anulate(this)" data-id="<%=desp[i].iddespacho%>"><i class="fa fa-ban"></i></a>
+						</div>
 					<%} %>
 				</td>
 					
@@ -65,6 +67,41 @@
 </table>
 
 <script type="text/javascript">
+
+    function getxlsx(file){
+		$.ajax({
+			type: 'GET',
+			url: 'bodega/gen_pdfgdd/'+$(file).attr("data-id"),
+			success: function(data){
+				console.log(data);
+                $(file).attr("href",data);
+                $(file).attr("download","gdd"+$(file).attr("data-id"),+".xlsx");
+                $(file).removeClass("genguia");
+                $(file).addClass("genok");
+                $(file).html("<i class='fa fa-download'></i>");
+			}
+		});
+    }
+
+    function anulate(file){
+        var resp = confirm("Anular la Guia de despacho retorna el stock a los materiales involucrados y ademas es irreversible. \n\n                         ¿Esta seguro que desea continuar?");
+        if(resp){
+            $.ajax({
+                type: 'POST',
+                data: {id: $(file).data('id'), val: $(this).data('val')},
+                url: 'bodega/anular_gdd',
+                success: function(){
+					$("#btns"+$(file).data('id')).html('');
+					//Por cada material, de la GD de despacho.
+					for(var i = 0; i < $('#est'+$(file).data('id')+"-0").data('id'); i++){
+					    console.log('#est'+$(file).data('id')+"-"+String(i))
+                        $('#est'+$(file).data('id')+"-"+String(i)).html("Anulado");
+					}
+                }
+            });
+        }
+    }
+
 	$(document).ready(function(){
 		$(".order-column").removeClass('o-sort-up');
 		$(".order-column").removeClass('o-sort-down');
@@ -95,14 +132,5 @@
 		});
 	});
 
-	function datos_despacho(yo){
-		//$("#form"+$(yo).data('idodc')).submit();
-		$.ajax({
-			type: 'GET',
-			url: '/plan/page_oc/'+$(yo).data('idodc'),
-			success: function(data){
-				$(".main-page").html(data);	
-			}
-		});
-	}
+
 </script>
