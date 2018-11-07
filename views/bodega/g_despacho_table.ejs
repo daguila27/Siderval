@@ -1,26 +1,9 @@
- <%function numberFormat(numero){
-            var resultado = "";
-            numero = numero.toString();
-            if(numero[0]=="-")
-            {
-                nuevoNumero=numero.replace(/\./g,'').substring(1);
-            }else{
-                nuevoNumero=numero.replace(/\./g,'');
-            }
-            if(numero.indexOf(",")>=0)
-                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
-     
-            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
-                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
-            if(numero.indexOf(",")>=0)
-                resultado+=numero.substring(numero.indexOf(","));
-            if(numero[0]=="-")
-            {
-                return "-"+resultado;
-            }else{
-                return resultado;
-            }
-}
+ <%
+    function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+    }
 function letraMayus(string) {
      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
@@ -68,8 +51,8 @@ function largeID(string, large){
                     <td><%= data[i].numitem%></td>
                     <td><%= letraMayus(data[i].detalle)%></td>
                     <td style="text-align: center;"><%=data[i].anom%></td>
-                    <td style="text-align: center;"><%=numberFormat(data[i].cantidad - data[i].despachados)%></td>
-                    <td style="text-align: center;"><%=numberFormat(data[i].stock)%></td>
+                    <td style="text-align: center;"><%=parsear_nro(data[i].cantidad - data[i].despachados)%></td>
+                    <td style="text-align: center;"><%=parsear_nro(data[i].stock)%></td>
                     <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
                     <td><a onclick="send_queue(this)" data-notstock="<%=stateButton%>" data-num="<%=data[i].numordenfabricacion%>" data-idmat="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>" data-sinenviar="<%= data[i].cantidad - data[i].despachados%>" data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" data-idof="<%= data[i].idordenfabricacion%>" data-idcli="<%= data[i].idcliente%>" data-numitem="<%= data[i].idcliente%>" class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
 

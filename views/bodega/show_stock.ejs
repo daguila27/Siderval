@@ -1,8 +1,13 @@
 <h1 class="page-header">Bodega <a class="btn btn-info pull-right getcsvof" data-tipo="stock" href="#"><i class="fa fa-download"></i> Generar csv</a></h1>
 <%
-function letraMayus(string) {
-     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-} 
+	function letraMayus(string) {
+	     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+	} 
+	function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+	}
 %>
 <style type="text/css">
 	#tablaStock_wrapper{
@@ -29,7 +34,7 @@ function letraMayus(string) {
 	        		<td><%= letraMayus(mat[j].detalle)%></td>
 	        		<!--<td><%= mat[j].codigo%></td>-->
 	        		<td><%= mat[j].infaena%></td>
-	        		<td><%= mat[j].stock%></td>
+	        		<td><%= parsear_nro(mat[j].stock) %></td>
 	        	</tr>
 	        <%}
 	        }

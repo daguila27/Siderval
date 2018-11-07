@@ -7,6 +7,11 @@
 			return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
 		}
 	}
+	function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+	}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
 	<style>
@@ -34,8 +39,8 @@
 					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].idordenfabricacion%></td>
 					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numoc%></td>
 					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].detalle%></td>
-					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].cantidad%></td>
-					<td class="sin_produccion o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].restantes%></td>
+					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= parsear_nro(data[i].cantidad) %></td>
+					<td class="sin_produccion o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= parsear_nro(data[i].restantes) %></td>
 					<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
 						<span cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%></span>
 					</td>

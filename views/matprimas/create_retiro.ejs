@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 <%
 function numberWithCommas(x){
@@ -6,6 +7,15 @@ function numberWithCommas(x){
 	return parts.join(",");
 }
  %>
+=======
+<%
+	function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+	}
+%>
+>>>>>>> 2d75a2e3b95c7a6101d849622eab53baa06bd834
 <style type="text/css">
 	#tablaStock_wrapper{
 		padding: 1%;
@@ -68,6 +78,7 @@ function numberWithCommas(x){
 			</tr>
 		</thead>
 		<tbody>
+<<<<<<< HEAD
 			<%if(mat.length > 0){
 			for(var j=0; j < mat.length; j++){%>
 			<tr id="row<%= mat[j].idmaterial%>">
@@ -83,6 +94,23 @@ function numberWithCommas(x){
 				No hay materiales registrados.
 			</tr>
 			<%}%>
+=======
+        <%if(mat.length > 0){
+		for(var j=0; j < mat.length; j++){%>
+		<tr id="row<%= mat[j].idmaterial%>">
+			<td><%= mat[j].codigo%></td>
+			<td><%= mat[j].detalle%></td>
+			<td><%= parsear_nro(mat[j].stock) %></td>
+			<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
+		</tr>
+        <%}
+		}
+		else{%>
+		<tr>
+			No hay materiales registrados.
+		</tr>
+        <%}%>
+>>>>>>> 2d75a2e3b95c7a6101d849622eab53baa06bd834
 		</tbody>
 	</table>
 </div>

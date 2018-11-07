@@ -1,9 +1,14 @@
 <div class="row" style=" margin: 0;padding-top: 3%; padding-bottom: 2%; margin-right: 7%;margin-left: 7%;background-color: white; height: 100%">
 <h1 class="page-header" style="margin: 0; padding-top: 5%">Productos: <a class="btn btn-info pull-right getcsvmat" data-tipo="stock" href="#"><i class="fa fa-download"></i> Generar excel</a></h1>
 <%
-function letraMayus(string) {
-     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-} 
+	function letraMayus(string) {
+	     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+	}
+	function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+	}
 %>
 <style type="text/css">
 	#tablaMaterial_wrapper{
@@ -27,7 +32,7 @@ function letraMayus(string) {
 	        	for(var j=0; j < mat.length; j++){%>
 	        	<tr>
 	        		<td><%= letraMayus(mat[j].detalle)%></td>
-	        		<td><%= mat[j].stock%></td>
+	        		<td><%= parsear_nro(mat[j].stock) %></td>
 	        		<td><%= mat[j].sigla%></td>
 	        	</tr>
 	        <%}

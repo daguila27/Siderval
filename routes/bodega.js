@@ -545,10 +545,10 @@ router.post('/anular_gdd', function(req, res, next){
                             console.log("Error Selecting : %s", err);
                     });
                 }
-                res.redirect('/bodega/show_despachos'); 
+                res.send('/Guia anulada');
             });
         });
-        
+
     });
 });
 
