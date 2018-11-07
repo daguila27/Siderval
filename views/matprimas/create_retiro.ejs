@@ -1,3 +1,10 @@
+<%
+	function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+	}
+%>
 <style type="text/css">
 	#tablaStock_wrapper{
 		padding: 1%;
@@ -65,7 +72,7 @@
 		<tr id="row<%= mat[j].idmaterial%>">
 			<td><%= mat[j].codigo%></td>
 			<td><%= mat[j].detalle%></td>
-			<td><%= mat[j].stock%></td>
+			<td><%= parsear_nro(mat[j].stock) %></td>
 			<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
 		</tr>
         <%}

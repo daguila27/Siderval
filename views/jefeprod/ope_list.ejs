@@ -5,6 +5,11 @@
 function fechaLatino(string){
     return string.split('-')[2]+"-"+string.split('-')[1]+"-"+string.split('-')[0];
 }
+    function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+    }
 %> 
     <!--return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();-->
     <style type="text/css">
@@ -85,17 +90,17 @@ function fechaLatino(string){
                     <tr>
                         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
                         <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].numordenfabricacion %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= parsear_nro(datalen[i].cantidad) %></td>
                         <!--<td data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center"><%= datalen[i].abastecidos %></td>-->
-                        <td data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= datalen[i]['4'] %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
-                        <td data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" id="prod<%=datalen[i].idproduccion%>-8" style="text-align: center"><%= datalen[i]['8'] %></td>
-                        <td class='danger' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= parsear_nro(datalen[i]['1']) %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= parsear_nro(datalen[i]['2']) %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= parsear_nro(datalen[i]['3']) %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= parsear_nro(datalen[i]['4']) %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= parsear_nro(datalen[i]['5']) %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= parsear_nro(datalen[i]['6']) %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= parsear_nro(datalen[i]['7']) %></td>
+                        <td data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" id="prod<%=datalen[i].idproduccion%>-8" style="text-align: center"><%= parsear_nro(datalen[i]['8']) %></td>
+                        <td class='danger' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= parsear_nro(datalen[i].trats) %></td>
                     </tr>
                     <%  }
                     } else {

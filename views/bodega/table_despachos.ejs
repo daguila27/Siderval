@@ -2,6 +2,11 @@
 	function fechaLatino(string){
 		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
 	}
+	function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+	}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
 		<thead>
@@ -30,7 +35,7 @@
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"> - </td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">Anulado</td>
 				<%}else{%>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].cant_token[j]%></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%= parsear_nro(desp[i].cant_token[j]) %></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<%}%>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
