@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8c1f3a88-f7bb-4107-a0d9-506355a16ca3" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/views/matprimas/table_movimientos.ejs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/views/matprimas/view_movimientos.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/abast.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/abast.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/matprimas.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/matprimas.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/matprimas/create_retiro.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/matprimas/create_retiro.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/matprimas/header_new.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/matprimas/header_new.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/plan.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/plan.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -69,24 +63,25 @@
           <entry key="project.open.time.49" value="1" />
           <entry key="project.open.time.56" value="1" />
           <entry key="project.open.time.57" value="1" />
-          <entry key="project.opened" value="15" />
+          <entry key="project.open.time.68" value="1" />
+          <entry key="project.opened" value="16" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="ejs" value="2770" />
-          <entry key="js" value="2422" />
+          <entry key="js" value="2452" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="EJS" value="2770" />
-          <entry key="JavaScript" value="2422" />
+          <entry key="JavaScript" value="2452" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="csv" value="4" />
+          <entry key="csv" value="6" />
           <entry key="ejs" value="34" />
           <entry key="js" value="10" />
           <entry key="rnc" value="1" />
@@ -96,7 +91,7 @@
         <counts>
           <entry key="EJS" value="34" />
           <entry key="JavaScript" value="10" />
-          <entry key="PLAIN_TEXT" value="4" />
+          <entry key="PLAIN_TEXT" value="6" />
           <entry key="RNG Compact" value="1" />
         </counts>
       </usages-collector>
@@ -104,25 +99,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/routes/matprimas.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2006">
-              <caret line="118" column="55" selection-start-line="118" selection-start-column="55" selection-end-line="118" selection-end-column="55" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/plan.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-349">
-              <caret line="3372" column="29" selection-start-line="3372" selection-start-column="22" selection-end-line="3372" selection-end-column="29" />
+            <state relative-caret-position="229">
+              <caret line="1334" column="51" selection-start-line="1334" selection-start-column="51" selection-end-line="1334" selection-end-column="51" />
               <folding>
                 <element signature="e#836#958#0" />
                 <element signature="e#1016#1133#0" />
                 <element signature="e#1196#1319#0" />
                 <element signature="e#1377#1512#0" />
+                <element signature="n#style#0;n#td#3;n#tr#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#td#4;n#!!top" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -140,7 +130,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/matprimas/table_movimientos.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
+            <state relative-caret-position="340">
               <caret line="20" column="146" selection-start-line="20" selection-start-column="146" selection-end-line="20" selection-end-column="146" />
             </state>
           </provider>
@@ -150,7 +140,7 @@
         <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret selection-end-line="154" selection-end-column="9" />
+              <caret selection-end-line="159" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -167,8 +157,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/views/matprimas/create_retiro.ejs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1292">
-              <caret line="76" column="45" selection-start-line="76" selection-start-column="45" selection-end-line="76" selection-end-column="45" />
+            <state relative-caret-position="1479">
+              <caret line="87" column="45" selection-start-line="87" selection-start-column="45" selection-end-line="87" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -215,6 +205,7 @@
       <find>retiro</find>
       <find>bom_mat_uni_</find>
       <find>table_pedidos</find>
+      <find>parsecsv_bom</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -235,7 +226,6 @@
         <option value="$PROJECT_DIR$/views/abast/header_new.ejs" />
         <option value="$PROJECT_DIR$/views/plan/item_ofs.ejs" />
         <option value="$PROJECT_DIR$/views/jefeprod/lanzar_op.ejs" />
-        <option value="$PROJECT_DIR$/routes/plan.js" />
         <option value="$PROJECT_DIR$/views/abast/modal_bom_op.ejs" />
         <option value="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" />
         <option value="$PROJECT_DIR$/views/abast/view_abastecimiento.ejs" />
@@ -248,6 +238,7 @@
         <option value="$PROJECT_DIR$/views/matprimas/view_movimientos.ejs" />
         <option value="$PROJECT_DIR$/routes/matprimas.js" />
         <option value="$PROJECT_DIR$/views/matprimas/table_movimientos.ejs" />
+        <option value="$PROJECT_DIR$/routes/plan.js" />
       </list>
     </option>
   </component>
@@ -286,6 +277,11 @@
             <path>
               <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
               <item name="Siderval" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Siderval" type="462c0819:PsiDirectoryNode" />
+              <item name="csvs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
@@ -381,11 +377,12 @@
       <workItem from="1541531437584" duration="2747000" />
       <workItem from="1541553037037" duration="5870000" />
       <workItem from="1541604924626" duration="273000" />
+      <workItem from="1541615240645" duration="1038000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="82227000" />
+    <option name="totallyTimeSpent" value="83265000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -398,6 +395,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17931548" />
       <window_info id="Structure" order="1" weight="0.24960339" />
@@ -577,10 +575,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/views/matprimas/table_movimientos.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="146" selection-start-line="20" selection-start-column="146" selection-end-line="20" selection-end-column="146" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret selection-end-line="154" selection-end-column="9" />
+          <caret selection-end-line="159" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -593,8 +598,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/views/matprimas/create_retiro.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1292">
-          <caret line="76" column="45" selection-start-line="76" selection-start-column="45" selection-end-line="76" selection-end-column="45" />
+        <state relative-caret-position="1479">
+          <caret line="87" column="45" selection-start-line="87" selection-start-column="45" selection-end-line="87" selection-end-column="45" />
         </state>
       </provider>
     </entry>
@@ -619,22 +624,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/matprimas/table_movimientos.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="20" column="146" selection-start-line="20" selection-start-column="146" selection-end-line="20" selection-end-column="146" />
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/csvs/BOM.csv">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/plan.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-349">
-          <caret line="3372" column="29" selection-start-line="3372" selection-start-column="22" selection-end-line="3372" selection-end-column="29" />
+        <state relative-caret-position="229">
+          <caret line="1334" column="51" selection-start-line="1334" selection-start-column="51" selection-end-line="1334" selection-end-column="51" />
           <folding>
             <element signature="e#836#958#0" />
             <element signature="e#1016#1133#0" />
             <element signature="e#1196#1319#0" />
             <element signature="e#1377#1512#0" />
+            <element signature="n#style#0;n#td#3;n#tr#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#4;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>
