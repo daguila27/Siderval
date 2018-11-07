@@ -1332,6 +1332,7 @@ router.get('/parsecsv_bomBD', function(req, res, next){
                                     throw err;
                                 }
                                 console.log(rows);
+                                res.redirect('/plan');
                             });
                         });
                         
@@ -1339,7 +1340,7 @@ router.get('/parsecsv_bomBD', function(req, res, next){
                     
                 });
             });
-        var input = fs.createReadStream('csvs/bomBD.csv');
+        var input = fs.createReadStream('csvs/BOM.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){

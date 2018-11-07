@@ -20,6 +20,12 @@ function unidad_medida(un, cant){
 			break;
 	}
 }
+
+function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+}
 %>
 
 <style type="text/css">
@@ -58,7 +64,7 @@ function unidad_medida(un, cant){
 	        		%>
 	        			<tr class="danger">
 	        		<%}else if(mat[j].stock > mat[j].stock_c && mat[j].stock <= mat[j].stock_i){
-	        			estado = "Abastecido";
+	        			estado = "Aviso";
 	        		%>
 	        			<tr class="warning">
 	        		<%}else{
@@ -69,10 +75,10 @@ function unidad_medida(un, cant){
 	        		<!--<td><%= mat[j].codigo%></td>-->
 	        		<td><%= mat[j].descripcion%></td>
 	        		<!--<td><%= mat[j].sigla%></td>-->
-	        		<td><%= mat[j].stock%></td>
-	        		<td><%= mat[j].stock_i%></td>
-	        		<td><%= mat[j].stock_c%></td>
-	        		<td><%= mat[j].u_medida%></td>
+	        		<td><%= parsear_nro(mat[j].stock) %></td>
+	        		<td><%= parsear_nro(mat[j].stock_i) %></td>
+	        		<td><%= parsear_nro(mat[j].stock_c) %></td>
+	        		<td><%= mat[j].u_medida %></td>
 	        		<td><%= estado%></td>
 	        	</tr>
 	        <%}
@@ -85,7 +91,6 @@ function unidad_medida(un, cant){
 	        </tbody>
 	</table>
 </div>
-
 
 <script type="text/javascript">
 	setDataTable("#tablaStock");

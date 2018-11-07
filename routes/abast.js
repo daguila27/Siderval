@@ -159,7 +159,7 @@ router.get('/bom_mat_uni_page/:page', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
-			connection.query("select * from material order by material.detalle limit "+pagina+",15",
+			connection.query("select * from material where material.codigo like 'P%' order by material.detalle limit "+pagina+",15",
 				function(err, ped){
 					if(err)
 						console.log("Error Selecting : %s", err);

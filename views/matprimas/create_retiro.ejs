@@ -1,3 +1,10 @@
+<%
+	function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return parts.join(",");
+	}
+%>
 <style type="text/css">
 	#tablaStock_wrapper{
 		padding: 1%;
@@ -7,14 +14,13 @@
 	<form id="session_form">
 		<div class="panel-heading">
 			<h1 id="sess_titulo" >Registrar Retiro de Materiales: </h1>
-			<button type="button" class="btn btn-danger pull-right" onclick="set_movimiento(this)" name="tipo"  value="0">Cambiar a Devolución</button>
 		</div>
 		<div class="panel-body">
 			<div class="col-sm-12 col-md-6">
 				<label for="receptor" id="sess_recep">Nombre del receptor</label>
 				<input type="text" class="form-control" id="receptor_r" name="receptor" required>
 			</div>
-			<div class="col-sm-12 col-md-6">
+			<div class="col-sm-10 col-md-5">
 				<label for="etapa">Etapa</label>
 				<select class="form-control" id="etapa_r" name="etapa" required>
 					<option disabled selected>-- Selecciona una etapa --</option>
@@ -27,6 +33,8 @@
 					<option value="6">Maestranza</option>
 					<option value="7">Control De Calidad</option>
 				</select>
+			</div>
+			<div class="col-md-1" style="margin-top: 12px">
 				<div class="form-group" style="margin-top: 10px">
 					<button class="btn btn-success pull-right" type="submit">Registrar</button>
 				</div>
@@ -34,14 +42,16 @@
 		</div>
 		<table id="tabla_session" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
 			<thead>
-			<tr>
-				<th>Código</th>
-				<th>Detalle</th>
-				<th>Stock</th>
-				<th></th>
-				<th>A Enviar</th>
-				<th></th>
-			</tr>
+
+				<tr>
+					<th>Código</th>
+					<th>Detalle</th>
+					<th>Stock</th>
+					<th>A Enviar</th>
+					<th>Unidad</th>
+					<th>Eliminar</th>
+				</tr>
+
 			</thead>
 			<tbody id="session_rows">
 			</tbody>
@@ -49,15 +59,14 @@
 	</form>
 </div>
 <div class="panel panel-default">
-	<div class="panel-heading">Registrar Retiro:</div>
 	<table id="tablaStock" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
 		<thead>
-		<tr>
-			<th>Código</th>
-			<th>Detalle</th>
-			<th>Stock</th>
-			<th></th>
-		</tr>
+			<tr>
+				<th>Código</th>
+				<th>Detalle</th>
+				<th>Stock</th>
+				<th></th>
+			</tr>
 		</thead>
 		<tbody>
         <%if(mat.length > 0){
@@ -65,7 +74,7 @@
 		<tr id="row<%= mat[j].idmaterial%>">
 			<td><%= mat[j].codigo%></td>
 			<td><%= mat[j].detalle%></td>
-			<td><%= mat[j].stock%></td>
+			<td><%= parsear_nro(mat[j].stock) %></td>
 			<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
 		</tr>
         <%}
@@ -87,25 +96,6 @@
 
     } );
     //  mat[Math.floor((Math.random()*mat.length)+1) - 1].detalle"
-	// Función para cambiar estilos de panel y el tipo de movimiento (alternar entre retiro y devolución)
-	function set_movimiento(esto){
-		var valor = $(esto).val();
-		if(valor != 0){
-		    $(esto).val(0);
-		    $(esto).attr("class","btn btn-danger pull-right");
-            $("#sess_panel").attr("class","panel panel-info");
-		    $("#sess_titulo").html("Registrar Retiro de materiales");
-            $("#sess_recep").html("Nombre del Receptor");
-		    $(esto).html("Cambiar a Devolución");
-		} else {
-            $(esto).val(1);
-            $(esto).attr("class","btn btn-info pull-right");
-            $("#sess_panel").attr("class","panel panel-danger");
-            $("#sess_titulo").html("Registrar Devolución de materiales");
-            $("#sess_recep").html("Nombre del Emisor");
-            $(esto).html("Cambiar a Retiro");
-		}
-	}
 	// Quitar de la sesión
     function drop_session(idmaterial){
         $("#row" + idmaterial.toString()).removeClass("hidden");
