@@ -68,14 +68,13 @@ function numberWithCommas(x){
 			</tr>
 		</thead>
 		<tbody>
-<<<<<<< HEAD
 			<%if(mat.length > 0){
 			for(var j=0; j < mat.length; j++){%>
 			<tr id="row<%= mat[j].idmaterial%>">
 				<td><%= mat[j].codigo%></td>
 				<td><%= mat[j].detalle%></td>
 				<td><%= numberWithCommas(mat[j].stock)%></td>
-				<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>)"><i class="fa fa-plus"></i></a></td>
+				<td style="text-align: center;"><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>)"><i class="fa fa-plus"></i></a></td>
 			</tr>
 			<%}
 			}
@@ -84,23 +83,6 @@ function numberWithCommas(x){
 				No hay materiales registrados.
 			</tr>
 			<%}%>
-=======
-        <%if(mat.length > 0){
-		for(var j=0; j < mat.length; j++){%>
-		<tr id="row<%= mat[j].idmaterial%>">
-			<td><%= mat[j].codigo%></td>
-			<td><%= mat[j].detalle%></td>
-			<td><%= mat[j].stock%></td>
-			<td><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
-		</tr>
-        <%}
-		}
-		else{%>
-		<tr>
-			No hay materiales registrados.
-		</tr>
-        <%}%>
->>>>>>> ddbc93f217df742a791ca32d06111d3e024acffd
 		</tbody>
 	</table>
 </div>

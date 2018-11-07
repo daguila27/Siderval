@@ -104,4 +104,31 @@ router.post("/save_movimiento",function(req,res,next){
     } else res.redirect("/bad_login");
 });
 
+/*
+* CONTROLADOR QUE RENDERIZA LA VISTA PRINCIPAL DE Materias Primas --> Movimientos --> Ver Movimientos
+* */
+router.get("/view_movimientos",function(req,res,next){
+    if(req.session.userData){
+        res.render('matprimas/view_movimientos');
+    } else res.redirect("/bad_login");
+});
+
+
+router.get("/table_movimientos/:orden",function(req,res,next){
+    if(req.session.userData){
+        var orden = req.params.orden.replace('-', ' ');
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("select movimiento.*, movimiento_detalle.*, material.*, "
+                +"coalesce(etapafaena.nombre_etapa, 'Jefe de Producción') as nombre_etapa "
+                +"from movimiento_detalle left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento "
+                +"left join material on material.idmaterial=movimiento_detalle.idmaterial "
+                +"left join etapafaena on etapafaena.value = movimiento.etapa ORDER BY "+orden, function(err, mov){
+                if(err) throw err;
+                res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
+            });
+        } );
+    } else res.redirect("/bad_login");
+});
+
 module.exports = router;
