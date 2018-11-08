@@ -7,6 +7,11 @@ function fechaLatino(string){
         return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
     }
 }
+function parsear_nro(x){
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return parts.join(",");
+}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%">
     <style>
@@ -29,7 +34,7 @@ function fechaLatino(string){
         <tr class="o_data_row">
             <td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>" style="text-align: center"><%=data[i].idmovimiento%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].detalle%></td>
-            <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].cantidad%></td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=parsear_nro(data[i].cantidad)%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].u_medida%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].nombre_etapa%></td>
             <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
@@ -57,17 +62,20 @@ function fechaLatino(string){
     $(document).ready(function(){
         $(".order-column").removeClass('o-sort-up');
         $(".order-column").removeClass('o-sort-down');
+        $(".order-column").removeClass('columna-activa');
         $(".order-column").each(function(){
             //$(this).css("width", $("."+$(this).attr('id')).css('width'));
 
             if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
                 if("<%= key.split('-')[1]%>" == "ASC"){
                     $(this).addClass('o-sort-up');
+                    $(this).addClass('columna-activa');
                     $(this).data('order', '<%= key.split("-")[0]%>-DESC');
+
                 }
                 else{
                     $(this).addClass('o-sort-down');
-
+                    $(this).addClass('columna-activa');
                     $(this).data('order', '<%= key.split("-")[0]%>-ASC');
                 }
             }
@@ -81,8 +89,9 @@ function fechaLatino(string){
         var item = this;
         var orden = $(this).data('order');
         $.ajax({
-            type: 'GET',
-            url: '/matprimas/table_movimientos/'+orden,
+            type: 'POST',
+            data: {orden: orden, clave: $("#buscar_movimiento").val()},
+            url: '/matprimas/table_movimientos',
             success: function(data){
                 $(".main-page").html(data);
             }

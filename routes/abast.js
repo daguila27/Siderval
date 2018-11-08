@@ -314,10 +314,13 @@ router.post('/search_bom', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
-			connection.query("select * from material where detalle like '%"+info+"%' or codigo like '%"+info+"%' order by material.detalle",
+			connection.query("select * from material where (detalle like '%"+info+"%' or codigo like '%"+info+"%') and material.tipo='P' order by material.detalle",
 			function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);
+
+
+				console.log(mat);
 				res.render('abast/bom_all_list', {data: mat});
 			});
  
@@ -1364,13 +1367,11 @@ router.get('/item_abs/:showPend', function(req, res, next){
 router.post('/buscar_abastecimientos_list', function(req, res, next){
 	if(verificar(req.session.userData)){
     	var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
     	var clave = input.clave;
-        var orden = input.orden;
+        var orden = input.orden.split('/')[1].replace('-',' ');
         var showPend = input.showPend;
         var cc_selected = input.cc_selected.split(',');
-        console.log(cc_selected);
-        var where = " WHERE material.detalle LIKE '%"+clave+"%' ";
+        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR abastecimiento.idoda LIKE '%"+clave+"%')";
         var cc_cond = " ";
         if(showPend == 'true'){
             where += " AND abastecimiento.cantidad > abastecimiento.recibidos ";
@@ -1388,15 +1389,13 @@ router.post('/buscar_abastecimientos_list', function(req, res, next){
             cc_cond = cc_cond.substring(0, cc_cond.length-2);
             where = where +" AND ("+cc_cond+") ";
 		}
-
-        console.log(where);
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select abastecimiento.*, coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta, material.*,oda.numoda, oda.creacion, cliente.sigla "+
 	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left join material on material.idmaterial=abastecimiento.idmaterial " +
 					"left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) "+
-	        		"left join cliente on cliente.idcliente=oda.idproveedor " + where + "GROUP BY abastecimiento.idoda",
+	        		"left join cliente on cliente.idcliente=oda.idproveedor " + where + "ORDER BY "+orden,
                 function(err, abs){
                     if(err) {throw err;}
                     else{

@@ -109,21 +109,31 @@ router.post("/save_movimiento",function(req,res,next){
 * */
 router.get("/view_movimientos",function(req,res,next){
     if(req.session.userData){
-        res.render('matprimas/view_movimientos');
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err) throw err;
+                res.render('matprimas/view_movimientos', {etp: etp});
+            });
+        });
     } else res.redirect("/bad_login");
 });
 
 
-router.get("/table_movimientos/:orden",function(req,res,next){
+router.post("/table_movimientos",function(req,res,next){
     if(req.session.userData){
-        var orden = req.params.orden.replace('-', ' ');
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var orden = input.orden.replace('-', ' ');
+        var clave = input.clave;
+        var where = " WHERE movimiento_detalle.idmovimiento like '%"+clave+"%' OR material.detalle like '%"+clave+"%'";
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select movimiento.*, movimiento_detalle.*, material.*, "
                 +"coalesce(etapafaena.nombre_etapa, 'Jefe de Producción') as nombre_etapa "
                 +"from movimiento_detalle left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento "
                 +"left join material on material.idmaterial=movimiento_detalle.idmaterial "
-                +"left join etapafaena on etapafaena.value = movimiento.etapa ORDER BY "+orden, function(err, mov){
+                +"left join etapafaena on etapafaena.value = movimiento.etapa"+where+" ORDER BY "+orden, function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
             });

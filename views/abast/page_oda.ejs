@@ -25,9 +25,10 @@ function fechaLatino(string){
                             </div>
                         </button>
                     </div>
-                    <div class="oe_title">
-                        <h1>
+                    <div class="oe_title" style="width: 100%;">
+                        <h1 style="width: 100%;">
                             <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span>
+                            <a class="pull-right" style="z-index: 10" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download><i class="fa fa-file-pdf-o"></i></a>
                         </h1>
                     </div>
                     <div class="o_group">

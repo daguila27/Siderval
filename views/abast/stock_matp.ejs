@@ -82,17 +82,10 @@ function parsear_nro(x){
 	        		<!--<td><%= mat[j].codigo%></td>-->
 	        		<td><%= mat[j].descripcion%></td>
 	        		<!--<td><%= mat[j].sigla%></td>-->
-<<<<<<< HEAD
-	        		<td><%= numberWithCommas(mat[j].stock)%></td>
-	        		<td><%= numberWithCommas(mat[j].stock_i)%></td>
-	        		<td><%= numberWithCommas(mat[j].stock_c)%></td>
-	        		<td><%= mat[j].u_medida%></td>
-=======
 	        		<td><%= parsear_nro(mat[j].stock) %></td>
 	        		<td><%= parsear_nro(mat[j].stock_i) %></td>
 	        		<td><%= parsear_nro(mat[j].stock_c) %></td>
 	        		<td><%= mat[j].u_medida %></td>
->>>>>>> 2d75a2e3b95c7a6101d849622eab53baa06bd834
 	        		<td><%= estado%></td>
 	        	</tr>
 	        <%}

@@ -12,7 +12,7 @@
 		<thead>
 			<tr>
 				<th class="o_column_sortable order-column o-sort-up" data-order="despacho.iddespacho-ASC">Número de GD</th>
-				<th class="o_column_sortable" data-order="material.detalle-ASC">Descripción</th>
+				<th class="o_column_sortable order-column" data-order="despacho.mat_token-ASC">Descripción</th>
 				<th class="o_column_sortable" data-order="pedido.cantidad-ASC">Despachados</th>
 				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="despacho.fecha-DESC">Fecha de Despacho</th>
 				<th class="o_column_sortable" data-order="cliente.razon-ASC">Tipo</th>
@@ -114,10 +114,12 @@
 			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
 				if("<%= key.split('-')[1]%>" == "ASC"){
 					$(this).addClass('o-sort-up');
-					$(this).data('order', '<%= key.split("-")[0]%>-DESC');
+					$(this).addClass('active-sort');
+                    $(this).data('order', '<%= key.split("-")[0]%>-DESC');
 				}
 				else{
 					$(this).addClass('o-sort-down');
+                    $(this).addClass('active-sort');
 					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
 					
 				}
@@ -127,14 +129,21 @@
 	$(".order-column").on('click', function(e){
 		e.preventDefault();
 		var item = this;
-		var orden = $(this).data('order');
-		$.ajax({
+		/*$.ajax({
 			type: 'GET',
 			url: '/bodega/table_despachos/'+orden,
 			success: function(data){
 				$(".main-page").html(data);
 			}
-		});
+		});*/
+        $.ajax({
+            type: 'POST',
+            data: {clave: $("#buscar_despacho").val(), orden: $(this).data('order'), tipo: $("#select_tipo_despacho").val()},
+            url: '/bodega/table_despachos',
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
 	});
 
 

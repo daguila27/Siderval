@@ -100,10 +100,12 @@ router.post('/buscar_despacho_list', function(req, res, next){
         var orden = input.orden;
         var tipo = input.tipo;
         console.log(clave);
+        console.log(tipo);
+
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM despacho WHERE despacho.iddespacho LIKE '%"+clave+"%' AND despacho.estado LIKE '"+tipo+"'",
+            connection.query("SELECT * FROM despacho WHERE despacho.iddespacho LIKE '%"+clave+"%' AND despacho.estado LIKE '%"+tipo+"%'",
                 function(err, desp){
                     if(err) throw err;
                     res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
@@ -113,16 +115,25 @@ router.post('/buscar_despacho_list', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
-router.get('/table_despachos/:orden', function(req, res, next){
+router.post('/table_despachos', function(req, res, next){
     if(verificar(req.session.userData)){
-        var orden = req.params.orden.replace('-', ' ');
-        console.log(orden);
+        var input = JSON.parse(JSON.stringify(req.body));
+
+        var orden = input.orden.replace('-', ' ');
+        var clave = input.clave;
+        var tipo = input.tipo;
+        var where = " WHERE (despacho.mat_token LIKE '%"+clave+"%' OR despacho.iddespacho LIKE '%"+clave+"%') AND despacho.estado LIKE '%"+tipo+"%'";
+        console.log(clave+"-"+tipo+"-"+orden);
+        console.log(where);
+        var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
+        console.log(query);
         req.getConnection(function(err, connection){
-            connection.query("SELECT * FROM despacho ORDER BY "+orden,function(err, desp){
+            connection.query("SELECT * FROM despacho"+where+" ORDER BY "+orden,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
-                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
 
+                console.log(desp);
+                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
             });         
         });
     }
