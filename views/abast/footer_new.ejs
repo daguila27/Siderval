@@ -147,6 +147,31 @@ However, delay the fade out process for 2.5 seconds */
       </div>
     </div>
 
+    <div id="receivedModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <form id="rec_form">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Modal Header</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Some text in the modal.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
 
 
 <div class="footer-hidden"></div>
@@ -197,7 +222,15 @@ However, delay the fade out process for 2.5 seconds */
 
 
 
-
+    function oda_data(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_dataoda/'+$(yo).data('id'),
+            success: function(data){
+                $("#receivedModal div div form").html(data);
+            }
+        });
+    }
     function foundSC(yo){
         $.ajax({
             type: 'GET',

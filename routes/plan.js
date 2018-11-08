@@ -4336,13 +4336,10 @@ router.get('/get_client_pred/:text', function(req,res,next){
 
 
 
-
+//SE LLAMA A ESTA RUTA INMEDIATAMENTE DESPUES DE CREAR LA ODA
 router.post('/view_ordenpdf', function(req,res,next){
     var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
     var fs = require('fs');
-
-
-  
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Connection : %s", err);
@@ -4385,6 +4382,9 @@ router.post('/view_ordenpdf', function(req,res,next){
     });    
 
 });
+
+
+//A ESTA RUTA SE LLAMA CUANDO SE QUIERE CREAR EL ARCHIVO PDF DE LA ODA TIEMPO DESPUES DE REGISTRARLA
 router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
     var idoda = req.params.idoda;
 
@@ -4401,12 +4401,11 @@ router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
                 if(err)
                     console.log("Error Selecting : %s", err);
 
-                var phantom = require('phantom');   
+                var phantom = require('phantom');
                 phantom.create().then(function(ph) {
                     ph.createPage().then(function(page) {
-
                         page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
-                            page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
+                            page.render('public/pdf/odc'+oda[0].idoda+'.pdf').then(function() {
                                 console.log('Page Rendered');
                                 ph.exit();
                                 var fs = require('fs');
@@ -4424,13 +4423,16 @@ router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
                         });
                     });
                 });
-                
+
 
             });
          });
     });    
 
 });
+
+
+//ESTA RUTA SE USA CUANDO SE QUIERE DESCARGAR EL PDF
 router.get('/view_ordenpdf_after_d/:idoda', function(req,res,next){
     var idoda = req.params.idoda;
 
@@ -4526,7 +4528,7 @@ router.get('/download_pdf/:numoda', function(req,res,next){
 
   });
 
-
+//RENDERIZA LO QUE VA A APARECER EN EL PDF
 router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
     req.getConnection(function(err, connection){
         if(err)
