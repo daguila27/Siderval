@@ -2701,6 +2701,7 @@ router.get('/parsecsv_verifProd', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });
+
 router.get('/parsecsv2', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs');
@@ -2777,14 +2778,6 @@ router.get('/parsecsv2', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
-
-
-
-
-
 router.get('/parsecsv_cuentas', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -2837,26 +2830,6 @@ router.get('/parsecsv_cuentas', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get('/parsecsv_stock_productos', function(req, res, next){
     if(req.session.isUserLogged){
@@ -2956,10 +2929,6 @@ router.get('/parsecsv_stock_productos', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
-
 router.get('/parsecsv_pago_clientes', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -3019,11 +2988,6 @@ router.get('/parsecsv_pago_clientes', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
-
-
 router.get('/parsecsv_rutas', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -3076,7 +3040,6 @@ router.get('/parsecsv_rutas', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 /*router.get('/parsecsv_forged', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -3106,9 +3069,6 @@ router.get('/parsecsv_rutas', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });*/
-
-
-
 
 router.get('/parsecsv_aleaciones', function(req, res, next){
     if(req.session.isUserLogged){
@@ -3143,10 +3103,6 @@ router.get('/parsecsv_aleaciones', function(req, res, next){
    
     } else res.redirect("/bad_login");
 });
-
-
-
-
 
 router.get('/parsecsv_bdmateriales', function(req, res, next){
     if(req.session.isUserLogged){
@@ -3256,9 +3212,6 @@ router.get('/parsecsv_bdmateriales', function(req, res, next){
    
     } else res.redirect("/bad_login");
 });
-
-
-
 
 router.get('/parsecsv_todo', function(req, res, next){
     if(req.session.isUserLogged){
@@ -3370,49 +3323,32 @@ router.get('/parsecsv_todo', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.get('/parsecsv_insumos', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
         var parse = require('csv-parse');
-
         var parser = parse(
             function(err,rows){
                 if(err) throw err;
                 rows.shift();
-                var ins = [];
+                var ins = "UPDATE material SET e_abast = CASE ";
+
                 for(var w=0; w < rows.length; w++){
-                    //console.log(rows[w]);
-                    rows[w][3] = rows[w][0].substring(0,1); 
-                    if(rows[w][10] == ''){
-                        rows[w][10] = 0;
-                    }
-                    if(rows[w][8] == ''){
-                        rows[w][8] = 0;
-                    }
-                    if(rows[w][9] == ''){
-                        rows[w][9] = 0;
-                    }
-                    if(rows[w][4] == 'Si'){        
-                        ins.push([rows[w][0], rows[w][1], rows[w][2], rows[w][3], true, rows[w][7], rows[w][8], rows[w][9], parseInt(rows[w][10]), parseInt(rows[w][0].substring(3,5)) ]);
-                    }
-                    else{
-                        ins.push([rows[w][0], rows[w][1], rows[w][2], rows[w][3], false, rows[w][7], rows[w][8], rows[w][9], parseInt(rows[w][10]), parseInt(rows[w][0].substring(3,5))]); 
-                    }
+                    ins += "WHEN codigo = '" + rows[w][0] + "' THEN '" + rows[w][4] + "' ";
+                    //console.log(rows[w][4]);
                 }
-                console.log(ins);
+                ins += "ELSE '0' END";
                 req.getConnection(function(err,connection){
                     if(err) throw err;
                     
-                    connection.query("INSERT INTO material (codigo, detalle, u_medida, tipo, notbom, subcuenta, stock_c, stock_i, u_compra, caracteristica) VALUES ?",[ins], function(err, mats){
+                    connection.query(ins, function(err, mats){
                         if(err)
                             console.log("Error Selecting : %s", err);
-                        console.log(mats);
-                        res.redirect('/plan');    
+                        res.send('YUPI!');
                     });
                 });
             });
-        var input = fs.createReadStream('csvs/insumosBD.csv');
+        var input = fs.createReadStream('csvs/insumosBD2.csv');
         input.pipe(parser);
 
    
