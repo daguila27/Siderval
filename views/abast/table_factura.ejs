@@ -1,4 +1,37 @@
+<%
+function parsear_nro(x){
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    return parts.join(",");
+}
+function trunc (x, posiciones = 0) {
+    var s = x.toString()
+    var l = s.length
+    var decimalLength = s.indexOf('.') + 1
 
+    if (l - decimalLength <= posiciones){
+        return x
+    }
+    // Parte decimal del número
+    var isNeg  = x < 0
+    var decimal =  x % 1
+    var entera  = isNeg ? Math.ceil(x) : Math.floor(x)
+    // Parte decimal como número entero
+    // Ejemplo: parte decimal = 0.77
+    // decimalFormated = 0.77 * (10^posiciones)
+    // si posiciones es 2 ==> 0.77 * 100
+    // si posiciones es 3 ==> 0.77 * 1000
+    var decimalFormated = Math.floor(
+            Math.abs(decimal) * Math.pow(10, posiciones)
+    )
+    // Sustraemos del número original la parte decimal
+    // y le sumamos la parte decimal que hemos formateado
+    var finalNum = entera +
+            ((decimalFormated / Math.pow(10, posiciones))*(isNeg ? -1 : 1))
+
+    return finalNum
+}
+%>
   <input type="hidden" name="idoda" value="<%= oda[0].idoda%>">
 <div style="width: 100%;  text-align: center;">
     <div style="width: 100%; display: flex;">    
@@ -57,7 +90,7 @@
             <td style="width: 30%"><%= oda[e].detalle%></td>
             <input type="hidden" name="idabast" value="<%= oda[e].idabast%>">
             <td align="center"><%= oda[e].cantidad%></td>
-            <td align="center" style="width: 15%"><%= oda[e].odacosto%></td>
+            <td align="center" style="width: 15%"><%= parsear_nro(oda[e].odacosto)%></td>
             <td><input class="form-control" type="number" name="costo-real"></td>
             <td>
               <select class="form-control" name="moneda-factura">

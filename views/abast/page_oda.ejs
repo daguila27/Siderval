@@ -28,14 +28,17 @@ function fechaLatino(string){
                     <div class="oe_title" style="width: 100%;">
                         <h1 style="width: 100%;">
                             <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span>
+                            <a class="pull-right" style="z-index: 10; margin:10px;" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
+                                <i data-toggle="tooltip" title="Ver PDF" class="fa fa-file-pdf-o"></i>
+                            </a>
                             <a class="pull-right" style="z-index: 10; margin:10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
-                                <i class="fa fa-file-pdf-o"></i>
+                                <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
                             </a>
                             <a class="pull-right" style="margin: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)" data-toggle="modal" data-target="#facturaModal">
-                                <i class="fa fa-money"></i>
+                                <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
                             </a>
                             <a class="pull-right" style="margin: 10px" data-toggle="modal" data-target="#receivedModal" data-id="<%= oda.idoda%>" onclick="oda_data(this)">
-                                <i class="fa fa-truck"></i>
+                                <i data-toggle="tooltip" title="Recepcionar" class="fa fa-truck"></i>
                             </a>
 
                         </h1>
@@ -428,3 +431,9 @@ function fechaLatino(string){
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
