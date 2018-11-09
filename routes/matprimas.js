@@ -36,9 +36,21 @@ router.get("/crear_movimiento",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%') AND notbom = true",function (err,materiales) {
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR codigo LIKE 'X%') AND notbom = true",function (err,materiales) {
                 if(err) console.log(err);
                 res.render("matprimas/create_retiro",{mat: materiales});
+            });
+        });
+    } else res.redirect("/bad_login");
+});
+// Enviar la vista para registrar un movimiento (DEVOLUCIÓN)
+router.get("/crear_movimiento_dev",function(req,res,next){
+    if(req.session.userData){
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR codigo LIKE 'X%') AND notbom = true",function (err,materiales) {
+                if(err) console.log(err);
+                res.render("matprimas/create_devolucion",{mat: materiales});
             });
         });
     } else res.redirect("/bad_login");
