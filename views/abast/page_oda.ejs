@@ -28,7 +28,7 @@ function fechaLatino(string){
                     <div class="oe_title" style="width: 100%;">
                         <h1 style="width: 100%;">
                             <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span>
-                            <a class="pull-right" style="z-index: 10; margin:10px;" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
+                            <a class="pull-right" style="z-index: 10; margin:10px;" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" onclick="verPdf(this)">
                                 <i data-toggle="tooltip" title="Ver PDF" class="fa fa-file-pdf-o"></i>
                             </a>
                             <a class="pull-right" style="z-index: 10; margin:10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
@@ -436,4 +436,8 @@ function fechaLatino(string){
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
     });
+
+    function verPdf(yo){
+       window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
+    }
 </script>

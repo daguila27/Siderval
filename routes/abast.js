@@ -1310,23 +1310,47 @@ router.get('/view_abastecimiento', function(req, res, next) {
 /*  Funcion que busca los abastecimientos y los ordena segun paramentro orden en la url, muestra solo pendiente si showPend es true
 	Renderiza una tabla con los abastecimientos solicitados
 */
-router.get('/table_abastecimientos/:orden/:showPend', function(req, res, next){
+router.post('/table_abastecimientos', function(req, res, next){
 	if(verificar(req.session.userData)){
-    	console.log(req.params.token);
-    	var orden = req.params.orden;
-        orden = orden.replace('-', ' ');
-        var where = " ";
-        if(req.params.showPend == 'true'){
-            where = " WHERE abastecimiento.cantidad > abastecimiento.recibidos ";
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var orden;
+        if(input.orden.split('/').length > 1){
+        	orden = input.orden.split('/')[1];
+		}
+		else{
+            orden = input.orden;
+		}
+        var showPend = input.showPend;
+        var cc_selected = input.cc_selected.split(',');
+        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR abastecimiento.idoda LIKE '%"+clave+"%' OR cliente.sigla LIKE '%"+clave+"%')";
+        var cc_cond = " ";
+        if(showPend == 'true'){
+            where += " AND abastecimiento.cantidad > abastecimiento.recibidos ";
         }
+        if(cc_selected.length>0){
+            for(var cc=0; cc <  cc_selected.length ; cc++){
+                if(cc_selected[cc] == 'all'){
+                    cc_cond = " abastecimiento.cc LIKE '%%' OR";
+                    break;
+                }
+                else{
+                    cc_cond += " abastecimiento.cc LIKE '%"+cc_selected[cc]+"%' OR";
+                }
+            }
+            cc_cond = cc_cond.substring(0, cc_cond.length-2);
+            where = where +" AND ("+cc_cond+") ";
+        }
+        orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("select abastecimiento.*, coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle "+
-	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left " +
+	        	connection.query("select abastecimiento.*, coalesce(cliente.sigla, 'Sin Proveedor') as sigla,coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle "+
+	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor left " +
 	        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) " + where + " ORDER BY "+orden, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
+	        			console.log(abs);
 		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-')});
 		        	}
 	        	});
@@ -1371,7 +1395,7 @@ router.post('/buscar_abastecimientos_list', function(req, res, next){
         var orden = input.orden.split('/')[1].replace('-',' ');
         var showPend = input.showPend;
         var cc_selected = input.cc_selected.split(',');
-        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR abastecimiento.idoda LIKE '%"+clave+"%')";
+        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR abastecimiento.idoda LIKE '%"+clave+"%' OR cliente.sigla LIKE '%"+clave+"%')";
         var cc_cond = " ";
         if(showPend == 'true'){
             where += " AND abastecimiento.cantidad > abastecimiento.recibidos ";

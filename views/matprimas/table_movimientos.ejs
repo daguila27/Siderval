@@ -26,7 +26,8 @@ function parsear_nro(x){
         <th id="solicitados" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="movimiento_detalle.cantidad*1-ASC">Solicitados</th>
         <th id="sin_produccion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
         <th id="sin_produccion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="etapafaena.nombre_etapa-ASC">Etapa</th>
-        <th id="f_entrega" class="cabecera o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="movimiento_detalle.f_gen-DESC">Fecha de Registro</th>
+        <th id="movimiento" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="movimiento.tipo-ASC">Movimiento</th>
+        <th id="f_entrega" class="cabecera o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="movimiento.f_gen-DESC">Fecha de Registro</th>
     </tr>
     </thead>
     <tbody class="ui-sortable" style="margin-top: 10px;">
@@ -37,6 +38,13 @@ function parsear_nro(x){
             <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=parsear_nro(data[i].cantidad)%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].u_medida%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].nombre_etapa%></td>
+            <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
+                <%if(data[i].tipo_mov == '0'){%>
+                    Retiro
+                <%}else{%>
+                    Devolución
+                <%}%>
+            </td>
             <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
                 <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_gen).toLocaleDateString())%></span>
             </td>
