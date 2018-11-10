@@ -117,7 +117,6 @@ router.post("/next_step",function(req,res,next){
                 if(err) throw err;
 				connection.query("INSERT INTO produccion_history SET ?",{idproduccion: input.idprod,enviados: input.sendnum,from: input.etapa_act,to:input.newetapa},function(err,insert_h){
 					if(err) throw err;
-					console.log('refreshfaena'+input.newetapa);
 					res.send("si");
         			/*res.on('finish', function(){ 
         				req.app.locals.io.emit('refreshfaena'+input.newetapa, notif); 
@@ -145,7 +144,9 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 				if(err){console.log("Error Selecting : %s", err);}
 				connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "+
 					"(select produccion.*,coalesce(producido.ruta,'1,2,3,4,5,6,7,8') as ruta,material.detalle, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.proceso+"') as nextStep from produccion"+
-					" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (fabricaciones.idmaterial=producido.idmaterial)"+
+					" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones)" +
+					" left join material on (fabricaciones.idmaterial=material.idmaterial)" +
+					" left join producido on (fabricaciones.idmaterial=producido.idmaterial)"+
 					" WHERE produccion."+input.proceso+" > 0 AND produccion.el=false GROUP BY produccion.idproduccion ORDER BY fabricaciones.f_entrega ASC)"+
 					" as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`)",
 					/*connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "
@@ -158,8 +159,6 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 						console.log("Error Selecting : %s", err);
 					}
                     var nextstep;
-                    console.log(rows);
-					
 					for(var i = 0;i<rows.length;i++){
                         rows[i].ruta = rows[i].ruta.split(",");
                         nextstep = rows[i].ruta.indexOf(input.proceso) + 1;
@@ -167,7 +166,6 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 							rows[i].nextstep = "bodega";
 						} else rows[i].nextstep = rows[i].ruta[nextstep];
 					}
-					console.log(rows);
 					res.render('faena/render_cola', {data: rows,etapaactual:input.proceso, nombreetapa: etapa[0].nombre_etapa});
 				});
 			});

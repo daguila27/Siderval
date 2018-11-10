@@ -2534,7 +2534,7 @@ router.get('/parsecsv_fase1testeo_4000', function(req, res, next){
                 var orden = [];
                 var idoca = [];
                 var abast = [];
-                //N° OC-0,-1,PRODUCTO-2,CANT-3,UNIT NETO-4,TOTAL NETO-5,ENTREGA-6,EXENTO-7,C° COSTO-8,OF-9,PROVEEDOR-10
+                //N° OC-0,CODIGO-1,PRODUCTO-2,CANT-3,UNIT NETO-4,TOTAL NETO-5,ENTREGA-6,EXENTO-7,C° COSTO-8,OF-9,PROVEEDOR-10
                 //,RUT-11,TOTAL C/IVA-12,FECHA-13,FACTURA-14,OBSERVACIONES-15,ESTADO-16,
                 for(var w=1; w < oca.length; w++){
                         oca[w][6] = [oca[w][6].split('-')[1], oca[w][6].split('-')[0], oca[w][6].split('-')[2]].join('-');
@@ -2602,10 +2602,10 @@ router.get('/parsecsv_fase1testeo_4000', function(req, res, next){
 
                                     connection.query("SELECT * FROM cliente", function(err, cli){
                                         if(err) throw err;
-                                        
-                                        for(var q=0; q < cli.length; q++){
-                                            for(var p=0; p < orden.length; p++){
-                                                if(cli[q].rut.replace(',','').replace('.', '').replace('-','') == orden[p][3].toString().replace(',','').replace('.', '').replace('-','')){
+
+                                        for(var p=0; p < orden.length; p++){
+                                            for(var q=0; q < cli.length; q++){
+                                                if(cli[q].rut.replace(',','').replace('.', '').replace('-','') == orden[p][3].replace(',','').replace('.', '').replace('-','')){
                                                     orden[p][3] = cli[q].idcliente;
                                                     break;
                                                 }
@@ -2633,7 +2633,7 @@ router.get('/parsecsv_fase1testeo_4000', function(req, res, next){
                         });                  
                 });
             });
-        var input = fs.createReadStream('csvs/OCA.csv');
+        var input = fs.createReadStream('csvs/OCA2.csv');
         input.pipe(parser);
 
         /*input.pipe(parse(function(err, rows){
@@ -2701,6 +2701,7 @@ router.get('/parsecsv_verifProd', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });
+
 router.get('/parsecsv2', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs');
@@ -2777,14 +2778,6 @@ router.get('/parsecsv2', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
-
-
-
-
-
 router.get('/parsecsv_cuentas', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -2837,26 +2830,6 @@ router.get('/parsecsv_cuentas', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get('/parsecsv_stock_productos', function(req, res, next){
     if(req.session.isUserLogged){
@@ -2956,10 +2929,6 @@ router.get('/parsecsv_stock_productos', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
-
 router.get('/parsecsv_pago_clientes', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -3019,11 +2988,6 @@ router.get('/parsecsv_pago_clientes', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
-
-
-
-
 router.get('/parsecsv_rutas', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -3076,7 +3040,6 @@ router.get('/parsecsv_rutas', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 /*router.get('/parsecsv_forged', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
@@ -3106,9 +3069,6 @@ router.get('/parsecsv_rutas', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });*/
-
-
-
 
 router.get('/parsecsv_aleaciones', function(req, res, next){
     if(req.session.isUserLogged){
@@ -3143,10 +3103,6 @@ router.get('/parsecsv_aleaciones', function(req, res, next){
    
     } else res.redirect("/bad_login");
 });
-
-
-
-
 
 router.get('/parsecsv_bdmateriales', function(req, res, next){
     if(req.session.isUserLogged){
@@ -3256,9 +3212,6 @@ router.get('/parsecsv_bdmateriales', function(req, res, next){
    
     } else res.redirect("/bad_login");
 });
-
-
-
 
 router.get('/parsecsv_todo', function(req, res, next){
     if(req.session.isUserLogged){
@@ -3370,49 +3323,32 @@ router.get('/parsecsv_todo', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
-
 router.get('/parsecsv_insumos', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
         var parse = require('csv-parse');
-
         var parser = parse(
             function(err,rows){
                 if(err) throw err;
                 rows.shift();
-                var ins = [];
+                var ins = "UPDATE material SET e_abast = CASE ";
+
                 for(var w=0; w < rows.length; w++){
-                    //console.log(rows[w]);
-                    rows[w][3] = rows[w][0].substring(0,1); 
-                    if(rows[w][10] == ''){
-                        rows[w][10] = 0;
-                    }
-                    if(rows[w][8] == ''){
-                        rows[w][8] = 0;
-                    }
-                    if(rows[w][9] == ''){
-                        rows[w][9] = 0;
-                    }
-                    if(rows[w][4] == 'Si'){        
-                        ins.push([rows[w][0], rows[w][1], rows[w][2], rows[w][3], true, rows[w][7], rows[w][8], rows[w][9], parseInt(rows[w][10]), parseInt(rows[w][0].substring(3,5)) ]);
-                    }
-                    else{
-                        ins.push([rows[w][0], rows[w][1], rows[w][2], rows[w][3], false, rows[w][7], rows[w][8], rows[w][9], parseInt(rows[w][10]), parseInt(rows[w][0].substring(3,5))]); 
-                    }
+                    ins += "WHEN codigo = '" + rows[w][0] + "' THEN '" + rows[w][4] + "' ";
+                    //console.log(rows[w][4]);
                 }
-                console.log(ins);
+                ins += "ELSE '0' END";
                 req.getConnection(function(err,connection){
                     if(err) throw err;
                     
-                    connection.query("INSERT INTO material (codigo, detalle, u_medida, tipo, notbom, subcuenta, stock_c, stock_i, u_compra, caracteristica) VALUES ?",[ins], function(err, mats){
+                    connection.query(ins, function(err, mats){
                         if(err)
                             console.log("Error Selecting : %s", err);
-                        console.log(mats);
-                        res.redirect('/plan');    
+                        res.send('YUPI!');
                     });
                 });
             });
-        var input = fs.createReadStream('csvs/insumosBD.csv');
+        var input = fs.createReadStream('csvs/insumosBD2.csv');
         input.pipe(parser);
 
    
@@ -4400,13 +4336,10 @@ router.get('/get_client_pred/:text', function(req,res,next){
 
 
 
-
+//SE LLAMA A ESTA RUTA INMEDIATAMENTE DESPUES DE CREAR LA ODA
 router.post('/view_ordenpdf', function(req,res,next){
     var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
     var fs = require('fs');
-
-
-  
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Connection : %s", err);
@@ -4449,6 +4382,9 @@ router.post('/view_ordenpdf', function(req,res,next){
     });    
 
 });
+
+
+//A ESTA RUTA SE LLAMA CUANDO SE QUIERE CREAR EL ARCHIVO PDF DE LA ODA TIEMPO DESPUES DE REGISTRARLA
 router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
     var idoda = req.params.idoda;
 
@@ -4465,12 +4401,11 @@ router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
                 if(err)
                     console.log("Error Selecting : %s", err);
 
-                var phantom = require('phantom');   
+                var phantom = require('phantom');
                 phantom.create().then(function(ph) {
                     ph.createPage().then(function(page) {
-
                         page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
-                            page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
+                            page.render('public/pdf/odc'+oda[0].idoda+'.pdf').then(function() {
                                 console.log('Page Rendered');
                                 ph.exit();
                                 var fs = require('fs');
@@ -4488,13 +4423,16 @@ router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
                         });
                     });
                 });
-                
+
 
             });
          });
     });    
 
 });
+
+
+//ESTA RUTA SE USA CUANDO SE QUIERE DESCARGAR EL PDF
 router.get('/view_ordenpdf_after_d/:idoda', function(req,res,next){
     var idoda = req.params.idoda;
 
@@ -4590,7 +4528,7 @@ router.get('/download_pdf/:numoda', function(req,res,next){
 
   });
 
-
+//RENDERIZA LO QUE VA A APARECER EN EL PDF
 router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
     req.getConnection(function(err, connection){
         if(err)

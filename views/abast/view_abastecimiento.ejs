@@ -9,8 +9,6 @@
 	<div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%">
 		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra</li>
-
-
 		</ol>
 
 		<div style="width: 50%;">
@@ -26,7 +24,7 @@
 					</label>
 					<div class="dropdown fill_cc">
 						<button class="btn btn-primary dropdown-toggle dropdown_btn_ccfill" type="button" data-toggle="dropdown">Filtrar por CC<span class="caret"></span></button>
-						<ul class="dropdown-menu" style="max-height: 300px;  padding: 4px 10px;>
+						<ul class="dropdown-menu" style="max-height: 300px;  padding: 4px 10px;">
 							<spam class="pull-right">
 								<button class="btn btn-xs btn-default" style="margin: 10px 2px;" onclick="fill_oda_cc(this)">Aplicar</button>
 								<button class="btn btn-xs btn-danger" style="margin: 10px 0px;" onclick="$('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');">Revertir</button>
@@ -37,7 +35,6 @@
 									En la función buscar_oda() (script de abajo) se obtiene mediante $(".select_cc").val()
 									 lo cual entrega una lista con los identificadores de CC. (EJ : [ '120307','310102', '310103','310104'])
 								-->
-
 								<select multiple class="form-control select_cc" style="height: 250px" onchange="change_mulselected(this)" data-allbeforecheck="0">
 									<option value="all" id="all_option_cc" class="option_multiple_select"> Todos</option>
 									<%for(var e=0; e < cc.length; e++){%>
@@ -61,8 +58,14 @@
 	var cc_fill = [];
 	$(document).ready(function(){
 		$.ajax({
-			type: 'GET',
-			url: '/abastecimiento/table_abastecimientos/abastecimiento.idabast-ASC/true',
+			type: 'POST',
+            data: {
+                clave: $("#buscar_abastecimiento").val(),
+                orden: $(".o_cp_switch_buttons .active").data('view'),
+                showPend: $("#pend").is(':checked'),
+                cc_selected: $(".select_cc").val().join(',')
+            },
+			url: '/abastecimiento/table_abastecimientos',
 			success: function(data){
 				$(".main-page").html(data);
 			}
@@ -86,15 +89,15 @@
 
 	function buscar_oda(onlylist){
         if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista'){
-			$.ajax({
+            $.ajax({
                 type: 'POST',
                 data: {
                     clave: $("#buscar_abastecimiento").val(),
-					orden: $(".o_cp_switch_buttons .active").data('view'),
-					showPend: $("#pend").is(':checked'),
-					cc_selected: $(".select_cc").val().join(',')
-				},
-                url: '/abastecimiento/buscar_abastecimientos_list',
+                    orden: $(".o_cp_switch_buttons .active").data('view'),
+                    showPend: $("#pend").is(':checked'),
+                    cc_selected: $(".select_cc").val().join(',')
+                },
+                url: '/abastecimiento/table_abastecimientos',
                 success: function(data){
                     $(".main-page").html(data);
                 }
@@ -125,17 +128,32 @@
 		$(this).addClass('active');
 		if($(this).data('original-title') == 'Lista'){
             $(".search-option-list").css('display', 'flex');
+            $.ajax({
+                type: 'POST',
+                data: {
+                    clave: $("#buscar_abastecimiento").val(),
+                    orden: $(".o_cp_switch_buttons .active").data('view'),
+                    showPend: $("#pend").is(':checked'),
+                    cc_selected: $(".select_cc").val().join(',')
+                },
+                url: '/abastecimiento/table_abastecimientos',
+                success: function(data){
+                    $(".main-page").html(data);
+                }
+            });
 		}
 		else{
+            $.ajax({
+                type: 'GET',
+                url: '/abastecimiento/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
+                success: function(data){
+                    $(".main-page").html(data);
+                }
+            });
             $(".search-option-list").css('display', 'none');
 		}
-		$.ajax({
-			type: 'GET',
-			url: '/abastecimiento/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
-			success: function(data){
-				$(".main-page").html(data);
-			}
-		});
+
+
 	});
 
 	function fill_oda_cc(yo){
