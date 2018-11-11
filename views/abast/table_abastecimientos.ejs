@@ -41,11 +41,11 @@
 			<tr class="o_data_row">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].idoda%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].detalle%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parsear_nro(data[i].cantidad) %></td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parsear_nro(data[i].recibidos) %></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].cantidad %></td>
+				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].recibidos %></td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].u_medida%></td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parsear_nro(data[i].costo) %></td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parsear_nro(parseInt(data[i].cantidad*data[i].costo)) %></td>
+				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].costo %></td>
+				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=textFormat( data[i].cuenta )%></td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=textFormat( data[i].sigla)%></td>
 				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" onclick="submit_form(this)" style="text-align: center;" data-idoda="<%= data[i].idoda%>">
@@ -68,6 +68,9 @@
 		</tr>
 	</tfoot>
 </table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>
 
 <script type="text/javascript">
 	$(document).ready(function(){

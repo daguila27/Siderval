@@ -119,7 +119,7 @@
                             <td><input type="text" value="<%=data['prov[]'][e]%>" name="prov" style="display:none;"> <%=data['alea[]'][e]%></td>
                             <td><input type="date" name="fechas" class="form-control" min="<%= new Date().toLocaleDateString()%>" required="" value="<%= data['fechas[]'][e]%>"></td>
                             <td style="width: 12%"><input class="form-control" type="number" name="cants" min="1" required="" value="<%= data['cants[]'][e]%>"></td>
-                            <td><%= data['stock[]'][e]%></td>
+                            <td class="parsear_nro"><%= data['stock[]'][e]%></td>
                             <td style="width: 12%"><input type="number" name="precio" class="form-control" min="0" placeholder="Precio" value="<%= data['precio[]'][e]%>"></td>
                             <td style="text-align: center;"><input type="checkbox" name="lock"></td>
                             <td><a onclick="drop(this)" class="btn btn-danger"><i class="fa fa-remove"></i></a></td>
@@ -138,6 +138,9 @@
             </div>
             </form>
         </div>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>
 
 <script type="text/javascript">
     $(document).ready(function(){

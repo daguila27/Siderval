@@ -105,7 +105,7 @@
                         <tr>
                             <!--productoterminado = solicitados - restantes-->
                             <td><%= data[i].mat_token[j].substring(0,1).toUpperCase() + data[i].mat_token[j].substring(1,data[i].mat_token[j].length).toLowerCase() %></td>
-                            <td><%= data[i].cant_token[j]%></td>
+                            <td class="parsear_nro"><%= data[i].cant_token[j]%></td>
                         </tr>
                         <%}
                     }%>
@@ -122,6 +122,10 @@
     </div>
 </div>
 </div>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>
+
 <script type="text/javascript">
     
     $("#fill-gdd").val("<%= tipo%>")
