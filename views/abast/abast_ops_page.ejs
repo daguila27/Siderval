@@ -1,4 +1,4 @@
-<%
+<!-- <%
 function numberFormat(numero){
         var resultado = "";
         if(numero[0]=="-")
@@ -21,7 +21,7 @@ function numberFormat(numero){
             return resultado;
         }
     }
-%>
+%> -->
 <div id="accordion_of" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
         <%
           function letraMayus(string) {
@@ -63,6 +63,7 @@ function numberFormat(numero){
                         <th>Nombre</th>
                         <th>Solicitados</th>
                         <th>Abastecidos</th>
+                        <th>Unidad</th>
                     </tr>
                     </thead>
                     <tbody id="t<%= data[i].idordenproduccion%>">
@@ -84,8 +85,9 @@ function numberFormat(numero){
                         %>
                             <tr class="<%=clase%>">
                                 <td><%= letraMayus(data[i].mats[j])%></td>
-                                <td><%= numberFormat(data[i].cants[j])%> <%=data[i].unid[j]%></td>
-                                <td><%= numberFormat(data[i].abast[j])%> <%=data[i].unid[j]%></td>
+                                <td class="parsear_nro"><%= data[i].cants[j] %></td>
+                                <td class="parsear_nro"><%= data[i].abast[j] %></td>
+                                <td><%=data[i].unid[j]%></td>
                             </tr>
                         <%}
                     }%>
@@ -98,6 +100,9 @@ function numberFormat(numero){
             <%}%>
         <%}%>
     </div>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>
 
 <script type="text/javascript">
     function bom_data(yo){

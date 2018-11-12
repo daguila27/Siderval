@@ -85,7 +85,6 @@ However, delay the fade out process for 2.5 seconds */
     
     <script src="/vendor/jquery/jquery.twbsPagination.js" type="text/javascript"></script>
 
-
     <!-- Modal -->
     <div id="facturaModal" class="modal fade bs-example-modal-lg" role="dialog">
       <div class="modal-dialog modal-lg">
@@ -130,7 +129,8 @@ However, delay the fade out process for 2.5 seconds */
 <script type="text/javascript">
             
 
-                 function setDataTable(str){
+    function setDataTable(str){
+
         return $(str).DataTable({
             responsive: true,
             language: {
@@ -179,7 +179,7 @@ However, delay the fade out process for 2.5 seconds */
         });
 
     }
-    function setDataTable(str){
+    /*function setDataTable(str){
         return $(str).DataTable({
             responsive: true,
             language: {
@@ -207,7 +207,7 @@ However, delay the fade out process for 2.5 seconds */
                     }
                 }
         });
-    }
+    }*/
 
     $("form#factura-form").on('submit', function(e){
         e.preventDefault();

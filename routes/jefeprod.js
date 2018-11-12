@@ -425,7 +425,7 @@ router.get('/list_ops', function(req, res, next){
                             connection.query("select produccion.idordenproduccion,produccion_history.idproduccion,producido.ruta, fabricaciones.idorden_f,material.detalle,produccion.cantidad,group_concat(etapafaena.nombre_etapa)"
                                 +" as etapas,group_concat(produccion_history.enviados) as enviados, group_concat(produccion_history.`from`) as `from` from produccion_history left join etapafaena on etapafaena.value = produccion_history.from"
                                 +" left join produccion on produccion.idproduccion=produccion_history.idproduccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join material on"
-                                +" material.idmaterial=fabricaciones.idmaterial left join producido on producido.idmaterial = material.idmaterial WHERE produccion.el=false group by produccion_history.idproduccion",function(err,progress){
+                                +" material.idmaterial=fabricaciones.idmaterial left join producido on producido.idmaterial = material.idmaterial WHERE produccion.el=false group by produccion_history.idproduccion ORDER BY material.detalle DESC",function(err,progress){
                                 if(err){ 
                                     console.log("Select Error: %s",err);
                                 }

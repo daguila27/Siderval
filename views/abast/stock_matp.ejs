@@ -20,12 +20,6 @@ function unidad_medida(un, cant){
 			break;
 	}
 }
-
-function parsear_nro(x){
-        var parts = x.toString().split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return parts.join(",");
-}
 %>
 
 <style type="text/css">
@@ -75,9 +69,9 @@ function parsear_nro(x){
 	        		<!--<td><%= mat[j].codigo%></td>-->
 	        		<td><%= mat[j].descripcion%></td>
 	        		<!--<td><%= mat[j].sigla%></td>-->
-	        		<td><%= parsear_nro(mat[j].stock) %></td>
-	        		<td><%= parsear_nro(mat[j].stock_i) %></td>
-	        		<td><%= parsear_nro(mat[j].stock_c) %></td>
+	        		<td class="parsear_nro"><%= mat[j].stock %></td>
+	        		<td class="parsear_nro"><%= mat[j].stock_i %></td>
+	        		<td class="parsear_nro"><%= mat[j].stock_c %></td>
 	        		<td><%= mat[j].u_medida %></td>
 	        		<td><%= estado%></td>
 	        	</tr>
@@ -91,6 +85,9 @@ function parsear_nro(x){
 	        </tbody>
 	</table>
 </div>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>
 
 <script type="text/javascript">
 	setDataTable("#tablaStock");

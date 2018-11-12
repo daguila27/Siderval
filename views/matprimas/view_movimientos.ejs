@@ -1,25 +1,49 @@
 <div class="row" style="margin: 0; padding: 0;">
-    <div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%;">
-        <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px;">
+    <div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%">
+        <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
             <li class="active">Movimiento Bodega Materias Primas</li>
         </ol>
         <div style="width: 40%;">
-            <input type="text" id="buscar_pedido" class="form-control pull-right" placeholder="Buscar...">
+            <input type="text" id="buscar_movimiento" class="form-control pull-right" placeholder="Buscar...">
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
-                <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_movimientos/movimiento_detalle.idmovimiento-DESC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_movimientos' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
                 <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_odcs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
                 <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
+
                 <!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
                     <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
+
+                <div class="search-option-list" style="display: flex;">
+                    <div class="dropdown fill_cc">
+                        <button class="btn btn-primary dropdown-toggle dropdown_btn_ccfill" type="button" data-toggle="dropdown">Filtrar por CC<span class="caret"></span></button>
+                        <ul class="dropdown-menu" style=" padding: 4px 10px;">
+                            <spam class="pull-right">
+                                <button class="btn btn-xs btn-default" style="margin: 10px 2px;" onclick="fill_oda_cc(this)">Aplicar</button>
+                                <button class="btn btn-xs btn-danger" style="margin: 10px 0px;" onclick="$('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');">Revertir</button>
+                            </spam>
+                            <div class="form-group" style="">
+                                <!--
+                                    Un SELECT MULTIPLE para filtrar los item de ODA según CC (centro de costo).
+                                    En la función buscar_oda() (script de abajo) se obtiene mediante $(".select_cc").val()
+                                     lo cual entrega una lista con los identificadores de CC. (EJ : [ '120307','310102', '310103','310104'])
+                                -->
+                                <select multiple class="form-control select_cc" onchange="change_mulselected(this)" data-allbeforecheck="0">
+                                    <option value="all" id="all_option_cc" class="option_multiple_select"> Todos</option>
+                                    <option value="0" class="option_multiple_select"> Jefe de Producción</option>
+                                    <%for(var e=0; e < etp.length; e++){%>
+                                        <option value="<%= etp[e].value%>" class="option_multiple_select"> <%= etp[e].nombre_etapa%></option>
+                                    <%}%>
+                                </select>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 <div class="row row-main" style=" margin: 0; padding: 0;">
-
-
     <div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5;">
-
     </div>
 
 
@@ -29,35 +53,41 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $.ajax({
-            type: 'GET',
-            url: '/matprimas/table_movimientos/movimiento_detalle.idmovimiento-DESC',
+            type: 'POST',
+            data:{ orden: 'movimiento_detalle.idmovimiento-DESC', clave: $("#buscar_movimiento").val()},
+            url: '/matprimas/table_movimientos',
             success: function(data){
                 $(".main-page").html(data);
             }
         });
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
-    $("#buscar_pedido").on('keyup', function(e){
+    //PARA QUE EL FILTRO NO SE CIERRE AL SELECCIONAR ALGUNA OPCION
+    $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+    $("#buscar_movimiento").on('keyup', function(e){
         e.preventDefault();
         if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+            //ENVIAR AJAX PARA RENDERIZAR TABLA
+            var orden = $(".columna-activa").data('order').split('-');
+            if(orden[1] == 'ASC'){
+                orden[1] = 'DESC';
+            }
+            else{
+                orden[1] = 'ASC';
+            }
             $.ajax({
                 type: 'POST',
-                data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view')},
-                url: '/plan/buscar_pedido_list',
+                data:{ orden: orden.join('-'), clave: $(this).val()},
+                url: '/matprimas/table_movimientos',
                 success: function(data){
                     $(".main-page").html(data);
                 }
             });
         }
         else{
-            $.ajax({
-                type: 'POST',
-                data: {clave: $(this).val()},
-                url: '/plan/buscar_odcs_item',
-                success: function(data){
-                    $(".main-page").html(data);
-                }
-            });
+            //ENVIAR AJAX PARA RENDERIZAR ITEMS
         }
     });
 
@@ -66,15 +96,34 @@
         e.preventDefault();
         $('.view-option').removeClass('active');
         $(this).addClass('active');
-        $.ajax({
-            type: 'GET',
-            url: '/plan/'+$(this).data('view'),
-            success: function(data){
-                $(".main-page").html(data);
-            }
-        });
+        if($(this).data('view') == 'table_movimientos'){
+            $.ajax({
+                type: 'POST',
+                data: {orden: 'movimiento_detalle.idmovimiento-DESC', clave: $("#buscar_movimiento").val()},
+                url: '/matprimas/table_movimientos',
+                success: function(data){
+                    $(".main-page").html(data);
+                }
+            });
+        }
 
     });
+
+    function fill_oda_cc(yo){
+        $('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');
+    }
+
+    function change_mulselected(yo){
+        var beforeCheck = $(yo).data('allbeforecheck');
+        if($("#all_option_cc").is(':selected') && !beforeCheck){
+            $(yo).data('allbeforecheck', 1);
+            $(".option_multiple_select").prop("selected", true);
+        }
+        else if(!$("#all_option_cc").is(':selected')){
+            $(yo).data('allbeforecheck', 0);
+        }
+    }
+
 
 
 </script>

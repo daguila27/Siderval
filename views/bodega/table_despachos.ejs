@@ -2,17 +2,12 @@
 	function fechaLatino(string){
 		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
 	}
-	function parsear_nro(x){
-        var parts = x.toString().split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return parts.join(",");
-	}
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
 		<thead>
 			<tr>
 				<th class="o_column_sortable order-column o-sort-up" data-order="despacho.iddespacho-ASC">Número de GD</th>
-				<th class="o_column_sortable" data-order="material.detalle-ASC">Descripción</th>
+				<th class="o_column_sortable order-column" data-order="despacho.mat_token-ASC">Descripción</th>
 				<th class="o_column_sortable" data-order="pedido.cantidad-ASC">Despachados</th>
 				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="despacho.fecha-DESC">Fecha de Despacho</th>
 				<th class="o_column_sortable" data-order="cliente.razon-ASC">Tipo</th>
@@ -35,7 +30,7 @@
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"> - </td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">Anulado</td>
 				<%}else{%>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%= parsear_nro(desp[i].cant_token[j]) %></td>
+					<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= desp[i].cant_token[j] %></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<%}%>
 				<td id="est<%=desp[i].iddespacho+"-"+j%>" <%if(j==0){%>data-id=<%=desp[i].cant_token.length%><%}%> class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
@@ -47,9 +42,6 @@
 						</div>
 					<%} %>
 				</td>
-					
-					
-
 				<% %>
 			</tr>
 						
@@ -70,6 +62,9 @@
 		</tr>
 	</tfoot>
 </table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>
 
 <script type="text/javascript">
 
@@ -114,10 +109,12 @@
 			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
 				if("<%= key.split('-')[1]%>" == "ASC"){
 					$(this).addClass('o-sort-up');
-					$(this).data('order', '<%= key.split("-")[0]%>-DESC');
+					$(this).addClass('active-sort');
+                    $(this).data('order', '<%= key.split("-")[0]%>-DESC');
 				}
 				else{
 					$(this).addClass('o-sort-down');
+                    $(this).addClass('active-sort');
 					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
 					
 				}
@@ -127,14 +124,21 @@
 	$(".order-column").on('click', function(e){
 		e.preventDefault();
 		var item = this;
-		var orden = $(this).data('order');
-		$.ajax({
+		/*$.ajax({
 			type: 'GET',
 			url: '/bodega/table_despachos/'+orden,
 			success: function(data){
 				$(".main-page").html(data);
 			}
-		});
+		});*/
+        $.ajax({
+            type: 'POST',
+            data: {clave: $("#buscar_despacho").val(), orden: $(this).data('order'), tipo: $("#select_tipo_despacho").val()},
+            url: '/bodega/table_despachos',
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
 	});
 
 

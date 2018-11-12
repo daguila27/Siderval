@@ -7,11 +7,6 @@
         }
     return ceros+string;
     }
-    function parsear_nro(x){
-        var parts = x.toString().split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return parts.join(",");
-    }
 %>
 <thead>
         <tr>
@@ -30,9 +25,12 @@
                 <td data-toggle="tooltip" data-placement="bottom" title="N° OF"><%= largeID(data[i].idordenfabricacion.toString(), 6)%></td>
                 <td data-toggle="tooltip" data-placement="bottom" title="Producto"><%=data[i].detalle%></td>
                 <td data-toggle="tooltip" data-placement="bottom" title="Aleación" style="text-align: center"><%=data[i].subnom%></td>
-                <td data-toggle="tooltip" data-placement="bottom" title="Necesitados" style="text-align: center"><%= parsear_nro(data[i].restantes) %></td>
+                <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Necesitados" style="text-align: center"><%= data[i].restantes %></td>
                 <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Entrega" style="text-align: center"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
                 <td><a data-aleacion="<%= data[i].subnom%>" data-restantes="<%= data[i].restantes%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" class="btn btn-success" onclick="sendtoQueue(this)"><i class="glyphicon glyphicon-plus"></i></a></td>
             </tr>
     <%}%>
         </tbody>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>

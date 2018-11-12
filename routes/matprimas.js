@@ -36,9 +36,27 @@ router.get("/crear_movimiento",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
+<<<<<<< HEAD
             connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE e_abast = 2 OR e_abast = 1",function (err,materiales) {
+=======
+            connection.query("SELECT idmaterial,codigo,detalle,stock,coalesce(u_medida, 'und') as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
+>>>>>>> bbbfc98aa2a44c1c739d59798ce15bea35b4f708
                 if(err) console.log(err);
                 res.render("matprimas/create_retiro",{mat: materiales});
+            });
+        });
+    } else res.redirect("/bad_login");
+});
+// Enviar la vista para registrar un movimiento (DEVOLUCIÓN)
+router.get("/crear_movimiento_dev",function(req,res,next){
+    if(req.session.userData){
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
+                if(err) console.log(err);
+
+                console.log(materiales.length);
+                res.render("matprimas/create_devolucion",{mat: materiales});
             });
         });
     } else res.redirect("/bad_login");
@@ -108,20 +126,35 @@ router.post("/save_movimiento",function(req,res,next){
 * */
 router.get("/view_movimientos",function(req,res,next){
     if(req.session.userData){
-        res.render('matprimas/view_movimientos');
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err) throw err;
+                res.render('matprimas/view_movimientos', {etp: etp});
+            });
+        });
     } else res.redirect("/bad_login");
 });
 
+<<<<<<< HEAD
 router.get("/table_movimientos/:orden",function(req,res,next){
+=======
+
+router.post("/table_movimientos",function(req,res,next){
+>>>>>>> bbbfc98aa2a44c1c739d59798ce15bea35b4f708
     if(req.session.userData){
-        var orden = req.params.orden.replace('-', ' ');
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var orden = input.orden.replace('-', ' ');
+        var clave = input.clave;
+        var where = " WHERE movimiento_detalle.idmovimiento like '%"+clave+"%' OR material.detalle like '%"+clave+"%'";
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select movimiento.*, movimiento_detalle.*, material.*, "
+            connection.query("select movimiento.*,movimiento.tipo as tipo_mov, movimiento_detalle.*, material.*, "
                 +"coalesce(etapafaena.nombre_etapa, 'Jefe de Producción') as nombre_etapa "
                 +"from movimiento_detalle left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento "
                 +"left join material on material.idmaterial=movimiento_detalle.idmaterial "
-                +"left join etapafaena on etapafaena.value = movimiento.etapa ORDER BY "+orden, function(err, mov){
+                +"left join etapafaena on etapafaena.value = movimiento.etapa"+where+" ORDER BY "+orden, function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
             });

@@ -8,23 +8,15 @@ function toFixed2(num, fixed) {
     return num.toString();
 }
 
-function formatoNumero(num){
-	if(num.split('.').length > 1){
-		return num.split('.')[0].split(',').join('.')+','+num.split('.')[1];
-	}
-	else{
-		return num.split('.')[0].split(',').join('.');
-	}
-}
 for(var e = 0 ; e < ins.length; e++){
 	console.log(ins[e]);
 %>
 	<tr>
 		<td><%= ins[e].detalle%></td>
 		<!--<td><%= ins[e].sinenviar%></td>-->
-		<!--<td><%= formatoNumero(ins[e].cantidad.toLocaleString())%></td>-->
-		<td><%= formatoNumero( (ins[e].cantidad*ins[e].sinenviar).toLocaleString())%></td>
-		<td><%= formatoNumero(ins[e].stock.toString())%></td>
+		<!--<td><%= ins[e].cantidad.toLocaleString()%></td>-->
+		<td class="parsear_nro"><%=  (ins[e].cantidad*ins[e].sinenviar).toLocaleString() %></td>
+		<td class="parsear_nro"><%= ins[e].stock.toString() %></td>
 	    <td><%= ins[e].u_medida%></td>
 	    <td>
 	        <div class="btn-group">
@@ -33,3 +25,6 @@ for(var e = 0 ; e < ins.length; e++){
 	    </td>
 	</tr>
 <%}%>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js""></script>
