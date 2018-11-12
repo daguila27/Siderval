@@ -132,7 +132,7 @@ router.post('/table_despachos', function(req, res, next){
                 if(err)
                     console.log("Error Selecting :%s", err);
 
-                console.log(desp);
+                // console.log(desp);
                 res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
             });         
         });
@@ -755,13 +755,13 @@ router.post('/activar_gdd', function(req,res,next){
             connection.query("SELECT * FROM despacho WHERE iddespacho = ?", [input.id], function(err, desp){
                 if(err){console.log("Error Selecting : %s", err);}
                 desp = desp[0];
-                console.log(desp);
+                // console.log(desp);
                 if(desp.mat_token != ''){
                     desp.mat_token = desp.mat_token.split('@@');
                     desp.id_token = desp.id_token.split('@');
                     desp.idf_token = desp.idf_token.split('@');
                     desp.cant_token = desp.cant_token.split(',');
-                    console.log(desp);                        
+                    // console.log(desp);
                     connection.query("SELECT odc.* FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc WHERE pedido.idpedido = ?", [desp.idf_token[0]],
                         function(err, odc){
                             if(err){console.log("Error Selecting : %s", err);}

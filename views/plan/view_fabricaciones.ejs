@@ -1,10 +1,9 @@
-<div class="row" style="margin: 0; padding: 0;">
+(<)div class="row" style="margin: 0; padding: 0;">
 	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 90%;">
 		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Fabricacion</li>
-		    <div style="display: flex;padding: 2px 4px; margin-left: 10px">
-		      	
-	        </div>
+		    <!-- Mostrar cantidad de datos -->
+			<div id="pedidos" style="margin-top: 8px"></div>
 		</ol>
 		<div style="width: 40%;">
 			<input type="text" id="buscar_fabricaciones" name="" class="form-control pull-right" placeholder="Buscar...">
@@ -51,6 +50,8 @@
 			url: '/plan/table_fabricaciones/fabricaciones.f_entrega-ASC/true',
 			success: function(data){
 				$(".main-page").html(data);
+				//Muestra la cantidad de pedidos
+				$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
 			}
 		});
 		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
@@ -64,15 +65,20 @@
 				url: '/plan/buscar_fabricaciones_list',
 				success: function(data){
 					$(".main-page").html(data);
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
 				}
 			});
 		}
 		else{
 			$.ajax({
-				type: 'GET',
-				url: '/plan/buscar_fabricaciones_item/'+$(this).val(),
+				type: 'POST',
+				data: {clave: $(this).val(),  showPend: $("#pend").is(':checked')},
+				url: '/plan/buscar_fabricaciones_item',
 				success: function(data){
 					$(".main-page").html(data);
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
 				}
 			});		
 		}
@@ -94,6 +100,10 @@
 			url: '/plan/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
 			success: function(data){
 				$(".main-page").html(data);
+				if($(this).data('view') == 'table_fabricaciones/fabricaciones.f_entrega-ASC' || $(this).data('view')=='item_ofs') {
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
+				}
 			}
 		});
 
