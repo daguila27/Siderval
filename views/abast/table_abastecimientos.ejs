@@ -14,12 +14,9 @@
 		}
 		return string.join(' ');
 	}
-	function parsear_nro(x){
-        var parts = x.toString().split(".");
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return parts.join(",");
-	}
 %>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"><%= data.length %></div>
 
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
 	<thead>

@@ -1,8 +1,10 @@
 <%
+	var count = 0;
 	function fechaLatino(string){
 		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
 	}
 %>
+
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
 		<thead>
 			<tr>
@@ -15,7 +17,8 @@
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
-		<%for(var i=0; i < desp.length; i++){
+		<%
+		for(var i=0; i < desp.length; i++){
 			desp[i].cant_token = desp[i].cant_token.split(',');
 			desp[i].mat_token = desp[i].mat_token.split('@@');
 			for(var j=0; j < desp[i].cant_token.length; j++){%>
@@ -46,8 +49,9 @@
 			</tr>
 						
 			<%
-		}
-	}%>
+			}
+			count = count + desp[i].cant_token.length;
+		}%>
 	</tbody>
 	<tfoot>
 		<tr>
@@ -58,10 +62,12 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td></td>
 		</tr>
 	</tfoot>
 </table>
+
+<!-- Oculta cantidad de datos, va al final para contar la cantidad de materiales -->
+<div id="registros" style="display: none"><%= desp.length %> <%= count %></div>
 
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js""></script>

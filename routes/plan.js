@@ -160,6 +160,32 @@ router.post('/buscar_fabricaciones_list', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
+//ERROR EN ESTE CONTROLADOR, ESTA INCOMPLETO, FILTRO NO FUNCIONA
+router.post('/buscar_fabricaciones_item', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var showPend = input.showPend;
+        var where = '';
+        console.log(clave);
+        if(showPend == 'true'){
+            where = " fabricaciones.restantes>0 and "; 
+        }
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM ordenfabricacion "
+                + "LEFT JOIN odc ON odc.idodc=ordenfabricacion.idodc "
+                + "LEFT JOIN fabricaciones ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion "
+                + "WHERE" + where +" (ordenfabricacion.idordenfabricacion like '%"+clave+"%' or fabricaciones.cantidad like '%"+clave+"%' OR odc.numoc like '%"+clave+"%')",
+                function(err, ofs){
+                    if(err) throw err;
+                    res.render('plan/item_ofs', {data: ofs});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
 router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
