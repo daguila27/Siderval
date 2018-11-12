@@ -36,7 +36,7 @@ router.get("/crear_movimiento",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%') AND notbom = true",function (err,materiales) {
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE e_abast = 2 OR e_abast = 1",function (err,materiales) {
                 if(err) console.log(err);
                 res.render("matprimas/create_retiro",{mat: materiales});
             });
@@ -103,7 +103,6 @@ router.post("/save_movimiento",function(req,res,next){
         });
     } else res.redirect("/bad_login");
 });
-
 /*
 * CONTROLADOR QUE RENDERIZA LA VISTA PRINCIPAL DE Materias Primas --> Movimientos --> Ver Movimientos
 * */
@@ -112,7 +111,6 @@ router.get("/view_movimientos",function(req,res,next){
         res.render('matprimas/view_movimientos');
     } else res.redirect("/bad_login");
 });
-
 
 router.get("/table_movimientos/:orden",function(req,res,next){
     if(req.session.userData){
