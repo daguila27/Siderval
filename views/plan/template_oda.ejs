@@ -12,19 +12,8 @@
 		<title>Orden de Compra #<%=oda[0].numoda%></title>
 		<link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-	    <!-- MetisMenu CSS -->
-	    <link href="/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
-
-	    <!-- Custom CSS -->
-	    <link href="/dist/css/sb-admin-2.css" rel="stylesheet">
-
 	    <!-- Morris Charts CSS -->
 	    <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
-	    
-
-
-	    <!-- Advance Table CSS -->
-	    <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">
 
 	    <!-- Custom Fonts -->
 	    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -40,7 +29,7 @@
 
 		body{ 
 			background-color: white;
-			margin: 5% 0.5%;
+			margin: 5% 15%;
 			padding: 0;
 		}
 		.headerss{
@@ -115,8 +104,8 @@
 				<p style='text-align: center; width: 40%; font-size: 11px;margin:0;float:left;'>
 					Fundición y Maestranza<br> Calle Décima - Parcela N° 474 <br> Placilla - Valparaíso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
 				</p>
-				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 30%;float:left; text-align: center; font-size: 13px'>
-					Orden de Compra <br> N° <%=oda[0].numoda%>
+				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 30%;float:left; text-align: center; font-size: 20px'>
+					Orden de Compra <br> <b>N° <%=oda[0].numoda%> </b>
 				</p>
 		</div>
 	<body>
@@ -147,12 +136,6 @@
 					width: 70px;
 				}
 			</style>
-			<script type="text/javascript">
-				$(".columna").each(function(){
-
-					console.log($(this).css('width'));
-				});
-			</script>
 			<table style='width: 100%;' class='tabla' cellspacing="3">
                 <thead>
                 <tr class='cab_table'>
@@ -331,35 +314,6 @@
             </div>
 		</div>
 
-
-
-    <!-- jQuery -->
-    <script src="/vendor/jquery/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
-
-    <!-- Metis Menu Plugin JavaScript -->
-    <script src="/vendor/metisMenu/metisMenu.min.js"></script>
-
-    <!-- DataTables JavaScript -->
-    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
-
-    <!-- Morris Charts JavaScript -->
-    <script src="/vendor/raphael/raphael.min.js"></script>
-    <script src="/vendor/morrisjs/morris.min.js"></script>
-    <script src="/data/morris-data.js"></script>
-    <!-- DataTables JavaScript -->
-    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
-
-    <!-- Custom Theme JavaScript -->
-    <script src="/dist/js/sb-admin-2.js"></script>
-    
-    <script src="/vendor/jquery/jquery.twbsPagination.js" type="text/javascript"></script>
 
 	</body>
 

@@ -58,10 +58,7 @@
 	var cc_fill = [];
 	$(document).ready(function(){
 		$.ajax({
-<<<<<<< HEAD
-			type: 'GET',
-			url: '/abastecimiento/table_abastecimientos/abastecimiento.idabast-DESC/true',
-=======
+
 			type: 'POST',
             data: {
                 clave: $("#buscar_abastecimiento").val(),
@@ -70,7 +67,6 @@
                 cc_selected: $(".select_cc").val().join(',')
             },
 			url: '/abastecimiento/table_abastecimientos',
->>>>>>> bbbfc98aa2a44c1c739d59798ce15bea35b4f708
 			success: function(data){
 				$(".main-page").html(data);
 			}

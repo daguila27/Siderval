@@ -335,11 +335,7 @@ router.get('/abast_myself', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Selecting : %s", err);
-			connection.query(/*"select ordenfabricacion.idordenfabricacion,fabricaciones.cantidad-fabricaciones.restantes"
-				+" as sinenviar,bom.cantidad,material.detalle,material.u_medida,material.tipo,material.stock from fabricaciones"
-				+" left join bom on bom.idmaterial_master=fabricaciones.idmaterial left join material on "
-				+"material.idmaterial=bom.idmaterial_slave left join ordenfabricacion on ordenfabricacion.idordenfabricacion"
-				+" = fabricaciones.idorden_f where fabricaciones.cantidad-fabricaciones.restantes>0"*/
+			connection.query(
 				"select ordenfabricacion.*, sum(fabricaciones.cantidad) as cantidad, sum(fabricaciones.restantes) "
 				+"as restantes,(sum(fabricaciones.restantes)/sum(fabricaciones.cantidad))*100 as porcentaje from fabricaciones"
 				+" left join material on material.idmaterial=fabricaciones.idmaterial left join bom on bom.idmaterial_master=material.idmaterial"
@@ -357,12 +353,10 @@ router.get('/abast_myself', function(req, res, next) {
 								console.log("Error Selecting : %s", err);
 							if(id.length){
 								id[0].numoda = id[0].numoda+1;
-								console.log(ins);
 								res.render('abast/lanzar_oc', {last: id[0].numoda, ofs: ins, subc: subc});
 							}
 							else{
-								console.log(ins);
-								res.render('abast/lanzar_oc', {last: 1, ofs: ins, subc: subc});					
+								res.render('abast/lanzar_oc', {last: 1, ofs: ins, subc: subc});
 							}
 						});
 					});
