@@ -3382,11 +3382,149 @@ router.get('/parsecsv_insumos', function(req, res, next){
 });
 
 
+router.get('/parsecsv_facturas', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+        var parser = parse(
+            function(err,rows){
+                if(err) throw err;
+                rows.shift();
+                var numfac = [];
+                var facturas = [];
+                var facs = [];
+                /*
+                * CSV:
+                * N° OC[0],	CODIGO[1],	PRODUCTO [2],	CANT [3],	UNIT NETO[4],
+                * TOTAL NETO[5],	ENTREGA[6],	EXENTO[7],	C° COSTO[8],
+                * OF[9],	PROVEEDOR[10], RUT[1|], TOTAL C/IVA[12],	FECHA[13],
+                * FACTURA[14],	OBSERVACIONES[15],	ESTADO [16]
+                *
+                * BD:
+                * Factura:
+                *   idfactura, fecha, numfac, idoda, coment
+                * Facturación:
+                *   idfact, idfactura, idabast, costo, moneda
+                *
+                * LOS PEDIDOS ESTAN EN EL MISMO ORDEN TANTO EN EL CSV COMO EN LA BD
+                *
+                * LOS IDENTIFICADORES DE LAS FACTURAS EN EL CSV SON EL RUT DEL CLIENTE Y NÚMERO DE FACTURAS
+                * */
+                for(var w=0; w < rows.length; w++){
+                    if(numfac.indexOf(rows[w][14]) == -1){
+                        //LA FACTURA AUN NO SE INGRESA A facturas[]
+                        facturas.push([rows[w][13],rows[w][14],rows[w][0],rows[w][15]]);
+                        //A facs LUEGO SE DEBE VINCULAR CON LA FACTURA RECIEN INGRESADA (idfactura)
+                        facs.push([rows[w][14], w, parseFloat(rows[w][12])]);
+                        numfac.push(rows[w][14]);
+                    }
+                    else{
+                        //LA FACTURA YA SE INGRESÓ A facturas[]
+                        facs.push([rows[w][14], w, rows[w][12]]);
+                    }
+                }
+                req.getConnection(function(err,connection){
+                    if(err) throw err;
+                    connection.query("SELECT min(idabast) as pr_abast FROM abastecimiento", function(err, idabast){
+                        if(err) throw err;
+                        idabast = idabast[0].pr_abast;
+                        for(var e=0; e < facs.length; e++){
+                            facs[e][1] = idabast + e;
+                        }
+                        console.log(facturas);
+                        console.log(facs);
+                        connection.query("INSERT IGNORE INTO factura (fecha, numfac, idoda, coment) VALUES ?",[facturas], function(err, inFacts){
+                            if(err) throw err;
+                            connection.query("SELECT idfactura,numfac FROM factura", function(err, Facts){
+                                if(err) throw err;
+                                for(var f=0; f < facs.length; f++){
+                                    for(var b=0; b < Facts.length; b++){
+                                        if(Facts[b].numfac == facs[f][0] ){
+                                            facs[f][0] = Facts[b].idfactura;
+                                            break;
+                                        }
+                                    }
+                                }
+                                connection.query("INSERT IGNORE INTO facturacion (idfactura, idabast, costo) VALUES ?", [facs], function(err, inFacturacion){
+                                    if(err) throw err;
+
+                                    res.redirect('/plan');
+
+                                });
+                            });
+                        });
+
+
+                    });
+
+
+                });
+            });
+        var input = fs.createReadStream('csvs/OCA2.csv');
+        input.pipe(parser);
+
+
+    } else res.redirect("/bad_login");
+});
 
 
 
+router.get('/parsecsv_fixcostos/:mon', function(req, res, next){
+    if(req.session.isUserLogged){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+        var parser = parse(
+            function(err,rows){
+                if(err) throw err;
+                rows.shift();
+                /*
+                * CSV:
+                * N° OC[0],	CODIGO[1],	PRODUCTO [2],	CANT [3],	UNIT NETO[4],
+                * TOTAL NETO[5],	ENTREGA[6],	EXENTO[7],	C° COSTO[8],
+                * OF[9],	PROVEEDOR[10], RUT[11], TOTAL C/IVA[12],	FECHA[13],
+                * FACTURA[14],	OBSERVACIONES[15],	ESTADO [16]
+                *
+                *
+                * UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+                * */
+                var query = "UPDATE abastecimiento SET costo = CASE"
+                var id = '';
+                req.getConnection(function(err,connection){
+                    if(err) throw err;
+                    connection.query("SELECT min(idabast) as idmin FROM abastecimiento", function(err, idabast){
+                        if(err) throw err;
+                        idabast = idabast[0].idmin;
+                        for(var w=0; w < rows.length; w++){
+                            if(rows[w][4] == ''){
+                                rows[w][4] = 'costo';
+                            }
+                            query += " WHEN idabast = "+(idabast+w)+" THEN "+rows[w][4].replace('.','');
+                            id += (idabast+w)+",";
+                        }
+                        id = id.substring(0, id.length-1);
+                        query = query + " ELSE costo END WHERE idabast in ("+id+")";
+                        connection.query(query, function(err, inC){
+                            if(err) throw err;
+
+                            res.redirect('/plan');
+                        });
+                    });
 
 
+                });
+            });
+        var input = fs.createReadStream('csvs/OCA2.csv');
+        input.pipe(parser);
+
+
+    } else res.redirect("/bad_login");
+});
 
 
 router.get('/parsecsv_of_op', function(req, res, next){

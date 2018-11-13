@@ -35,7 +35,7 @@
 			success: function(data){
 				$(".main-page").html(data);
 				//Muestra la cantidad de pedidos
-				$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
+				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 			}
 		});
 		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
@@ -50,7 +50,7 @@
 				success: function(data){
 					$(".main-page").html(data);
 					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 				}
 			});
 		}
@@ -62,7 +62,7 @@
 				success: function(data){
 					$(".main-page").html(data);
 					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 				}
 			});		
 		}
@@ -80,7 +80,7 @@
 				$(".main-page").html(data);
 				if($(this).data('view') == 'table_pedidos/pedido.f_entrega-ASC' || $(this).data('view')=='item_odcs') {
 					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5>Mostrando " + $("#registros").text() + " pedido(s)</h5>");
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 				}
 			}
 		});

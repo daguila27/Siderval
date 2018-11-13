@@ -39,7 +39,11 @@ function numberFormat(numero){
                     <td><%= data[j].detalle%></td>
                     <td><%= numberFormat(data[j].odacosto.toString())%></td>
                     <td><%= numberFormat(data[j].costo.toString())%></td>
-                    <td><%= data[j].moneda.toUpperCase()%></td>
+                    <%if(data[j].moneda == null ){%>
+                        <td>CLP</td>
+                    <%}else{%>
+                        <td><%= data[j].moneda.toUpperCase()%></td>
+                    <%}%>
                 </tr>
             <%}%>
         <%}%>
