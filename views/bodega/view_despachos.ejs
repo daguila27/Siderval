@@ -47,7 +47,7 @@
             success: function(data){
                 $(".main-page").html(data);
                 //Muestra la cantidad de pedidos
-				$("#pedidos").html("<h5>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</h5>");
+				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
             }
         });
 	}
@@ -59,7 +59,7 @@
             success: function(data){
                 $(".main-page").html(data);
                 //Muestra la cantidad de pedidos
-				$("#pedidos").html("<h5>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</h5>");
+				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
             }
         });
 	    /*$.ajax({
@@ -81,7 +81,7 @@
 				success: function(data){
 					$(".main-page").html(data);
 					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</h5>");
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
 				}
 			});
 		}
@@ -105,7 +105,7 @@
 				success: function(data){
 					$(".main-page").html(data);
 					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</h5>");
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
 				}
 			});
 		}
@@ -133,7 +133,7 @@
                 success: function(data){
                     $(".main-page").html(data);
                     //Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</h5>");
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
                 }
             });
 		}
@@ -145,7 +145,7 @@
                     $(".main-page").html(data);
                     if($(this).data('view') == 'table_despachos' || $(this).data('view')=='show_despachos') {
 						//Muestra la cantidad de pedidos
-						$("#pedidos").html("<h5>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</h5>");
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
 					}
                 }
             });
