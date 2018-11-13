@@ -4,12 +4,7 @@
     <list default="true" id="8c1f3a88-f7bb-4107-a0d9-506355a16ca3" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/plan.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/plan.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/abast/factura_info.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/abast/factura_info.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/bodega/view_despachos.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/bodega/view_despachos.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/table_fabricaciones.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/plan/template_oda.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/template_oda.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/plan/view_fabricaciones.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/view_fabricaciones.ejs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/plan/view_pedidos.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/plan/view_pedidos.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/abast/table_factura.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/abast/table_factura.ejs" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -75,30 +70,30 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="csv" value="2" />
-          <entry key="ejs" value="2507" />
-          <entry key="js" value="3643" />
+          <entry key="csv" value="5" />
+          <entry key="ejs" value="2514" />
+          <entry key="js" value="4283" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="EJS" value="2507" />
-          <entry key="JavaScript" value="3643" />
-          <entry key="PLAIN_TEXT" value="2" />
+          <entry key="EJS" value="2514" />
+          <entry key="JavaScript" value="4283" />
+          <entry key="PLAIN_TEXT" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="csv" value="7" />
-          <entry key="ejs" value="36" />
-          <entry key="js" value="10" />
+          <entry key="ejs" value="39" />
+          <entry key="js" value="11" />
           <entry key="rnc" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="EJS" value="36" />
-          <entry key="JavaScript" value="10" />
+          <entry key="EJS" value="39" />
+          <entry key="JavaScript" value="11" />
           <entry key="PLAIN_TEXT" value="7" />
           <entry key="RNG Compact" value="1" />
         </counts>
@@ -110,15 +105,35 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/plan.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="3476" selection-start-line="3476" selection-end-line="3476" />
+            <state relative-caret-position="17">
+              <caret line="3509" column="56" selection-start-line="3509" selection-start-column="56" selection-end-line="3509" selection-end-column="56" />
               <folding>
                 <element signature="n#style#0;n#td#3;n#tr#0;n#!!top" expanded="true" />
+                <element signature="e#143019#146203#0" />
+                <element signature="e#146263#148292#0" />
+                <element signature="e#148360#152416#0" />
+                <element signature="e#152482#154659#0" />
+                <element signature="e#154717#156732#0" />
+                <element signature="e#156736#157811#0" />
+                <element signature="e#157872#159020#0" />
+                <element signature="e#159085#164603#0" />
+                <element signature="e#164660#170107#0" />
+                <element signature="e#170167#171240#0" />
                 <element signature="e#171302#174889#0" />
+                <element signature="e#173175#175205#0" />
                 <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#td#4;n#!!top" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/csvs/OCA2.csv">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1" column="49" lean-forward="true" selection-start-line="1" selection-start-column="44" selection-end-line="1" selection-end-column="49" />
             </state>
           </provider>
         </entry>
@@ -138,19 +153,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/csvs/OCA2.csv">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="29" column="32" selection-start-line="29" selection-start-column="32" selection-end-line="29" selection-end-column="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/abast.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="1795" column="36" selection-start-line="1795" selection-start-column="36" selection-end-line="1795" selection-end-column="36" />
+            <state relative-caret-position="78">
+              <caret line="951" column="23" selection-start-line="951" selection-start-column="14" selection-end-line="951" selection-end-column="23" />
               <folding>
                 <element signature="e#559#1022#0" />
                 <element signature="e#1071#2202#0" />
@@ -223,6 +229,18 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/abast/table_factura.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="242">
+              <caret line="127" column="58" lean-forward="true" selection-start-line="127" selection-start-column="58" selection-end-line="127" selection-end-column="58" />
+              <folding>
+                <element signature="n#style#0;n#div#3;n#!!top" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
     </leaf>
   </component>
   <component name="FindInProjectRecents">
@@ -242,6 +260,8 @@
       <find>view</find>
       <find>parsecsv_insumos</find>
       <find>show_pdf_</find>
+      <find>get_table</find>
+      <find>invisi</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -276,8 +296,10 @@
         <option value="$PROJECT_DIR$/views/plan/view_pedidos.ejs" />
         <option value="$PROJECT_DIR$/views/plan/view_fabricaciones.ejs" />
         <option value="$PROJECT_DIR$/views/bodega/view_despachos.ejs" />
-        <option value="$PROJECT_DIR$/csvs/OCA2.csv" />
         <option value="$PROJECT_DIR$/views/abast/factura_info.ejs" />
+        <option value="$PROJECT_DIR$/views/abast/page_oda.ejs" />
+        <option value="$PROJECT_DIR$/csvs/OCA2.csv" />
+        <option value="$PROJECT_DIR$/views/abast/table_factura.ejs" />
         <option value="$PROJECT_DIR$/routes/plan.js" />
       </list>
     </option>
@@ -404,12 +426,12 @@
       <workItem from="1541982498432" duration="9000" />
       <workItem from="1542030655369" duration="6344000" />
       <workItem from="1542069750514" duration="5664000" />
-      <workItem from="1542110196028" duration="6844000" />
+      <workItem from="1542110196028" duration="11683000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="114736000" />
+    <option name="totallyTimeSpent" value="119575000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -421,8 +443,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1592262" />
       <window_info id="Structure" order="1" weight="0.24960339" />
@@ -436,7 +457,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.49344262" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.71311474" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Docker" order="10" show_stripe_button="false" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -470,9 +491,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/views/plan/indx_new.ejs">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/views/plan/odc_client_page.ejs">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -613,13 +631,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/faena.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -698,8 +709,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/abast.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1795" column="36" selection-start-line="1795" selection-start-column="36" selection-end-line="1795" selection-end-column="36" />
+        <state relative-caret-position="78">
+          <caret line="951" column="23" selection-start-line="951" selection-start-column="14" selection-end-line="951" selection-end-column="23" />
           <folding>
             <element signature="e#559#1022#0" />
             <element signature="e#1071#2202#0" />
@@ -771,15 +782,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/csvs/OCA2.csv">
+    <entry file="file://$PROJECT_DIR$/views/abast/page_oda.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="29" column="32" selection-start-line="29" selection-start-column="32" selection-end-line="29" selection-end-column="32" />
+        <state relative-caret-position="244">
+          <caret line="409" selection-start-line="409" selection-end-line="409" />
+          <folding>
+            <element signature="n#style#0;n#td#1;n#tr#5;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#1;n#tr#6;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#td#1;n#tr#2;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/abast/factura_view.ejs">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/views/abast/footer_new.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="89" column="13" selection-start-line="89" selection-start-column="13" selection-end-line="89" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="142" column="36" lean-forward="true" selection-start-line="142" selection-start-column="36" selection-end-line="142" selection-end-column="36" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/abast/factura_info.ejs">
       <provider selected="true" editor-type-id="text-editor">
@@ -788,13 +815,44 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/views/abast/factura_view.ejs">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/csvs/OCA2.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="49" lean-forward="true" selection-start-line="1" selection-start-column="44" selection-end-line="1" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/abast/table_factura.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="127" column="58" lean-forward="true" selection-start-line="127" selection-start-column="58" selection-end-line="127" selection-end-column="58" />
+          <folding>
+            <element signature="n#style#0;n#div#3;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/routes/plan.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="3476" selection-start-line="3476" selection-end-line="3476" />
+        <state relative-caret-position="17">
+          <caret line="3509" column="56" selection-start-line="3509" selection-start-column="56" selection-end-line="3509" selection-end-column="56" />
           <folding>
             <element signature="n#style#0;n#td#3;n#tr#0;n#!!top" expanded="true" />
+            <element signature="e#143019#146203#0" />
+            <element signature="e#146263#148292#0" />
+            <element signature="e#148360#152416#0" />
+            <element signature="e#152482#154659#0" />
+            <element signature="e#154717#156732#0" />
+            <element signature="e#156736#157811#0" />
+            <element signature="e#157872#159020#0" />
+            <element signature="e#159085#164603#0" />
+            <element signature="e#164660#170107#0" />
+            <element signature="e#170167#171240#0" />
             <element signature="e#171302#174889#0" />
+            <element signature="e#173175#175205#0" />
             <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#input#0;n#td#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#4;n#!!top" expanded="true" />

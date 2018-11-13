@@ -3477,15 +3477,44 @@ router.get('/parsecsv_fixcostos/:mon', function(req, res, next){
             function(err,rows){
                 if(err) throw err;
                 rows.shift();
-                var numfac = [];
-                var facturas = [];
-                var facs = [];
-                for(var w=0; w < rows.length; w++){
-
-                }
+                /*
+                * CSV:
+                * N° OC[0],	CODIGO[1],	PRODUCTO [2],	CANT [3],	UNIT NETO[4],
+                * TOTAL NETO[5],	ENTREGA[6],	EXENTO[7],	C° COSTO[8],
+                * OF[9],	PROVEEDOR[10], RUT[11], TOTAL C/IVA[12],	FECHA[13],
+                * FACTURA[14],	OBSERVACIONES[15],	ESTADO [16]
+                *
+                *
+                * UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+                * */
+                var query = "UPDATE abastecimiento SET costo = CASE"
+                var id = '';
                 req.getConnection(function(err,connection){
                     if(err) throw err;
+                    connection.query("SELECT min(idabast) as idmin FROM abastecimiento", function(err, idabast){
+                        if(err) throw err;
+                        idabast = idabast[0].idmin;
+                        for(var w=0; w < rows.length; w++){
+                            if(rows[w][4] == ''){
+                                rows[w][4] = 'costo';
+                            }
+                            query += " WHEN idabast = "+(idabast+w)+" THEN "+rows[w][4].replace('.','');
+                            id += (idabast+w)+",";
+                        }
+                        id = id.substring(0, id.length-1);
+                        query = query + " ELSE costo END WHERE idabast in ("+id+")";
+                        connection.query(query, function(err, inC){
+                            if(err) throw err;
 
+                            res.redirect('/plan');
+                        });
+                    });
 
 
                 });
@@ -3496,12 +3525,6 @@ router.get('/parsecsv_fixcostos/:mon', function(req, res, next){
 
     } else res.redirect("/bad_login");
 });
-
-
-
-
-
-
 
 
 router.get('/parsecsv_of_op', function(req, res, next){
