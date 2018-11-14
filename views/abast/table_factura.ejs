@@ -90,7 +90,7 @@ function trunc (x, posiciones = 0) {
           <tr>
             <td style="width: 30%"><%= oda[e].detalle%></td>
             <input type="hidden" name="idabast" value="<%= oda[e].idabast%>">
-            <td align="center"><%= oda[e].cantidad%></td>
+            <td align="center"><%= oda[e].cantidad - oda[e].facturados%></td>
             <td align="center" style="width: 15%"><%= parsear_nro(oda[e].odacosto)%></td>
 
             <td><input class="form-control" type="number" name="costo_unid"></td>
