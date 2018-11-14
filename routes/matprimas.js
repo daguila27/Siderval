@@ -146,7 +146,8 @@ router.post("/table_movimientos",function(req,res,next){
             if(err) throw err;
             connection.query("select movimiento.*,movimiento.tipo as tipo_mov, movimiento_detalle.*, material.*, "
                 +"coalesce(etapafaena.nombre_etapa, 'Jefe de Producción') as nombre_etapa "
-                +"from movimiento_detalle left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento "
+                +"from movimiento_detalle"
+                +"left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento "
                 +"left join material on material.idmaterial=movimiento_detalle.idmaterial "
                 +"left join etapafaena on etapafaena.value = movimiento.etapa"+where+" ORDER BY "+orden, function(err, mov){
                 if(err) throw err;
