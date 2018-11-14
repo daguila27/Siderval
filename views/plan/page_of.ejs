@@ -145,7 +145,7 @@
                                         </div>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                                        <table id="tablaOF" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                                 <tr>
                                                     <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
@@ -425,3 +425,10 @@
     </div>
 </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+        setDataTable("#tablaOF");
+    });
+
+</script>

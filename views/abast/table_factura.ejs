@@ -68,11 +68,11 @@ function trunc (x, posiciones = 0) {
   <table class="table table-bordered table-hover table-striped" >
         <thead>
           <tr>
-            <th>OK</th>
             <th>Descripción</th>
-            <th style="text-align: center;">Cantidad</th>
+            <th style="text-align: center;">Cantidad sin Facturar</th>
             <th style="text-align: center;">Precio OCA</th>
-            <th style="text-align: left;">Precio Factura</th>
+            <th style="text-align: left;">Precio Unidad</th>
+              <th style="text-align: left;">Unidades Facturadas</th>
             <th>Moneda</th>
           </tr>
         </thead>
@@ -88,12 +88,13 @@ function trunc (x, posiciones = 0) {
             if(oda[e].cantidad > oda[e].facturados){
             %>
           <tr>
-            <td style="text-align: center;"><input type="checkbox" name="complete"></td>
             <td style="width: 30%"><%= oda[e].detalle%></td>
             <input type="hidden" name="idabast" value="<%= oda[e].idabast%>">
-            <td align="center"><%= oda[e].cantidad%></td>
+            <td align="center"><%= oda[e].cantidad - oda[e].facturados%></td>
             <td align="center" style="width: 15%"><%= parsear_nro(oda[e].odacosto)%></td>
-            <td><input class="form-control" type="number" name="costo-real"></td>
+
+            <td><input class="form-control" type="number" name="costo_unid"></td>
+              <td><input class="form-control" type="number" name="cantidad"></td>
             <td>
               <select class="form-control" name="moneda-factura">
               <%for(var w=0; w < select_money.length; w++){

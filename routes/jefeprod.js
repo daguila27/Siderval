@@ -272,6 +272,46 @@ router.get('/itemprod/:val', function(req, res, next) {
     else{res.redirect('bad_login');}
 });
 
+router.get('/itemprod_progreso/:val', function(req, res, next) {
+    if(verificar(req.session.userData)){
+        var valor = req.params.val;
+        req.getConnection(function(err,connection){
+            if(err)console.log(err);
+            if(valor == 'checked'){
+                connection.query("select produccion.idordenproduccion,produccion_history.idproduccion,producido.ruta, fabricaciones.idmaterial,fabricaciones.idorden_f,material.detalle,sum(produccion.cantidad) as cantidad,group_concat(etapafaena.nombre_etapa)" +
+                        " as etapas,group_concat(produccion_history.enviados) as enviados, group_concat(produccion_history.`from`) as `from` from produccion_history left join etapafaena on etapafaena.value = produccion_history.from" +
+                        " left join produccion on produccion.idproduccion=produccion_history.idproduccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join material on" +
+                        " material.idmaterial=fabricaciones.idmaterial left join producido on producido.idmaterial = material.idmaterial WHERE produccion.el=false group by fabricaciones.idmaterial ORDER BY material.detalle DESC"
+                    ,function(err,prods){
+
+                        if(err) console.log("Select Error: %s",err);
+
+                        console.log("ITEMIZADOS");
+                        //console.log(prods);
+                        res.render('jefeprod/prodsstrim4',{prog: prods, check: true},function (err,html){if(err)throw err; res.send(html);});
+
+                    });
+            }
+            else{
+                connection.query("select produccion.idordenproduccion,produccion_history.idproduccion,producido.ruta, fabricaciones.idorden_f,material.detalle,produccion.cantidad,group_concat(etapafaena.nombre_etapa)"
+                        +" as etapas,group_concat(produccion_history.enviados) as enviados, group_concat(produccion_history.`from`) as `from` from produccion_history left join etapafaena on etapafaena.value = produccion_history.from"
+                        +" left join produccion on produccion.idproduccion=produccion_history.idproduccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join material on"
+                        +" material.idmaterial=fabricaciones.idmaterial left join producido on producido.idmaterial = material.idmaterial WHERE produccion.el=false group by produccion_history.idproduccion ORDER BY material.detalle DESC"
+                    ,function(err,prods){
+
+                        if(err) console.log("Select Error: %s",err);
+                        console.log("TODOS");
+                        //console.log(prods);
+                        res.render('jefeprod/prodsstrim4',{prog: prods, check: false},function (err,html){if(err)throw err; res.send(html);});
+
+                    });
+            }
+
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
 router.get('/crear_op', function(req, res, next){
 	if(verificar(req.session.userData)){
 		req.session.arrayProduccion = [];

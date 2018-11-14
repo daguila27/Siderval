@@ -29,6 +29,7 @@
             </div>
           </div>
           <input type="hidden" id="prod_id" value="">
+          <input type="hidden" id="cantprod" value="">
           <input type="hidden" id="e_act">
           <input type="hidden" id="sgt_etapa" value="">
           <p class="p-sigetp"></p>
@@ -97,6 +98,8 @@
         var data = {};
         console.log($("#sendnum").val());
         data.idprod = $("#prod_id").val();
+        data.cantprod = $("#cantprod").val();
+
         data.newetapa = $("#sgt_etapa").val();
         data.sendnum = $("#sendnum").val();
         data.etapa_act = $("#e_act").val();

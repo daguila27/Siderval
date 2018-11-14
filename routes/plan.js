@@ -3469,7 +3469,7 @@ router.get('/parsecsv_facturas', function(req, res, next){
 
 
 
-router.get('/parsecsv_fixcostos/:mon', function(req, res, next){
+router.get('/parsecsv_fixcostos', function(req, res, next){
     if(req.session.isUserLogged){
         var fs = require('fs')
         var parse = require('csv-parse');
