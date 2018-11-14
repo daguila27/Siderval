@@ -84,7 +84,9 @@ function trunc (x, posiciones = 0) {
             {valor: 'Euro (EUR)',sgl: 'eur'},
             {valor: 'Libra (GLP)',sgl: 'gbp'}
           ];
-          for(var e=0; e < oda.length; e++){%>
+          for(var e=0; e < oda.length; e++){
+            if(oda[e].cantidad > oda[e].facturados){
+            %>
           <tr>
             <td style="text-align: center;"><input type="checkbox" name="complete"></td>
             <td style="width: 30%"><%= oda[e].detalle%></td>
@@ -103,7 +105,8 @@ function trunc (x, posiciones = 0) {
               </select>
             </td>
           </tr>
-          <%}%>
+          <%}
+          }%>
         </tbody>
             <%  
             var moneda = oda[0].tokenoda.split('@')[6]; 
@@ -121,22 +124,10 @@ function trunc (x, posiciones = 0) {
     
   </table>
 </div>
-      <div class="panel panel-warning" style="margin-right: 5%;width: 90%;margin-left: 5%;">
-        <!-- Default panel contents -->
-        <div class="panel-heading" data-toggle="collapse" data-target="#comentPanel" style="cursor: pointer; text-align: center;">Comentario / Observación <i class="fa fa-caret-down desp-arrow"></i></div>
-        <div class="panel-body collapse" id="comentPanel">
-          <textarea style="width: 100%" type="textarea" class="form-control" name="comentario" placeholder="Ingresar comentario ..."></textarea>
-        </div>
-
-      </div>
-<div style="margin-top: 15px">
-    <!--<label for="avatar">Adjuntar PDF:</label>
-    <input type="file" id="pdffac" name="pdffac" accept=".pdf"/>
-    <button onclick="formSubmit()">click me</button>
-  -->
+<div class="panel panel-warning" style="margin-right: 5%;width: 90%;margin-left: 5%;">
+<!-- Default panel contents -->
+    <div class="panel-heading" data-toggle="collapse" data-target="#comentPanel" style="cursor: pointer; text-align: center;">Comentario / Observación <i class="fa fa-caret-down desp-arrow"></i></div>
+    <div class="panel-body collapse" id="comentPanel">
+      <textarea style="width: 100%" type="textarea" class="form-control" name="comentario" placeholder="Ingresar comentario ..."></textarea>
+    </div>
 </div>
-
-
-<script type="text/javascript">
-
-</script>

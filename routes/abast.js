@@ -73,9 +73,9 @@ router.get('/page_oda/:idoda', function(req, res, next){
                 connection.query("SELECT oda.*,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
 					" LEFT JOIN factura ON factura.idoda = oda.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT abastecimiento.*,SUM(facturacion.cantidad) as facturados" +
+                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados" +
 						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
-						" LEFT JOIN faturacion ON facturacion.idabast = abastecimiento.idabast WHERE abastecimiento.idoda = ?" +
+						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
                         //res.redirect('/plan');
@@ -950,22 +950,35 @@ router.get('/fact_info_view/:idfactura', function(req, res, next){
 		});
     } else res.redirect("/bad_login");
 });
-
+// Renderizar modal para registrar factura a una OCA
 router.post('/get_table_fact', function(req, res, next){
     if(verificar(req.session.userData)){
         var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
         req.getConnection(function(err, connection){
         	if(err)
         		console.log("Error Connection : %s", err);
-        	connection.query("select  abastecimiento.idabast,oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
+        	// Se consigue cada fila de la OCA, acompaada del nombre del material de cada fila y la cantidad ya facturada por fila, además de la razón
+        	connection.query("select abastecimiento.idabast,oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
         		+" abastecimiento.costo, abastecimiento.costo*abastecimiento.cantidad as odacosto,"
-        		+" oda.tokenoda from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
-        		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor WHERE abastecimiento.idoda = ? AND abastecimiento.facturado = false",[idoda],
+        		+" oda.tokenoda,SUM(COALESCE(facturacion.cantidad,0)) AS facturados from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
+        		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor" +
+				" LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast WHERE abastecimiento.idoda = ? GROUP BY abastecimiento.idabast",[idoda],
         		function(err, oda){
         		if(err)
         			console.log("Error Selecting : %s", err);
-        		console.log(oda);
-        		res.render('abast/table_factura', {oda: oda});
+        		var isfacturable = false;
+        		if(oda.length){
+        			// Se revisa si existen 'filas' de la OCA que aún no hayan sido facturados
+        			for(var i =0;i<oda.length;i++){
+        				if(oda[i].cantidad > oda[i].facturados){
+        					isfacturable = true;
+        					break;
+						}
+					}
+                    res.render('abast/table_factura', {oda: oda,isfacturable: isfacturable});
+				} else {
+                    res.render('abast/table_factura', {oda: [],isfacturable: isfacturable});
+				}
         	});
         });
     } else res.redirect("/bad_login");

@@ -160,10 +160,10 @@ function fechaLatino(string){
                                         <table id="tablaODA" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                             <tr>
-                                                <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
                                                 <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                 <th class="o_column_sortable">Cantidad</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Recibidos</th>
+                                                <th class="o_column_sortable" style="text-align: center;">Facturados</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Costo Unitario</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
@@ -174,12 +174,10 @@ function fechaLatino(string){
                                             <tbody class="ui-sortable">
                                             <%for(var e=0; e < abast.length; e++){%>
                                             <tr class="o_data_row text-info danger">
-                                                <td class="o_data_cell o_list_number o_handle_cell">
-                                                    <span class="o_row_handle fa fa-arrows o_field_widget ui-sortable-handle" name="sequence"></span>
-                                                </td>
                                                 <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
                                                 <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].recibidos%></td>
+                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].facturados%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].costo%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
                                                 <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date().toLocaleDateString())%></td>
