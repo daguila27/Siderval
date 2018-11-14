@@ -139,6 +139,7 @@ function fechaLatino(string){
                             </li>
                         </ul>
                         <div class="tab-content nav nav-tabs">
+                            <!-- Página Pedidos -->
                             <div class="tab-pane active" id="notebook_page_1074">
                                 <div class="o_field_one2many o_field_widget o_field_x2many o_field_x2many_list" name="order_line">
                                     <div class="o_x2m_control_panel">
@@ -149,8 +150,6 @@ function fechaLatino(string){
                                                     <span class="o_pager_value"></span> / <span class="o_pager_limit"></span>
                                                 </span>
                                                 <span class="btn-group btn-group-sm">
-
-
                                                     <button aria-label="Previous" class="fa fa-chevron-left btn btn-icon o_pager_previous" type="button"></button>
                                                     <button aria-label="Next" class="fa fa-chevron-right btn btn-icon o_pager_next" type="button"></button>
                                                 </span>
@@ -161,10 +160,10 @@ function fechaLatino(string){
                                         <table id="tablaODA" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                             <tr>
-                                                <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
                                                 <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                 <th class="o_column_sortable">Cantidad</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Recibidos</th>
+                                                <th class="o_column_sortable" style="text-align: center;">Facturados</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Costo Unitario</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
@@ -175,12 +174,10 @@ function fechaLatino(string){
                                             <tbody class="ui-sortable">
                                             <%for(var e=0; e < abast.length; e++){%>
                                             <tr class="o_data_row text-info danger">
-                                                <td class="o_data_cell o_list_number o_handle_cell">
-                                                    <span class="o_row_handle fa fa-arrows o_field_widget ui-sortable-handle" name="sequence"></span>
-                                                </td>
                                                 <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
                                                 <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].recibidos%></td>
+                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].facturados%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].costo%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
                                                 <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date().toLocaleDateString())%></td>
@@ -242,6 +239,7 @@ function fechaLatino(string){
                                 <span class="o_field_text o_field_widget o_field_empty oe_inline" name="note"></span>
                                 <div class="oe_clear"></div>
                             </div>
+                            <!-- Página Mas Información -->
                             <div class="tab-pane" id="notebook_page_1080">
                                 <div class="o_group">
                                     <table class="o_group o_inner_group o_group_col_6">
@@ -249,22 +247,6 @@ function fechaLatino(string){
                                         <tr>
                                             <td colspan="2" style="width: 100%;">
                                                 <div class="o_horizontal_separator">Información de envio</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1081">Inventario</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" href="#id=1&amp;model=stock.warehouse" name="warehouse_id" id="o_field_input_1081">YourCompany</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_form_label_empty" for="o_field_input_1082" data-original-title="" title="">Incoterms</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span name="incoterm" class="o_field_widget o_invisible_modifier o_field_empty"></span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -435,7 +417,7 @@ function fechaLatino(string){
 <script>
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
-        setDataTable("#tablaODA");
+        setDataTable2('#tablaODA');
     });
 
     function verPdf(yo){
