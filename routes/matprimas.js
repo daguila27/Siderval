@@ -144,12 +144,12 @@ router.post("/table_movimientos",function(req,res,next){
         var where = " WHERE movimiento_detalle.idmovimiento like '%"+clave+"%' OR material.detalle like '%"+clave+"%'";
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select movimiento.*,movimiento.tipo as tipo_mov, movimiento_detalle.*, material.*, "
-                +"coalesce(etapafaena.nombre_etapa, 'Jefe de Producción') as nombre_etapa "
-                +"from movimiento_detalle"
-                +"left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento "
-                +"left join material on material.idmaterial=movimiento_detalle.idmaterial "
-                +"left join etapafaena on etapafaena.value = movimiento.etapa"+where+" ORDER BY "+orden, function(err, mov){
+            connection.query("select movimiento.*,movimiento.tipo as tipo_mov, movimiento_detalle.*, material.*,"
+                +"coalesce(etapafaena.nombre_etapa, 'Jefe de Producción') as nombre_etapa"
+                +" from movimiento_detalle"
+                +" left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento"
+                +" left join material on material.idmaterial=movimiento_detalle.idmaterial"
+                +" left join etapafaena on etapafaena.value = movimiento.etapa"+where+" ORDER BY "+orden, function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
             });
