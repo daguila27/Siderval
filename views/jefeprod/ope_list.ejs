@@ -170,7 +170,7 @@ function fechaLatino(string){
                                             </li>
                                             <%if(!inProceso){%>
                                                 <li class="ficha_a">
-                                                    <a href="#" onclick="closeOP(this)" data-idop= "<%=data[i].idordenproduccion%>">
+                                                    <a href="#" onclick="closeOP(this)" data-idop="<%=data[i].idordenproduccion%>">
                                                         Cerrar OP
                                                     </a>
                                                 </li>
@@ -251,10 +251,12 @@ function fechaLatino(string){
                     <form id="fullserchprogress">
                         <a>
                                 <h4>Buscador:
-                                
-                                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-search"></i></button> 
+                                    <div class="checkbox">
+                                        <label><input type="checkbox" id="itemProd_progreso" value="" onchange="itemizarProductosProgreso(this)">Comprimir Productos</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-search"></i></button>
 
-                                <button class="btn btn-primary pull-right fseis"><i class="fa fa-refresh"></i></button> 
+                                    <button class="btn btn-primary pull-right fseis"><i class="fa fa-refresh"></i></button>
                                 </h4>
                         </a>
                         <div>
@@ -687,6 +689,27 @@ function fechaLatino(string){
                 url: '/jefeprod/itemprod/notchecked',
                 success: function(data){
                     $("#todosbody").html(data);
+                }
+            });
+        }
+    }
+
+    function itemizarProductosProgreso(yo){
+        if($(yo).is(':checked')){
+            $.ajax({
+                type: 'GET',
+                url: '/jefeprod/itemprod_progreso/checked',
+                success: function(data){
+                    $("#todosbodyprogress").html(data);
+                }
+            });
+        }
+        else{
+            $.ajax({
+                type: 'GET',
+                url: '/jefeprod/itemprod_progreso/notchecked',
+                success: function(data){
+                    $("#todosbodyprogress").html(data);
                 }
             });
         }

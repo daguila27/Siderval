@@ -933,7 +933,7 @@ router.get('/fact_info_view/:idfactura', function(req, res, next){
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
-			connection.query("select factura.numfac, facturacion.*,abastecimiento.costo*abastecimiento.cantidad as odacosto, material.detalle from facturacion left join factura on factura.idfactura = facturacion.idfactura left join oda on oda.idoda = factura.idoda left join abastecimiento on abastecimiento.idabast = facturacion.idabast left join material on material.idmaterial = abastecimiento.idmaterial where factura.idfactura = ?",
+			connection.query("select factura.numfac, facturacion.*,abastecimiento.costo as odacosto, material.detalle from facturacion left join factura on factura.idfactura = facturacion.idfactura left join oda on oda.idoda = factura.idoda left join abastecimiento on abastecimiento.idabast = facturacion.idabast left join material on material.idmaterial = abastecimiento.idmaterial where factura.idfactura = ?",
 				[req.params.idfactura],
 			 function(err, facts){
 			 	if(err)
@@ -996,18 +996,18 @@ router.post('/save_factura', function(req, res, next){
         	connection.query("INSERT INTO factura (fecha, numfac, idoda, coment) VALUES ?", [fact], function(err, inFact){
         		if(err)
         			console.log("Error Insert : %s", err);
-        		if(typeof input['idabast[]'] == 'string'){
-        				items.push([inFact.insertId, input['costo-real[]'], input['moneda-factura[]'], input['idabast[]']]);
-        		}
-        		else{
-	        		for (var i = 0; i < input['idabast[]'].length; i++){
-	        			if(input['costo-real[]'][i] != 0 && input['costo-real[]'][i] != ''){
-	        				items.push([inFact.insertId, input['costo-real[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i]]);
-	        			}
-	        		}
-        		}
-        		connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast) VALUES ?", [items], function(err, fact){
-        			if(err)
+                if(typeof input['idabast[]'] == 'string'){
+                    items.push([inFact.insertId, input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
+                }
+                else{
+                    for (var i = 0; i < input['idabast[]'].length; i++){
+                        if(input['costo_unid[]'][i] != 0 && input['costo_unid[]'][i] != ''){
+                            items.push([inFact.insertId, input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
+                        }
+                    }
+                }
+                connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
+                    if(err)
 	        			console.log("Error Insert : %s", err);
     				
 

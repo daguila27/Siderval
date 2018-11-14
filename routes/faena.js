@@ -104,32 +104,82 @@ router.get('/add_notificacion/:idproduccion/:cantidad/:key', function(req,res,ne
 router.post("/next_step",function(req,res,next){
 	if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        var notif =  {cant: input.sendnum, idproduccion: input.idprod};
+        console.log(input);
+        /*
+        * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
+        *
+        * */
+        /*
+                * UPDATE `table` SET `uid` = CASE
+                        WHEN id = 1 THEN 2952
+                        WHEN id = 2 THEN 4925
+                        WHEN id = 3 THEN 1592
+                        ELSE `uid`
+                        END
+                    WHERE id  in (1,2,3)
+                *  */
+        input.idprod = input.idprod.split('-');
+        input.cantprod = input.cantprod.split('-');
+        var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
+        var query2 = "UPDATE produccion SET produccion.`"+input.newetapa+"` = CASE ";
 
+        var ids = "";
+        var cant_aux = parseInt(input.sendnum);
+        var history = [];
+        for(var w=0; w < input.idprod.length; w++){
+            cant_aux -= parseInt(input.cantprod[w]);
+        	if(cant_aux > 0){
+        		/* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION */
+                query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
+                query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
+				//history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
+                history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
+                ids += input.idprod[w]+",";
+            }
+			else{
+                /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA */
+				query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
+                query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
+                //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
+                history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa]);
+                ids += input.idprod[w]+",";
+				break;
+            }
+        }
+        var notif =  {cant: input.sendnum, idproduccion: input.idprod};
+		query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
+        query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
 
         //SE EMITE UNA NOTIFICACION AL USUARIO FAENA
         //req.app.locals.io.emit('refreshfaena'+input.newetapa, notif);
-
-
 		req.getConnection(function(err,connection){
 			if(err) throw err;
-			connection.query("UPDATE produccion SET `" + input.etapa_act + "` = `" + input.etapa_act  + "` - ?,`" + input.newetapa + "` = `" + input.newetapa + "` + ? WHERE idproduccion = ?",[parseInt(input.sendnum),parseInt(input.sendnum),input.idprod],function(err,prod){
+			//connection.query("UPDATE produccion SET `" + input.etapa_act + "` = `" + input.etapa_act  + "` - ?,`" + input.newetapa + "` = `" + input.newetapa + "` + ? WHERE idproduccion = ?",[parseInt(input.sendnum),parseInt(input.sendnum),input.idprod],function(err,prod){
+            connection.query(query ,function(err,upProd1){
                 if(err) throw err;
-				connection.query("INSERT INTO produccion_history SET ?",{idproduccion: input.idprod,enviados: input.sendnum,from: input.etapa_act,to:input.newetapa},function(err,insert_h){
-					if(err) throw err;
-					res.send("si");
-        			/*res.on('finish', function(){ 
-        				req.app.locals.io.emit('refreshfaena'+input.newetapa, notif); 
-        				if(input.newetapa == '8'){
-        					res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/idm');		
-			        		req.app.locals.io.emit('notif', notif);
-        				}
-        			});
-					res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/fa'+input.newetapa);*/					
+                console.log(upProd1);
 
+                connection.query(query2 ,function(err,upProd2){
+					if(err) throw err;
+
+					console.log(upProd2);
+					connection.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
+						if(err) throw err;
+						res.send("si");
+						/*res.on('finish', function(){
+							req.app.locals.io.emit('refreshfaena'+input.newetapa, notif);
+							if(input.newetapa == '8'){
+								res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/idm');
+								req.app.locals.io.emit('notif', notif);
+							}
+						});
+						res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/fa'+input.newetapa);*/
+
+					});
 				});
-			});
-		})
+	        });
+
+    })
 	} else res.send("no");
 });
 
@@ -142,18 +192,21 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 			//select * from ordenproduccion left join material on (ordenproduccion.idproducido=material.idmaterial) left join producto ON (ordenproduccion.idproducido=producto.idmaterial)
 			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.proceso, function(err, etapa){
 				if(err){console.log("Error Selecting : %s", err);}
-				connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "+
+				/*connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "+
 					"(select produccion.*,coalesce(producido.ruta,'1,2,3,4,5,6,7,8') as ruta,material.detalle, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.proceso+"') as nextStep from produccion"+
 					" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones)" +
 					" left join material on (fabricaciones.idmaterial=material.idmaterial)" +
 					" left join producido on (fabricaciones.idmaterial=producido.idmaterial)"+
 					" WHERE produccion."+input.proceso+" > 0 AND produccion.el=false GROUP BY produccion.idproduccion ORDER BY fabricaciones.f_entrega ASC)"+
-					" as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`)",
-					/*connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "
-					+"(select produccion.idproduccion,group_concat(produccion.idordenproduccion separator '-') as idordenproduccion,sum(produccion.cantidad) as cantidad ,sum(produccion.`1`) as `1`,sum(produccion.`2`) as `2`,sum(produccion.`3`) as `3`,sum(produccion.`4`) as `4`,sum(produccion.`5`) as `5`,sum(produccion.`6`) as `6`,sum(produccion.`7`) as `7`,sum(produccion.`8`) as `8`,producido.ruta,material.detalle,material.idmaterial, Siguiente(producido.ruta, '1') as nextStep from produccion"
-					+" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (fabricaciones.idproducto=producido.idproducto)"
-					+"WHERE produccion."+input.proceso+" > 0 group by material.idmaterial ORDER BY fabricaciones.f_entrega ASC )"
-					+"as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`) group by querytable.idmaterial",*/
+					" as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`)",*/
+					connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "
+						+"(select group_concat(produccion.idproduccion separator '-') as idproduccion,group_concat(produccion.idordenproduccion separator '-') as idordenproduccion,sum(produccion.cantidad) as cantidad ,"
+						+"group_concat(produccion.1 separator '-') as prod_1,group_concat(produccion.2 separator '-') as prod_2,group_concat(produccion.3 separator '-') as prod_3,group_concat(produccion.4 separator '-') as prod_4,"
+						+"group_concat(produccion.5 separator '-') as prod_5,group_concat(produccion.6 separator '-') as prod_6,group_concat(produccion.7 separator '-') as prod_7,group_concat(produccion.8 separator '-') as prod_8,"
+						+"sum(produccion.`1`) as `1`,sum(produccion.`2`) as `2`,sum(produccion.`3`) as `3`,sum(produccion.`4`) as `4`,sum(produccion.`5`) as `5`,sum(produccion.`6`) as `6`,sum(produccion.`7`) as `7`,sum(produccion.`8`) as `8`,coalesce(producido.ruta, '1,2,3,4,5,6,7,8') as ruta,material.detalle,material.idmaterial, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '1') as nextStep from produccion"
+						+" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (material.idmaterial=producido.idmaterial)"
+						+"WHERE produccion."+input.proceso+" > 0 group by material.idmaterial ORDER BY produccion.idproduccion DESC )"
+						+"as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`) group by querytable.idmaterial",
 				function(err, rows){
 					if(err){
 						console.log("Error Selecting : %s", err);
@@ -161,6 +214,7 @@ router.get('/render_proceso/:proceso', function(req, res, next){
                     var nextstep;
 					for(var i = 0;i<rows.length;i++){
                         rows[i].ruta = rows[i].ruta.split(",");
+                        rows[i].cant_prod = rows[i]["prod_"+input.proceso];
                         nextstep = rows[i].ruta.indexOf(input.proceso) + 1;
                         if(nextstep == rows[i].ruta.length){
 							rows[i].nextstep = "bodega";
