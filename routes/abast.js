@@ -63,20 +63,21 @@ router.get('/odcs', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
-
+//Renderizar la página de ODA específica de odoo.
 router.get('/page_oda/:idoda', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
-            console.log(req.params.idoda);
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT * FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor WHERE idoda = ?",[idoda], function(err, oda){
+                connection.query("SELECT oda.*,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
+					" LEFT JOIN factura ON factura.idoda = oda.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
-                    console.log(oda);
-                    connection.query("SELECT * FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial WHERE abastecimiento.idoda=?",[idoda], function(err ,abast){
+                    connection.query("SELECT abastecimiento.*,SUM(facturacion.cantidad) as facturados" +
+						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
+						" LEFT JOIN faturacion ON facturacion.idabast = abastecimiento.idabast WHERE abastecimiento.idoda = ?" +
+						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
-
                         //res.redirect('/plan');
                         res.render('abast/page_oda', {oda:oda[0], abast: abast});
                     });
@@ -87,6 +88,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
+
 router.get('/sol_odc', function(req, res, next) {
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
@@ -972,8 +974,6 @@ router.post('/get_table_fact', function(req, res, next){
 router.post('/save_factura', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
-
         var fact = [];
         fact.push([input['fecha-facturacion'], input['numeroFactura'], input['idoda'], input['comentario']]);
         var items = [];
@@ -983,8 +983,6 @@ router.post('/save_factura', function(req, res, next){
         	connection.query("INSERT INTO factura (fecha, numfac, idoda, coment) VALUES ?", [fact], function(err, inFact){
         		if(err)
         			console.log("Error Insert : %s", err);
-
-        		console.log(inFact);
         		if(typeof input['idabast[]'] == 'string'){
         				items.push([inFact.insertId, input['costo-real[]'], input['moneda-factura[]'], input['idabast[]']]);
         		}
@@ -1035,7 +1033,6 @@ router.post('/save_factura', function(req, res, next){
 	        		where = where.substring(0, where.length-1);
 	        		where += ")";
 	        		update += 'ELSE false END WHERE idabast in '+where;
-					console.log(update);
 					connection.query(update, function(err, upAbast){
 						if(err)
 							console.log("Error Updating : %s", err);
