@@ -931,7 +931,7 @@ router.get('/fact_info_view/:idfactura', function(req, res, next){
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
-			connection.query("select factura.numfac, facturacion.*,abastecimiento.costo*abastecimiento.cantidad as odacosto, material.detalle from facturacion left join factura on factura.idfactura = facturacion.idfactura left join oda on oda.idoda = factura.idoda left join abastecimiento on abastecimiento.idabast = facturacion.idabast left join material on material.idmaterial = abastecimiento.idmaterial where factura.idfactura = ?",
+			connection.query("select factura.numfac, facturacion.*,abastecimiento.costo as odacosto, material.detalle from facturacion left join factura on factura.idfactura = facturacion.idfactura left join oda on oda.idoda = factura.idoda left join abastecimiento on abastecimiento.idabast = facturacion.idabast left join material on material.idmaterial = abastecimiento.idmaterial where factura.idfactura = ?",
 				[req.params.idfactura],
 			 function(err, facts){
 			 	if(err)

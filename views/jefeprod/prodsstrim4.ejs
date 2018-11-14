@@ -1,0 +1,64 @@
+       <%var progress = [];
+        var prod;
+        for(var e=0; e < prog.length; e++){
+            prod = {
+                idprod: prog[e].idproduccion,
+                desc: prog[e].detalle,
+                numof: prog[e].idorden_f,
+                cant: prog[e].cantidad,
+                pasos: prog[e].ruta.split(',').length-1,
+                numop: prog[e].idordenproduccion,
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 0,
+                7: 0
+            };
+
+            for(var t=0; t < prog[e].from.split(',').length; t++){
+                prod[prog[e].from.split(',')[t]] += parseInt(prog[e].enviados.split(',')[t]);
+            }
+            progress.push(prod);
+        }
+        if(progress.length){
+            var sum = 0;
+        for(var i = 0; i< progress.length; i++){
+            sum = 0;
+        %>
+        <tr>
+            <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=progress[i].desc%></td>
+            <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°"><%= progress[i].numof %></td>
+            <td data-toggle="tooltip" data-placement="bottom" title="N° OP" style="text-align: center"><%= progress[i].numop %></td>
+            <td data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= progress[i].cant %></td>
+            <td data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center"><%= progress[i]['1'] %></td>
+            <% sum += parseInt(progress[i]['1'])%>
+            <td data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center"><%= progress[i]['2'] %></td>
+            <% sum += parseInt(progress[i]['2'])%>
+            <td data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center"><%= progress[i]['3'] %></td>
+            <% sum += parseInt(progress[i]['3'])%>
+            <td data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center"><%= progress[i]['4'] %></td>
+            <% sum += parseInt(progress[i]['4'])%>
+            <td data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" style="text-align: center"><%= progress[i]['5'] %></td>
+            <% sum += parseInt(progress[i]['5'])%>
+            <td data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center"><%= progress[i]['6'] %></td>
+            <% sum += parseInt(progress[i]['6'])%>
+            <td data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center"><%= progress[i]['7'] %></td>
+            <% sum += parseInt(progress[i]['7'])%>
+            <%if(100*(sum/(parseInt(progress[i].pasos)*parseInt(progress[i].cant))) == 100){%>
+            <td class="success" data-toggle="tooltip" data-placement="bottom" title="Progreso" style="text-align: center">
+                <%}else if(100*(sum/(parseInt(progress[i].pasos)*parseInt(progress[i].cant))) > 50){%>
+            <td class="warning" data-toggle="tooltip" data-placement="bottom" title="Progreso" style="text-align: center">
+                <%}else{%>
+            <td class="danger" data-toggle="tooltip" data-placement="bottom" title="Progreso" style="text-align: center">
+                <%}%>
+                <%= (100*(sum/(parseInt(progress[i].pasos)*parseInt(progress[i].cant)))).toLocaleString().split('.')[0]%>%</td>
+        </tr>
+        <%  }
+        } else {
+        %>
+            <tr><td>No hay nada por producir</td></tr>
+        <%
+        }
+        %>

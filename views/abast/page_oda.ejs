@@ -158,7 +158,7 @@ function fechaLatino(string){
                                         </div>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                                        <table id="tablaODA" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                             <tr>
                                                 <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
@@ -435,6 +435,7 @@ function fechaLatino(string){
 <script>
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
+        setDataTable("#tablaODA");
     });
 
     function verPdf(yo){

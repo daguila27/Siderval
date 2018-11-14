@@ -45,8 +45,17 @@
 	    				<p style="width: 75%"><b>Siguiente Etapa: </b><%= data[i].sigetapa%></p>
     					<p style="width: 25%"><b>OP N° </b><%= data[i].idordenproduccion%></p>
     				</div>
-    			</div>	
-                <button style="margin-top: 10px;" class="btn btn-success btnProd" id="bq<%=data[i].idproduccion%>" data-cantidad="<%=data[i][etapaactual]%>" onclick="setmodal(this)" data-id="<%=data[i].idproduccion%>" data-sgt_etapa="<%=data[i].nextstep%>" data-sigetp="<%= data[i].sigetapa%>" data-toggle="modal" data-target="#send_step">
+    			</div>
+                <button style="margin-top: 10px;" class="btn btn-success btnProd"
+						id="bq<%=data[i].idproduccion%>"
+						data-cantidad="<%=data[i][etapaactual]%>"
+						onclick="setmodal(this)"
+						data-id="<%=data[i].idproduccion%>"
+						data-sgt_etapa="<%=data[i].nextstep%>"
+						data-sigetp="<%= data[i].sigetapa%>"
+						data-cantprod="<%= data[i].cant_prod%>"
+						data-toggle="modal"
+						data-target="#send_step">
                   Enviar Producto</button>
 	        </div>
     	</div>
@@ -57,17 +66,18 @@
 
 
 	function setmodal(yo){
-	  $("#prod_id").val($(yo).data('id'));
-    $("#sgt_etapa").val($(yo).data('sgt_etapa'));
-    $("#sendnum").attr('max',$(yo).data('cantidad'));
-    $("#sendnum").val($(yo).data('cantidad'));
-    $(".totalSend").html("/ "+$(yo).data('cantidad'));
-    $(".p-sigetp").html("<b>Siguiente etapa: </b> "+$(yo).data('sigetp'));
+	  	$("#prod_id").val($(yo).data('id'));
+	  	$("#cantprod").val($(yo).data('cantprod'));
+		$("#sgt_etapa").val($(yo).data('sgt_etapa'));
+		$("#sendnum").attr('max',$(yo).data('cantidad'));
+		$("#sendnum").val($(yo).data('cantidad'));
+		$(".totalSend").html("/ "+$(yo).data('cantidad'));
+		$(".p-sigetp").html("<b>Siguiente etapa: </b> "+$(yo).data('sigetp'));
 		console.log($(yo).data('sgt_etapa'));
 	}
 
 	
-        //io.on('refreshfaena<%= etapaactual%>', function(){
+        //io.on('refreshfaena<= etapaactual>', function(){
             //alert("Refrescar la pagina");
 
             //add_notificacion(notif);

@@ -29,8 +29,13 @@
                 padding: 0;
             }
 
-            .b-number:hover{
+            .b-number:hover .bt-hover{
                 cursor: pointer;
+                background-color: rgb(230,230,230);
+            }
+            .del-number:hover .bt-hover{
+                cursor: pointer;
+                background-color: rgb(230,230,230);
             }
             .b-number > div{
                 margin: 0;
@@ -87,77 +92,77 @@
                             <div class="col-sm-4 col-md-4 b-number" data-valor="1">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>1</h3></div>
+                                    <div class="panel-body bt-hover"><h3>1</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="2">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>2</h3></div>
+                                    <div class="panel-body bt-hover"><h3>2</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="3">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>3</h3></div>
+                                    <div class="panel-body bt-hover"><h3>3</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="4">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>4</h3></div>
+                                    <div class="panel-body bt-hover"><h3>4</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="5">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>5</h3></div>
+                                    <div class="panel-body bt-hover"><h3>5</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="6">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>6</h3></div>
+                                    <div class="panel-body bt-hover"><h3>6</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="7">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>7</h3></div>
+                                    <div class="panel-body bt-hover"><h3>7</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="8">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>8</h3></div>
+                                    <div class="panel-body bt-hover"><h3>8</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-sm-4 col-md-4 b-number" data-valor="9">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>9</h3></div>
+                                    <div class="panel-body bt-hover"><h3>9</h3></div>
                                   </div>
                                 </div>   
                             </div>
                             <div class="col-md-offset-4 col-sm-offset-4 col-sm-4 col-md-4 b-number" data-valor="0">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>0</h3></div>
+                                    <div class="panel-body bt-hover"><h3>0</h3></div>
                                   </div>
                                 </div> 
                             </div>
-                            <div class="col-sm-4 col-md-4 del-number" data-valor="9">
+                            <div class="col-sm-4 col-md-4 del-number">
                                 <div class="panel-group">
                                   <div class="panel panel-default">
-                                    <div class="panel-body"><h3>Borrar</h3></div>
+                                    <div class="panel-body bt-hover"><h3>Borrar</h3></div>
                                   </div>
                                 </div>   
                             </div>
@@ -166,6 +171,8 @@
                             <input type="hidden" id="prod_id" value="">
                             <input type="hidden" id="e_act" value="<%= proceso%>">
                             <input type="hidden" id="sgt_etapa" value="">
+                            <input type="hidden" id="cantprod" value="">
+
                             <p class="p-sigetp"></p>
                         </div>
                         <div class="modal-footer">
@@ -363,6 +370,7 @@
             var data = {};
             console.log($("#sendnum").val());
             data.idprod = $("#prod_id").val();
+            data.cantprod = $("#cantprod").val();
             data.newetapa = $("#sgt_etapa").val();
             data.sendnum = $("#sendnum").val();
             data.etapa_act = $("#e_act").val();
