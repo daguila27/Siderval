@@ -4,7 +4,7 @@
 			<li class="active">Guía de Despacho</li>
 
 			<!-- Mostrar cantidad de datos -->
-			<div id="pedidos" style="margin-top: 8px"></div>
+			<div id="despachos" style="margin-top: 8px"></div>
 		</ol>
 		<div style="width: 40%;">			
 			<input type="text" id="buscar_despacho" class="form-control pull-right" placeholder="Buscar...">
@@ -13,7 +13,7 @@
 					
 					<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_despachos' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 		    
-			        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='show_despachos' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
+			        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_gd' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 		    
 		    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 		    
@@ -46,8 +46,8 @@
             url: '/bodega/table_despachos',
             success: function(data){
                 $(".main-page").html(data);
-                //Muestra la cantidad de pedidos
-				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+                //Muestra la cantidad de despachos
+				$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
             }
         });
 	}
@@ -58,8 +58,8 @@
             url: '/bodega/table_despachos',
             success: function(data){
                 $(".main-page").html(data);
-                //Muestra la cantidad de pedidos
-				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+                //Muestra la cantidad de despachos
+				$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
             }
         });
 	    /*$.ajax({
@@ -80,19 +80,22 @@
 				url: '/bodega/table_despachos',
 				success: function(data){
 					$(".main-page").html(data);
-					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+					//Muestra la cantidad de despachos
+					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
 				}
 			});
 		}
 		else{
-			/*$.ajax({
-				type: 'GET',
-				url: '/plan/buscar_pedido_item/'+$(this).val(),
+			$.ajax({
+				type: 'POST',
+				data: {clave: $("#buscar_despacho").val(), tipo: $("#select_tipo_despacho").val()},
+				url: '/bodega/item_gd',
 				success: function(data){
 					$(".main-page").html(data);
+					//Muestra la cantidad de despachos
+					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text() + " despacho(s)</small></h5>");
 				}
-			});*/		
+			});
 		}
 	}
 	$("#buscar_despacho").on('keyup', function(e){
@@ -104,19 +107,22 @@
 				url: '/bodega/table_despachos',
 				success: function(data){
 					$(".main-page").html(data);
-					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+					//Muestra la cantidad de despachos
+					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
 				}
 			});
 		}
 		else{
-			/*$.ajax({
-				type: 'GET',
-				url: '/plan/buscar_pedido_item/'+$(this).val(),
+			$.ajax({
+				type: 'POST',
+				data: {clave: $(this).val(), tipo: $("#select_tipo_despacho").val()},
+				url: '/bodega/item_gd',
 				success: function(data){
 					$(".main-page").html(data);
+					//Muestra la cantidad de despachos
+					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text() + " despacho(s)</small></h5>");
 				}
-			});*/		
+			});		
 		}
 	});
 
@@ -132,21 +138,20 @@
                 url: '/bodega/table_despachos',
                 success: function(data){
                     $(".main-page").html(data);
-                    //Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+                    //Muestra la cantidad de despachos
+					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
                 }
             });
 		}
-		else if($(this).data('view') == 'show_despachos'){
+		else if($(this).data('view') == 'item_gd'){
             $.ajax({
-                type: 'GET',
+                type: 'POST',
+                data: {clave: $("#buscar_despacho").val(), tipo: $("#select_tipo_despacho").val()},
                 url: '/bodega/'+$(this).data('view'),
                 success: function(data){
                     $(".main-page").html(data);
-                    if($(this).data('view') == 'table_despachos' || $(this).data('view')=='show_despachos') {
-						//Muestra la cantidad de pedidos
-						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
-					}
+					//Muestra la cantidad de despachos
+					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text() + " despacho(s)</small></h5>");
                 }
             });
         }

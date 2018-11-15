@@ -141,6 +141,40 @@ router.post('/table_despachos', function(req, res, next){
 
 });
 
+// Renderiza los items de despacho filtrados por tipo, token y iddespacho
+router.post('/item_gd', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var tipo = input.tipo;
+        var where = '';
+        console.log(clave);
+        if(clave != '' && clave != null) {
+            where = " WHERE (despacho.mat_token LIKE '%" + clave + "%' OR despacho.iddespacho LIKE '%"+clave+"%')";
+        }
+        if(tipo != '' && tipo != null) {
+            if(clave != '' && clave != null) {
+                where += " AND despacho.estado='"+tipo+"'";
+            }
+            else {
+                where = " WHERE despacho.estado='"+tipo+"'";
+            }
+        }
+        console.log(where);
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT despacho.*, coalesce(odc.idodc, 'OC indefinida') as idodc, coalesce(cliente.sigla, 'Cliente indefinido') as sigla FROM despacho "
+                + "LEFT JOIN ordenfabricacion ON despacho.idorden_f=ordenfabricacion.idordenfabricacion "
+                + "LEFT JOIN odc ON odc.idodc=ordenfabricacion.idodc "
+                + "LEFT JOIN cliente ON cliente.idcliente=odc.idcliente" + where, function(err, desp){
+                if(err) throw err;
+                res.render('bodega/item_gd', {data: desp});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
 router.post('/saveStateGDBD', function(req, res, next){
     if(verificar(req.session.userData)){
         var data = JSON.parse(JSON.stringify(req.body));
