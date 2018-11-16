@@ -25,7 +25,7 @@
         <tr class="o_data_row">
             <td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>" style="text-align: center"><%=data[i].idmovimiento%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].detalle%></td>
-            <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>""><%=  data[i].cantidad %></td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%= data[i].cantidad%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].u_medida%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].nombre_etapa%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
@@ -54,7 +54,7 @@
 </table>
 
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js""></script>
+<script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
     $(document).ready(function(){
@@ -80,7 +80,7 @@
             /*$(".cabecera").each(function(){
                 $(this).css("width", ("."+$(this).attr('id')).css('width')+"px");
             });*/
-        });
+        });|
     });
     $(".order-column").on('click', function(e){
         e.preventDefault();

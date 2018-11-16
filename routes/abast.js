@@ -17,6 +17,10 @@ router.use(
 
 );
 
+
+
+
+
 function verificar(usr){
 	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas'){
 		return true;
@@ -70,7 +74,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
 					" LEFT JOIN factura ON factura.idoda = oda.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados" +
@@ -79,7 +83,17 @@ router.get('/page_oda/:idoda', function(req, res, next){
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
                         //res.redirect('/plan');
-                        res.render('abast/page_oda', {oda:oda[0], abast: abast});
+
+						console.log(abast);
+                        console.log(oda);
+
+                        var isFacturable = false;
+						for(var w=0; w < abast.length; w++){
+							if(abast[w].cantidad > abast[w].facturados ){
+								isFacturable = true;
+							}
+						}
+                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable});
                     });
                 });
             });
@@ -455,10 +469,11 @@ router.post('/buscar_matp', function(req, res, next){
             connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
-                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion " + wher +" GROUP BY material.idmaterial",dats,function(err,rows)
+                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion " + wher +" GROUP BY material.detalle",dats,function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
+                console.log(rows);
                 /*console.log("SELECT material.*,caracteristica.cnom,producido.pdf,aleacion.nom,producido.idproducto as idprod,subaleacion.subnom FROM material LEFT JOIN producido ON material.idmaterial = producido.idmaterial" +
                 " LEFT JOIN subaleacion ON subaleacion.idsubaleacion = producido.idsubaleacion LEFT JOIN aleacion ON subaleacion.idaleacion = aleacion.idaleacion" +
                 " LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " + wher + " GROUP BY producido.idproducto");*/
@@ -966,8 +981,12 @@ router.post('/get_table_fact', function(req, res, next){
         		function(err, oda){
         		if(err)
         			console.log("Error Selecting : %s", err);
+
+
+        		console.log(oda);
         		var isfacturable = false;
         		if(oda.length){
+        			console.log("NOT EMPTY");
         			// Se revisa si existen 'filas' de la OCA que aún no hayan sido facturados
         			for(var i =0;i<oda.length;i++){
         				if(oda[i].cantidad > oda[i].facturados){
@@ -977,6 +996,7 @@ router.post('/get_table_fact', function(req, res, next){
 					}
                     res.render('abast/table_factura', {oda: oda,isfacturable: isfacturable});
 				} else {
+        			console.log('EMPTY');
                     res.render('abast/table_factura', {oda: [],isfacturable: isfacturable});
 				}
         	});
