@@ -2,15 +2,15 @@
 	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%;">
 		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra</li>
-			
 			<!-- Mostrar cantidad de datos -->
 			<div id="pedidos" style="margin-top: 8px"></div>
+
 
 		</ol>
 		<div style="width: 40%;">
 			<input type="text" id="buscar_pedido" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
-				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 	    
 		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_odcs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 	    
@@ -20,6 +20,13 @@
 	    	
 	        	<button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
 	        </div>
+	        <!-- Paginacion -->
+		  	<div id="paginacion" style="position: absolute; top: 28px; left: 17%">
+		  		<nav aria-label="Page navigation">
+			        <ul class="pagination" id="paginationup">
+			        </ul>
+			    </nav>
+		  	</div>
 		</div>
 	</div>
 </div>
@@ -27,11 +34,18 @@
 	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5;"></div>
 </div>
 
+<style type="text/css">
+	.caption a:hover{
+		cursor:pointer;
+	}
+</style>
+
 <script type="text/javascript">
+	// Carga la tabla de pedidos
 	$(document).ready(function(){
 		$.ajax({
 			type: 'GET',
-			url: '/plan/table_pedidos/pedido.f_entrega-ASC',
+			url: '/plan/table_pedidos/pedido.f_entrega-ASC/1',
 			success: function(data){
 				$(".main-page").html(data);
 				//Muestra la cantidad de pedidos
@@ -46,7 +60,7 @@
 			$.ajax({
 				type: 'POST',
 				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view')},
-				url: '/plan/buscar_pedido_list',
+				url: '/plan/buscar_pedido_list/1',
 				success: function(data){
 					$(".main-page").html(data);
 					//Muestra la cantidad de pedidos
@@ -73,19 +87,48 @@
 		e.preventDefault();
 		$('.view-option').removeClass('active');
 		$(this).addClass('active');
+		if($(this).data('view')=='item_odcs') {
+			// Quita el nav de paginacion
+			$("#paginacion").css('display','none');
+		}
+		else if($(this).data('view') == 'table_pedidos/pedido.f_entrega-ASC/1') {
+			// Muestra el nav de paginacion
+			console.log("agrega paginacion");
+			$("#paginacion").css('display','block');
+		}
 		$.ajax({
 			type: 'GET',
 			url: '/plan/'+$(this).data('view'),
 			success: function(data){
 				$(".main-page").html(data);
-				if($(this).data('view') == 'table_pedidos/pedido.f_entrega-ASC' || $(this).data('view')=='item_odcs') {
-					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-				}
+				//Muestra la cantidad de pedidos
+				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 			}
 		});
-
 	});
 	
+	// Paginacion
+	$(function(){
+        window.pagObj = $('.pagination').twbsPagination({
+            totalPages: <%=Math.ceil(largo/50)%>,
+            visiblePages: 5,
+            first:"Primero",
+            prev: '<span aria-hidden="true">&laquo;</span>',
+            next: '<span aria-hidden="true">&raquo;</span>',
+            last: "Ultimo",
+            loop: true,
+            onPageClick: function (event, page) {
+                $.ajax({
+                	type:'GET', 
+                	url: '/plan/table_pedidos/pedido.f_entrega-ASC/'+page,
+                	success: function(data){
+                		$(".main-page").html(data);
+                	}
+                });
+            }
+        }).on('page', function (event, page) {
+            console.info(page + ' (from event listening)');
+        });
+    });
 
 </script>

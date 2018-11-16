@@ -43,8 +43,17 @@ router.get('/render_informes', function(req, res, next){
 
 
 router.get('/view_pedidos', function(req, res, next){
-  if(verificar(req.session.userData)){
-    res.render('plan/view_pedidos');}
+    if(verificar(req.session.userData)) {
+        req.getConnection(function(err,connection){
+            if(err) console.log("Connection Error: %s",err);
+            connection.query("SELECT * FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
+                +" ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
+                +" WHERE pedido.cantidad > pedido.despachados", function (err,odc){
+                    if(err) console.log("Select Error: %s",err);
+                    res.render('plan/view_pedidos',{largo: odc.length});
+            });
+        });
+    }
   else{res.redirect('bad_login');}  
 });
 
@@ -62,19 +71,22 @@ router.get('/calendar_peds', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
-router.get('/table_pedidos/:orden', function(req, res, next){
+router.get('/table_pedidos/:orden/:page', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
         orden = orden.replace('-', ' ');
+        var page = req.params.page - 1;
+        var page_now = page*50;
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
-                +" ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
-                +" WHERE pedido.cantidad > pedido.despachados ORDER BY "+orden,
+            connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido "
+                + "LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
+                + " ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
+                + " WHERE pedido.cantidad > pedido.despachados LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden,
                 function(err, odc){
                     if(err) throw err;
 
-                    res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-')});
+                    res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-'), page: page+1});
                 
             });
         });
@@ -83,24 +95,26 @@ router.get('/table_pedidos/:orden', function(req, res, next){
 });
 
 
-router.post('/buscar_pedido_list', function(req, res, next){
+router.post('/buscar_pedido_list/:page', function(req, res, next){
   if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        var clave = input.clave;
         var orden = input.orden;
-        console.log(clave);
         orden = orden.replace('-', ' ');
+        var clave = input.clave;
+        console.log(clave);
+        var page = req.params.page - 1;
+        var page_now = page*50;
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("SELECT * FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
                 +" ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 +" WHERE pedido.cantidad > pedido.despachados and"
                 +" (material.detalle like '%"+clave+"%' or odc.numoc like '%"+clave+"%' or pedido.cantidad"
-                +" like '%"+clave+"%' or cliente.razon like '%"+clave+"%' or cliente.sigla like '%"+clave+"%')",
+                +" like '%"+clave+"%' or cliente.razon like '%"+clave+"%' or cliente.sigla like '%"+clave+"%') LIMIT " + page_now + ",50",
                 function(err, odc){
                     if(err) throw err;
 
-                    res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-')});
+                    res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-'), page: page+1});
                 
             });
         });

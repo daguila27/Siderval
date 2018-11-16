@@ -92,7 +92,7 @@
 		var orden = $(this).data('order');
 		$.ajax({
 			type: 'GET',
-			url: '/plan/table_pedidos/'+orden,
+			url: '/plan/table_pedidos/' + orden + '/<%= page %>',
 			success: function(data){
 				$(".main-page").html(data);
 			}
