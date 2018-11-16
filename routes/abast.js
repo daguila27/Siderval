@@ -17,6 +17,10 @@ router.use(
 
 );
 
+
+
+
+
 function verificar(usr){
 	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas'){
 		return true;
@@ -79,7 +83,15 @@ router.get('/page_oda/:idoda', function(req, res, next){
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
                         //res.redirect('/plan');
-                        res.render('abast/page_oda', {oda:oda[0], abast: abast});
+
+						console.log(abast);
+						var isFacturable = false;
+						for(var w=0; w < abast.length; w++){
+							if(abast[w].cantidad > abast[w].facturados ){
+								isFacturable = true;
+							}
+						}
+                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable});
                     });
                 });
             });
@@ -967,8 +979,12 @@ router.post('/get_table_fact', function(req, res, next){
         		function(err, oda){
         		if(err)
         			console.log("Error Selecting : %s", err);
+
+
+        		console.log(oda);
         		var isfacturable = false;
         		if(oda.length){
+        			console.log("NOT EMPTY");
         			// Se revisa si existen 'filas' de la OCA que aún no hayan sido facturados
         			for(var i =0;i<oda.length;i++){
         				if(oda[i].cantidad > oda[i].facturados){
@@ -978,6 +994,7 @@ router.post('/get_table_fact', function(req, res, next){
 					}
                     res.render('abast/table_factura', {oda: oda,isfacturable: isfacturable});
 				} else {
+        			console.log('EMPTY');
                     res.render('abast/table_factura', {oda: [],isfacturable: isfacturable});
 				}
         	});
