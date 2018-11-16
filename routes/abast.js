@@ -74,7 +74,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
 					" LEFT JOIN factura ON factura.idoda = oda.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados" +
@@ -85,7 +85,9 @@ router.get('/page_oda/:idoda', function(req, res, next){
                         //res.redirect('/plan');
 
 						console.log(abast);
-						var isFacturable = false;
+                        console.log(oda);
+
+                        var isFacturable = false;
 						for(var w=0; w < abast.length; w++){
 							if(abast[w].cantidad > abast[w].facturados ){
 								isFacturable = true;
