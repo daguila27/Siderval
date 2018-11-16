@@ -1,0 +1,62 @@
+<h2 class="panel-title">Orden de Compra N°<%= data[0].numoda%></h2>
+<table class="table table-striped table-hover table-bordered" style="margin-top: 10px">
+    <thead>
+    <tr>
+        <th>Nombre</th>
+        <th>Pendientes</th>
+        <th>Recibidos</th>
+        <th>Unidades</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+    if(data.length){
+        var pendientes;
+        for(var j = 0;j< data.length;j++){
+            pendientes = data[j].cantidad - data[j].recibidos;%>
+            <tr>
+                <!--<td><input type="checkbox" name="hab" onchange="habInput(this)"></td>-->
+                <td style="padding: 5px;"><%= data[j].detalle%></td>
+                <td style="text-align: center;"><%= pendientes%></td>
+                <td style="padding:2px;">
+                    <div class="form-group">
+                        <input type="number" class="form-control" name="rec" data-idmat="<%= data[j].idmaterial%>" data-idabast="<%= data[j].idabast%>" value="0" min="0" max="<%= pendientes%>" required>
+                    </div>
+                </td>
+                <td style="text-align: center;"><%= data[j].umed%></td>
+
+            </tr>
+        <%}
+    }%>
+
+    </tbody>
+
+</table>
+<div class="input-group">
+    <span class="input-group-addon">N° GD</span>
+    <input type="text" class="form-control" name="numgdd" required>
+</div>
+</div>
+<div class="modal-footer">
+    <button type="button" data-target="#confirmar_gdd" data-toggle="modal" class="btn btn-primary">Registrar</button>
+</div>
+<div id="confirmar_gdd" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <form id="factura-form">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmar Recepción</h4>
+                </div>
+                <div class="modal-body">
+                    <p>¿ Confirma que todos los datos están correctos y que no hay inconvenientes ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Confirmar Registro</button>
+                    <button type="button" class="btn btn-default closeModal" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
