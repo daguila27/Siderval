@@ -1058,10 +1058,10 @@ router.post('/save_factura', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
+// Renderizar modal para registrar Recepción (GDD)
 router.get('/get_dataoda/:idoda', function(req, res, next){
     if(verificar(req.session.userData)){
 		var idodc = req.params.idoda;
-		console.log(idodc);
 		req.getConnection(function(err, connection){
         	if(err)
         		console.log("Error Connection : %s", err);
@@ -1072,7 +1072,6 @@ router.get('/get_dataoda/:idoda', function(req, res, next){
         		[idodc],function(err, oda){
         		if(err)
         			console.log("Error Selecting : %s", err);
-        		console.log(oda);
         		res.render('abast/modal_odc_received', {data: oda});
         	});
         });

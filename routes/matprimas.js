@@ -121,6 +121,48 @@ router.post("/save_movimiento",function(req,res,next){
 /*
 * CONTROLADOR QUE RENDERIZA LA VISTA PRINCIPAL DE Materias Primas --> Movimientos --> Ver Movimientos
 * */
+router.get("/busq_oda",function(req,res,next){
+    if(req.session.userData){
+        res.render("matprimas/search_oda");
+    } else res.redirect("/bad_login");
+});
+/*
+* CONTROLADOR QUE ENVÍA VISTA PARA RECEPCIÓN DE OCA
+* */
+router.post("/search_oca",function(req,res,next){
+    if(req.session.userData){
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+            connection.query("select oda.numoda,abastecimiento.idabast,material.idmaterial,material.detalle,coalesce(material.u_medida,'und') AS umed,abastecimiento.cantidad,abastecimiento.recibidos"
+                + " from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
+                + "abastecimiento.idmaterial = material.idmaterial WHERE oda.numoda = ? and abastecimiento.recibidos < abastecimiento.cantidad group by abastecimiento.idabast"
+                ,[req.body.numoda],function(err,rows){
+                if(err) console.log(err);
+                if(rows.length){
+                    res.render("matprimas/oda_recep",{data:rows},function(err,html){
+                        if(err) console.log(err);
+                        res.send({err: false,err_msg: "Exito",html:html});
+                    });
+                } else {
+                    res.send({err: true,err_msg: "No se encontró ninguna OC con tal número"});
+                }
+            });
+
+        });
+    } else res.redirect("/bad_login");
+});
+/*
+* CONTROLADOR QUE REGISTRA LA RECEPCIÓN DESDE PROVEEDORES
+* */
+router.post("/save_recepcion",function(req,res,next){
+    if(req.session.userData){
+        console.log(req.body);
+        res.send({err:false,err_msg: "inprogress"});
+    } else res.send({err:true,err_msg:"MENTIROSO, EMBUSTERO"});
+});
+/*
+* Controlador que renderiza la vista Mat_primas --> Registrar Llegada de Productos.
+* */
 router.get("/view_movimientos",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err, connection){
