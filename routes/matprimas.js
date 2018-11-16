@@ -172,15 +172,6 @@ router.post("/save_recepcion",function(req,res,next){
         var input = JSON.parse(JSON.stringify(req.body));
         var recep = [[input.numgdd, new Date().toLocaleDateString()]];
         var recep_d = [];
-        /*
-        * UPDATE `table` SET `uid` = CASE
-                WHEN id = 1 THEN 2952
-                WHEN id = 2 THEN 4925
-                WHEN id = 3 THEN 1592
-                ELSE `uid`
-                END
-            WHERE id  in (1,2,3)
-        * */
         var ids = '';
         var idsm = '';
 
@@ -230,7 +221,7 @@ router.post("/save_recepcion",function(req,res,next){
                 });
             });
         });
-    } else res.send({err:true,err_msg:"MENTIROSO, EMBUSTERO"});
+    } else res.send({err:true,err_msg:"Ha ocurrido un error."});
 });
 /*
 * Controlador que renderiza la vista Mat_primas --> Registrar Llegada de Productos.
@@ -259,7 +250,7 @@ router.post("/table_movimientos",function(req,res,next){
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select movimiento.*,movimiento.tipo as tipo_mov, movimiento_detalle.*, material.*,"
-                +"coalesce(etapafaena.nombre_etapa, 'Jefe de Producción') as nombre_etapa"
+                +"movimiento.etapa as nombre_etapa"
                 +" from movimiento_detalle"
                 +" left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento"
                 +" left join material on material.idmaterial=movimiento_detalle.idmaterial"
