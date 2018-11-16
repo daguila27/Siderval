@@ -43,7 +43,7 @@
             $("input[name = 'rec']").each(function(e){
                 //Agregar a la lista sólo los inputs que sean distintos de cero.
                 if($(this).val() != 0){
-                    detalle.push([$(this).data('idabast'),$(this).val()]);
+                    detalle.push([$(this).data('idabast'),$(this).val(),$(this).data('idmat')]);
                 }
             });
 

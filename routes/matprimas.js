@@ -157,7 +157,9 @@ router.post("/search_oca",function(req,res,next){
 Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
+        if (obj.hasOwnProperty(key)){
+            size++;
+        }
     }
     return size;
 };
@@ -180,13 +182,23 @@ router.post("/save_recepcion",function(req,res,next){
             WHERE id  in (1,2,3)
         * */
         var ids = '';
+        var idsm = '';
+
         var query = "UPDATE abastecimiento SET recibidos = CASE";
+        var query2 = "UPDATE material SET stock = CASE";
+
         for(var e=1; e < Object.size(input); e++){
             recep_d.push([0, input['detalle['+(e-1)+'][]'][0], input['detalle['+(e-1)+'][]'][1] ]);
             ids +=  input['detalle['+(e-1)+'][]'][0]+",";
+            idsm +=  input['detalle['+(e-1)+'][]'][2]+",";
+
             query += " WHEN idabast = "+input['detalle['+(e-1)+'][]'][0]+" THEN recibidos+"+parseInt(input['detalle['+(e-1)+'][]'][1]);
+            query2 += " WHEN idmaterial = "+input['detalle['+(e-1)+'][]'][2]+" THEN stock+"+parseInt(input['detalle['+(e-1)+'][]'][1]);
+
         }
         query += " ELSE recibidos END WHERE idabast IN ("+ids.substring(0,ids.length-1)+")";
+        query2 += " ELSE stock END WHERE idmaterial IN ("+idsm.substring(0,idsm.length-1)+")";
+
         console.log(query);
 
         req.getConnection(function(err, connection){
@@ -208,7 +220,12 @@ router.post("/save_recepcion",function(req,res,next){
                         if(err) {console.log("Error Insert : %s", err);}
 
                         console.log(upAbast);
-                        res.redirect('/matprimas/busq_oda');
+                        connection.query(query2, function(err, upMat){
+                            if(err) {console.log("Error Insert : %s", err);}
+
+                            console.log(upMat);
+                            res.redirect('/matprimas/busq_oda');
+                        });
                     });
                 });
             });

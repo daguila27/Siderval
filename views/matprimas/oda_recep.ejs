@@ -20,7 +20,7 @@
                 <td style="text-align: center;"><%= pendientes%></td>
                 <td style="padding:2px;">
                     <div class="form-group">
-                        <input type="number" class="form-control" name="rec" data-idabast="<%= data[j].idabast%>" value="0" min="0" max="<%= pendientes%>" required>
+                        <input type="number" class="form-control" name="rec" data-idmat="<%= data[j].idmaterial%>" data-idabast="<%= data[j].idabast%>" value="0" min="0" max="<%= pendientes%>" required>
                     </div>
                 </td>
                 <td style="text-align: center;"><%= data[j].umed%></td>
@@ -34,7 +34,7 @@
 </table>
 <div class="input-group">
     <span class="input-group-addon">N° GD</span>
-    <input type="number" class="form-control" name="numgdd" required>
+    <input type="text" class="form-control" name="numgdd" required>
 </div>
 </div>
 <div class="modal-footer">
