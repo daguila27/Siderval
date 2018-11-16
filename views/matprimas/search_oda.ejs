@@ -1,0 +1,67 @@
+<h1 class="page-header">Registrar Recepción de materiales</h1>
+<div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Buscar OC
+        </div>
+        <div class="panel-body">
+            <form id="oda_form">
+                <div class="form-inline input-group">
+                    <input type="text" id="oda_input" class="form-control" name="numoda">
+                    <div class="input-group-btn">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </form>
+            <form id="gdd_form">
+                <div id="oda_gdd" class="well" style="margin-top: 20px">
+                    No se ha seleccionado ninguna OC
+                </div>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //Formulario de Búsqueda
+        $("#oda_form").submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                url: "/matprimas/search_oca",
+                data: { numoda: $("#oda_input").val()},
+                type: "POST",
+                success: function(data){
+                    if(!data.err){
+                        $("#oda_gdd").html(data.html);
+                    } else alert(data.err_msg);
+                }
+            })
+        });
+        //Formulario de Recepcion
+        $("#gdd_form").submit(function(e){
+            e.preventDefault();
+            var detalle = [];
+            //revisar todos los inputs de la tabla
+            $("input[name = 'rec']").each(function(e){
+                //Agregar a la lista sólo los inputs que sean distintos de cero.
+                if($(this).val() != 0){
+                    detalle.push([$(this).data('idabast'),$(this).val()]);
+                }
+            });
+
+            $("#confirmar_gdd").modal('hide');
+            //Enviar Ajax
+            $.ajax({
+                type: 'post',
+                url: "/matprimas/save_recepcion",
+                data: {
+                    numgdd: $("input[name = 'numgdd']").val(),
+                    detalle: detalle
+                },
+                success: function(data){
+                    if(!data.err){
+                        $("#page-wrapper").html(data);
+                    } else alert(data.err_msg);
+                }
+            });
+        });
+    </script>
+</div>

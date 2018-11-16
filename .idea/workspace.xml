@@ -34,12 +34,15 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/views/abast/table_factura.ejs" afterPath="$PROJECT_DIR$/views/abast/table_factura.ejs" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/matprimas.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/matprimas.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/matprimas/oda_recep.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/matprimas/oda_recep.ejs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/matprimas/search_oda.ejs" beforeDir="false" afterPath="$PROJECT_DIR$/views/matprimas/search_oda.ejs" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
-    <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -93,36 +96,37 @@
           <entry key="project.open.time.40" value="1" />
           <entry key="project.open.time.42" value="2" />
           <entry key="project.open.time.45" value="1" />
+          <entry key="project.open.time.5" value="1" />
           <entry key="project.open.time.56" value="1" />
           <entry key="project.open.time.8" value="1" />
-          <entry key="project.opened" value="14" />
+          <entry key="project.opened" value="15" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="csv" value="5" />
-          <entry key="ejs" value="2514" />
-          <entry key="js" value="4283" />
+          <entry key="ejs" value="2638" />
+          <entry key="js" value="5459" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="EJS" value="2514" />
-          <entry key="JavaScript" value="4283" />
+          <entry key="EJS" value="2638" />
+          <entry key="JavaScript" value="5459" />
           <entry key="PLAIN_TEXT" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="csv" value="7" />
-          <entry key="ejs" value="39" />
+          <entry key="ejs" value="42" />
           <entry key="js" value="11" />
           <entry key="rnc" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="EJS" value="39" />
+          <entry key="EJS" value="42" />
           <entry key="JavaScript" value="11" />
           <entry key="PLAIN_TEXT" value="7" />
           <entry key="RNG Compact" value="1" />
@@ -137,8 +141,8 @@
       <file leaf-file-name="abast.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/abast.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="967" column="0" lean-forward="false" selection-start-line="967" selection-start-column="0" selection-end-line="967" selection-end-column="0" />
+            <state relative-caret-position="-289">
+              <caret line="966" column="23" selection-start-line="966" selection-start-column="23" selection-end-line="966" selection-end-column="23" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
                 <element signature="e#5105#5588#0" />
@@ -216,6 +220,31 @@
                 <marker date="1542206844192" expanded="true" signature="32375:32394" ph="..." />
                 <marker date="1542206844192" expanded="true" signature="32466:32479" ph="..." />
                 <marker date="1542206844192" expanded="true" signature="32677:32692" ph="..." />
+                <element signature="e#559#1022#0" />
+                <element signature="e#1071#2202#0" />
+                <element signature="e#3720#4887#0" />
+                <element signature="e#4954#7087#0" />
+                <element signature="e#7154#7708#0" />
+                <element signature="e#7764#8190#0" />
+                <element signature="e#8244#10330#0" />
+                <element signature="e#15636#16896#0" />
+                <element signature="e#16951#17607#0" />
+                <element signature="e#17611#18474#0" />
+                <element signature="e#18560#20787#0" />
+                <element signature="e#20844#21996#0" />
+                <element signature="e#22051#27339#0" />
+                <element signature="e#27402#33371#0" />
+                <element signature="e#33440#34624#0" />
+                <element signature="e#34678#37058#0" />
+                <element signature="e#37112#38287#0" />
+                <element signature="e#38342#38961#0" />
+                <element signature="e#39026#39547#0" />
+                <element signature="e#43167#44503#0" />
+                <element signature="e#44556#45692#0" />
+                <element signature="e#45745#46335#0" />
+                <element signature="e#46391#47122#0" />
+                <element signature="e#47191#48299#0" />
+                <element signature="e#50199#53222#0" />
               </folding>
             </state>
           </provider>
@@ -467,65 +496,38 @@
             <state relative-caret-position="21">
               <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/routes/matprimas.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="479">
-              <caret line="64" column="11" lean-forward="false" selection-start-line="64" selection-start-column="11" selection-end-line="64" selection-end-column="11" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="page_oda.ejs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/abast/page_oda.ejs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="94">
-              <caret line="245" column="47" lean-forward="true" selection-start-line="245" selection-start-column="47" selection-end-line="245" selection-end-column="47" />
+            <state relative-caret-position="347">
+              <caret line="218" selection-start-line="218" selection-end-line="219" />
               <folding>
-                <element signature="n#style#0;n#th#0;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#th#2;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#th#3;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#th#4;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#th#5;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#th#6;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#2;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#3;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#4;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#5;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#6;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#0;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#2;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#3;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#4;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#5;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#6;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#2;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#3;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#2;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#3;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#4;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-                <element signature="n#style#0;n#td#1;n#tr#5;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
+                <element signature="e#7989#9168#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="table_factura.ejs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/views/abast/table_factura.ejs">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/matprimas/search_oda.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-30">
+              <caret line="49" column="46" selection-start-line="49" selection-start-column="46" selection-end-line="49" selection-end-column="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/matprimas/oda_recep.ejs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="211">
+              <caret line="42" column="22" lean-forward="true" selection-start-line="42" selection-start-column="9" selection-end-line="42" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/views/matprimas/header_new.ejs">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="714">
               <caret line="42" column="36" selection-start-line="42" selection-start-column="36" selection-end-line="42" selection-end-column="36" />
@@ -555,6 +557,8 @@
             <state relative-caret-position="798">
               <caret line="308" column="13" lean-forward="false" selection-start-line="308" selection-start-column="13" selection-end-line="308" selection-end-column="13" />
               <folding />
+            <state relative-caret-position="123">
+              <caret line="247" column="49" selection-start-line="247" selection-start-column="49" selection-end-line="247" selection-end-column="49" />
             </state>
           </provider>
         </entry>
@@ -595,6 +599,10 @@
       <find>rec_odc</find>
       <find>page_</find>
       <find>table_fact</find>
+      <find>rec_</find>
+      <find>rec</find>
+      <find>busq_oda</find>
+      <find>insert</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -640,6 +648,7 @@
         <option value="$PROJECT_DIR$/views/plan/page_oc.ejs" />
         <option value="$PROJECT_DIR$/views/faena/footer.ejs" />
         <option value="$PROJECT_DIR$/views/faena/select_procesos.ejs" />
+
         <option value="$PROJECT_DIR$/routes/faena.js" />
         <option value="$PROJECT_DIR$/views/faena/render_cola.ejs" />
         <option value="$PROJECT_DIR$/views/jefeprod/ope_list.ejs" />
@@ -649,13 +658,17 @@
         <option value="$PROJECT_DIR$/routes/plan.js" />
         <option value="$PROJECT_DIR$/views/plan/template_oda.ejs" />
         <option value="$PROJECT_DIR$/views/abast/recieved_ped_page.ejs" />
-        <option value="$PROJECT_DIR$/routes/matprimas.js" />
         <option value="$PROJECT_DIR$/views/abast/page_oda.ejs" />
         <option value="$PROJECT_DIR$/views/abast/table_factura.ejs" />
-        <option value="$PROJECT_DIR$/routes/abast.js" />
         <option value="$PROJECT_DIR$/views/matprimas/create_retiro.ejs" />
         <option value="$PROJECT_DIR$/views/matprimas/create_devolucion.ejs" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/views/abast/footer_new.ejs" />
+        <option value="$PROJECT_DIR$/routes/abast.js" />
+        <option value="$PROJECT_DIR$/views/matprimas/oda_recep.ejs" />
+        <option value="$PROJECT_DIR$/routes/matprimas.js" />
+        <option value="$PROJECT_DIR$/views/matprimas/search_oda.ejs" />
+        <option value="$PROJECT_DIR$/views/matprimas/header_new.ejs" />
       </list>
     </option>
   </component>
@@ -677,23 +690,14 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
+    <option name="x" value="65" />
+    <option name="y" value="-23" />
     <option name="width" value="976" />
     <option name="height" value="1038" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
-      <flattenPackages />
-      <showMembers />
-      <showModules />
-      <showLibraryContents />
-      <hideEmptyPackages />
-      <abbreviatePackageNames />
-      <autoscrollToSource />
-      <autoscrollFromSource />
-      <sortByType />
-      <manualOrder />
+    <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
@@ -704,16 +708,6 @@
             <path>
               <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
               <item name="Siderval" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Siderval" type="462c0819:PsiDirectoryNode" />
-              <item name="csvs" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Siderval" type="462c0819:PsiDirectoryNode" />
-              <item name="routes" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Siderval" type="b2602c69:ProjectViewProjectNode" />
@@ -735,18 +729,20 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="nodejs_interpreter_path" value="C:/Program Files/nodejs/node" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\benja\Desktop\JibJab\Siderval2\Siderval\views\bodega" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\benja\Desktop\JibJab\Siderval2\Siderval\views\matprimas" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\benja\Desktop\JibJab\Siderval2\Siderval\views\matprimas" />
+      <recent name="C:\Users\benja\Desktop\JibJab\Siderval2\Siderval\views\bodega" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -761,16 +757,15 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Node.js.app.js">
-    <configuration name="app.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="project" path-to-js-file="app.js" working-dir="$PROJECT_DIR$" />
+  <component name="RunManager">
+    <configuration name="app.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-js-file="app.js" working-dir="$PROJECT_DIR$">
+      <method v="2" />
+    </configuration>
     <recent_temporary>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="Node.js.app.js" />
+      <list>
+        <item itemvalue="Node.js.app.js" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -812,6 +807,10 @@
       <workItem from="1542116242597" duration="20208000" />
       <workItem from="1542030655369" duration="6501000" />
       <workItem from="1542116242597" duration="24034000" />
+      <workItem from="1542236608868" duration="2996000" />
+      <workItem from="1542371924518" duration="603000" />
+      <workItem from="1542376397101" duration="8439000" />
+      <workItem from="1542385224183" duration="5182000" />
     </task>
     <servers />
   </component>
@@ -819,6 +818,7 @@
     <option name="totallyTimeSpent" value="146823000" />
     <option name="totallyTimeSpent" value="130564000" />
     <option name="totallyTimeSpent" value="134390000" />
+    <option name="totallyTimeSpent" value="151610000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -834,26 +834,28 @@
     <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1734532" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32460135" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24960339" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3997722" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17336309" />
+      <window_info id="Structure" order="1" weight="0.24960339" />
+      <window_info id="npm" order="2" side_tool="true" />
+      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32460135" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.3997722" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" visible="true" weight="0.3295082" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
     <layout-to-restore>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1592262" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12321523" />
       <window_info id="Structure" order="1" weight="0.24960339" />
       <window_info id="npm" order="2" side_tool="true" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -910,6 +912,15 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Terminal" order="9" weight="0.0" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1182,6 +1193,7 @@
         </state>
       </provider>
     </entry>
+  <component name="editorHistoryManager">
     <entry file="file://$USER_HOME$/envio_mails/app.js" />
     <entry file="file://$PROJECT_DIR$/views/plan/GDD/table_pedidos.ejs" />
     <entry file="file://$PROJECT_DIR$/views/plan/GDD/view_pedidos.ejs" />
@@ -1189,23 +1201,19 @@
     <entry file="file://$PROJECT_DIR$/views/jefeprod/ope_list.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4473">
-          <caret line="213" column="87" lean-forward="false" selection-start-line="213" selection-start-column="87" selection-end-line="213" selection-end-column="87" />
+          <caret line="213" column="87" selection-start-line="213" selection-start-column="87" selection-end-line="213" selection-end-column="87" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/users.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-378">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
+        <state relative-caret-position="-378" />
       </provider>
     </entry>
->>>>>>> cde7c843fab80ac3a7a71ee11904e47855f7fa0e
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-378">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-=======
     <entry file="file://$PROJECT_DIR$/routes/abast.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="318">
@@ -1357,6 +1365,7 @@
         <state relative-caret-position="1386">
           <caret line="472" column="0" lean-forward="false" selection-start-line="472" selection-start-column="0" selection-end-line="472" selection-end-column="0" />
         </state>
+        <state relative-caret-position="-378" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/bodega/show_stock.ejs">
@@ -1366,7 +1375,7 @@
     <entry file="file://$PROJECT_DIR$/views/bodega/g_despacho.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2163">
-          <caret line="184" column="0" lean-forward="false" selection-start-line="184" selection-start-column="0" selection-end-line="184" selection-end-column="0" />
+          <caret line="184" selection-start-line="184" selection-end-line="184" />
         </state>
       </provider>
     </entry>
@@ -1385,12 +1394,13 @@
         <state relative-caret-position="-768">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
+        <state relative-caret-position="-768" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="38" lean-forward="true" selection-start-line="0" selection-start-column="38" selection-end-line="0" selection-end-column="38" />
+        <state>
+          <caret column="38" lean-forward="true" selection-start-column="38" selection-end-column="38" />
         </state>
       </provider>
     </entry>
@@ -1404,13 +1414,15 @@
     <entry file="file://$PROJECT_DIR$/routes/matprimas.js">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state>
+          <caret lean-forward="true" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/jefeprod/header_new.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1056">
-          <caret line="240" column="0" lean-forward="false" selection-start-line="240" selection-start-column="0" selection-end-line="240" selection-end-column="0" />
+          <caret line="240" selection-start-line="240" selection-end-line="240" />
         </state>
       </provider>
     </entry>
@@ -1546,15 +1558,13 @@
     <entry file="file://$PROJECT_DIR$/routes/bodega.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="392">
-          <caret line="904" column="0" lean-forward="false" selection-start-line="904" selection-start-column="0" selection-end-line="904" selection-end-column="0" />
+          <caret line="904" selection-start-line="904" selection-end-line="904" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/bodega/header.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3711">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
+        <state relative-caret-position="-3711" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/jefeprod.js">
@@ -1562,7 +1572,7 @@
         <state relative-caret-position="1428">
           <caret line="87" column="28" lean-forward="false" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
         <state relative-caret-position="1386">
-          <caret line="472" column="0" lean-forward="false" selection-start-line="472" selection-start-column="0" selection-end-line="472" selection-end-column="0" />
+          <caret line="472" selection-start-line="472" selection-end-line="472" />
         </state>
       </provider>
     </entry>
@@ -1573,14 +1583,14 @@
         <state relative-caret-position="-504">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
-      </provider>
+        <state relative-caret-position="-504" />
     </entry>
     <entry file="file://$PROJECT_DIR$/views/plan/header_new.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="211">
           <caret line="104" column="109" lean-forward="false" selection-start-line="104" selection-start-column="109" selection-end-line="104" selection-end-column="109" />
         <state relative-caret-position="3360">
-          <caret line="160" column="0" lean-forward="false" selection-start-line="160" selection-start-column="0" selection-end-line="162" selection-end-column="43" />
+          <caret line="160" selection-start-line="160" selection-end-line="162" selection-end-column="43" />
         </state>
       </provider>
     </entry>
@@ -1610,6 +1620,8 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1282">
           <caret line="238" column="0" lean-forward="false" selection-start-line="238" selection-start-column="0" selection-end-line="238" selection-end-column="0" />
+        <state>
+          <caret lean-forward="true" />
         </state>
       </provider>
     </entry>
@@ -1674,144 +1686,63 @@
     <entry file="file://$PROJECT_DIR$/routes/faena.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
-          <caret line="5" column="22" lean-forward="false" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
+          <caret line="5" column="22" selection-start-line="5" selection-start-column="22" selection-end-line="5" selection-end-column="22" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/jefeprod/footer_new.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4284">
-          <caret line="252" column="46" lean-forward="false" selection-start-line="252" selection-start-column="46" selection-end-line="252" selection-end-column="46" />
+          <caret line="252" column="46" selection-start-line="252" selection-start-column="46" selection-end-line="252" selection-end-column="46" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/abast/lanzar_oc.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1649">
-          <caret line="97" column="15" lean-forward="false" selection-start-line="97" selection-start-column="15" selection-end-line="97" selection-end-column="15" />
+          <caret line="97" column="15" selection-start-line="97" selection-start-column="15" selection-end-line="97" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/abast/view_abastecimiento.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1156">
-          <caret line="68" column="52" lean-forward="false" selection-start-line="68" selection-start-column="52" selection-end-line="68" selection-end-column="52" />
+          <caret line="68" column="52" selection-start-line="68" selection-start-column="52" selection-end-line="68" selection-end-column="52" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/plan/template_oda.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="21">
-          <caret line="122" column="32" lean-forward="false" selection-start-line="122" selection-start-column="32" selection-end-line="122" selection-end-column="32" />
-          <folding>
-            <marker date="1542141726209" expanded="false" signature="4092:4104" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="4170:4182" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="4239:4251" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="4302:4370" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="4316:4359" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="4389:4401" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="4456:4871" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="4495:4846" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="4525:4553" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="4593:4623" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="4667:4697" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="4744:4764" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="5053:7076" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="5078:7054" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="5112:6828" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="5285:5303" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="5318:5328" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="5455:5733" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="5595:5613" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="5737:6535" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="5821:6222" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="6013:6031" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="6226:6508" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="6368:6386" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="6603:6724" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="6728:6803" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="6832:7029" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="7099:7532" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="7191:7350" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="7354:7508" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="7815:8045" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="7864:7882" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="8049:8896" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="8171:8517" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="8221:8239" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="8240:8491" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="8521:8778" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="8571:8589" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="8590:8752" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="8976:12635" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="8998:9986" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="9156:9361" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="9200:9218" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="9219:9340" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="9365:9962" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="9449:9717" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="9498:9516" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="9517:9692" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="9721:9937" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="9770:9788" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="9789:9912" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="10009:11356" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="10099:10116" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="10266:11230" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="10323:10583" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="10373:10391" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="10392:10514" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="10587:11205" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="10669:10935" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="10719:10737" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="10738:10909" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="10939:11156" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="10989:11007" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="11008:11130" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="11234:11331" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="11282:11300" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="11469:11485" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="11686:11915" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="11734:11752" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="11753:11891" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="11919:12584" ph="{...}" />
-            <marker date="1542141726209" expanded="true" signature="12020:12322" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="12069:12087" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="12088:12297" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="12326:12559" ph="{...}" />
-            <marker date="1542141726209" expanded="false" signature="12375:12393" ph="..." />
-            <marker date="1542141726209" expanded="true" signature="12394:12534" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="13193:13240" ph="..." />
-            <marker date="1542141726209" expanded="false" signature="13268:13279" ph="..." />
-          </folding>
+          <caret line="122" column="32" selection-start-line="122" selection-start-column="32" selection-end-line="122" selection-end-column="32" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/plan/table_fabricaciones.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1428">
-          <caret line="87" column="28" lean-forward="false" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
+          <caret line="87" column="28" selection-start-line="87" selection-start-column="28" selection-end-line="87" selection-end-column="28" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/bodega/view_despachos.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-10">
-          <caret line="39" column="0" lean-forward="true" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
+          <caret line="39" lean-forward="true" selection-start-line="39" selection-end-line="39" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/plan/view_fabricaciones.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="211">
-          <caret line="104" column="109" lean-forward="false" selection-start-line="104" selection-start-column="109" selection-end-line="104" selection-end-column="109" />
+          <caret line="104" column="109" selection-start-line="104" selection-start-column="109" selection-end-line="104" selection-end-column="109" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/plan/view_pedidos.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="731">
-          <caret line="82" column="109" lean-forward="false" selection-start-line="82" selection-start-column="109" selection-end-line="82" selection-end-column="109" />
+          <caret line="82" column="109" selection-start-line="82" selection-start-column="109" selection-end-line="82" selection-end-column="109" />
         </state>
       </provider>
     </entry>
@@ -2011,231 +1942,156 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="493">
           <caret line="71" column="36" lean-forward="true" selection-start-line="71" selection-start-column="36" selection-end-line="71" selection-end-column="36" />
-          <folding>
-            <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/plan.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="21">
-          <caret line="4621" column="0" lean-forward="true" selection-start-line="4621" selection-start-column="0" selection-end-line="4621" selection-end-column="0" />
-          <folding>
-            <element signature="e#37656#45054#0" expanded="false" />
-            <element signature="e#45747#48015#0" expanded="false" />
-            <element signature="e#48058#51131#0" expanded="false" />
-            <element signature="e#51177#59172#0" expanded="false" />
-            <element signature="e#59219#62745#0" expanded="false" />
-            <element signature="e#62791#65643#0" expanded="false" />
-            <element signature="e#65705#67693#0" expanded="false" />
-            <element signature="e#67749#69830#0" expanded="false" />
-            <marker date="1542141726169" expanded="true" signature="36619:36638" ph="..." />
-            <marker date="1542141726169" expanded="true" signature="199864:199877" ph="..." />
-            <marker date="1542141726169" expanded="true" signature="200129:200142" ph="..." />
-            <marker date="1542141726169" expanded="true" signature="200575:200593" ph="..." />
-          </folding>
+          <caret line="4621" lean-forward="true" selection-start-line="4621" selection-end-line="4621" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="159">
-          <caret line="117" column="31" lean-forward="false" selection-start-line="117" selection-start-column="31" selection-end-line="117" selection-end-column="31" />
-          <folding>
-            <element signature="e#3086#4108#0" expanded="false" />
-            <element signature="e#4161#6098#0" expanded="false" />
-          </folding>
+          <caret line="117" column="31" selection-start-line="117" selection-start-column="31" selection-end-line="117" selection-end-column="31" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/abast/footer_new.ejs">
+    <entry file="file://$PROJECT_DIR$/views/abast/table_abastecimientos.ejs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="798">
-          <caret line="308" column="13" lean-forward="false" selection-start-line="308" selection-start-column="13" selection-end-line="308" selection-end-column="13" />
-          <folding />
+        <state relative-caret-position="168">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/matprimas/create_retiro.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="567">
+          <caret line="27" selection-start-line="27" selection-end-line="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/matprimas/create_devolucion.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="588">
+          <caret line="28" selection-start-line="28" selection-end-line="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/abast/page_oda.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="607">
+          <caret line="39" column="103" lean-forward="true" selection-start-line="39" selection-start-column="103" selection-end-line="39" selection-end-column="118" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/abast/table_factura.ejs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="493">
-          <caret line="116" column="15" lean-forward="true" selection-start-line="116" selection-start-column="15" selection-end-line="116" selection-end-column="15" />
-          <folding>
-            <element signature="n#style#0;n#th#2;n#tr#0;n#thead#0;n#table#0;n#div#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#th#3;n#tr#0;n#thead#0;n#table#0;n#div#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#th#4;n#tr#0;n#thead#0;n#table#0;n#div#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#3;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#div#0;n#div#2;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#textarea#0;n#div#1;n#div#2;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/routes/abast.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="967" column="0" lean-forward="false" selection-start-line="967" selection-start-column="0" selection-end-line="967" selection-end-column="0" />
-          <folding>
-            <element signature="e#559#1022#0" expanded="false" />
-            <element signature="e#1071#2202#0" expanded="false" />
-            <element signature="e#3720#4887#0" expanded="false" />
-            <element signature="e#4954#7087#0" expanded="false" />
-            <element signature="e#7154#7708#0" expanded="false" />
-            <element signature="e#7764#8190#0" expanded="false" />
-            <element signature="e#8244#10330#0" expanded="false" />
-            <element signature="e#15636#16896#0" expanded="false" />
-            <element signature="e#16951#17607#0" expanded="false" />
-            <element signature="e#17611#18474#0" expanded="false" />
-            <element signature="e#18560#20787#0" expanded="false" />
-            <element signature="e#20844#21996#0" expanded="false" />
-            <element signature="e#22051#27339#0" expanded="false" />
-            <element signature="e#27402#33371#0" expanded="false" />
-            <element signature="e#33440#34624#0" expanded="false" />
-            <element signature="e#34678#37058#0" expanded="false" />
-            <element signature="e#37112#38287#0" expanded="false" />
-            <element signature="e#38342#38961#0" expanded="false" />
-            <element signature="e#39026#39547#0" expanded="false" />
-            <element signature="e#43167#44503#0" expanded="false" />
-            <element signature="e#44556#45692#0" expanded="false" />
-            <element signature="e#45745#46335#0" expanded="false" />
-            <element signature="e#46391#47122#0" expanded="false" />
-            <element signature="e#47191#48323#0" expanded="false" />
-            <element signature="e#53149#54314#0" expanded="false" />
-            <element signature="e#54376#56474#0" expanded="false" />
-            <element signature="e#56736#59931#0" expanded="false" />
-            <element signature="e#61888#63219#0" expanded="false" />
-            <element signature="e#63272#65580#0" expanded="false" />
-            <element signature="e#65643#68943#0" expanded="false" />
-            <element signature="e#69089#69406#0" expanded="false" />
-            <element signature="e#72046#72981#0" expanded="false" />
-            <element signature="e#73213#75193#0" expanded="false" />
-            <element signature="e#75249#77083#0" expanded="false" />
-            <element signature="e#77144#78086#0" expanded="false" />
-            <element signature="e#78148#79482#0" expanded="false" />
-            <element signature="e#79543#83576#0" expanded="false" />
-            <element signature="e#83640#87063#0" expanded="false" />
-            <element signature="e#87118#92088#0" expanded="false" />
-            <element signature="e#92144#92642#0" expanded="false" />
-            <element signature="e#92698#94518#0" expanded="false" />
-            <element signature="e#94588#95466#0" expanded="false" />
-            <element signature="e#95530#95854#0" expanded="false" />
-            <element signature="e#95920#97282#0" expanded="false" />
-            <element signature="e#97336#105169#0" expanded="false" />
-            <element signature="e#105223#107287#0" expanded="false" />
-            <element signature="e#107341#111024#0" expanded="false" />
-            <element signature="e#111080#113493#0" expanded="false" />
-            <element signature="e#113549#115608#0" expanded="false" />
-            <element signature="e#115667#117251#0" expanded="false" />
-            <marker date="1542206844192" expanded="true" signature="28512:28533" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="28740:28759" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="28831:28844" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="29068:29083" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="29675:29696" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="29903:29922" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="29994:30007" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="30231:30246" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="31012:31033" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="31240:31259" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="31331:31344" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="31542:31557" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="32147:32168" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="32375:32394" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="32466:32479" ph="..." />
-            <marker date="1542206844192" expanded="true" signature="32677:32692" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/25octubre-sql.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-13856">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/routes/matprimas.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="291">
-          <caret line="145" column="30" lean-forward="true" selection-start-line="145" selection-start-column="30" selection-end-line="145" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/abast/page_oda.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="94">
-          <caret line="245" column="47" lean-forward="true" selection-start-line="245" selection-start-column="47" selection-end-line="245" selection-end-column="47" />
-          <folding>
-            <element signature="n#style#0;n#th#0;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#th#2;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#th#3;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#th#4;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#th#5;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#th#6;n#tr#0;n#thead#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#2;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#3;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#4;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#5;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#6;n#tr#0;n#tbody#0;n#table#0;n#div#1;n#div#0;n#div#0;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#0;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#0;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#2;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#3;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#4;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#5;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#6;n#tbody#0;n#table#1;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#2;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#3;n#tbody#0;n#table#2;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#0;n#tr#0;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#1;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#2;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#3;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#4;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-            <element signature="n#style#0;n#td#1;n#tr#5;n#tbody#0;n#table#3;n#div#0;n#div#1;n#div#0;n#div#3;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/abast/table_abastecimientos.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="20" column="0" lean-forward="false" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/matprimas/create_retiro.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="388">
-          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/views/matprimas/create_devolucion.ejs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="21">
-          <caret line="28" column="0" lean-forward="false" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
-          <folding />
+          <caret line="116" column="15" selection-start-line="116" selection-start-column="15" selection-end-line="116" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="479">
-          <caret line="64" column="11" lean-forward="false" selection-start-line="64" selection-start-column="11" selection-end-line="64" selection-end-column="11" />
-          <folding />
+        <state relative-caret-position="659">
+          <caret line="64" column="11" selection-start-line="64" selection-start-column="11" selection-end-line="64" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/25octubre-sql.sql" />
+    <entry file="file://$PROJECT_DIR$/views/abast/modal_odc_received.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="28" selection-start-line="14" selection-start-column="28" selection-end-line="14" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/abast/recieved_ped.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4233">
+          <caret line="249" selection-start-line="249" selection-end-line="249" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/matprimas/footer_new.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1496">
+          <caret line="88" selection-start-line="88" selection-end-line="110" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/abast/footer_new.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2618">
+          <caret line="154" column="30" selection-start-line="154" selection-start-column="26" selection-end-line="154" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/abast.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-289">
+          <caret line="966" column="23" selection-start-line="966" selection-start-column="23" selection-end-line="966" selection-end-column="23" />
+          <folding>
+            <element signature="e#559#1022#0" />
+            <element signature="e#1071#2202#0" />
+            <element signature="e#3720#4887#0" />
+            <element signature="e#4954#7087#0" />
+            <element signature="e#7154#7708#0" />
+            <element signature="e#7764#8190#0" />
+            <element signature="e#8244#10330#0" />
+            <element signature="e#15636#16896#0" />
+            <element signature="e#16951#17607#0" />
+            <element signature="e#17611#18474#0" />
+            <element signature="e#18560#20787#0" />
+            <element signature="e#20844#21996#0" />
+            <element signature="e#22051#27339#0" />
+            <element signature="e#27402#33371#0" />
+            <element signature="e#33440#34624#0" />
+            <element signature="e#34678#37058#0" />
+            <element signature="e#37112#38287#0" />
+            <element signature="e#38342#38961#0" />
+            <element signature="e#39026#39547#0" />
+            <element signature="e#43167#44503#0" />
+            <element signature="e#44556#45692#0" />
+            <element signature="e#45745#46335#0" />
+            <element signature="e#46391#47122#0" />
+            <element signature="e#47191#48299#0" />
+            <element signature="e#50199#53222#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/matprimas/oda_recep.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="211">
+          <caret line="42" column="22" lean-forward="true" selection-start-line="42" selection-start-column="9" selection-end-line="42" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/matprimas.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="347">
+          <caret line="218" selection-start-line="218" selection-end-line="219" />
+          <folding>
+            <element signature="e#7989#9168#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/matprimas/search_oda.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-30">
+          <caret line="49" column="46" selection-start-line="49" selection-start-column="46" selection-end-line="49" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/matprimas/header_new.ejs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="123">
+          <caret line="247" column="49" selection-start-line="247" selection-start-column="49" selection-end-line="247" selection-end-column="49" />
         </state>
       </provider>
     </entry>

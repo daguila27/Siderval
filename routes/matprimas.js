@@ -120,6 +120,104 @@ router.post("/save_movimiento",function(req,res,next){
 /*
 * CONTROLADOR QUE RENDERIZA LA VISTA PRINCIPAL DE Materias Primas --> Movimientos --> Ver Movimientos
 * */
+router.get("/busq_oda",function(req,res,next){
+    if(req.session.userData){
+        res.render("matprimas/search_oda");
+    } else res.redirect("/bad_login");
+});
+/*
+* CONTROLADOR QUE ENVÍA VISTA PARA RECEPCIÓN DE OCA
+* */
+router.post("/search_oca",function(req,res,next){
+    if(req.session.userData){
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+            connection.query("select oda.numoda,abastecimiento.idabast,material.idmaterial,material.detalle,coalesce(material.u_medida,'und') AS umed,abastecimiento.cantidad,abastecimiento.recibidos"
+                + " from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
+                + "abastecimiento.idmaterial = material.idmaterial WHERE oda.idoda = ? and abastecimiento.recibidos < abastecimiento.cantidad group by abastecimiento.idabast"
+                ,[req.body.numoda],function(err,rows){
+                if(err) console.log(err);
+
+                console.log(rows);
+                if(rows.length){
+                    res.render("matprimas/oda_recep",{data:rows},function(err,html){
+                        if(err) console.log(err);
+                        res.send({err: false,err_msg: "Exito",html:html});
+                    });
+                } else {
+                    res.send({err: true,err_msg: "No se encontró ninguna OC con tal número"});
+                }
+            });
+
+        });
+    } else res.redirect("/bad_login");
+});
+
+
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+/*
+* CONTROLADOR QUE REGISTRA LA RECEPCIÓN DESDE PROVEEDORES
+* */
+router.post("/save_recepcion",function(req,res,next){
+    if(req.session.userData){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var recep = [[input.numgdd, new Date().toLocaleDateString()]];
+        var recep_d = [];
+        /*
+        * UPDATE `table` SET `uid` = CASE
+                WHEN id = 1 THEN 2952
+                WHEN id = 2 THEN 4925
+                WHEN id = 3 THEN 1592
+                ELSE `uid`
+                END
+            WHERE id  in (1,2,3)
+        * */
+        var ids = '';
+        var query = "UPDATE abastecimiento SET recibidos = CASE";
+        for(var e=1; e < Object.size(input); e++){
+            recep_d.push([0, input['detalle['+(e-1)+'][]'][0], input['detalle['+(e-1)+'][]'][1] ]);
+            ids +=  input['detalle['+(e-1)+'][]'][0]+",";
+            query += " WHEN idabast = "+input['detalle['+(e-1)+'][]'][0]+" THEN recibidos+"+parseInt(input['detalle['+(e-1)+'][]'][1]);
+        }
+        query += " ELSE recibidos END WHERE idabast IN ("+ids.substring(0,ids.length-1)+")";
+        console.log(query);
+
+        req.getConnection(function(err, connection){
+            if(err){ console.log("Error Connection : %s", err);}
+
+            connection.query("INSERT INTO recepcion (numgd, fecha) VALUES ?", [recep], function(err, inRecep){
+                if(err){ console.log("Error Insert : %s", err);}
+
+                console.log(inRecep);
+                for(var p=0; p < recep_d.length; p++){
+                    recep_d[p][0] = inRecep.insertId;
+                }
+
+                connection.query("INSERT INTO recepcion_detalle (idrecepcion, idabast, cantidad) VALUES ?", [recep_d], function(err, inRecepD){
+                    if(err) {console.log("Error Insert : %s", err);}
+
+                    console.log(inRecepD);
+                    connection.query(query, function(err, upAbast){
+                        if(err) {console.log("Error Insert : %s", err);}
+
+                        console.log(upAbast);
+                        res.redirect('/matprimas/busq_oda');
+                    });
+                });
+            });
+        });
+    } else res.send({err:true,err_msg:"MENTIROSO, EMBUSTERO"});
+});
+/*
+* Controlador que renderiza la vista Mat_primas --> Registrar Llegada de Productos.
+* */
 router.get("/view_movimientos",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err, connection){
