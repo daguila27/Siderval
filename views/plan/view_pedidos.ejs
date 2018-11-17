@@ -93,7 +93,6 @@
 		}
 		else if($(this).data('view') == 'table_pedidos/pedido.f_entrega-ASC/1') {
 			// Muestra el nav de paginacion
-			console.log("agrega paginacion");
 			$("#paginacion").css('display','block');
 		}
 		$.ajax({
@@ -111,7 +110,7 @@
 	$(function(){
         window.pagObj = $('.pagination').twbsPagination({
             totalPages: <%=Math.ceil(largo/50)%>,
-            visiblePages: 5,
+            visiblePages: 4,
             first:"Primero",
             prev: '<span aria-hidden="true">&laquo;</span>',
             next: '<span aria-hidden="true">&raquo;</span>',

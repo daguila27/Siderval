@@ -67,6 +67,7 @@ router.get('/odcs', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
+
 //Renderizar la página de ODA específica de odoo.
 router.get('/page_oda/:idoda', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -77,7 +78,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
                 connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
 					" LEFT JOIN factura ON factura.idoda = oda.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados" +
+                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(abastecimiento.cantidad,0)) as facturados" +
 						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
 						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
@@ -1323,8 +1324,20 @@ router.get('/view_abastecimiento', function(req, res, next) {
         req.getConnection(function(err, connection){
             connection.query("SELECT * FROM cuenta", function(err, cc){
 				if(err) throw err;
-
-                res.render('abast/view_abastecimiento', {cc: cc});
+				req.getConnection(function(err, connection){
+		        	if(err) { console.log("Error Connection : %s", err);
+		        	} else {
+			        	connection.query("select abastecimiento.*, coalesce(cliente.sigla, 'Sin Proveedor') as sigla,coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle "+
+			        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor left " +
+			        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) WHERE  abastecimiento.cantidad > abastecimiento.recibidos", function(err, abs){
+			        		if(err) { console.log("Error Selecting : %s", err);
+			        		}else {
+			        			console.log(abs);
+				        		res.render('abast/view_abastecimiento', {cc: cc, largo: abs.length});
+				        	}
+			        	});
+			        }
+		        });
 			});
         });
     }
@@ -1334,8 +1347,11 @@ router.get('/view_abastecimiento', function(req, res, next) {
 /*  Funcion que busca los abastecimientos y los ordena segun paramentro orden en la url, muestra solo pendiente si showPend es true
 	Renderiza una tabla con los abastecimientos solicitados
 */
-router.post('/table_abastecimientos', function(req, res, next){
+router.post('/table_abastecimientos/:page', function(req, res, next){
 	if(verificar(req.session.userData)){
+		//Obtiene la pagina de la url y obtiene el nro de registros a solicitar
+		var page = req.params.page - 1;
+        var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
         var clave = input.clave;
         var orden;
@@ -1369,13 +1385,16 @@ router.post('/table_abastecimientos', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("select abastecimiento.*, coalesce(cliente.sigla, 'Sin Proveedor') as sigla,coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle "+
-	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor left " +
-	        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) " + where + " ORDER BY "+orden, function(err, abs){
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*, COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
+	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
+	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
+	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
+	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where 
+	        		+ " LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 	        			console.log(abs);
-		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-')});
+		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1});
 		        	}
 	        	});
 	        }

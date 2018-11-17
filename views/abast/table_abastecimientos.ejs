@@ -62,6 +62,7 @@
 			<td></td>
 			<td></td>
 			<td></td>
+			<td></td>
 		</tr>
 	</tfoot>
 </table>
@@ -107,7 +108,7 @@
                 showPend: $("#pend").is(':checked'),
                 cc_selected: $(".select_cc").val().join(',')
             },
-            url: '/abastecimiento/table_abastecimientos',
+            url: '/abastecimiento/table_abastecimientos/<%=page%>',
             success: function(data){
                 $(".main-page").html(data);
             }
