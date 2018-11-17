@@ -7,6 +7,20 @@
             return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
         }
     }
+    
+    var etapas = [
+        "Jefe de Producción",
+        "Moldeo",
+        "Fusión",
+        "Quiebre",
+        "Terminación",
+        "Tratamiento Térmico",
+        "Maestranza",
+        "Control de Calidad",
+        "Mantención",
+        "Externo",
+        "Otros"
+    ];
 %>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
     <thead>
@@ -27,7 +41,7 @@
             <td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].detalle%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%= data[i].cantidad%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].u_medida%></td>
-            <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].nombre_etapa%></td>
+            <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=etapas[parseInt(data[i].nombre_etapa)]%></td>
             <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
                 <%if(data[i].tipo_mov == '0'){%>
                     Retiro
