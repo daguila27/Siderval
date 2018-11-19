@@ -984,7 +984,7 @@ router.post('/get_table_fact', function(req, res, next){
         			console.log("Error Selecting : %s", err);
 
 
-        		console.log(oda);
+        		//console.log(oda);
         		var isfacturable = false;
         		if(oda.length){
         			console.log("NOT EMPTY");
@@ -995,14 +995,20 @@ router.post('/get_table_fact', function(req, res, next){
         					break;
 						}
 					}
-                    res.render('abast/table_factura', {oda: oda,isfacturable: isfacturable});
+                    res.render('abast/table_factura', {oda: oda},function(err,html){
+                        if(err) console.log(err);
+                        res.send({html:html,isfacturable: isfacturable})
+                    });
 				} else {
         			console.log('EMPTY');
-                    res.render('abast/table_factura', {oda: [],isfacturable: isfacturable});
+                    res.render('abast/table_factura', {oda: []},function(err,html){
+                        if(err) console.log(err);
+                        res.send({html:html,isfacturable: isfacturable})
+                    });
 				}
         	});
         });
-    } else res.redirect("/bad_login");
+    } else res.send({isfacturbale: false,err_msg: "MALDITO HACKER, BASTA"});
 });
 
 router.post('/save_factura', function(req, res, next){

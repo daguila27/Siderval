@@ -34,14 +34,10 @@ function fechaLatino(string){
                             <a class="pull-right" style="z-index: 10; margin:10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
                                 <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
                             </a>
-                            <%if(isfact){%>
-                                <a class="pull-right" style="margin: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)" data-toggle="modal" data-target="#facturaModal">
-                                    <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
-                                </a>
-                            <%}%>
-                            <a class="pull-right" style="margin: 10px" data-toggle="modal" data-target="#receivedModal" data-id="<%= oda.idoda%>" onclick="oda_data(this)">
-                                <i data-toggle="tooltip" title="Recepcionar" class="fa fa-truck"></i>
+                            <a class="pull-right" style="margin: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
+                                <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
                             </a>
+
 
                         </h1>
                     </div>
