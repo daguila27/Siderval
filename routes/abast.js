@@ -1337,7 +1337,6 @@ router.get('/view_abastecimiento', function(req, res, next) {
 			        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) WHERE  abastecimiento.cantidad > abastecimiento.recibidos", function(err, abs){
 			        		if(err) { console.log("Error Selecting : %s", err);
 			        		}else {
-			        			console.log(abs);
 				        		res.render('abast/view_abastecimiento', {cc: cc, largo: abs.length});
 				        	}
 			        	});
