@@ -1369,7 +1369,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 		}
         var showPend = input.showPend;
         var cc_selected = input.cc_selected.split(',');
-        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR abastecimiento.idoda LIKE '%"+clave+"%' OR cliente.sigla LIKE '%"+clave+"%')";
+        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR oda.idoda LIKE '%"+clave+"%' OR cliente.sigla LIKE '%"+clave+"%')";
         var cc_cond = " ";
         if(showPend == 'true'){
             where += " AND abastecimiento.cantidad > abastecimiento.recibidos ";
@@ -1396,7 +1396,8 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
 	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
-                    + " LEFT JOIN factura ON factura.idoda = abastecimiento.idoda"
+                    + " LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast"
+                    + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
 	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
 	        		+ " GROUP BY abastecimiento.idabast LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
