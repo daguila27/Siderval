@@ -660,7 +660,7 @@ However, delay the fade out process for 2.5 seconds */
                 success: function(data){
                     if(data.isfacturable){
                         $(".table-factura").html(data.html);
-                        $("#facturaModal").modal(toggle);
+                        $("#facturaModal").modal('toggle');
                     } else alert("No es posible registrar Facturas a esta OC");
                 }
 

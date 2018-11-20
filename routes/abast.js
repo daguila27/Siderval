@@ -75,12 +75,14 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
-					" LEFT JOIN factura ON factura.idoda = oda.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) AS facturas_token FROM oda" +
+                    " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
+                    " LEFT JOIN factura ON oda.idoda = factura.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(abastecimiento.cantidad,0)) as facturados" +
+                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados, GROUP_CONCAT(facturacion.cantidad,facturacion.costo,factura.numfac)" +
 						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
-						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast WHERE abastecimiento.idoda = ?" +
+						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast" +
+                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
                         //res.redirect('/plan');
@@ -1389,12 +1391,14 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*, COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) as factura_token," +
+                    " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
 	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
-	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where 
-	        		+ " LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden, function(err, abs){
+                    + " LEFT JOIN factura ON factura.idoda = abastecimiento.idoda"
+	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
+	        		+ " GROUP BY abastecimiento.idabast LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 	        			console.log(abs);
