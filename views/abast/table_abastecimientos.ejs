@@ -18,6 +18,7 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
+
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
 	<thead>
 		<tr>
@@ -55,7 +56,7 @@
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].recibidos %></td>
 				<td class="o_data_cell" style="text-align: center;">
 					<% for(var j=0;j<lista.length;j++){%>
-					<a href="#" data-idfactura="<%= lista[j][1] %>" class="label label-primary"><%= lista[j][0]%></a>
+						<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
 					<%}%>
 				</td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].u_medida%></td>
@@ -84,6 +85,11 @@
 		</tr>
 	</tfoot>
 </table>
+
+
+
+
+
 
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js" type="text/javascript"></script>
