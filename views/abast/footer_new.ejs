@@ -333,6 +333,13 @@ However, delay the fade out process for 2.5 seconds */
               url: '/abastecimiento/save_factura',
               success: function(data){
                   alert(data);
+                  $.ajax({
+                      type: 'GET',
+                      url: '/abastecimiento/page_oda/'+$('#factura_idoda').val(),
+                      success: function(data){
+                          $(".main-page").html(data);
+                      }
+                  });
                   $("#facturaModal").modal('hide');
               }
             });
