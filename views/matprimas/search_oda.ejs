@@ -39,6 +39,7 @@
         $("#gdd_form").submit(function(e){
             e.preventDefault();
             var detalle = [];
+            $("#confirmar_gdd").modal("toggle");
             //revisar todos los inputs de la tabla
             $("input[name = 'rec']").each(function(e){
                 //Agregar a la lista sólo los inputs que sean distintos de cero.
@@ -47,7 +48,6 @@
                 }
             });
 
-            $("#confirmar_gdd").modal('hide');
             //Enviar Ajax
             $.ajax({
                 type: 'post',
@@ -58,6 +58,7 @@
                 },
                 success: function(data){
                     if(!data.err){
+                        alert("Guía guardada correctamente");
                         $("#page-wrapper").html(data);
                     } else alert(data.err_msg);
                 }

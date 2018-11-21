@@ -25,6 +25,7 @@
 			<th class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Detalle</th>
 			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.cantidad-ASC">Solicitados</th>
 			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.recibidos-ASC">Recibidos</th>
+			<th class="cabecera o_column_sortable" >Facturas adjuntas</th>
 			<th class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
 			<th class="cabecera o_column_sortable order-column" style="text-align: center" data-order="abastecimiento.costo-ASC">Costo</th>
 			<th class="cabecera o_column_sortable order-column" style="text-align: center" data-order="abastecimiento.costo*abastecimiento.cantidad-ASC">Total</th>
@@ -34,12 +35,29 @@
 		</tr>
 	</thead>
 	<tbody class="ui-sortable">
-		<%for(var i=0; i < data.length; i++){ %>
+		<%var lista = [];
+		var lista2 = [];
+		for(var i=0; i < data.length; i++){
+		    if(data[i].factura_token != null){
+				lista = data[i].factura_token.split(",");
+				if(lista.length > 1){
+					lista.map(function(e){
+						lista2.push(e.split("@"));
+						return e;
+					});
+					lista = lista2;
+				} else lista[0] = lista[0].split("@");
+			} else lista = [];%>
 			<tr class="o_data_row">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].idoda%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].detalle%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].cantidad %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].recibidos %></td>
+				<td class="o_data_cell" style="text-align: center;">
+					<% for(var j=0;j<lista.length;j++){%>
+					<a href="#" data-idfactura="<%= lista[j][1] %>" class="label label-primary"><%= lista[j][0]%></a>
+					<%}%>
+				</td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].u_medida%></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].costo %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
@@ -62,12 +80,13 @@
 			<td></td>
 			<td></td>
 			<td></td>
+			<td></td>
 		</tr>
 	</tfoot>
 </table>
 
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js""></script>
+<script src="parsear_nro.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -107,7 +126,7 @@
                 showPend: $("#pend").is(':checked'),
                 cc_selected: $(".select_cc").val().join(',')
             },
-            url: '/abastecimiento/table_abastecimientos',
+            url: '/abastecimiento/table_abastecimientos/<%=page%>',
             success: function(data){
                 $(".main-page").html(data);
             }

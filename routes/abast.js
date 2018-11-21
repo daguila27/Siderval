@@ -67,6 +67,7 @@ router.get('/odcs', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
+
 //Renderizar la página de ODA específica de odoo.
 router.get('/page_oda/:idoda', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -74,12 +75,14 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac) AS facturas_token FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
-					" LEFT JOIN factura ON factura.idoda = oda.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) AS facturas_token FROM oda" +
+                    " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
+                    " LEFT JOIN factura ON oda.idoda = factura.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados" +
+                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados, GROUP_CONCAT(facturacion.cantidad,facturacion.costo,factura.numfac)" +
 						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
-						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast WHERE abastecimiento.idoda = ?" +
+						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast" +
+                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
                         //res.redirect('/plan');
@@ -983,7 +986,7 @@ router.post('/get_table_fact', function(req, res, next){
         			console.log("Error Selecting : %s", err);
 
 
-        		console.log(oda);
+        		//console.log(oda);
         		var isfacturable = false;
         		if(oda.length){
         			console.log("NOT EMPTY");
@@ -994,14 +997,20 @@ router.post('/get_table_fact', function(req, res, next){
         					break;
 						}
 					}
-                    res.render('abast/table_factura', {oda: oda,isfacturable: isfacturable});
+                    res.render('abast/table_factura', {oda: oda},function(err,html){
+                        if(err) console.log(err);
+                        res.send({html:html,isfacturable: isfacturable})
+                    });
 				} else {
         			console.log('EMPTY');
-                    res.render('abast/table_factura', {oda: [],isfacturable: isfacturable});
+                    res.render('abast/table_factura', {oda: []},function(err,html){
+                        if(err) console.log(err);
+                        res.send({html:html,isfacturable: isfacturable})
+                    });
 				}
         	});
         });
-    } else res.redirect("/bad_login");
+    } else res.send({isfacturbale: false,err_msg: "MALDITO HACKER, BASTA"});
 });
 
 router.post('/save_factura', function(req, res, next){
@@ -1322,8 +1331,19 @@ router.get('/view_abastecimiento', function(req, res, next) {
         req.getConnection(function(err, connection){
             connection.query("SELECT * FROM cuenta", function(err, cc){
 				if(err) throw err;
-
-                res.render('abast/view_abastecimiento', {cc: cc});
+				req.getConnection(function(err, connection){
+		        	if(err) { console.log("Error Connection : %s", err);
+		        	} else {
+			        	connection.query("select abastecimiento.*, coalesce(cliente.sigla, 'Sin Proveedor') as sigla,coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle "+
+			        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor left " +
+			        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) WHERE  abastecimiento.cantidad > abastecimiento.recibidos", function(err, abs){
+			        		if(err) { console.log("Error Selecting : %s", err);
+			        		}else {
+				        		res.render('abast/view_abastecimiento', {cc: cc, largo: abs.length});
+				        	}
+			        	});
+			        }
+		        });
 			});
         });
     }
@@ -1333,8 +1353,11 @@ router.get('/view_abastecimiento', function(req, res, next) {
 /*  Funcion que busca los abastecimientos y los ordena segun paramentro orden en la url, muestra solo pendiente si showPend es true
 	Renderiza una tabla con los abastecimientos solicitados
 */
-router.post('/table_abastecimientos', function(req, res, next){
+router.post('/table_abastecimientos/:page', function(req, res, next){
 	if(verificar(req.session.userData)){
+		//Obtiene la pagina de la url y obtiene el nro de registros a solicitar
+		var page = req.params.page - 1;
+        var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
         var clave = input.clave;
         var orden;
@@ -1346,7 +1369,7 @@ router.post('/table_abastecimientos', function(req, res, next){
 		}
         var showPend = input.showPend;
         var cc_selected = input.cc_selected.split(',');
-        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR abastecimiento.idoda LIKE '%"+clave+"%' OR cliente.sigla LIKE '%"+clave+"%')";
+        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR oda.idoda LIKE '%"+clave+"%' OR cliente.sigla LIKE '%"+clave+"%')";
         var cc_cond = " ";
         if(showPend == 'true'){
             where += " AND abastecimiento.cantidad > abastecimiento.recibidos ";
@@ -1368,13 +1391,19 @@ router.post('/table_abastecimientos', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("select abastecimiento.*, coalesce(cliente.sigla, 'Sin Proveedor') as sigla,coalesce(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle "+
-	        		"from abastecimiento left join oda on oda.idoda=abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor left " +
-	        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) " + where + " ORDER BY "+orden, function(err, abs){
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) as factura_token," +
+                    " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
+	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
+	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
+	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
+                    + " LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast"
+                    + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
+	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
+	        		+ " GROUP BY abastecimiento.idabast LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 	        			console.log(abs);
-		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-')});
+		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1});
 		        	}
 	        	});
 	        }

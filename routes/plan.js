@@ -40,8 +40,6 @@ router.get('/render_informes', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
-
-
 router.get('/view_pedidos', function(req, res, next){
     if(verificar(req.session.userData)) {
         req.getConnection(function(err,connection){
@@ -57,7 +55,6 @@ router.get('/view_pedidos', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
-
 router.get('/view_fabricaciones', function(req, res, next){
   if(verificar(req.session.userData)){
     res.render('plan/view_fabricaciones');}
@@ -71,6 +68,9 @@ router.get('/calendar_peds', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
+/*  Funcion que busca los pedidos y los filtra segun paramentros pasados por url(orden,page).
+    Renderiza una tabla con los pedidos en orden solicitado
+*/
 router.get('/table_pedidos/:orden/:page', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
@@ -79,8 +79,8 @@ router.get('/table_pedidos/:orden/:page', function(req, res, next){
         var page_now = page*50;
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido "
-                + "LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido"
+                + " LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
                 + " ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " WHERE pedido.cantidad > pedido.despachados LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden,
                 function(err, odc){

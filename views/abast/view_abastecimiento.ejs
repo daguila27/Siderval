@@ -17,39 +17,44 @@
 		<div style="width: 50%;">
 			<input type="text" id="buscar_abastecimiento" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
-				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-DESC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 	    		<div class="search-option-list" style="display: flex;">
-					<label style="margin-left: 20px;margin-right: 20px">
-						<input type="checkbox" id="pend" style="margin-left: 10px" onchange="buscar_oda(true)" checked>
-						Mostrar Pendientes Solamente
-					</label>
-					<div class="dropdown fill_cc">
+	    			<!--  -->
+	    			<label style="margin-left: 30px; margin-top: 6px">Mostrar Pendientes Solamente</label>
+					<input type="checkbox" id="pend" style="margin-left: 5px; margin-top: 6px; width: 20px; height: 20px" onchange="buscar_oda(true)" checked>
+					<div class="dropdown fill_cc" style="margin-left: 30px">
 						<button class="btn btn-default dropdown-toggle dropdown_btn_ccfill" type="button" data-toggle="dropdown">Filtrar por CC<span class="caret"></span></button>
-						<ul class="dropdown-menu" style="max-height: 300px;  padding: 4px 10px;">
-							<spam class="pull-right">
-								<button class="btn btn-xs btn-default" style="margin: 10px 2px;" onclick="fill_oda_cc(this)">Aplicar</button>
-								<button class="btn btn-xs btn-danger" style="margin: 10px 0px;" onclick="$('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');">Revertir</button>
-							</spam>
-							<div class="form-group" style="height: 300px;">
+						<ul class="dropdown-menu" style="max-height: 350px; width: 190px; padding: 4px 10px;">
+							<div class="form-group" style="height: 350px;">
 								<!--
 									Un SELECT MULTIPLE para filtrar los item de ODA según CC (centro de costo).
 									En la función buscar_oda() (script de abajo) se obtiene mediante $(".select_cc").val()
 									 lo cual entrega una lista con los identificadores de CC. (EJ : [ '120307','310102', '310103','310104'])
 								-->
-								<select multiple class="form-control select_cc" style="height: 250px" onchange="change_mulselected(this)" data-allbeforecheck="0">
+								<select multiple class="form-control select_cc" style="height: 300px" onchange="change_mulselected(this)" data-allbeforecheck="0">
 									<option value="all" id="all_option_cc" class="option_multiple_select"> Todos</option>
 									<%for(var e=0; e < cc.length; e++){%>
 										<option value="<%= cc[e].cuenta%>" class="option_multiple_select"> <%= textFormat(cc[e].detalle)%></option>
 									<%}%>
 
 								</select>
+								<spam>
+									<button class="btn btn-xs btn-success" style="margin-top: 10px" onclick="fill_oda_cc(this)">Aplicar</button>
+								</spam>
 							</div>
 						</ul>
 					</div>
 				</div>
 	        </div>
+	        <!-- Paginacion -->
+		  	<div id="paginacion" style="position: absolute; top: 28px; left: 17%">
+		  		<nav aria-label="Page navigation">
+			        <ul class="pagination" id="paginationup">
+			        </ul>
+			    </nav>
+		  	</div>
 		</div>
 	</div>
 </div>
@@ -59,6 +64,8 @@
 
 <script type="text/javascript">
 	var cc_fill = [];
+	// Pagina actual
+	var global_page = '1';
 	$(document).ready(function(){
 		$.ajax({
 
@@ -69,7 +76,7 @@
                 showPend: $("#pend").is(':checked'),
                 cc_selected: $(".select_cc").val().join(',')
             },
-			url: '/abastecimiento/table_abastecimientos',
+			url: '/abastecimiento/table_abastecimientos/' + global_page,
 			success: function(data){
 				$(".main-page").html(data);
 				//Muestra la cantidad de pedidos
@@ -103,7 +110,7 @@
                     showPend: $("#pend").is(':checked'),
                     cc_selected: $(".select_cc").val().join(',')
                 },
-                url: '/abastecimiento/table_abastecimientos',
+                url: '/abastecimiento/table_abastecimientos/' + global_page,
                 success: function(data){
                     $(".main-page").html(data);
                     //Muestra la cantidad de pedidos
@@ -137,6 +144,8 @@
 		$('.view-option').removeClass('active');
 		$(this).addClass('active');
 		if($(this).data('original-title') == 'Lista'){
+			// Muestra el nav de paginacion
+			$("#paginacion").css('display','block');
             $(".search-option-list").css('display', 'flex');
             $.ajax({
                 type: 'POST',
@@ -146,7 +155,7 @@
                     showPend: $("#pend").is(':checked'),
                     cc_selected: $(".select_cc").val().join(',')
                 },
-                url: '/abastecimiento/table_abastecimientos',
+                url: '/abastecimiento/table_abastecimientos/' + global_page,
                 success: function(data){
                     $(".main-page").html(data);
                     //Muestra la cantidad de pedidos
@@ -155,6 +164,8 @@
             });
 		}
 		else{
+			// Quita el nav de paginacion
+			$("#paginacion").css('display','none');
             $.ajax({
                 type: 'GET',
                 url: '/abastecimiento/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
@@ -185,6 +196,39 @@
             $(yo).data('allbeforecheck', 0);
 		}
 	}
+
+	// Paginacion
+	$(function(){
+        window.pagObj = $('.pagination').twbsPagination({
+            totalPages: <%=Math.ceil(largo/50)%>,
+            visiblePages: 4,
+            first:"Primero",
+            prev: '<span aria-hidden="true">&laquo;</span>',
+            next: '<span aria-hidden="true">&raquo;</span>',
+            last: "Ultimo",
+            loop: true,
+            onPageClick: function (event, page) {
+                $.ajax({
+                	type:'POST',
+                	data: {
+	                    clave: $("#buscar_abastecimiento").val(),
+	                    orden: $(".o_cp_switch_buttons .active").data('view'),
+	                    showPend: $("#pend").is(':checked'),
+	                    cc_selected: $(".select_cc").val().join(',')
+	                },
+                	url: '/abastecimiento/table_abastecimientos/' + page,
+                	success: function(data){
+                		$(".main-page").html(data);
+                		global_page = page.toString();
+                		//Muestra la cantidad de pedidos
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                	}
+                });
+            }
+        }).on('page', function (event, page) {
+            console.info('Pagina ' + page + ' a sido presionada');
+        });
+    });
 
 
 </script>
