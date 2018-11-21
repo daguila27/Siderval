@@ -1391,7 +1391,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) as factura_token," +
+	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura)) as factura_token," +
                     " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
