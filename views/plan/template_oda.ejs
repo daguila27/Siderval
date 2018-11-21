@@ -109,32 +109,32 @@
 	<body>
 		<div class='headerss' style="width: 100%; margin-bottom: 20px;float: left;">
 				<img style='width: 30%; margin: 0;float:left;' src='/assets/img/logo.png'>
-				<p style='text-align: center; width: 40%; font-size: 11px;margin:0;float:left;'>
+				<p style='text-align: center; width: 40%; font-size: 20px;margin:0;float:left;font-weight: 200;'>
 					Fundición y Maestranza<br> Calle Décima - Parcela N° 474 <br> Placilla - Valparaíso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
 				</p>
-				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 30%;float:left; text-align: center; font-size: 20px'>
+				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 30%;float:left; text-align: center;font-weight: 500; font-size: 25px'>
 					Orden de Compra <br> <b>N° <%=oda[0].numoda%> </b>
 				</p>
 		</div>
-		<div class='bodyss' style="font-size: 12px;">
+		<div class='bodyss' style="font-size: 20px;font-weight: 600">
 			<div class='info' style="float: left">
 				<div style="float: left;width: 100%">
 					<div style="float: left;">
 						<div class="columna">NOMBRE:</div>
-						<div style="float: left"  class="columna2"><%= oda[0].razon%></div>
+						<div style="float: left;font-weight: 400;"  class="columna2"><%= oda[0].razon%></div>
 					</div>
 					<div style="float: right;">Valparaíso, <%= new Date().getDate();%>/<%= parseInt(new Date().getMonth()) + 1;%>/<%= new Date().getFullYear();%></div>
 				</div>
 				<div style='width: 100%;float: left'>
-					<div style='width: 60%;float:left;'><div class="columna">RUT: </div><div  class="columna2" style="float: left"><%= oda[0].rut%></div></div>
-					<div style='width: 38%;float:left;'>CIUDAD: <%=oda[0].ciudad%></div>
+					<div style='width: 60%;float:left;'><div class="columna">RUT: </div><div  class="columna2" style="float: left;font-weight: 400;"><%= oda[0].rut%></div></div>
+					<div style='width: 38%;float:left;'>CIUDAD: <div style="font-weight: 400;"><%=oda[0].ciudad%></div></div>
 				</div>
-				<div style="float:left;"><div class="columna">DIRECCION:</div> <div  class="columna2" style="float: left"><%= oda[0].direccion%></div></div>
+				<div style="float:left;"><div class="columna">DIRECCION:</div> <div  class="columna2" style="float: left;font-weight: 400;"><%= oda[0].direccion%></div></div>
 				<div style='width: 100%;float: left' >
-					<div style='width: 60%;float:left;'><div class="columna">AT:</div> <div class="columna2" style="float: left"><%= oda[0].contacto%></div></div>
-					<div style='width: 38%;float:left;'>FONO: <%=oda[0].telefono%></div>
+					<div style='width: 60%;float:left;'><div class="columna">AT:</div> <div class="columna2" style="float: left;font-weight: 400;"><%= oda[0].contacto%></div></div>
+					<div style='width: 38%;float:left;'>FONO: <div style="font-weight: 400;"><%=oda[0].telefono%></div></div>
 				</div>
-				<div style="float: left;"><div class="columna">GIRO: </div> <div  class="columna2" style="float: left;"><%= oda[0].giro%></div></div>
+				<div style="float: left;"><div class="columna">GIRO: </div> <div  class="columna2" style="float: left;font-weight: 400;"><%= oda[0].giro%></div></div>
 			</div>
 			<div style="float: left;">POR LO SIGUIENTE:</div>
 			<style type="text/css">
@@ -143,7 +143,7 @@
 					width: 70px;
 				}
 			</style>
-			<table style='width: 100%;' class='tabla' cellspacing="3">
+			<table style='width: 100%; font-size: 20px;font-weight: 700;' class='tabla' cellspacing="3">
                 <thead>
                 <tr class='cab_table'>
                 	<th style='width: 5%;text-align: right;'>Item</th>
