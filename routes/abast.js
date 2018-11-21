@@ -2622,13 +2622,13 @@ router.get('/comprobar_notificaciones/:idorden', function(req, res, next){
 		
 	});
 });
-
+//La verdad es que esta funcion se puede simplificar, no requiere tantos query
 router.get('/get_factura/:idfact', function(req, res, next) {
 	req.getConnection(function(err, connection) {
 		if(err) console.log("Error Selecting : %s", err);
 		connection.query('SELECT * FROM factura WHERE idfactura = ?', [req.params.idfact], function (err, factura) {
 			connection.query('SELECT * FROM facturacion WHERE idfactura = ?',[req.params.idfact], function (err, factcion) {
-				connection.query('SELECT * FROM facturacion LEFT JOIN abastecimiento ON facturacion.idabast = abastecimiento.idabast LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE idfactura = ?'
+				connection.query('SELECT facturacion.*,material.detalle, material.codigo FROM facturacion LEFT JOIN abastecimiento ON facturacion.idabast = abastecimiento.idabast LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE idfactura = ?'
                     ,[factura[0].idfactura], function(err, mats) {
 					if (err) console.log('We got an error! - '+err);
 					res.render('abast/modal_factura', {factura: factura, factcion: factcion, mats: mats});
