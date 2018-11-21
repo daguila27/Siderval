@@ -1030,7 +1030,7 @@ router.post('/save_factura', function(req, res, next){
                 }
                 else{
                     for (var i = 0; i < input['idabast[]'].length; i++){
-                        if(input['costo_unid[]'][i] != 0 && input['costo_unid[]'][i] != ''){
+                        if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != ''){
                             items.push([inFact.insertId, input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
                         }
                     }
@@ -1391,7 +1391,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) as factura_token," +
+	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) as factura_token," +
                     " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
@@ -1399,7 +1399,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     + " LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast"
                     + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
 	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
-	        		+ " GROUP BY abastecimiento.idabast LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden, function(err, abs){
+	        		+ " GROUP BY abastecimiento.idabast ORDER BY " + orden + " LIMIT " + page_now + ",50", function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 	        			console.log(abs);

@@ -18,18 +18,25 @@
 	    <!-- Custom Fonts -->
 	    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-	    
-	    
-	    
+
+
+
 
 
 
 	</head>
 	<style type='text/css'>
-
-		body{ 
+		html{
+			padding: 0.5cm;
+			width: 21.59cm;
+			height: 27.94cm;
+		}
+		body{
+			display: block;
+			align-content: center;
+			width:100%;
 			background-color: white;
-			margin: 5% 15%;
+			margin-left: 25%;
 			padding: 0;
 		}
 		.headerss{
@@ -44,7 +51,7 @@
 			margin: 0;
 			padding: 0;
 			width: 100%;
-			padding-left:1%; 
+			padding-left:1%;
 		}
 		.cab_table th{
 			padding-left: 1%;
@@ -56,7 +63,7 @@
 		}
 
 
-		
+
 		.tabla tfoot{
 			border: 1px solid;
 			text-align: center;
@@ -66,7 +73,7 @@
 		}
 		.obs{
 			margin-top: 2%;
-		}
+			}
 		.obs div{
 			border: 1px solid;
 		}
@@ -81,7 +88,7 @@
             }
             if(numero.indexOf(",")>=0)
                 nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
-     
+
             for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
                 resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
             if(numero.indexOf(",")>=0)
@@ -99,6 +106,7 @@
 		}
 
         %>
+	<body>
 		<div class='headerss' style="width: 100%; margin-bottom: 20px;float: left;">
 				<img style='width: 30%; margin: 0;float:left;' src='/assets/img/logo.png'>
 				<p style='text-align: center; width: 40%; font-size: 11px;margin:0;float:left;'>
@@ -108,7 +116,6 @@
 					Orden de Compra <br> <b>N° <%=oda[0].numoda%> </b>
 				</p>
 		</div>
-	<body>
 		<div class='bodyss' style="font-size: 12px;">
 			<div class='info' style="float: left">
 				<div style="float: left;width: 100%">
@@ -116,7 +123,7 @@
 						<div class="columna">NOMBRE:</div>
 						<div style="float: left"  class="columna2"><%= oda[0].razon%></div>
 					</div>
-					<div style="float: right;">Valparaíso, <%= new Date().getDate();%>/<%= parseInt(new Date().getMonth()) - 1%>/<%= new Date().getFullYear();%></div>
+					<div style="float: right;">Valparaíso, <%= new Date().getDate();%>/<%= parseInt(new Date().getMonth()) + 1;%>/<%= new Date().getFullYear();%></div>
 				</div>
 				<div style='width: 100%;float: left'>
 					<div style='width: 60%;float:left;'><div class="columna">RUT: </div><div  class="columna2" style="float: left"><%= oda[0].rut%></div></div>
