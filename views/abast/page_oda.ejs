@@ -256,7 +256,7 @@ function fechaLatino(string){
                                                 lista_aux = oda.facturas_token[j].split('@');%>
                                         <tr>
                                             <td class="o_td_label">
-                                                <a href="#" data-idfactura="<%=lista_aux[1]%>">
+                                                <a href="#" onclick="modal_fact(this)" data-idfactura="<%=lista_aux[1]%>">
                                                     <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">N° <%= lista_aux[0]%></label>
                                                 </a>
                                             </td>
