@@ -459,7 +459,7 @@ router.post('/save_gdd', function(req, res, next){
                     });
                 }
                 else{
-                    res.redirect('/bodega/show_despachos');
+                    res.redirect('/bodega/view_despachos');
                 }
 
 			}
