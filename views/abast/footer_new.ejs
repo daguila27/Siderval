@@ -127,7 +127,7 @@ However, delay the fade out process for 2.5 seconds */
               <label for="subcuentasModal"></label>
               <select class="form-control" id="subcuentasModal" onchange="foundSC(this)">
                 <%for(var e=0; e < subc.length; e++){%>
-                    <option value="<%= subc[e].cuenta%>-<%= subc[e].detalle.substring(0,1).toUpperCase() +subc[e].detalle.substring(1, subc[e].detalle.length).toLowerCase() %>"><%= subc[e].cuenta%> - <%= subc[e].detalle%></option>
+                    <option value="<%= subc[e].cuenta%>-<%= subc[e].detalle.substring(0,1).toUpperCase() +subc[e].detalle.substring(1, subc[e].detalle.length).toLowerCase() %>"><%= subc[e].detalle%></option>
                 <%}%>
               </select>
             </div>
