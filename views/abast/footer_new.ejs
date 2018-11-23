@@ -127,7 +127,7 @@ However, delay the fade out process for 2.5 seconds */
               <label for="subcuentasModal"></label>
               <select class="form-control" id="subcuentasModal" onchange="foundSC(this)">
                 <%for(var e=0; e < subc.length; e++){%>
-                    <option value="<%= subc[e].cuenta%>-<%= subc[e].detalle.substring(0,1).toUpperCase() +subc[e].detalle.substring(1, subc[e].detalle.length).toLowerCase() %>"><%= subc[e].detalle%></option>
+                    <option value="<%= subc[e].cuenta%>-<%= subc[e].detalle.substring(0,1).toUpperCase() +subc[e].detalle.substring(1, subc[e].detalle.length).toLowerCase() %>"><%= subc[e].cuenta%> - <%= subc[e].detalle%></option>
                 <%}%>
               </select>
             </div>
@@ -358,35 +358,25 @@ However, delay the fade out process for 2.5 seconds */
      $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
      $("#SCModal").val(null);
   }
-  function finSelectCCModal(){
-        //alert($("#subcuentasModal").val()+"-"+$("#SCModal").val());
-        if($("#SCModal").val() != null || $("#SCModal").val() != '' ){
+      function finSelectCCModal(){
+        if( ($("#SCModal").val() != null || $("#SCModal").val() != '') || $(".SCModal").css('display') != 'none' ){
           $("#"+$("#auxCC").val()).val($("#subcuentasModal").val()+"-"+$("#SCModal").val().split('-')[1]);
-          //alert("CON SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
           $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
         }
         else{
           $("#"+$("#auxCC").val()).val($("#subcuentasModal").val());
-          //alert("SIN SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]);
-          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val()); 
+          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val());
         }
-     }
+      }
 
      function finSelectCC(){
-        //alert($("#subcuentasModal").val()+"-"+$("#SCModal").val());
-        if($("#SCModal").val() != null && $("#SCModal").val() != '' ){
-          $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
-          //alert("CON SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
-          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
+        if( $(".SCModal").css('display') != 'none'  ){
+            $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
+            $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
         }
         else{
-          $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]);
-          //alert("SIN SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]);
-          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val()); 
+            $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]);
+            $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val());
         }
      }
   function inNumero(){
