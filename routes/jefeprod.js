@@ -560,6 +560,63 @@ router.post('/add_produccion', function(req, res, next){
 	res.render('jefeprod/session_stream',{data:req.session.arrayProduccion});
 });
 
+router.post('/lista_materiales', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var cantidades = JSON.parse(JSON.stringify(req.body)).list;
+        var id_fabricaciones = "";
+        if(req.session.arrayProduccion.length != 0){
+            id_fabricaciones += " AND fabricaciones.idfabricaciones IN (";
+            for(var t=0; t < req.session.arrayProduccion.length; t++){
+                if(t+1 != req.session.arrayProduccion.length){
+                    id_fabricaciones += "" + req.session.arrayProduccion[t][0] + ", ";
+                }
+                else{
+                    id_fabricaciones += "" + req.session.arrayProduccion[t][0];
+                }
+            }
+            id_fabricaciones += ")";
+        }
+        else{
+            id_fabricaciones += " AND fabricaciones.idfabricaciones IN (0)"; //Permite retornar la consulta vacia
+        }
+        // console.log(req.session.arrayProduccion);
+        req.getConnection(function(err, connection){
+            connection.query('SELECT fabricaciones.idfabricaciones, bom.idmaterial_master, bom.idmaterial_slave, material.detalle, material.stock, bom.cantidad FROM fabricaciones'
+                + ' LEFT JOIN bom ON fabricaciones.idmaterial=bom.idmaterial_master'
+                + ' LEFT JOIN material ON material.idmaterial = bom.idmaterial_slave'
+                + ' WHERE material.e_abast = 2' + id_fabricaciones
+                + ' ORDER BY fabricaciones.idfabricaciones, bom.idmaterial_master, bom.idmaterial_slave', function(err, data){
+                    if(err){console.log("Error Selecting materials: %s", err);}
+                    datos = [];
+                    for(var i=0; i<data.length; i++){
+                        var count = 0;
+                        for(var j=0; j<req.session.arrayProduccion.length; j++){
+                            if(req.session.arrayProduccion[j][0] == data[i].idfabricaciones){
+                                var indice = count;
+                                break;
+                            }
+                            count++;
+                        }
+                        var cantidad = cantidades[indice]*data[i].cantidad;
+                        var existe = false;
+                        for(var j=0; j<datos.length; j++){
+                            if(datos[j][2] == data[i].idmaterial_slave){
+                                datos[j][5] = Number((cantidad + datos[j][5]).toFixed(3));
+                                existe = true;
+                                break;
+                            }
+                        }
+                        if(!existe) {
+                            datos.push([data[i].idfabricaciones, data[i].idmaterial_master, data[i].idmaterial_slave, 
+                            data[i].detalle, data[i].stock, Number(cantidad.toFixed(3))]);
+                        }
+                    }
+                    res.render('jefeprod/lista_materiales',{data: datos});
+            });
+        });
+    }
+});
+
 router.post('/del_produccion', function(req, res, next){
     var idf = JSON.parse(JSON.stringify(req.body)).idf;
     for(var t=0; t < req.session.arrayProduccion.length; t++){

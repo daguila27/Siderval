@@ -111,6 +111,8 @@ However, delay the fade out process for 2.5 seconds */
                     <td></td>
                     <td></td>
                     <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
@@ -119,6 +121,8 @@ However, delay the fade out process for 2.5 seconds */
                     <!--<button class="btn btn-info" style="width:12%;margin-left:75%;" id="op_program" data-toggle="modal" data-target="#programOPModal">Programar</button>-->
                     <button class="btn btn-success" style="width:10%;margin-left:0%;" id="op_submit" >+ Crear</button>
                     <!--<button class="btn btn-success comprobarItemsPrueba">+ Ver</button>-->
+                    <!-- Btn a modal lista materiales -->
+                    <button style="margin-left: 77%; width: 15%" class="btn pull-right btn-info" type="button" data-toggle="modal" data-target="#lista_materiales" id="btn_materiales" onclick="lista_materiales()" disabled>Lista materiales</button>
                 </div>
             </div>
         </div>
@@ -286,11 +290,33 @@ However, delay the fade out process for 2.5 seconds */
                     url: 'jefeprod/add_produccion',
                     success: function(data){
                         $("#session_prod").html(data);
-                        //$("#" + idfabricaciones).css('transform', 'scaleY(0)');
-                        //$("#" + idfabricaciones).html("");
+                        $("#btn_materiales").attr("disabled",false);
                     }
             });
             
+    }
+
+    // funcion que busca la lista de materiales para la OP
+    function lista_materiales(){
+        var cantidades = [];
+        $(".valor_cant").each(function(){
+            if($(this).val() == "") {
+                cantidades.push(1);
+            }
+            else{
+                cantidades.push(Number($(this).val()));
+            }
+        });
+        // Actualiza la lista de materiales
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify({list: cantidades}),
+            contentType: 'application/json',
+            url: 'jefeprod/lista_materiales',
+            success: function(data){
+                $("#lista_mat").html(data);
+            }
+        });
     }
 
     function refreshProdList(){
@@ -485,25 +511,30 @@ However, delay the fade out process for 2.5 seconds */
 
     function delProd(yo){
         var idf = $(yo).data('idf');
-            $.ajax({
-                type: 'POST',
-                data: {idf: idf},
-                url: '/jefeprod/del_produccion',
-                success: function(data){
-                    $("#session_prod").html(data);
-                    /*$.ajax({
-                        type: 'POST',
-                        data: {idf: idf},
-                        url: '/jefeprod/restore_fab',
-                        success: function(htmlSend){
-                            //$("#" + idf).css('transform', 'scaleY(1)');
-                            
-                            //$("#" + idf).html(htmlSend);
-                        }
-                    });*/
-                    
+        $.ajax({
+            type: 'POST',
+            data: {idf: idf},
+            url: '/jefeprod/del_produccion',
+            success: function(data){
+                $("#session_prod").html(data);
+                //Verifica si esta vacio para desabilitar btn de lista materiales
+                var valores = $("#session_prod").find("td:first").text();
+                if(valores == 'No hay productos añadidos'){
+                    $("#btn_materiales").attr("disabled",true);
                 }
-            });
+                /*$.ajax({
+                    type: 'POST',
+                    data: {idf: idf},
+                    url: '/jefeprod/restore_fab',
+                    success: function(htmlSend){
+                        //$("#" + idf).css('transform', 'scaleY(1)');
+                        
+                        //$("#" + idf).html(htmlSend);
+                    }
+                });*/
+                
+            }
+        });
     }
 /*    $("#delProd").on('click', function(e){
             e.preventDefault();
