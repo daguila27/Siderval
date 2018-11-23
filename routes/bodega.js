@@ -541,7 +541,7 @@ router.post('/act_gdd', function(req, res, next){
                     console.log("es blanco!");
                 }
                 req.session.arraydespacho = [];
-                res.redirect('/bodega/show_despachos');
+                res.redirect('/bodega/view_despachos');
             }
         });
     });
