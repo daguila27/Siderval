@@ -40,7 +40,11 @@
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 					<%if(desp[i].estado != 'Anulado' && j+1 == desp[i].cant_token.length){%>
 						<div id="btns<%=desp[i].iddespacho%>">
-							<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].iddespacho%>">GD</a>
+							<%if(desp[i].estado == 'Blanco'){%>
+								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].iddespacho%>">AC</a>
+							<%}else{%>
+								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].iddespacho%>">GD</a>
+							<%}%>
 							<a class="btn btn-xs btn-warning anular" onclick="anulate(this)" data-id="<%=desp[i].iddespacho%>"><i class="fa fa-ban"></i></a>
 						</div>
 					<%} %>
@@ -70,7 +74,7 @@
 <div id="registros" style="display: none"><%= desp.length %> <%= count %></div>
 
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js""></script>
+<script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
 
@@ -127,6 +131,17 @@
 			}
 		});
 	});
+
+    function activarGD(yo){
+        $.ajax({
+            type: 'POST',
+            data: {id: $(yo).data('id')},
+            url: 'bodega/activar_gdd',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+	}
 	$(".order-column").on('click', function(e){
 		e.preventDefault();
 		var item = this;

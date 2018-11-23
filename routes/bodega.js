@@ -789,50 +789,55 @@ router.post('/activar_gdd', function(req,res,next){
             connection.query("SELECT * FROM despacho WHERE iddespacho = ?", [input.id], function(err, desp){
                 if(err){console.log("Error Selecting : %s", err);}
                 desp = desp[0];
-                // console.log(desp);
-                if(desp.mat_token != ''){
-                    desp.mat_token = desp.mat_token.split('@@');
-                    desp.id_token = desp.id_token.split('@');
-                    desp.idf_token = desp.idf_token.split('@');
-                    desp.cant_token = desp.cant_token.split(',');
+                connection.query("SELECT * FROM cliente", function(err, cli){
+                    if(err){console.log("Error Selecting : %s", err);}
                     // console.log(desp);
-                    connection.query("SELECT odc.* FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc WHERE pedido.idpedido = ?", [desp.idf_token[0]],
-                        function(err, odc){
-                            if(err){console.log("Error Selecting : %s", err);}
-                            connection.query("select pedido.idpedido as idfabricaciones,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
-                                +"odc.numoc as numordenfabricacion, aleacion.nom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                                +" left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion"
-                                +" left join aleacion on aleacion.idaleacion=subaleacion.idaleacion where pedido.despachados!=pedido.cantidad AND pedido.idodc="+odc[0].idodc+" group by pedido.idpedido order by pedido.f_entrega asc",
-                                function(err, rows){
-                                    if(err)
-                                        console.log("Error Selecting :%s", err);
+                    if(desp.mat_token != ''){
+                        desp.mat_token = desp.mat_token.split('@@');
+                        desp.id_token = desp.id_token.split('@');
+                        desp.idf_token = desp.idf_token.split('@');
+                        desp.cant_token = desp.cant_token.split(',');
+                        // console.log(desp);
+                        connection.query("SELECT odc.* FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc WHERE pedido.idpedido = ?", [desp.idf_token[0]],
+                            function(err, odc){
+                                if(err){console.log("Error Selecting : %s", err);}
+                                connection.query("select pedido.idpedido as idfabricaciones,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                                    +"odc.numoc as numordenfabricacion, aleacion.nom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
+                                    +" left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion"
+                                    +" left join aleacion on aleacion.idaleacion=subaleacion.idaleacion where pedido.despachados!=pedido.cantidad AND pedido.idodc="+odc[0].idodc+" group by pedido.idpedido order by pedido.f_entrega asc",
+                                    function(err, rows){
+                                        if(err)
+                                            console.log("Error Selecting :%s", err);
 
-                                    req.session.arraydespacho = [];
-                                    res.render('bodega/g_despacho', {data: rows, num: desp.iddespacho, blanco: 1});
-                                    //res.render('jefeprod/ordenes_produccion', {data: rows});
+                                        console.log(rows);
+                                        req.session.arraydespacho = [];
+                                        console.log("HOLADAHDOAJDOAJ");
+                                        res.render('bodega/g_despacho', {data: rows, num: desp.iddespacho, blanco: 1, cli:cli});
+                                        //res.render('jefeprod/ordenes_produccion', {data: rows});
 
-                            });
+                                });
 
-                            
-                        });
-
-                }
-                else{
-                    connection.query("select pedido.idpedido as idfabricaciones,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
-                                +"odc.numoc as numordenfabricacion, aleacion.nom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                                +" left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion"
-                                +" left join aleacion on aleacion.idaleacion=subaleacion.idaleacion where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by pedido.f_entrega asc",
-                                function(err, rows){
-                                    if(err)
-                                        console.log("Error Selecting :%s", err);
-
-                                    req.session.arraydespacho = [];
-                                    res.render('bodega/g_despacho', {data: rows, num: desp.iddespacho, blanco: 1});
-                                    //res.render('jefeprod/ordenes_produccion', {data: rows});
 
                             });
-                }   
-                
+
+                    }
+                    else{
+                        connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,pedido.idpedido as idfabricaciones,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                                    +" odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
+                                    +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
+                                    +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
+                                    +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by pedido.f_entrega asc",
+                                    function(err, rows){
+                                        if(err)
+                                            console.log("Error Selecting :%s", err);
+
+                                        console.log(rows);
+                                        req.session.arraydespacho = [];
+                                        res.render('bodega/g_despacho', {data: rows, num: desp.iddespacho, blanco: 1, cli: cli});
+                                });
+                    }
+                });
+
             }); 
         });
 });
