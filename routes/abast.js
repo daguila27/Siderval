@@ -1389,13 +1389,15 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura)) as factura_token," +
-                    " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
+	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
+                    + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
 	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
                     + " LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast"
                     + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
+                    + " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast"
+                    + " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion"
 	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
 	        		+ " GROUP BY abastecimiento.idabast ORDER BY " + orden + " LIMIT " + page_now + ",50", function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
@@ -2623,6 +2625,7 @@ router.get('/comprobar_notificaciones/:idorden', function(req, res, next){
 	});
 });
 //La verdad es que esta funcion se puede simplificar, no requiere tantos query
+//SI SE PUEDE SIMPLIFICAR... POR ESO SON MUY PERO MUY PERO MUY IMPORTANTES LOS "LEFT JOINS" EN SQL
 router.get('/get_factura/:idfact', function(req, res, next) {
 	req.getConnection(function(err, connection) {
 		if(err) console.log("Error Selecting : %s", err);
@@ -2634,6 +2637,20 @@ router.get('/get_factura/:idfact', function(req, res, next) {
 					res.render('abast/modal_factura', {factura: factura, factcion: factcion, mats: mats});
 				});
             });
+        });
+    });
+});
+
+
+router.get('/get_factura/:idfact', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+        connection.query('SELECT * FROM ', [req.params.idfact], function (err, factura) {
+
+        	if (err) console.log('We got an error! - '+err);
+
+            res.render('abast/modal_factura', {factura: factura, factcion: factcion, mats: mats});
+
         });
     });
 });

@@ -18,26 +18,84 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-
+<style>
+	.filtro-tabla:hover{
+		cursor: pointer;
+	}
+	.filtro-tabla{
+		margin: 0;
+		padding: 0px 3px;
+		margin-right: 5px;
+	}
+</style>
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
 	<thead>
 		<tr>
 			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.idabast-ASC">N° OC</th>
 			<th class="cabecera o_column_sortable order-column" data-order="oda.creacion-ASC">Creación</th>
-			<th class="cabecera o_column_sortable" >Facturas adjuntas</th>
-			<th class="cabecera o_column_sortable order-column" data-order="cliente.sigla-ASC" style="text-align: center ;">Proveedor</th>
+			<th class="cabecera o_column_sortable" >Facturas</th>
+			<th class="cabecera o_column_sortable" >Guías</th>
+			<th class="cabecera o_column_sortable order-column" data-order="cliente.sigla-ASC" style="text-align: center ;">
+				<!--<div class="dropdown filtro-tabla">
+					<button class="pull-left dropdown-toggle btn btn-default btn-xs" type="button" data-toggle="dropdown"><i class='fa fa-filter'></i></button>
+					<ul class="dropdown-menu" style="width: 150px; padding: 4px 10px; margin-top: 20px">
+						<div class="form-group">
+							<select multiple class="form-control select_cc" data-allbeforecheck="0">
+								<option value="all"> Todos</option>
+							</select>
+							<spam>
+								<button class="btn btn-xs btn-success" style="margin-top: 10px" onclick="fill_apply(this)">Aplicar</button>
+							</spam>
+						</div>
+					</ul>
+				</div>-->
+				Proveedor
+			</th>
 			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.cantidad-ASC">Solicitados</th>
 			<th class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Detalle</th>
 			<th class="cabecera o_column_sortable order-column" data-order="abastecimiento.recibidos-ASC">Recibidos</th>
 			<th class="cabecera o_column_sortable order-column" style="text-align: center" data-order="abastecimiento.costo-ASC">Costo</th>
 			<th class="cabecera o_column_sortable order-column" style="text-align: center" data-order="abastecimiento.costo*abastecimiento.cantidad-ASC">Total</th>
-			<th class="cabecera o_column_sortable" style="text-align: center ;">CC</th>
-			<th class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
+			<th class="cabecera" style="text-align: center ;">
+				<!--<div class="dropdown filtro-tabla">
+					<button class="pull-left dropdown-toggle btn btn-xs btn-default" type="button" data-toggle="dropdown"><i class='fa fa-filter'></i></button>
+					<ul class="dropdown-menu" style="width: 150px; padding: 4px 10px; margin-top: 20px">
+						<div class="form-group">
+							<select multiple class="form-control">
+								<option value="all"> Todos</option>
+							</select>
+							<spam>
+								<button class="btn btn-xs btn-success" style="margin-top: 10px" onclick="fill_apply(this)">Aplicar</button>
+							</spam>
+						</div>
+					</ul>
+				</div>-->
+				CC
+			</th>
+			<th class="cabecera" style="text-align: right; display: flex" data-order="material.u_medida-ASC">
+				<!--<div class="dropdown filtro-tabla">
+					<button class="pull-left dropdown-toggle btn btn-xs btn-default" type="button" data-toggle="dropdown" style="z-index: 10"><i class='fa fa-filter'></i></button>
+					<ul class="dropdown-menu" style="width: 150px; padding: 4px 10px; margin-top: 5px">
+						<div class="form-group">
+							<select multiple class="form-control">
+								<option value="all"> Todos</option>
+							</select>
+							<spam>
+								<button class="btn btn-xs btn-success" style="margin-top: 10px" onclick="fill_apply(this)">Aplicar</button>
+							</spam>
+						</div>
+					</ul>
+				</div>-->
+				Unidad
+			</th>
 		</tr>
 	</thead>
 	<tbody class="ui-sortable">
-		<%var lista = [];
+		<%
+		var lista = [];
+		var gd_lista = [];
 		var lista2 = [];
+		var lista3 = [];
 		for(var i=0; i < data.length; i++){
 		    if(data[i].factura_token != null){
 				lista = data[i].factura_token.split(",");
@@ -48,16 +106,62 @@
 					});
 					lista = lista2;
 				} else lista[0] = lista[0].split("@");
-			} else lista = [];%>
+			} else {
+		        lista = [];
+			}
+			if(data[i].gd_token != null){
+				gd_lista = data[i].gd_token.split(",");
+				if(gd_lista.length > 1){
+					gd_lista.map(function(e){
+						lista3.push(e.split("@"));
+						return e;
+					});
+					gd_lista = lista3;
+				} else gd_lista[0] = gd_lista[0].split("@");
+			} else {
+				gd_lista = [];
+			}%>
 			<tr class="o_data_row">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].idoda%></td>
 				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" onclick="submit_form(this)" style="text-align: center;" data-idoda="<%= data[i].idoda%>">
 					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
 				</td>
 				<td class="o_data_cell" style="text-align: center;">
+					<%if(lista.length>3){
+						for(var j=0;j<3;j++){%>
+							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
+						<%}%>
+							<a class="label label-primary" type="button" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>"><i class="fa fa-arrow-down"></i></a>
+							<div class="collapse" id="collapseFactura<%=i%>">
+							<%for(var j=3; j<lista.length; j++){%>
+								<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
+							<%}%>
+						</div>
+						<%}else{
+							for(var j=0; j<lista.length; j++){%>
+								<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
+							<%}
+						}%>
 					<% for(var j=0;j<lista.length;j++){%>
 						<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
 					<%}%>
+				</td>
+				<td class="o_data_cell" style="text-align: center;">
+					<%if(gd_lista.length>3){
+						for(var j=0;j<3;j++){%>
+							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][0] %>" ><%= gd_lista[j][0]%></a>
+						<%}%>
+							<a class="label label-success" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-arrow-down"></i></a>
+							<div class="collapse" id="collapseExample">
+								<%for(var j=3; j<gd_lista.length; j++){%>
+									<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][0] %>" ><%= gd_lista[j][0]%></a>
+								<%}%>
+							</div>
+					<%}else{
+						for(var j=0; j<gd_lista.length; j++){%>
+							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][0] %>" ><%= gd_lista[j][0]%></a>
+					<%}
+					}%>
 				</td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=textFormat( data[i].sigla)%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].cantidad %></td>
@@ -88,9 +192,6 @@
 
 
 
-
-
-
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js" type="text/javascript"></script>
 
@@ -102,16 +203,28 @@
 			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
 				if("<%= key.split('-')[1]%>" == "ASC"){
 					$(this).addClass('o-sort-up');
+					//$(this).append("<a><i class='fa fa-filter table-filtro'></i></a>");
 					$(this).data('order', '<%= key.split("-")[0]%>-DESC');
 				}
 				else{
 					$(this).addClass('o-sort-down');
+                    //$(this).append("<a><i class='fa fa-filter table-filtro'></i></a>");
 					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
-					
 				}
 			}
 		});
-	});
+    });
+    $(document).on('click', '.filtro-tabla .dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+	function fill_apply(yo){
+	    $(yo).parent().parent().parent().parent().removeClass('open');
+	}
+	$(".filtro-tabla").click(function(e){
+	    e.preventDefault();
+        //$(this).addClass('open');
+	    //$(this).children('a').dropdown('toggle');
+    });
 	$(".order-column").on('click', function(e){
 		e.preventDefault();
 		var item = this;
