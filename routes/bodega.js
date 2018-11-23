@@ -437,7 +437,7 @@ router.post('/save_gdd', function(req, res, next){
                                                 console.log("Error Selecting : %s", err);
 
                                             console.log(upOdc);
-                                            res.redirect('/bodega/show_despachos');
+                                            res.redirect('/bodega/view_despachos');
 
                                         });
                                     }
@@ -448,13 +448,13 @@ router.post('/save_gdd', function(req, res, next){
                                                 console.log("Error Selecting : %s", err);
 
                                             console.log(upOdc);
-                                            res.redirect('/bodega/show_despachos');
+                                            res.redirect('/bodega/view_despachos');
                                         });
                                     }
                                 }
                                 else{
                                     console.log("ODC NO COMPLETADA!!");
-                                    res.redirect('/bodega/show_despachos');
+                                    res.redirect('/bodega/view_despachos');
                                 } 
                     });
                 }
