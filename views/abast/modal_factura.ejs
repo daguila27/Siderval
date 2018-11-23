@@ -1,0 +1,45 @@
+<script src="parsear_nro.js" type="text/javascript"></script>
+<%
+var d = new Date(factura[0].fecha);
+var tot_cost = 0;
+%>
+<div class="modal-dialog" role="document">
+    <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h3 class="modal-title">Factura n° <%=factura[0].numfac%></h3>
+            <h4 class="modal-title" style="text-align: right"><%=d.toLocaleDateString()%> </h4>
+        </div>
+        <div class="modal-body">
+             <table class="table" >
+                 <tr>
+                     <th>Codigo</th>
+                     <th>Detalle</th>
+                     <th>Cantidad</th>
+                     <th>Precio</th>
+                 </tr>
+                 <tbody>
+                 <%for (var i = 0; i < mats.length; i++){%>
+                     <tr>
+                         <td><%=mats[i].codigo%></td>
+                         <td><%=mats[i].detalle%></td>
+                         <td class="parsear_nro"><%=mats[i].cantidad%></td>
+                         <td class="parsear_nro"><%=mats[i].costo%></td>
+                         <%
+                         tot_cost += (mats[i].cantidad * mats[i].costo);
+                         %>
+                     </tr>
+                 </tbody>
+                <%}%>
+                 <tfoot>
+                    <td class="parsear_nro" colspan="4" style="text-align: right">Costo Total: <%=tot_cost%></td>
+                 </tfoot>
+             </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+
+<!-- Funcion para parsear nros -->

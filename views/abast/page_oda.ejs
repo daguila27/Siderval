@@ -133,7 +133,7 @@ function fechaLatino(string){
                                 </a>
                             </li>
                             <li>
-                                <a data-toggle="tab" disable_anchor="true" href="#notebook_page_1080" role="tab">Facturas</a>
+                                <a data-toggle="tab" disable_anchor="true" href="#notebook_page_1080" role="tab">Documentos Adjuntos</a>
                             </li>
                         </ul>
                         <div class="tab-content nav nav-tabs">
@@ -240,159 +240,50 @@ function fechaLatino(string){
                             <!-- Página Mas Información -->
                             <div class="tab-pane" id="notebook_page_1080">
                                 <div class="o_group">
+                                    <!-- Mostrar las Facturas de la OC -->
                                     <table class="o_group o_inner_group o_group_col_6">
                                         <tbody>
                                         <tr>
                                             <td colspan="2" style="width: 100%;">
-                                                <div class="o_horizontal_separator">Información de envio</div>
+                                                <div class="o_horizontal_separator">Facturas</div>
                                             </td>
                                         </tr>
+                                        <%
+                                        if(oda.facturas_token != null){
+                                            oda.facturas_token = oda.facturas_token.split(",");
+                                            var lista_aux = [];
+                                            for(var j = 0;j<oda.facturas_token.length;j++){
+                                                lista_aux = oda.facturas_token[j].split('@');%>
                                         <tr>
                                             <td class="o_td_label">
-                                                <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">Política de entrega</label>
+                                                <a href="#" onclick="modal_fact(this)" data-idfactura="<%=lista_aux[1]%>">
+                                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">N° <%= lista_aux[0]%></label>
+                                                </a>
                                             </td>
                                             <td style="width: 100%;">
-                                                <span name="picking_policy" class="o_field_widget o_readonly_modifier o_required_modifier">Despachar cada producto cuando se encuentre disponible</span>
+                                                <span name="picking_policy" class="o_field_widget o_readonly_modifier o_required_modifier"><%= lista_aux[3]%></span>
+                                                <span class="badge pull-right"><%= new Date(lista_aux[2]).toLocaleDateString()%></span>
                                             </td>
                                         </tr>
+                                        <%  }
+                                        } else {%>
+                                        <tr>
+                                            <td class="o_td_label">
+                                                <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">No hay Facturas</label>
+                                            </td>
+                                            <td style="width: 100%;">
+                                                <span name="picking_policy" class="o_field_widget o_readonly_modifier o_required_modifier">No se encontró ninguna factura adjunta.</span>
+                                            </td>
+                                        </tr>
+                                        <%}%>
                                         </tbody>
                                     </table>
+                                    <!-- Mostrar las guías de Despacho de la OC -->
                                     <table class="o_group o_inner_group o_group_col_6">
                                         <tbody>
                                         <tr>
                                             <td colspan="2" style="width: 100%;">
-                                                <div class="o_horizontal_separator">Información de ventas</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label" for="o_field_input_1084">Vendedor</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget" href="#id=5&amp;model=res.users" name="user_id" id="o_field_input_1084">Demo User</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_form_label_empty" for="o_field_input_1085">Etiquetas</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <div class="o_field_many2manytags o_field_widget o_field_empty" name="tag_ids">
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label" for="o_field_input_1086">Canal de ventas</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget" href="#id=3&amp;model=crm.team" name="team_id" id="o_field_input_1086">América</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_form_label_empty" for="o_field_input_1087">Referencia cliente</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span class="o_field_char o_field_widget o_field_empty" name="client_order_ref"></span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier" for="o_field_input_1088">Compañía</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_invisible_modifier" href="#id=1&amp;model=res.company" name="company_id" id="o_field_input_1088">YourCompany</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_readonly_modifier o_form_label_empty" for="o_field_input_1089" data-original-title="" title="">Cuenta analítica</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_invisible_modifier o_readonly_modifier o_field_empty" href="#" name="analytic_account_id" id="o_field_input_1089"></a>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <table class="o_group o_inner_group o_group_col_6">
-                                        <tbody>
-                                        <tr>
-                                            <td colspan="2" style="width: 100%;">
-                                                <div class="o_horizontal_separator">Facturando</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_readonly_modifier o_required_modifier" for="o_field_input_1090">Fecha orden</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span class="o_field_date o_field_widget o_invisible_modifier o_readonly_modifier o_required_modifier" name="date_order">28/09/2018 13:22:44</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_form_label_empty" for="o_field_input_1091">Posición fiscal</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_field_empty" href="#" name="fiscal_position_id" id="o_field_input_1091"></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_readonly_modifier" for="o_field_input_1092">Estado de facturación</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span name="invoice_status" class="o_field_widget o_readonly_modifier">Para facturar</span>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <table class="o_group o_inner_group o_invisible_modifier o_group_col_6">
-                                        <tbody>
-                                        <tr>
-                                            <td colspan="2" style="width: 100%;">
-                                                <div class="o_horizontal_separator">Informes</div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_form_label_empty" for="o_field_input_1093" data-original-title="" title="">Documento origen</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span class="o_field_char o_field_widget o_invisible_modifier o_field_empty" name="origin"></span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_form_label_empty" for="o_field_input_1094" data-original-title="" title="">Campaign</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_invisible_modifier o_field_empty" href="#" name="campaign_id" id="o_field_input_1094"></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_form_label_empty" for="o_field_input_1095" data-original-title="" title="">Medium</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_invisible_modifier o_field_empty" href="#" name="medium_id" id="o_field_input_1095"></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_form_label_empty" for="o_field_input_1096" data-original-title="" title="">Source</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_invisible_modifier o_field_empty" href="#" name="source_id" id="o_field_input_1096"></a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_invisible_modifier o_form_label_empty" for="o_field_input_1097" data-original-title="" title="">Oportunidad</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <a class="o_form_uri o_field_widget o_invisible_modifier o_field_empty" href="#" name="opportunity_id" id="o_field_input_1097"></a>
+                                                <div class="o_horizontal_separator">Guías de despacho</div>
                                             </td>
                                         </tr>
                                         </tbody>

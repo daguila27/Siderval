@@ -4533,7 +4533,7 @@ router.post('/view_ordenpdf', function(req,res,next){
                 var phantom = require('phantom');   
                 phantom.create().then(function(ph) {
                     ph.createPage().then(function(page) {
-
+                        page.property('viewportSize',{width:612,height:792});
                         page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
                             page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
                                 console.log('Page Rendered');
@@ -4582,10 +4582,7 @@ router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
                 var phantom = require('phantom');
                 phantom.create().then(function(ph) {
                     ph.createPage().then(function(page) {
-                        page.paperSize = {
-                          format: 'Letter',
-                          margin: '5px'
-                        };
+                        page.property('viewportSize',{width:612,height:792});
                         page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
                             page.render('public/pdf/odc'+oda[0].idoda+'.pdf').then(function() {
                                 console.log('Page Rendered');
@@ -4634,7 +4631,7 @@ router.get('/view_ordenpdf_after_d/:idoda', function(req,res,next){
                 var phantom = require('phantom');   
                 phantom.create().then(function(ph) {
                     ph.createPage().then(function(page) {
-
+                        page.property('viewportSize',{width:612,height:792});
                         page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
                             page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
                                 console.log('Page Rendered');

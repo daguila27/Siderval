@@ -75,21 +75,19 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) AS facturas_token FROM oda" +
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura,'@',factura.fecha,'@',factura.coment)) AS facturas_token FROM oda" +
                     " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
                     " LEFT JOIN factura ON oda.idoda = factura.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados, GROUP_CONCAT(facturacion.cantidad,facturacion.costo,factura.numfac)" +
+                    connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados, GROUP_CONCAT(facturacion.cantidad,facturacion.costo,factura.numfac) as fact_detalle" +
 						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
 						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast" +
                         " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
                         //res.redirect('/plan');
-
-						console.log(abast);
-                        console.log(oda);
-
+						//console.log(abast);
+                        //console.log(oda);
                         var isFacturable = false;
 						for(var w=0; w < abast.length; w++){
 							if(abast[w].cantidad > abast[w].facturados ){
@@ -1030,7 +1028,7 @@ router.post('/save_factura', function(req, res, next){
                 }
                 else{
                     for (var i = 0; i < input['idabast[]'].length; i++){
-                        if(input['costo_unid[]'][i] != 0 && input['costo_unid[]'][i] != ''){
+                        if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != ''){
                             items.push([inFact.insertId, input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
                         }
                     }
@@ -1391,7 +1389,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,GROUP_CONCAT(factura.numfac,'@',factura.idfactura) as factura_token," +
+	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura)) as factura_token," +
                     " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
@@ -1399,7 +1397,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     + " LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast"
                     + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
 	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
-	        		+ " GROUP BY abastecimiento.idabast LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden, function(err, abs){
+	        		+ " GROUP BY abastecimiento.idabast ORDER BY " + orden + " LIMIT " + page_now + ",50", function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 	        			console.log(abs);
@@ -2623,6 +2621,21 @@ router.get('/comprobar_notificaciones/:idorden', function(req, res, next){
 			});
 		
 	});
+});
+//La verdad es que esta funcion se puede simplificar, no requiere tantos query
+router.get('/get_factura/:idfact', function(req, res, next) {
+	req.getConnection(function(err, connection) {
+		if(err) console.log("Error Selecting : %s", err);
+		connection.query('SELECT * FROM factura WHERE idfactura = ?', [req.params.idfact], function (err, factura) {
+			connection.query('SELECT * FROM facturacion WHERE idfactura = ?',[req.params.idfact], function (err, factcion) {
+				connection.query('SELECT facturacion.*,material.detalle, material.codigo FROM facturacion LEFT JOIN abastecimiento ON facturacion.idabast = abastecimiento.idabast LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE idfactura = ?'
+                    ,[factura[0].idfactura], function(err, mats) {
+					if (err) console.log('We got an error! - '+err);
+					res.render('abast/modal_factura', {factura: factura, factcion: factcion, mats: mats});
+				});
+            });
+        });
+    });
 });
 
 

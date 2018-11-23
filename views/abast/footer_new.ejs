@@ -169,6 +169,11 @@ However, delay the fade out process for 2.5 seconds */
         </div>
     </div>
 
+    <!-- Modal Factura0 -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+        <!-- La informacion de este modal es cargada con modal-factura.ejs. -->
+    </div><!-- /.modal -->
+
 
 
 
@@ -188,7 +193,19 @@ However, delay the fade out process for 2.5 seconds */
         </body>
 
 
+
 <script type="text/javascript">
+
+    function modal_fact(label) {
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_factura/'+$(label).data('idfactura'),
+            success: function(data) {
+                $('#myModal').html(data);
+                $('#myModal').modal('toggle');
+            }
+        });
+    }
 
 
     function setDataTable(str){
@@ -316,6 +333,13 @@ However, delay the fade out process for 2.5 seconds */
               url: '/abastecimiento/save_factura',
               success: function(data){
                   alert(data);
+                  $.ajax({
+                      type: 'GET',
+                      url: '/abastecimiento/page_oda/'+$('#factura_idoda').val(),
+                      success: function(data){
+                          $(".main-page").html(data);
+                      }
+                  });
                   $("#facturaModal").modal('hide');
               }
             });
