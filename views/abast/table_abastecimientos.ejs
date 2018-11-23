@@ -131,32 +131,32 @@
 						for(var j=0;j<3;j++){%>
 							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
 						<%}%>
-							<a class="label label-primary" type="button" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>"><i class="fa fa-arrow-down"></i></a>
-							<div class="collapse" id="collapseFactura<%=i%>">
+					    <a class="label label-primary" type="button" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>"><i class="fa fa-arrow-down"></i></a>
+					    <div class="collapse" id="collapseFactura<%=i%>">
 							<%for(var j=3; j<lista.length; j++){%>
 								<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
 							<%}%>
 						</div>
-						<%}else{
-							for(var j=0; j<lista.length; j++){%>
-								<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
-							<%}
-						}%>
+					<%}else{
+					    for(var j=0; j<lista.length; j++){%>
+							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1]%>" ><%= lista[j][0]%></a>
+						<%}
+					}%>
 				</td>
 				<td class="o_data_cell" style="text-align: center;">
 					<%if(gd_lista.length>3){
 						for(var j=0;j<3;j++){%>
-							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][0] %>" ><%= gd_lista[j][0]%></a>
+							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" ><%= gd_lista[j][0]%></a>
 						<%}%>
 							<a class="label label-success" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"><i class="fa fa-arrow-down"></i></a>
 							<div class="collapse" id="collapseExample">
 								<%for(var j=3; j<gd_lista.length; j++){%>
-									<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][0] %>" ><%= gd_lista[j][0]%></a>
+								<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" ><%= gd_lista[j][0]%></a>
 								<%}%>
 							</div>
 					<%}else{
 						for(var j=0; j<gd_lista.length; j++){%>
-							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][0] %>" ><%= gd_lista[j][0]%></a>
+							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" ><%= gd_lista[j][0]%></a>
 					<%}
 					}%>
 				</td>

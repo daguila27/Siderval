@@ -210,7 +210,7 @@ However, delay the fade out process for 2.5 seconds */
     function modal_guia(label) {
         $.ajax({
             type: 'GET',
-            url: '/abastecimiento/get_guiaAbast/'+$(label).data('idfactura'),
+            url: '/abastecimiento/get_guiaAbast/'+$(label).data('idgd'),
             success: function(data) {
                 $('#myModalInformation').html(data);
                 $('#myModalInformation').modal('toggle');

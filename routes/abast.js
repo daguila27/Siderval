@@ -1389,7 +1389,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
+	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
                     + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
@@ -2642,14 +2642,17 @@ router.get('/get_factura/:idfact', function(req, res, next) {
 });
 
 
-router.get('/get_factura/:idfact', function(req, res, next) {
+router.get('/get_guiaAbast/:idgd', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);
-        connection.query('SELECT * FROM ', [req.params.idfact], function (err, factura) {
-
-        	if (err) console.log('We got an error! - '+err);
-
-            res.render('abast/modal_factura', {factura: factura, factcion: factcion, mats: mats});
+        connection.query('SELECT recepcion.fecha, recepcion.numgd ,material.detalle, material.u_medida,'
+					+'abastecimiento.cantidad as solicitados , recepcion_detalle.cantidad FROM recepcion_detalle '
+					+'LEFT JOIN recepcion ON recepcion.idrecepcion = recepcion_detalle.idrecepcion '
+					+'LEFT JOIN abastecimiento ON abastecimiento.idabast=recepcion_detalle.idabast '
+					+'LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial WHERE recepcion.idrecepcion = ?', [req.params.idgd], function (err, guia) {
+	        	if (err) console.log('We got an error! - '+err);
+    	        console.log(guia);
+	        	res.render('abast/modal_gd', {guia: guia, info: [guia[0].fecha, guia[0].numgd, guia[0].razon] });
 
         });
     });
