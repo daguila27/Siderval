@@ -681,7 +681,7 @@ router.get('/found_subcuentas/:idcuenta', function(req, res, next){
 
                     console.log(cuenta);
                     if(cuenta[0].subcuenta != ''){
-	                    connection.query("SELECT coalesce(concat(cuenta.cuenta,'-',subcuenta.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.') as cc,subcuenta.* FROM subcuenta LEFT JOIN cuenta ON substring(cuenta.subcuenta,1,2) = substring(subcuenta.subcuenta,1,2) WHERE subcuenta.subcuenta  LIKE '"+cuenta[0].subcuenta.substring(0,2)+"%'", function(err, subcuenta){
+	                    connection.query("SELECT coalesce(concat(cuenta.cuenta,'-',subcuenta.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.') as cc,subcuenta.* FROM subcuenta LEFT JOIN cuenta ON substring(cuenta.subcuenta,1,2) = substring(subcuenta.subcuenta,1,2) WHERE subcuenta.subcuenta  LIKE '"+cuenta[0].subcuenta.substring(0,2)+"%' AND cuenta.cuenta = '"+cuenta[0].cuenta+"'", function(err, subcuenta){
 	                    	if(err){console.log("Error Selecting : %s", err);}
 	                    	console.log(subcuenta);
 	                    	res.render('abast/option_select_sc', {subc: subcuenta});
