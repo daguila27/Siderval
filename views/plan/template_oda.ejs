@@ -181,7 +181,12 @@
 				               <%}else{%>
 				                	<%if(mats[t].precio.toLocaleString().split('.').length > 1){%>
 				                		<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].precio.toLocaleString().split('.')[1] %></td>
-				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')+','+(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1]%></td>
+				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%>
+											,<% if((mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1] != null){%>
+												<%= (mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1]%>
+											<%} else {%>
+												0
+											<%}%></td>
 				                	<%}else{%>
 				                		<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.') %></td>
 				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%></td>
