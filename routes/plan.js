@@ -4512,12 +4512,9 @@ router.get('/get_client_pred/:text', function(req,res,next){
         });
 });
 
-
-
 //SE LLAMA A ESTA RUTA INMEDIATAMENTE DESPUES DE CREAR LA ODA
 router.post('/view_ordenpdf', function(req,res,next){
     var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
-    var fs = require('fs');
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Connection : %s", err);
@@ -4651,12 +4648,9 @@ router.get('/view_ordenpdf_after_d/:idoda', function(req,res,next){
                         });
                     });
                 });
-                
-
             });
          });
-    });    
-
+    });
 });
 
 router.get('/show_pdf/:numoda', function(req,res,next){
@@ -4721,7 +4715,7 @@ router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 console.log(mats);
-                res.render('plan/template_oda', {oda: oda,mats: mats});
+                res.render('plan/template_oda', {oda: oda,mats: mats,tipo: 'oda'});
             });
         });        
     });    

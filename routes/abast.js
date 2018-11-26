@@ -34,6 +34,7 @@ router.get('/', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s",err);
+			console.log("hola" + new Date().toTimeString() + "");
 			connection.query("SELECT * FROM cuenta WHERE detalle != ''", function(err, subc){
 				if(err)
 					console.log("Error Selecting : %s", err);
@@ -44,6 +45,66 @@ router.get('/', function(req, res, next) {
 	}
 	else{res.redirect('bad_login');}	
 });
+//RENDERIZA LO QUE VA A APARECER EN EL PDF
+router.get('/view_facturapdf_get/:idfactura', function(req,res){
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+
+        connection.query('select material.detalle,abastecimiento.cc as subcuenta, facturacion.costo as precio, facturacion.cantidad,' +
+			' abastecimiento.exento FROM facturacion LEFT JOIN abastecimiento ON facturacion.idabast = abastecimiento.idabast' +
+			' LEFT JOIN  material on material.idmaterial=abastecimiento.idmaterial WHERE facturacion.idfactura = ?', [req.params.idfactura],
+            function(err, mats){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                connection.query("SELECT oda.*,cliente.*,factura.numfac as numfactura FROM factura" +
+					" LEFT JOIN oda ON factura.idoda = oda.idoda" +
+					" LEFT JOIN cliente ON cliente.idcliente = oda.idproveedor WHERE factura.idfactura = ?", [req.params.idfactura], function(err, oda){
+                    if(err)
+                        console.log("Error Selecting : %s", err);
+                    console.log(mats);
+                    res.render('plan/template_oda', {oda: oda,mats: mats,tipo: 'factura'},function(err,html){
+                    	if(err) console.log(err);
+                    	res.send(html);
+					});
+                });
+            });
+    });
+});
+//Genera el PDF de una factura y retorna el PATH de guardado
+router.get('/view_facturapdf/:idfactura', function(req,res,next){
+    req.getConnection(function(err, connection){
+        if(err) console.log("Error Connection : %s", err);
+		// Se consigue el número de la factura
+		connection.query("SELECT numfac FROM factura WHERE factura.idfactura = ?", [req.params.idfactura], function(err, oda){
+			if(err) console.log("Error Selecting : %s", err);
+			var phantom = require('phantom');
+            // Ubicacion donde se guardará el pdf
+            var path = '/pdf/fact_N' + oda[0].numfac + '-' + new Date().getTime() + '.pdf';
+			// Inicializa phantom y lo pone en 'ph'
+			phantom.create().then(function(ph) {
+				// Se Crea la 'promesa' o el ~canvas~ por decirlo de otra manera
+				ph.createPage().then(function(page) {
+					//Setea las propiedades de la pagina donde se pegara el html
+					page.property('viewportSize',{width:612,height:792});
+					//Cargar html a pegar desde otro controlador
+					page.open("http://localhost:4300/abastecimiento/view_facturapdf_get/"+req.params.idfactura).then(function(status) {
+						// Guardar pdf en el 'path' especificado
+						page.render('public' + path).then(function() {
+							ph.exit();
+							//Enviar
+							res.send(path);
+							//res.send('/Users/dagui/Desktop/siderval/pdfs/odc'+oda[0].numoda+'-'+oda[0].idoda+'.pdf');
+							//res.redirect("/plan/view_ordenpdf_get/"+oda[0].idoda);
+						});
+					});
+				});
+			});
+
+
+		});
+	});
+});
 
 router.get('/odcs', function(req, res, next) {
 	if(verificar(req.session.userData)){
@@ -51,21 +112,21 @@ router.get('/odcs', function(req, res, next) {
                 if(err) console.log("Connection Error: %s",err);
                 connection.query("SET SESSION group_concat_max_len = 10000000", function(err ,rows){
                     if(err) console.log("Select Error: %s",err);
-                   
+
                     connection.query("select oda.*,cliente.sigla,cliente.razon,group_concat(replace(material.detalle,',','.'),'@',abastecimiento.cantidad,'@',abastecimiento.recibidos) as token from oda left join abastecimiento on abastecimiento.idoda= oda.idoda "
                         +"left join material on material.idmaterial = abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor group by oda.numoda",
                         function (err,ped){
                             if(err) console.log("Select Error: %s",err);
-                        	
+
                         console.log(ped);
                         res.render('abast/odas', {data: ped});
-    
+
                     });
                 });
             });
 
     }
-	else{res.redirect('bad_login');}	
+	else{res.redirect('bad_login');}
 });
 
 //Renderizar la página de ODA específica de odoo.
@@ -1028,7 +1089,7 @@ router.post('/save_factura', function(req, res, next){
                 }
                 else{
                     for (var i = 0; i < input['idabast[]'].length; i++){
-                        if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != ''){
+                        if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
                             items.push([inFact.insertId, input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
                         }
                     }
