@@ -57,7 +57,7 @@ router.get('/view_facturapdf_get/:idfactura', function(req,res){
             function(err, mats){
                 if(err)
                     console.log("Error Selecting : %s", err);
-                connection.query("SELECT oda.*,cliente.*,factura.numfac as numfactura FROM factura" +
+                connection.query("SELECT oda.*,cliente.*,factura.fecha,factura.numfac as numfactura FROM factura" +
 					" LEFT JOIN oda ON factura.idoda = oda.idoda" +
 					" LEFT JOIN cliente ON cliente.idcliente = oda.idproveedor WHERE factura.idfactura = ?", [req.params.idfactura], function(err, oda){
                     if(err)

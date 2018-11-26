@@ -93,8 +93,8 @@ function trunc (x, posiciones = 0) {
             <input type="hidden" name="idabast" value="<%= oda[e].idabast%>">
             <td align="center"><%= oda[e].cantidad - oda[e].facturados%></td>
             <td align="center" style="width: 15%"><%= parsear_nro(oda[e].odacosto)%></td>
-            <td><input class="form-control" type="number" name="costo_unid" min="0"></td>
-              <td><input class="form-control" type="number" name="cantidad" min="0" value="0" max="<%= oda[e].cantidad - oda[e].facturados%>" required></td>
+            <td><input class="form-control" type="number" step=".01" name="costo_unid" min="0"></td>
+              <td><input class="form-control" type="number" step=".01" name="cantidad" min="0" value="0" max="<%= oda[e].cantidad - oda[e].facturados%>" required></td>
             <td>
               <select class="form-control" name="moneda-factura" required>
               <%for(var w=0; w < select_money.length; w++){
