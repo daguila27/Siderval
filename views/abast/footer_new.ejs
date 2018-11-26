@@ -172,7 +172,7 @@ However, delay the fade out process for 2.5 seconds */
     </div>
 
     <!-- Modal Factura0 -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="myModalInformation" tabindex="-1" role="dialog">
         <!-- La informacion de este modal es cargada con modal-factura.ejs. -->
     </div><!-- /.modal -->
 
@@ -203,8 +203,19 @@ However, delay the fade out process for 2.5 seconds */
             type: 'GET',
             url: '/abastecimiento/get_factura/'+$(label).data('idfactura'),
             success: function(data) {
-                $('#myModal').html(data);
-                $('#myModal').modal('toggle');
+                $('#myModalInformation').html(data);
+                $('#myModalInformation').modal('toggle');
+            }
+        });
+    }
+
+    function modal_guia(label) {
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_guiaAbast/'+$(label).data('idgd'),
+            success: function(data) {
+                $('#myModalInformation').html(data);
+                $('#myModalInformation').modal('toggle');
             }
         });
     }
@@ -374,35 +385,25 @@ However, delay the fade out process for 2.5 seconds */
      $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
      $("#SCModal").val(null);
   }
-  function finSelectCCModal(){
-        //alert($("#subcuentasModal").val()+"-"+$("#SCModal").val());
-        if($("#SCModal").val() != null || $("#SCModal").val() != '' ){
+      function finSelectCCModal(){
+        if( ($("#SCModal").val() != null || $("#SCModal").val() != '') || $(".SCModal").css('display') != 'none' ){
           $("#"+$("#auxCC").val()).val($("#subcuentasModal").val()+"-"+$("#SCModal").val().split('-')[1]);
-          //alert("CON SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
           $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
         }
         else{
           $("#"+$("#auxCC").val()).val($("#subcuentasModal").val());
-          //alert("SIN SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]);
-          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val()); 
+          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val());
         }
-     }
+      }
 
      function finSelectCC(){
-        //alert($("#subcuentasModal").val()+"-"+$("#SCModal").val());
-        if($("#SCModal").val() != null && $("#SCModal").val() != '' ){
-          $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
-          //alert("CON SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
-          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
+        if( $(".SCModal").css('display') != 'none'  ){
+            $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
+            $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
         }
         else{
-          $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]);
-          //alert("SIN SUBC");
-          //alert($("#subcuentasModal").val().split('-')[0]);
-          $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val()); 
+            $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]);
+            $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val());
         }
      }
   function inNumero(){
