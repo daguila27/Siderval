@@ -80,8 +80,6 @@
                             <th>Devoluciones</th>
                             <th>Usados</th>
                             <th>Unidad</th>
-                            <th>Precio</th>
-                            <th>Total</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -93,8 +91,6 @@
                                     <td><%= numberFormat(data[i].sum_ing.toString())%></td>
                                     <td><%= numberFormat( (data[i].sum_sal - data[i].sum_ing).toString() )%></td>
                                     <td><%= data[i].u_medida%></td>
-                                    <td>$<%= numberFormat(data[i].precio.toString())%></td>
-                                    <td>$<%= numberFormat((data[i].precio*(data[i].sum_sal - data[i].sum_ing)).toString()) %></td>
                                     <% total += data[i].precio*(data[i].sum_sal - data[i].sum_ing);%>
                                 </tr>
                                <!--    <tr id="c<%= i%>" class="panel-collapse collapse dd<%=i%> warning" role="tabpanel" aria-labelledby="h<%= i%>" >
