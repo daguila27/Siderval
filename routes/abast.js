@@ -1384,7 +1384,7 @@ router.get('/insumos_list/:token', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	//SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
 
-        	connection.query("SELECT material.idmaterial,material.detalle,salidas.sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing,coalesce(ingresos.sum_dev,0) as sum_dev,material.u_medida" +
+        	connection.query("SELECT material.idmaterial,material.detalle,salidas.sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing,coalesce(ingresos.sum_devs,0) as sum_dev,material.u_medida" +
 				" FROM (select movimiento_detalle.idmaterial, sum(movimiento_detalle.cantidad) as sum_sal FROM movimiento" +
 				" LEFT JOIN movimiento_detalle on movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
 				" WHERE movimiento.tipo = 0 AND movimiento.f_gen" +
