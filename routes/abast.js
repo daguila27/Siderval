@@ -87,15 +87,13 @@ router.get('/view_facturapdf/:idfactura', function(req,res,next){
 				ph.createPage().then(function(page) {
 					//Setea las propiedades de la pagina donde se pegara el html
 					page.property('viewportSize',{width:612,height:792});
-					//Cargar html a pegar desde otro controlador
+					//Cargar html a pegar desde un request http
 					page.open("http://localhost:4300/abastecimiento/view_facturapdf_get/"+req.params.idfactura).then(function(status) {
 						// Guardar pdf en el 'path' especificado
 						page.render('public' + path).then(function() {
 							ph.exit();
 							//Enviar
 							res.send(path);
-							//res.send('/Users/dagui/Desktop/siderval/pdfs/odc'+oda[0].numoda+'-'+oda[0].idoda+'.pdf');
-							//res.redirect("/plan/view_ordenpdf_get/"+oda[0].idoda);
 						});
 					});
 				});
@@ -103,6 +101,7 @@ router.get('/view_facturapdf/:idfactura', function(req,res,next){
 
 
 		});
+
 	});
 });
 
@@ -1071,78 +1070,87 @@ router.post('/get_table_fact', function(req, res, next){
         });
     } else res.send({isfacturbale: false,err_msg: "MALDITO HACKER, BASTA"});
 });
-
+// Controlador que Guarda la factura en la bdd
 router.post('/save_factura', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         var fact = [];
-        fact.push([input['fecha-facturacion'], input['numeroFactura'], input['idoda'], input['comentario']]);
         var items = [];
-        req.getConnection(function(err, connection){
-        	if(err)
-        		console.log("Error Connection : %s", err);
-        	connection.query("INSERT INTO factura (fecha, numfac, idoda, coment) VALUES ?", [fact], function(err, inFact){
-        		if(err)
-        			console.log("Error Insert : %s", err);
-                if(typeof input['idabast[]'] == 'string'){
-                    items.push([inFact.insertId, input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
+        if(typeof input['idabast[]'] == 'string' && input['costo_unid[]'] != '0' && input['costo_unid[]'] != '' && input['cantidad[]'] != '0'){
+            items.push([input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
+        } else{
+            for (var i = 0; i < input['idabast[]'].length; i++){
+                if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
+                    items.push([input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
                 }
-                else{
-                    for (var i = 0; i < input['idabast[]'].length; i++){
-                        if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
-                            items.push([inFact.insertId, input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
-                        }
-                    }
-                }
-                connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
-                    if(err)
-	        			console.log("Error Insert : %s", err);
-    				
-
-/*					UPDATE `table` SET `uid` = CASE
-					    WHEN id = 1 THEN 2952
-					    WHEN id = 2 THEN 4925
-					    WHEN id = 3 THEN 1592
-					    ELSE `uid`
-					    END
-					WHERE id  in (1,2,3)*/
-					input['complete'] = input['complete'].split('@');
-					var update = "UPDATE abastecimiento SET facturado = CASE ";
-					var where = "(";
+            }
+        }
+        fact.push([input['fecha-facturacion'], input['numeroFactura'], input['idoda'], input['comentario']]);
+        if(items.length){
+			req.getConnection(function(err, connection){
+				if(err)
+					console.log("Error Connection : %s", err);
+				connection.query("INSERT INTO factura (fecha, numfac, idoda, coment) VALUES ?", [fact], function(err, inFact){
+					if(err)
+						console.log("Error Insert : %s", err);
 					if(typeof input['idabast[]'] == 'string'){
-		        		if(input['complete'] == 'on'){
-		        			update += "WHEN idabast="+input['idabast[]']+" THEN true ";
-		        			where += input['idabast[]']+",";
-		        		}
-		        		else{
-		        			update += "WHEN idabast="+input['idabast[]']+" THEN false ";
-		        			where += input['idabast[]']+",";
-		        		}
-        			}
-	        		else{
-		        		for (var i = 0; i < input['idabast[]'].length; i++){
-		        			if(input['complete'][i] == 'on'){
-		        				update += "WHEN idabast="+input['idabast[]'][i]+" THEN true ";
-		        				where += input['idabast[]'][i]+",";
-		        			}
-		        			else{
-		        				update += "WHEN idabast="+input['idabast[]'][i]+" THEN false ";
-		        				where += input['idabast[]'][i]+",";
-		        			}
-		        		}
-	        		}
-	        		where = where.substring(0, where.length-1);
-	        		where += ")";
-	        		update += 'ELSE false END WHERE idabast in '+where;
-					connection.query(update, function(err, upAbast){
+						items[0].unshift(inFact.insertId);
+					} else {
+						items.map(function(item){
+							item.unshift(inFact.insertId);
+							return items
+						});
+					}
+					connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
 						if(err)
-							console.log("Error Updating : %s", err);
+							console.log("Error Insert : %s", err);
 
-	    				res.send('¡Factura registrada con exito!');
+
+	/*					UPDATE `table` SET `uid` = CASE
+							WHEN id = 1 THEN 2952
+							WHEN id = 2 THEN 4925
+							WHEN id = 3 THEN 1592
+							ELSE `uid`
+							END
+						WHERE id  in (1,2,3)*/
+						input['complete'] = input['complete'].split('@');
+						var update = "UPDATE abastecimiento SET facturado = CASE ";
+						var where = "(";
+						if(typeof input['idabast[]'] == 'string'){
+							if(input['complete'] == 'on'){
+								update += "WHEN idabast="+input['idabast[]']+" THEN true ";
+								where += input['idabast[]']+",";
+							}
+							else{
+								update += "WHEN idabast="+input['idabast[]']+" THEN false ";
+								where += input['idabast[]']+",";
+							}
+						}
+						else{
+							for (var i = 0; i < input['idabast[]'].length; i++){
+								if(input['complete'][i] == 'on'){
+									update += "WHEN idabast="+input['idabast[]'][i]+" THEN true ";
+									where += input['idabast[]'][i]+",";
+								}
+								else{
+									update += "WHEN idabast="+input['idabast[]'][i]+" THEN false ";
+									where += input['idabast[]'][i]+",";
+								}
+							}
+						}
+						where = where.substring(0, where.length-1);
+						where += ")";
+						update += 'ELSE false END WHERE idabast in '+where;
+						connection.query(update, function(err, upAbast){
+							if(err)
+								console.log("Error Updating : %s", err);
+
+							res.send({err:false,msg:'¡Factura registrada con exito!'});
+						});
 					});
-        		});
-        	});
-        });
+				});
+			});
+        } else res.send({err: true,msg: "Los valores ingresados son inválidos, asegúrese los datos son correctos"});
     } else res.redirect("/bad_login");
 });
 
