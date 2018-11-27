@@ -1384,15 +1384,16 @@ router.get('/insumos_list/:token', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	//SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
 
-        	connection.query("SELECT material.idmaterial,material.detalle,salidas.sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing,material.u_medida" +
+        	connection.query("SELECT material.idmaterial,material.detalle,salidas.sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing,coalesce(ingresos.sum_dev,0) as sum_dev,material.u_medida" +
 				" FROM (select movimiento_detalle.idmaterial, sum(movimiento_detalle.cantidad) as sum_sal FROM movimiento" +
 				" LEFT JOIN movimiento_detalle on movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
 				" WHERE movimiento.tipo = 0 AND movimiento.f_gen" +
 				" BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59' GROUP BY movimiento_detalle.idmaterial) as salidas" +
-				" LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing FROM recepcion" +
+				" LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing, sum(COALESCE(movimiento_detalle.cantidad,0)) as sum_devs FROM recepcion" +
                 " LEFT JOIN recepcion_detalle on recepcion_detalle.idrecepcion = recepcion.idrecepcion" +
                 " LEFT JOIN abastecimiento ON abastecimiento.idabast = recepcion_detalle.idabast" +
                 " LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial" +
+                " LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
                 " WHERE recepcion.fecha" +
                 " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59' GROUP BY material.idmaterial) as ingresos ON ingresos.idmaterial = salidas.idmaterial" +
 				" LEFT JOIN material on material.idmaterial=salidas.idmaterial GROUP BY material.idmaterial" ,function(err, ops){

@@ -78,6 +78,7 @@
                             <th>Detalle</th>
                             <th>Salidas</th>
                             <th>Devoluciones</th>
+                            <th>Recepciones</th>
                             <th>Usados</th>
                             <th>Unidad</th>
                         </tr>
@@ -88,6 +89,7 @@
                                 <tr data-idmat="<%= data[i].idmaterial%>" data-detalle="<%= data[i].detalle%>" onclick="ajaxColapse(this)" data-toggle="modal" data-target="#opsModal" style="cursor: pointer;">
                                     <td><%= letraMayus(data[i].detalle)%></td>
                                     <td><%= numberFormat(data[i].sum_sal.toString())%></td>
+                                    <td><%= numberFormat(data[i].sum_dev.toString())%></td>
                                     <td><%= numberFormat(data[i].sum_ing.toString())%></td>
                                     <td><%= numberFormat( (data[i].sum_sal - data[i].sum_ing).toString() )%></td>
                                     <td><%= data[i].u_medida%></td>
