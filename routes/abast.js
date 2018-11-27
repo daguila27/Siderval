@@ -1395,9 +1395,9 @@ router.get('/insumos_list/:token', function(req, res, next){
                 " LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial" +
                 " LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
                 " LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
-                " WHERE movimiento.tipo = 0 AND (recepcion.fecha" +
+                " WHERE (recepcion.fecha" +
                 " BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
-				" AND (movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
+				" OR (movimiento.tipo = 0 AND movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
 				" GROUP BY material.idmaterial) as ingresos ON ingresos.idmaterial = salidas.idmaterial" +
 				" LEFT JOIN material on material.idmaterial=salidas.idmaterial GROUP BY material.idmaterial" ,function(err, ops){
         		if(err)
