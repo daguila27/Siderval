@@ -286,6 +286,36 @@ function fechaLatino(string){
                                                 <div class="o_horizontal_separator">Guías de despacho</div>
                                             </td>
                                         </tr>
+                                        <%
+                                        if(oda.gd_token != null){
+                                            oda.gd_token = oda.gd_token.split(",");
+                                            var lista_aux = [];
+                                        for(var j = 0; j < oda.gd_token.length;j++){
+                                            lista_aux = oda.gd_token[j].split('@');%>
+                                        <tr>
+                                            <td class="o_td_label">
+                                                <a href="#" onclick="modal_guia(this)" data-idgd="<%=lista_aux[1]%>">
+                                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">
+                                                        N° <%= lista_aux[0]%>
+                                                    </label>
+                                                </a>
+                                            </td>
+                                            <td style="width: 100%;">
+                                                <span class="o_field_widget o_readonly_modifier o_required_modifier"></span>
+                                                <span class="badge pull-right"><%= new Date(lista_aux[2]).toLocaleString()%></span>
+                                            </td>
+                                        </tr>
+                                        <%}
+                                        }else{%>
+                                            <tr>
+                                                <td class="o_td_label">
+                                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">No hay Facturas</label>
+                                                </td>
+                                                <td style="width: 100%;">
+                                                    <span name="picking_policy" class="o_field_widget o_readonly_modifier o_required_modifier">No se encontró ninguna factura adjunta.</span>
+                                                </td>
+                                            </tr>
+                                        <%}%>
                                         </tbody>
                                     </table>
                                 </div>

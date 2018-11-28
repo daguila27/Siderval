@@ -23,7 +23,7 @@
 	        <!-- Paginacion -->
 		  	<div id="paginacion" style="position: absolute; top: 28px; left: 17%">
 		  		<nav aria-label="Page navigation">
-			        <ul class="pagination" id="paginationup">
+			        <ul class="pagination pagination-sm" id="paginationup">
 			        </ul>
 			    </nav>
 		  	</div>
@@ -62,6 +62,11 @@
 				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view')},
 				url: '/plan/buscar_pedido_list/1',
 				success: function(data){
+                    $(".page-item").each(function(){
+                        if($(this).hasClass('first')){
+                            $(this).click();
+                        }
+                    });
 					$(".main-page").html(data);
 					//Muestra la cantidad de pedidos
 					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");

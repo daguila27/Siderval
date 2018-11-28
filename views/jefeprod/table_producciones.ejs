@@ -1,0 +1,72 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+%>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"></div>
+
+<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin:0; padding: 0;width: 100%;">
+    <thead>
+    <tr>
+        <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="N° OF" style="text-align: center">N° OF</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+        <!--<th data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center">Abastecidos</th>-->
+        <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">MOL</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center">FUS</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center">QUI</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center">TER</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" style="text-align: center">BPT</th>
+        <th class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center">TRA</th>
+    </tr>
+    </thead>
+    <tbody id="todosbody">
+    <%
+    if(datalen.length){
+    for(var i = 0; i< datalen.length; i++){
+    %>
+    <tr>
+        <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
+        <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].numordenfabricacion %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad %></td>
+        <!--<td data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center"><%= datalen[i].abastecidos %></td>-->
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= datalen[i]['4'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" id="prod<%=datalen[i].idproduccion%>-8" style="text-align: center"><%= datalen[i]['8'] %></td>
+        <td class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
+    </tr>
+    <%  }
+    } else {
+    %>
+        <tr><td>No hay nada por producir</td></tr>
+    <%
+    }
+    %>
+    </tbody>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        setDataTableMain("#prodTable");
+    });
+
+
+
+</script>

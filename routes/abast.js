@@ -75,14 +75,19 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura,'@',factura.fecha,'@',factura.coment)) AS facturas_token FROM oda" +
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura,'@',factura.fecha,'@',factura.coment)) AS facturas_token, GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion,'@', recepcion.fecha )) as gd_token FROM oda" +
                     " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
-                    " LEFT JOIN factura ON oda.idoda = factura.idoda WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
+                    " LEFT JOIN factura ON oda.idoda = factura.idoda "+
+                    " LEFT JOIN abastecimiento ON abastecimiento.idoda=oda.idoda "+
+                    " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast "+
+                    " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion "+
+                    " WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados, GROUP_CONCAT(facturacion.cantidad,facturacion.costo,factura.numfac) as fact_detalle" +
 						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
 						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast" +
-                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura WHERE abastecimiento.idoda = ?" +
+                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura " +
+                        " WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
                         //res.redirect('/plan');
@@ -1357,7 +1362,21 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 		var page = req.params.page - 1;
         var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
-        var clave = input.clave;
+        var array_fill = [
+            "oda.idoda",
+            "factura.numfac",
+            "recepcion.numgd",
+            "cliente.sigla",
+            "material.detalle",
+            "cuenta.detalle"
+        ];
+        var clave;
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+        	clave = input.clave.split(',');
+		}
         var orden;
         if(input.orden.split('/').length > 1){
         	orden = input.orden.split('/')[1];
@@ -1367,24 +1386,41 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 		}
         var showPend = input.showPend;
         var cc_selected = input.cc_selected.split(',');
-        var where = " WHERE (material.detalle LIKE '%"+clave+"%' OR oda.idoda LIKE '%"+clave+"%' OR cliente.sigla LIKE '%"+clave+"%')";
+        var where = " WHERE ";
+        var condiciones_where = [];
+        var condiciones_cc = [];
+
+        if(clave.length>0){
+			for(var e=0; e < clave.length; e++){
+				condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+			}
+        }
         var cc_cond = " ";
         if(showPend == 'true'){
-            where += " AND abastecimiento.cantidad > abastecimiento.recibidos ";
+            condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
         }
+        where += condiciones_where.join(" AND ");
         if(cc_selected.length>0){
             for(var cc=0; cc <  cc_selected.length ; cc++){
                 if(cc_selected[cc] == 'all'){
-                    cc_cond = " abastecimiento.cc LIKE '%%' OR";
+                    condiciones_cc.push(" abastecimiento.cc LIKE '%%'");
                     break;
                 }
                 else{
-                    cc_cond += " abastecimiento.cc LIKE '%"+cc_selected[cc]+"%' OR";
+                    condiciones_cc.push(" abastecimiento.cc LIKE '%"+cc_selected[cc]+"%'");
                 }
             }
-            cc_cond = cc_cond.substring(0, cc_cond.length-2);
-            where = where +" AND ("+cc_cond+") ";
         }
+        console.log(condiciones_where);
+
+        if(condiciones_where.length==0){
+        	condiciones_where.push('true');
+		}
+        if(condiciones_cc.length==0){
+            condiciones_cc.push('true');
+        }
+        where = "WHERE "+ condiciones_where.join(" AND ")+ " AND ("+condiciones_cc.join(' OR ')+")";
+        console.log(where);
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
@@ -1399,10 +1435,9 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     + " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast"
                     + " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion"
 	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
-	        		+ " GROUP BY abastecimiento.idabast ORDER BY " + orden + " LIMIT " + page_now + ",50", function(err, abs){
+	        		+ " GROUP BY abastecimiento.idabast" /*ORDER BY " + orden + " LIMIT " + page_now + ",50"*/, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
-	        			console.log(abs);
 		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1});
 		        	}
 	        	});

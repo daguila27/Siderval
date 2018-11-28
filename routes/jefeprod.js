@@ -42,6 +42,60 @@ router.get('/', function(req, res, next){
 	else{res.redirect('bad_login');}	
 });
 
+router.get('/view_producciones', function(req, res, next){
+    if(verificar(req.session.userData)) {
+        res.render('jefeprod/view_producciones');
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.post('/table_producciones', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND material.detalle LIKE '%"+clave+"%'";
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
+                +" as trats FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
+                +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
+                +" fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=ordenfabricacion.idordenfabricacion" +
+                " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial" +
+                where+" GROUP BY produccion.idproduccion",
+                function(err, prods){
+                    if(err) throw err;
+
+                    res.render('jefeprod/table_producciones', {datalen: prods});
+
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+router.post('/table_producciones_progreso', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var clave = input.clave;
+        var where = " WHERE produccion.el=false AND material.detalle LIKE '%"+clave+"%' ";
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("select produccion.idordenproduccion,produccion_history.idproduccion,producido.ruta, fabricaciones.idorden_f,material.detalle,produccion.cantidad,group_concat(etapafaena.nombre_etapa)"
+                +" as etapas,group_concat(produccion_history.enviados) as enviados, group_concat(produccion_history.`from`) as `from` from produccion_history left join etapafaena on etapafaena.value = produccion_history.from"
+                +" left join produccion on produccion.idproduccion=produccion_history.idproduccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join material on"
+                +" material.idmaterial=fabricaciones.idmaterial left join producido on producido.idmaterial = material.idmaterial "+where+" group by produccion_history.idproduccion ORDER BY material.detalle DESC",function(err,progress){
+                if(err){
+                    console.log("Select Error: %s",err);
+                }
+                console.log(progress);
+                res.render('jefeprod/table_producciones_progreso',{prog: progress},function (err,html){if(err)throw err;res.send(html);});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
 router.post('/serchprods', function(req, res, next) {
     if(verificar(req.session.userData)){
         req.getConnection(function(err,connection){
