@@ -85,8 +85,9 @@
 			success: function(data){
 				console.log(data);
                 $(file).attr("href",data);
-                $(file).attr("download","gdd"+$(file).attr("data-id"),+".xlsx");
+                $(file).attr("download","gdd"+$(file).attr("data-id")+".xlsx");
                 $(file).removeClass("genguia");
+                $(file).removeAttr("onclick");
                 $(file).addClass("genok");
                 $(file).html("<i class='fa fa-download'></i>");
 			}

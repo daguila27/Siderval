@@ -515,22 +515,25 @@ router.post('/buscar_matp', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
-        input.det = "%" + input.det + "%";
+        list_input = input.det.split(' ');
+        console.log(list_input.length);
+        input.det = "WHERE ";
         //var wher = "WHERE (material.tipo = 'I' OR material.tipo='M') AND material.detalle LIKE ?";
-        var wher;
+        for (var i = 0; i < list_input.length; i++){
+            input.det += "material.detalle LIKE '%" + list_input[i] +"%'";
+            if (i !== list_input.length - 1){
+                input.det += ' AND ';
+            }
+		}
         if(input.prod == 'false'){
-        	wher = "WHERE material.detalle LIKE ? AND material.tipo != 'P'";
+        	input.det += " AND material.tipo != 'P'";
         }
-        else{
-        	wher = "WHERE material.detalle LIKE ?";
-        }
-        
-        var dats = [input.det];
+		console.log(input.det);
         req.getConnection(function(err,connection){
             connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
-                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion " + wher +" GROUP BY material.detalle",dats,function(err,rows)
+                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion " + input.det +" GROUP BY material.detalle",function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
