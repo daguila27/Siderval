@@ -224,10 +224,17 @@
 
 
                             <div class="oe_secondary_menu_section">
-                                Movimientos
+                                Movimientos de Planta
                             </div>
 
                             <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                                <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Ver Movimientos
+                                        </span>
+                                    </a>
+                                </li>
                                 <li  onclick="ajax(this)" data-link="/matprimas/crear_movimiento" id="create_retiro">
                                     <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
@@ -242,22 +249,28 @@
                                         </span>
                                     </a>
                                 </li>
+                            </ul>
+                            <div class="oe_secondary_menu_section">
+                                Recepecion de Externos
+                            </div>
+                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+<!--                                <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Ver Recepciones
+                                        </span>
+                                    </a>
+                                </li>     -->
                                 <li  onclick="ajax(this)" data-link="/matprimas/busq_oda" id="view_movimientos">
                                     <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
-                                            Recepción desde proveedores
+                                            Registrar recepción
                                         </span>
                                     </a>
                                 </li>
-                                <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
-                                    <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Movimientos
-                                        </span>
-                                    </a>
-                                </li>
+
                             </ul>
-                        
+
                                         
                         </div>
                         

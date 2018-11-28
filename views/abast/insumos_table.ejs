@@ -1,4 +1,4 @@
-<div id="accordion_of" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+<div style="margin-top: 20px">
         <%
           function letraMayus(string) {
              return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -31,96 +31,50 @@
                 return resultado;
             }
         }%>
-
-<h3 class="page-header" style="margin: 0; padding-top: 5% ">Productos fabricados:</h3>
-        <%if(prods.length){
-            total_fabricados = 0;
-        %>
-            <table class="table table-hover table-striped table-inverse table-bordered">
-                        <thead>
-                        <tr>
-                            <th>Detalle</th>
-                            <th>Fabricados</th>
-                            <th>Precio</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <% 
-                            for(var r = 0;r < prods.length; r++){%>
-                                <tr data-idmat="<%= prods[r].idmaterial%>" data-detalle="<%= prods[r].detalle%>">
-                                    <td><%= prods[r].detalle%></td>
-                                    <td><%= numberFormat(prods[r].fabricados.toString())%></td>
-                                    <td>$<%= numberFormat(prods[r].precio.toString())%></td>
-                                    <% total_fabricados += prods[r].fabricados;%>
-                                </tr>
-                            <%}%>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                              <td><b>Total fabricados:</b></td>
-                              <td><%=numberFormat(total_fabricados.toString())%> Unidades</td>
-                              <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-
-
-
-        <%}%>
-        
-
-<h3 class="page-header" style="margin: 0; padding-top: 5% ">Consumo de Materias Primas e Insumos:</h3>
-        <%var total = 0;
-        if(data.length){%>
-            <table class="table table-striped table-hover table-bordered">
-                        <thead>
-                        <tr>
-                            <th>Detalle</th>
-                            <th>Salidas</th>
-                            <th>Devoluciones</th>
-                            <th>Usados</th>
-                            <th>Unidad</th>
-                            <th>Precio</th>
-                            <th>Total</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <% 
-                            for(var i = 0;i< data.length;i++){%>
-                                <tr data-idmat="<%= data[i].idmaterial%>" data-detalle="<%= data[i].detalle%>" onclick="ajaxColapse(this)" data-toggle="modal" data-target="#opsModal" style="cursor: pointer;">
-                                    <td><%= letraMayus(data[i].detalle)%></td>
-                                    <td><%= numberFormat(data[i].sum_sal.toString())%></td>
-                                    <td><%= numberFormat(data[i].sum_ing.toString())%></td>
-                                    <td><%= numberFormat( (data[i].sum_sal - data[i].sum_ing).toString() )%></td>
-                                    <td><%= data[i].u_medida%></td>
-                                    <td>$<%= numberFormat(data[i].precio.toString())%></td>
-                                    <td>$<%= numberFormat((data[i].precio*(data[i].sum_sal - data[i].sum_ing)).toString()) %></td>
-                                    <% total += data[i].precio*(data[i].sum_sal - data[i].sum_ing);%>
-                                </tr>
-                               <!--    <tr id="c<%= i%>" class="panel-collapse collapse dd<%=i%> warning" role="tabpanel" aria-labelledby="h<%= i%>" >
+    <h3 class="page-header" style="margin: 0; padding-top: 5% ">Consumo de Materias Primas e Insumos:</h3>
+    <%var total = 0;
+    if(data.length){%>
+    <table class="table table-striped table-hover table-bordered" id="insumos_tabl">
+        <thead>
+        <tr>
+            <th>Código</th>
+            <th>Detalle</th>
+            <th>Virtuales</th>
+            <th>Ingreso</th>
+            <th>Salidas</th>
+            <th>Unidad</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+        for(var i = 0;i< data.length;i++){%>
+        <tr data-idmat="<%= data[i].idmaterial%>" data-detalle="<%= data[i].detalle%>" style="cursor: pointer;">
+            <td><%= data[i].codigo%></td>
+            <td><%= letraMayus(data[i].detalle)%></td>
+            <td><%= numberFormat(data[i].sum_virtual.toString())%></td>
+            <td><%= numberFormat( (data[i].sum_ing + data[i].sum_dev).toString() )%></td>
+            <td><%= numberFormat(data[i].sum_sal.toString())%></td>
+            <td><%= data[i].u_medida%></td>
+            <% total += data[i].precio*(data[i].sum_sal - data[i].sum_ing);%>
+        </tr>
+        <!--    <tr id="c<%= i%>" class="panel-collapse collapse dd<%=i%> warning" role="tabpanel" aria-labelledby="h<%= i%>" >
                                        <td><%= letraMayus(data[i].detalle)%></td>
                                         <td><%= numberFormat(data[i].sum_sal.toString())%></td>
                                         <td><%= numberFormat(data[i].sum_ing.toString())%></td>
-                                        <td><%= numberFormat( (data[i].sum_sal - data[i].sum_ing).toString() )%></td>
+                                        <td><%= numberFormat( (data[i].sum_ing + data[i].sum_dev).toString() )%></td>
                                         <td><%= data[i].u_medida%></td>
-                                        
+
                                     </tr>-->
-                            <%}%>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td><b>Total:</b></td>
-                              <td>$<%=numberFormat(total.toString())%></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-            <%}else{%>
-                <h4 style="text-align: center;">No hay elementos sin contabilizar</h4>
-            <%}%>
-    </div>  
+        <%}%>
+        </tbody>
+    </table>
+    <%}else{%>
+    <h4 style="text-align: center;">No hay movimientos que mostrar</h4>
+    <%}%>
+
+</div>
+
     <button type="button" class="btn btn-success" onclick="cierreMensual()">Cierre mensual</button>
+<script type="text/javascript">
+    setDataTable("#insumos_tabl");
+</script>
