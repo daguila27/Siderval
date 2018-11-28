@@ -238,8 +238,6 @@ router.get("/view_movimientos",function(req,res,next){
     } else res.redirect("/bad_login");
 });
 
-
-
 router.post("/table_movimientos",function(req,res,next){
     if(req.session.userData){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -261,5 +259,39 @@ router.post("/table_movimientos",function(req,res,next){
         } );
     } else res.redirect("/bad_login");
 });
-
+/*
+* Controlador que renderiza la vista Mat_primas --> Ver Recepciones.
+* */
+router.get("/view_recep",function(req,res,next){
+    if(req.session.userData){
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err) throw err;
+                res.render('matprimas/view_recepcion', {etp: etp});
+            });
+        });
+    } else res.redirect("/bad_login");
+});
+router.post("/table_recepcion",function(req,res,next){
+    if(req.session.userData){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var orden = input.orden.replace('-', ' ');
+        var clave = input.clave;
+        var where = " WHERE recepcion_detalle.idrecepcion like '%"+clave+"%' OR material.detalle like '%"+clave+"%'";
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("select recepcion.*, recepcion_detalle.*, material.*"
+                +" from recepcion_detalle"
+                +" left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion"
+                +" left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast"
+                +" left join material on material.idmaterial=abastecimiento.idmaterial"
+                + where + " ORDER BY "+orden, function(err, mov){
+                if(err) throw err;
+                res.render('matprimas/table_recepcion', {data: mov, key: orden.replace(' ', '-')});
+            });
+        } );
+    } else res.redirect("/bad_login");
+});
 module.exports = router;
