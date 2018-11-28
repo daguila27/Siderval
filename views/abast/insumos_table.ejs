@@ -36,12 +36,13 @@
         <%if(prods.length){
             total_fabricados = 0;
         %>
-            <table class="table table-hover table-striped table-inverse table-bordered">
+            <table class="table table-hover table-striped table-inverse table-bordered" id="fabrs_tabl">
                         <thead>
                         <tr>
                             <th>Detalle</th>
-                            <th>Fabricados</th>
-                            <th>Precio</th>
+                            <th>Solicitados</th>
+                            <th>Ingresados</th>
+                            <th>Despachados</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -49,8 +50,9 @@
                             for(var r = 0;r < prods.length; r++){%>
                                 <tr data-idmat="<%= prods[r].idmaterial%>" data-detalle="<%= prods[r].detalle%>">
                                     <td><%= prods[r].detalle%></td>
+                                    <td><%= numberFormat(prods[r].solicitados.toString())%></td>
                                     <td><%= numberFormat(prods[r].fabricados.toString())%></td>
-                                    <td>$<%= numberFormat(prods[r].precio.toString())%></td>
+                                    <td><%= numberFormat(prods[r].despachados.toString())%></td>
                                     <% total_fabricados += prods[r].fabricados;%>
                                 </tr>
                             <%}%>
@@ -122,3 +124,6 @@
             <%}%>
     </div>  
     <button type="button" class="btn btn-success" onclick="cierreMensual()">Cierre mensual</button>
+<script type="text/javascript">
+    setDataTable("#fabrs_tabl");
+</script>
