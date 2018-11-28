@@ -6,7 +6,7 @@
 			<!-- Mostrar cantidad de datos -->
 			<div id="despachos" style="margin-top: 8px"></div>
 		</ol>
-		<div style="width: 40%;">			
+		<div style="width: 50%;">			
 			<input type="text" id="buscar_despacho" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
 				<div style="display: flex;">
@@ -20,7 +20,7 @@
 		       		<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
 		    	
 		        	<button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
-					<select class="form-control" id="select_tipo_despacho" style="margin-left: 15px " onchange="refreshTablaDespachos(this)">
+					<select class="form-control" id="select_tipo_despacho" style="margin-left: 30px " onchange="refreshTablaDespachos(this)">
 					    <option value="">Todos</option>
 					    <option value="Venta">Venta</option>
 					    <option value="Traslado">Traslado</option>
@@ -157,6 +157,5 @@
         }
 
 	});
-	
 
 </script>
