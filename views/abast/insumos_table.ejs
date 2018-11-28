@@ -74,7 +74,7 @@
 <h3 class="page-header" style="margin: 0; padding-top: 5% ">Consumo de Materias Primas e Insumos:</h3>
         <%var total = 0;
         if(data.length){%>
-            <table class="table table-striped table-hover table-bordered">
+            <table class="table table-striped table-hover table-bordered" id="insumos_tabl">
                         <thead>
                         <tr>
                             <th>Detalle</th>
@@ -126,4 +126,5 @@
     <button type="button" class="btn btn-success" onclick="cierreMensual()">Cierre mensual</button>
 <script type="text/javascript">
     setDataTable("#fabrs_tabl");
+    setDataTable("#insumos_tabl");
 </script>
