@@ -1404,6 +1404,7 @@ router.get("/fabrs_list/:token",function(req,res){
         });
     } else res.redirect("/bad_login");
 });
+//Cargar
 router.get('/insumos_list/:token', function(req, res, next){
     if(verificar(req.session.userData)){
     	console.log(req.params.token);
@@ -1420,12 +1421,6 @@ router.get('/insumos_list/:token', function(req, res, next){
 				" WHERE movimiento.tipo = 0 AND movimiento.f_gen" +
 				" BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
 				" GROUP BY movimiento_detalle.idmaterial) as salidas ON salidas.idmaterial = material.idmaterial" +
-                // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
-                " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
-                " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
-                " WHERE oda.creacion" +
-                " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
 				// LEFT JOIN (sum_ing) AS ingresos -- entradas desde recepción de OCA
 				" LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing FROM recepcion" +
                 " LEFT JOIN recepcion_detalle on recepcion_detalle.idrecepcion = recepcion.idrecepcion" +
@@ -1439,7 +1434,13 @@ router.get('/insumos_list/:token', function(req, res, next){
                 " LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
 				" WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
 				" GROUP BY material.idmaterial) AS devs ON devs.idmaterial = material.idmaterial" +
-				" WHERE NOT (virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial" ,function(err, ops){
+                // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
+                " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
+                " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
+                " WHERE oda.creacion" +
+                " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
+                " WHERE NOT (virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial" ,function(err, ops){
         		if(err)
         			console.log("Error Selecting : %s", err);
         		console.log(ops);

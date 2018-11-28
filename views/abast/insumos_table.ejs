@@ -37,6 +37,7 @@
     <table class="table table-striped table-hover table-bordered" id="insumos_tabl">
         <thead>
         <tr>
+            <th>Código</th>
             <th>Detalle</th>
             <th>Virtuales</th>
             <th>Ingreso</th>
@@ -48,6 +49,7 @@
         <%
         for(var i = 0;i< data.length;i++){%>
         <tr data-idmat="<%= data[i].idmaterial%>" data-detalle="<%= data[i].detalle%>" style="cursor: pointer;">
+            <td><%= data[i].codigo%></td>
             <td><%= letraMayus(data[i].detalle)%></td>
             <td><%= numberFormat(data[i].sum_virtual.toString())%></td>
             <td><%= numberFormat( (data[i].sum_ing + data[i].sum_dev).toString() )%></td>
@@ -67,7 +69,7 @@
         </tbody>
     </table>
     <%}else{%>
-    <h4 style="text-align: center;">No hay elementos sin contabilizar</h4>
+    <h4 style="text-align: center;">No hay movimientos que mostrar</h4>
     <%}%>
 
 </div>
