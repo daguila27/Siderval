@@ -258,11 +258,14 @@ function fechaLatino(string){
                                             <td class="o_td_label">
                                                 <a href="#" onclick="modal_fact(this)" data-idfactura="<%=lista_aux[1]%>">
                                                     <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">N° <%= lista_aux[0]%></label>
+                                                    <span class="label label-primary pull-right"><%= new Date(lista_aux[2]).toLocaleDateString()%></span>
                                                 </a>
                                             </td>
                                             <td style="width: 100%;">
                                                 <span name="picking_policy" class="o_field_widget o_readonly_modifier o_required_modifier"><%= lista_aux[3]%></span>
-                                                <span class="badge pull-right"><%= new Date(lista_aux[2]).toLocaleDateString()%></span>
+                                                <a onclick="gen_pdf(<%= lista_aux[1]%>)" class="btn btn-primary">
+                                                    <i class="fa fa-file-pdf-o"></i> Ver PDF
+                                                </a>
                                             </td>
                                         </tr>
                                         <%  }

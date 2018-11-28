@@ -65,6 +65,9 @@ However, delay the fade out process for 2.5 seconds */
 
     <!-- Metis Menu Plugin JavaScript -->
     <script src="/vendor/metisMenu/metisMenu.min.js"></script>
+    <!-- Jquery para dejar objetos en modo 'cargando' -->
+    <link href="/assets/css/loading.css" rel="stylesheet">
+    <script src="/js/loading.js"></script>
 
     <!-- DataTables JavaScript -->
     <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
@@ -151,7 +154,6 @@ However, delay the fade out process for 2.5 seconds */
     <!-- Modal Recepcionar OCA -->
     <div id="receivedModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-
             <!-- Modal content-->
             <div class="modal-content">
                 <form id="rec_form">
@@ -320,6 +322,20 @@ However, delay the fade out process for 2.5 seconds */
             }
         });
     }
+
+    function gen_pdf(id){
+        $("#vpdf_btn").attr('disabled',true);
+        $('body').loading('toggle');
+        $.ajax({
+            type: 'get',
+            url: '/abastecimiento/view_facturapdf/' + id,
+            success: function(data){
+                $("#vpdf_btn").attr('disabled',false);
+                $("body").loading('toggle');
+                window.open(data,'_blank')
+            }
+        })
+    }
     function foundSC(yo){
         $.ajax({
             type: 'GET',
@@ -376,15 +392,17 @@ However, delay the fade out process for 2.5 seconds */
               data: data,
               url: '/abastecimiento/save_factura',
               success: function(data){
-                  alert(data);
-                  $.ajax({
-                      type: 'GET',
-                      url: '/abastecimiento/page_oda/'+$('#factura_idoda').val(),
-                      success: function(data){
-                          $(".main-page").html(data);
-                      }
-                  });
-                  $("#facturaModal").modal('hide');
+                  if(!data.err){
+                      alert(data.msg);
+                      $.ajax({
+                          type: 'GET',
+                          url: '/abastecimiento/page_oda/'+$('#factura_idoda').val(),
+                          success: function(data){
+                              $(".main-page").html(data);
+                          }
+                      });
+                      $("#facturaModal").modal('toggle');
+                  } else alert(data.msg);
               }
             });
         }

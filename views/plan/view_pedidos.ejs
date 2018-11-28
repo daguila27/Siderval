@@ -7,7 +7,7 @@
 
 
 		</ol>
-		<div style="width: 40%;">
+		<div style="width: 50%;">
 			<input type="text" id="buscar_pedido" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
@@ -87,7 +87,6 @@
 		}
 	});
 
-
 	$('.view-option').on('click', function(e){
 		e.preventDefault();
 		$('.view-option').removeClass('active');
@@ -134,5 +133,47 @@
             console.info(page + ' (from event listening)');
         });
     });
+
+    // Muestra la tabla antes de ver una OC
+    function mostrar_tabla(){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+        	if($("#buscar_pedido").val() == "" || $("#buscar_pedido").val() == null) {
+        		$.ajax({
+					type: 'GET',
+					url: '/plan/table_pedidos/pedido.f_entrega-ASC/1',
+					success: function(data){
+						$(".main-page").html(data);
+						//Muestra la cantidad de pedidos
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+					}
+				});
+				$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+        	}
+        	else{
+        		$.ajax({
+	                type: 'POST',
+	                data: {clave: $("#buscar_pedido").val(), orden: "pedido.f_entrega-ASC"},
+	                url: '/plan/buscar_pedido_list/1',
+	                success: function(data){
+	                    $(".main-page").html(data);
+	                    //Muestra la cantidad de pedidos
+	                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+	                }
+	            });
+        	}
+        }
+        else {
+        	$.ajax({
+				type: 'POST',
+				data: {clave: $("#buscar_pedido").val()},
+				url: '/plan/buscar_odcs_item',
+				success: function(data){
+					$(".main-page").html(data);
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+				}
+			});
+        }
+    };
 
 </script>

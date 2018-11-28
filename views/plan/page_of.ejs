@@ -25,10 +25,18 @@
                             </div>
                         </button>
                     </div>
-                    <div class="oe_title">
-                        <h1>
-                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Fabricación N°<%=of.numordenfabricacion%></span>
-                        </h1>
+                    <div class="row">
+                        <div class="col-md-11">
+                            <h1 style="margin-top: 0"><span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Fabricación N°<%=of.numordenfabricacion%></span></h1>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="dropdown">
+                                <button type="button" class="btn" onclick="mostrar_tabla()" type="button" style="align-content: center; width: 100%">
+                                    <i class="glyphicon glyphicon-share-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
                     </div>
                     <div class="o_group">
                         <table class="o_group o_inner_group o_group_col_6">

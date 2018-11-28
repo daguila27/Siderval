@@ -1237,9 +1237,15 @@ router.get('/csv_prod', function(req,res){
 router.post('/producidos_stream', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        input.det = "%" + input.det + "%";
-        var wher = "WHERE (material.tipo = 'P' OR material.tipo= 'S') "+ /*AND material.especificacion = 1 */"AND material.detalle LIKE ?";
-        var dats = [input.det];
+        list_input = input.det.split(" ");
+        input.det = '';
+        for (var i = 0; i < list_input.length; i++){
+            input.det += "material.detalle LIKE '%" + list_input[i] +"%'";
+            if (i !== list_input.length - 1){
+                input.det += ' AND ';
+            }
+        }
+        var wher = "WHERE (material.tipo = 'P' OR material.tipo= 'S') "+ /*AND material.especificacion = 1 */"AND " + input.det;
         if(input.caract != "0"){
             wher += " AND material.caracteristica = ?";
             dats.push(parseInt(input.caract));
@@ -1247,7 +1253,7 @@ router.post('/producidos_stream', function(req, res, next){
         req.getConnection(function(err,connection){
             connection.query("SELECT material.*,caracteristica.cnom,producido.pdf,aleacion.nom,producido.idproducto as idprod,subaleacion.subnom FROM material INNER JOIN producido ON material.idmaterial = producido.idmaterial" +
                 " LEFT JOIN subaleacion ON subaleacion.idsubaleacion = producido.idsubaleacion LEFT JOIN aleacion ON "+/*subaleacion.idaleacion*/"CAST(substring(material.codigo,4,2) AS UNSIGNED) = aleacion.idaleacion" +
-                " LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " + wher + " GROUP BY producido.idproducto",dats,function(err,rows)
+                " LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " + wher + " GROUP BY producido.idproducto",function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
@@ -4094,10 +4100,18 @@ router.post('/addsession_prepeds', function(req,res,next){
 router.post('/buscar_mat', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        input.det = "%" + input.det + "%";
-        var wher = "WHERE (material.tipo != 'I' and material.tipo != 'C' and material.tipo != 'X' and material.tipo!='S' and material.tipo!='M') AND material.detalle LIKE ?";
+        var list_input = input.det.split(' ');
+        input.det = '';
+        for (var i = 0; i < list_input.length; i++){
+            input.det += "material.detalle LIKE '%" + list_input[i] +"%'";
+            if (i !== list_input.length - 1){
+                input.det += ' AND ';
+            }
+        }
+        var wher = "WHERE (material.tipo != 'I' AND material.tipo != 'C' AND material.tipo != 'X' AND material.tipo!='S' AND material.tipo!='M')" +
+                " AND " + input.det;
         var dats = [input.det];
-        if(input.caract != "0"){
+        if(input.caract !== "0"){
             wher += " AND material.caracteristica = ?";
             dats.push(parseInt(input.caract));
         }
@@ -4105,7 +4119,7 @@ router.post('/buscar_mat', function(req, res, next){
             connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
-                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion " + wher + " GROUP BY material.idmaterial",dats,function(err,rows)
+                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion " + wher + " GROUP BY material.idmaterial",function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
@@ -4512,12 +4526,9 @@ router.get('/get_client_pred/:text', function(req,res,next){
         });
 });
 
-
-
 //SE LLAMA A ESTA RUTA INMEDIATAMENTE DESPUES DE CREAR LA ODA
 router.post('/view_ordenpdf', function(req,res,next){
     var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
-    var fs = require('fs');
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Connection : %s", err);
@@ -4651,12 +4662,9 @@ router.get('/view_ordenpdf_after_d/:idoda', function(req,res,next){
                         });
                     });
                 });
-                
-
             });
          });
-    });    
-
+    });
 });
 
 router.get('/show_pdf/:numoda', function(req,res,next){
@@ -4721,7 +4729,7 @@ router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 console.log(mats);
-                res.render('plan/template_oda', {oda: oda,mats: mats});
+                res.render('plan/template_oda', {oda: oda,mats: mats,tipo: 'oda'});
             });
         });        
     });    

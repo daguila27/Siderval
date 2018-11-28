@@ -10,16 +10,14 @@ var tot_cost = 0;
             <h3 class="modal-title">Factura n° <%=factura[0].numfac%></h3>
             <h4 class="modal-title" style="text-align: right"><%=d.toLocaleDateString()%> </h4>
         </div>
-        <div class="modal-body"  style="overflow-y: scroll; max-height: 300px;">
-             <table class="table">
-                 <thead>
-                     <tr>
-                         <th>Codigo</th>
-                         <th>Detalle</th>
-                         <th>Cantidad</th>
-                         <th>Precio</th>
-                     </tr>
-                 </thead>
+        <div class="modal-body" id="vpdf">
+             <table class="table" >
+                 <tr>
+                     <th>Codigo</th>
+                     <th>Detalle</th>
+                     <th>Cantidad</th>
+                     <th>Precio</th>
+                 </tr>
                  <tbody>
                  <%for (var i = 0; i < mats.length; i++){%>
                      <tr>
@@ -38,10 +36,9 @@ var tot_cost = 0;
                  </tfoot>
              </table>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer" >
+            <a onclick="gen_pdf(<%= factura[0].idfactura%>)" class="btn btn-primary" id="vpdf_btn">Gen PDF</a>
             <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
         </div>
     </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
-
-<!-- Funcion para parsear nros -->

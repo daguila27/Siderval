@@ -18,12 +18,6 @@
 	    <!-- Custom Fonts -->
 	    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-
-
-
-
-
-
 	</head>
 	<style type='text/css'>
 		html{
@@ -107,12 +101,23 @@
 	<body>
 		<div class='headerss' style="width: 100%; margin-bottom: 20px;float: left;">
 				<img style='width: 30%; margin: 0;float:left;' src='/assets/img/logo.png'>
-				<p style='text-align: center; width: 40%; font-size: 20px;margin:0;float:left;font-weight: 200;'>
+				<p style='text-align: center; width: 40%; font-size: 15px;margin:0;float:left;font-weight: 200;'>
 					Fundición y Maestranza<br> Calle Décima - Parcela N° 474 <br> Placilla - Valparaíso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
 				</p>
+				<!-- Se setea el numero de documento -->
 				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 30%;float:left; text-align: center;font-weight: 500; font-size: 25px'>
+				<% switch(tipo){
+					case 'oda':%>
 					Orden de Compra <br> <b>N° <%=oda[0].numoda%> </b>
+				<% break;
+					case 'factura':%>
+					Factura<br> <b>N° <%=oda[0].numfactura%> </b>
+				<% break;
+					default:%>
+					JEJEJE
+				<%}%>
 				</p>
+
 		</div>
 		<div class='bodyss' style="font-size: 15px;font-weight: 600">
 			<div class='info' style="float: left">
@@ -122,7 +127,20 @@
 						<div class="columna">NOMBRE:</div>
 						<div style="float: left;font-weight: 400;margin-left: 10%"  class="columna2"><%= oda[0].razon%></div>
 					</div>
-					<div style="float: right;">Valparaíso, <%= new Date().getDate();%>/<%= parseInt(new Date().getMonth()) + 1;%>/<%= new Date().getFullYear();%></div>
+					<div style="float: right;">
+                        <% switch(tipo){
+							case 'oda':
+								var fecha_doc = new Date(oda[0].creacion);
+								break;
+							case 'factura':
+								var fecha_doc = new Date(oda[0].fecha);
+								break;
+							default:
+								var fecha_doc = new Date();
+								break;
+						}%>
+						Valparaíso, <%= fecha_doc.getDate();%>/<%= parseInt(fecha_doc.getMonth()) + 1;%>/<%= fecha_doc.getFullYear();%>
+					</div>
 				</div>
 				<!-- Rut y Ciudad-->
 				<div style='width: 100%;float: left'>
@@ -170,21 +188,23 @@
 			                    <td><%= t+1%></td>
 			                    <td><%= mats[t].cantidad.toLocaleString() %></td>
 			                    <td style="text-align: right;"><span style="float:left"><%= mats[t].detalle%></span>  <%=mats[t].subcuenta%></td>
-			                    <%if(oda[0].tokenoda.split('@')[6] == 'clp'){%>
+			                    <% if(oda[0].tokenoda.split('@')[6] == 'clp'){%>
 				                	<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.') %></td>
 				                	<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%></td>
 				               <%}else{%>
 				                	<%if(mats[t].precio.toLocaleString().split('.').length > 1){%>
 				                		<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].precio.toLocaleString().split('.')[1] %></td>
-				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')+','+(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1]%></td>
+				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%>
+											,<% if((mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1] != null){%>
+												<%= (mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1]%>
+											<%} else {%>
+												0
+											<%}%></td>
 				                	<%}else{%>
 				                		<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.') %></td>
 				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%></td>
 				                	<%}%>
                  				<%}%>
-
-                 				
-
                  				<%if(mats[t].exento){
 		                			nototal += mats[t].precio*mats[t].cantidad;
 		                			ex = true;

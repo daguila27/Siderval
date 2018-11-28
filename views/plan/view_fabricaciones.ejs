@@ -1,11 +1,11 @@
 <div class="row" style="margin: 0; padding: 0;">
-	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 90%;">
+	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%">
 		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Fabricacion</li>
 		    <!-- Mostrar cantidad de datos -->
 			<div id="pedidos" style="margin-top: 8px"></div>
 		</ol>
-		<div style="width: 40%;">
+		<div style="width: 50%;">
 			<input type="text" id="buscar_fabricaciones" name="" class="form-control pull-right" placeholder="Buscar...">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
@@ -14,15 +14,13 @@
 
 				<button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 				<div style="display: flex">
-                    <select class="form-control" style="width: 25%;margin-left: 80px; margin-right: 10px;">
+					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Pendientes Solamente</label>
+					<input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" checked>
+					<select class="form-control" style="width: 85px; margin-left: 40px; margin-right: 10px;">
                         <option value="todos">Todos</option>
                         <option value="conoc">Con OC</option>
                         <option value="sinoc">Sin OC</option>
                     </select>
-                    <label class="check_pendientes" style="display: block;">
-						<input type="checkbox" id="pend" style="margin-left: 10px" checked> Mostrar Solo Pendientes
-					</label>
-
 				</div>
 
 					<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
@@ -109,5 +107,46 @@
 
 	});
 	
+	// Muestra la tabla antes de ver una OF
+    function mostrar_tabla(){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+        	if($("#buscar_fabricaciones").val() == "" || $("#buscar_fabricaciones").val() == null) {
+        		$.ajax({
+					type: 'GET',
+					url: '/plan/table_fabricaciones/fabricaciones.f_entrega-ASC/true',
+					success: function(data){
+						$(".main-page").html(data);
+						//Muestra la cantidad de pedidos
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+					}
+				});
+				$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+        	}
+        	else{
+        		$.ajax({
+					type: 'POST',
+					data: {clave: $("#buscar_fabricaciones").val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
+					url: '/plan/buscar_fabricaciones_list',
+					success: function(data){
+						$(".main-page").html(data);
+						//Muestra la cantidad de pedidos
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+					}
+				});
+        	}
+        }
+        else {
+        	$.ajax({
+				type: 'POST',
+				data: {clave: $("#buscar_fabricaciones").val(),  showPend: $("#pend").is(':checked')},
+				url: '/plan/buscar_fabricaciones_item',
+				success: function(data){
+					$(".main-page").html(data);
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+				}
+			});
+        }
+    };
 
 </script>
