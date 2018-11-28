@@ -152,14 +152,24 @@
 
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
-    $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
-        e.stopPropagation();
-    });
+
 	function saveinSession(option){
 		if(cc_fill.indexOf($(option).val()) == -1 ){
             alert( $(option).val() );
 		}
 	}
+
+
+
+    $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
 
     $("#buscar_abastecimiento").on('keyup', function(e){
 		e.preventDefault();
@@ -214,13 +224,51 @@
         buscar_oda(false);
 	}
 
+    function despInput(event){
+        var char = event.which || event.keyCode;
+        var item = $(".o_searchview_autocomplete").data('item');
+        //BORRAR LABEL
+        if(char == 8 && ($("#buscar_abastecimiento").val()==null || $("#buscar_abastecimiento").val()=='' || $("#buscar_abastecimiento").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
+            eliminarEtiqueta($("#label"+labels).children('div'));
+        }
+        //ENTER
+        else if(char == 13){
+            $(".fill-item-abast.o-selection-focus").click();
+        }
+        //ARRIBA
+        else if(char == 38){
+            item = parseInt(item) - 1;
+        }
+        //ABAJO
+        else if(char == 40){
+            item = parseInt(item) + 1;
+        }
 
 
+        //SI SOBREPASA EL LIMITE INFERIOR
+        if(parseInt(item) >= 6){
+            $(".o_searchview_autocomplete").data('item', "0");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item0").addClass("o-selection-focus");
+        }
+        //SI SOBREPASA EL LIMITE SUPERIOR
+        else if(parseInt(item) < 0){
+            $(".o_searchview_autocomplete").data('item', "5");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item5").addClass("o-selection-focus");
+        }
+        else{
+            $(".o_searchview_autocomplete").data('item', item);
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item"+item).addClass("o-selection-focus");
+        }
+
+    }
 
 
-	function buscar_oda(onlylist){
+    function buscar_oda(onlylist){
         if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista'){
-
             $.ajax({
                 type: 'POST',
                 data: {
@@ -259,7 +307,6 @@
 						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 					}
 				});
-
             }
         }
 	}
@@ -378,47 +425,5 @@
 
 
 
-
-	function despInput(event){
-        var char = event.which || event.keyCode;
-        var item = $(".o_searchview_autocomplete").data('item');
-        //BORRAR LABEL
-        if(char == 8 && ($("#buscar_abastecimiento").val()==null || $("#buscar_abastecimiento").val()=='' || $("#buscar_abastecimiento").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
-            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
-            eliminarEtiqueta($("#label"+labels).children('div'));
-        }
-        //ENTER
-        else if(char == 13){
-            $(".fill-item-abast.o-selection-focus").click();
-        }
-		//ARRIBA
-        else if(char == 38){
-		    item = parseInt(item) - 1;
-		}
-		//ABAJO
-		else if(char == 40){
-            item = parseInt(item) + 1;
-		}
-
-
-		//SI SOBREPASA EL LIMITE INFERIOR
-		if(parseInt(item) >= 6){
-            $(".o_searchview_autocomplete").data('item', "0");
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item0").addClass("o-selection-focus");
-        }
-        //SI SOBREPASA EL LIMITE SUPERIOR
-		else if(parseInt(item) < 0){
-            $(".o_searchview_autocomplete").data('item', "5");
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item5").addClass("o-selection-focus");
-		}
-		else{
-            $(".o_searchview_autocomplete").data('item', item);
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item"+item).addClass("o-selection-focus");
-		}
-
-    }
 
 </script>
