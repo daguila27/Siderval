@@ -230,5 +230,58 @@
         });
     });
 
+    // Muestra la tabla antes de ver una OC
+    function mostrar_tabla(){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+        	if($("#buscar_pedido").val() == "" || $("#buscar_pedido").val() == null) {
+        		$.ajax({
+					type: 'POST',
+		            data: {
+		                clave: $("#buscar_abastecimiento").val(),
+		                orden: $(".o_cp_switch_buttons .active").data('view'),
+		                showPend: $("#pend").is(':checked'),
+		                cc_selected: $(".select_cc").val().join(',')
+		            },
+					url: '/abastecimiento/table_abastecimientos/1',
+					success: function(data){
+						$(".main-page").html(data);
+						//Muestra la cantidad de pedidos
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+					}
+				});
+        		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+        	}
+        	else{
+        		$.ajax({
+                type: 'POST',
+                data: {
+                    clave: $("#buscar_abastecimiento").val(),
+                    orden: $(".o_cp_switch_buttons .active").data('view'),
+                    showPend: $("#pend").is(':checked'),
+                    cc_selected: $(".select_cc").val().join(',')
+                },
+                url: '/abastecimiento/table_abastecimientos/1',
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                }
+            });
+        	}
+        }
+        else {
+			$("#paginacion").css('display','none');
+            $.ajax({
+                type: 'GET',
+                url: '/abastecimiento/item_abs/'+$("#pend").is(':checked'),
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                }
+            });
+            $(".search-option-list").css('display', 'none');
+        }
+    };
 
 </script>

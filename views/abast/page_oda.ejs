@@ -25,21 +25,29 @@ function fechaLatino(string){
                             </div>
                         </button>
                     </div>
-                    <div class="oe_title" style="width: 100%;">
-                        <h1 style="width: 100%;">
-                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span>
-                            <a class="pull-right" style="z-index: 10; margin:10px;" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" onclick="verPdf(this)">
-                                <i data-toggle="tooltip" title="Ver PDF" class="fa fa-file-pdf-o"></i>
-                            </a>
-                            <a class="pull-right" style="z-index: 10; margin:10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
-                                <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
-                            </a>
-                            <a class="pull-right" style="margin: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
-                                <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
-                            </a>
-
-
-                        </h1>
+                    <div class="row" style="width: 100%;">
+                        <div class="col-md-8">
+                            <h1 style="width: 100%; margin-top: 0"><span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span></h1>
+                        </div>
+                        <div class="col-md-2" style="margin-left: 12.7%">
+                            <h1 style="width: 100%; margin-top: 0">
+                                <a class="pull-right" style="z-index: 10; margin-left: 10px;" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" onclick="verPdf(this)">
+                                    <i data-toggle="tooltip" title="Ver PDF" class="fa fa-file-pdf-o"></i>
+                                </a>
+                                <a class="pull-right" style="z-index: 10; margin-left: 10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
+                                    <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
+                                </a>
+                                <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
+                                    <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
+                                </a>
+                            </h1>
+                        </div>
+                        <div class="col-md-1" style="padding: 0; width: 32px">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-sm btn-danger" onclick="mostrar_tabla()" type="button" style="align-content: center;"><i class="fa fa-close"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="o_group">
                         <table class="o_group o_inner_group o_group_col_6">
@@ -190,8 +198,6 @@ function fechaLatino(string){
                                             </tbody>
                                             <tfoot>
                                             <tr>
-                                                <td></td>
-                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
