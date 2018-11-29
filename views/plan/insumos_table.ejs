@@ -1,0 +1,70 @@
+<div style="margin-top: 20px">
+        <%
+          function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+          function unidades(string){
+            if(string=='UN'){return 'unidades';}
+            else if(string=='LT'){return 'litros';}
+            else{return 'kilos'}
+        }
+
+        function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }%>
+
+<h3 class="page-header" style="margin: 0; padding-top: 5% ">Productos fabricados:</h3>
+        <%if(prods.length){
+            total_fabricados = 0;
+        %>
+            <table class="table table-hover table-striped table-inverse table-bordered" id="fabrs_tabl">
+                        <thead>
+                        <tr>
+                            <th>Detalle</th>
+                            <th>Solicitados</th>
+                            <th>Ingresados</th>
+                            <th>Despachados</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% 
+                            for(var r = 0;r < prods.length; r++){%>
+                                <tr data-idmat="<%= prods[r].idmaterial%>" data-detalle="<%= prods[r].detalle%>">
+                                    <td><%= prods[r].detalle%></td>
+                                    <td><%= numberFormat(prods[r].solicitados.toString())%></td>
+                                    <td><%= numberFormat(prods[r].fabricados.toString())%></td>
+                                    <td><%= numberFormat(prods[r].despachados.toString())%></td>
+                                    <% total_fabricados += prods[r].fabricados;%>
+                                </tr>
+                            <%}%>
+                        </tbody>
+                    </table>
+
+
+
+        <%}%>
+</div>
+
+    <button type="button" class="btn btn-success" onclick="cierreMensual()">Cierre mensual</button>
+<script type="text/javascript">
+    setDataTable("#insumos_tabl");
+</script>

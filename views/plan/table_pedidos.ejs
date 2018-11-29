@@ -11,7 +11,7 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+<table id="DataTablePeds" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
 		<style>
 			.order-column:hover{
 				cursor: pointer;
@@ -66,38 +66,39 @@
 </table>
 
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js""></script>
+<script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		$(".order-column").removeClass('o-sort-up');
+	    setDataTableMain("#DataTablePeds");
+		/*$(".order-column").removeClass('o-sort-up');
 		$(".order-column").removeClass('o-sort-down');
 		$(".order-column").each(function(){
-			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
-				if("<%= key.split('-')[1]%>" == "ASC"){
+			if($(this).data('order').split('-')[0] == "< key.split('-')[0]>" ){
+				if("< key.split('-')[1]>" == "ASC"){
 					$(this).addClass('o-sort-up');
-					$(this).data('order', '<%= key.split("-")[0]%>-DESC');
+					$(this).data('order', '< key.split("-")[0]>-DESC');
 				}
 				else{
 					$(this).addClass('o-sort-down');
-					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
+					$(this).data('order', '< key.split("-")[0]>-ASC');
 					
 				}
 			}
-		});
+		});*/
 	});
-	$(".order-column").on('click', function(e){
+	/*$(".order-column").on('click', function(e){
 		e.preventDefault();
 		var item = this;
 		var orden = $(this).data('order');
 		$.ajax({
 			type: 'GET',
-			url: '/plan/table_pedidos/' + orden + '/<%= page %>',
+			url: '/plan/table_pedidos/' + orden + '/',
 			success: function(data){
 				$(".main-page").html(data);
 			}
 		});
-	});
+	});*/
 
 	function submit_form(yo){
 		//$("#form"+$(yo).data('idodc')).submit();

@@ -11,7 +11,7 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
 	<style>
 		.order-column:hover{
 			cursor: pointer;
@@ -55,7 +55,7 @@
 							</td>
 						<%}else{%>
 							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
-								<button class="btn btn-xs btn-primary"  onclick="habFabricacion(this)" data-state="1" data-id="<%= data[i].idfabricaciones%>">
+								<button class="btn btn-xs btn-danger"  onclick="habFabricacion(this)" data-state="1" data-id="<%= data[i].idfabricaciones%>">
 									<i class="fa fa-lock"></i>
 								</button>
 							</td>
@@ -89,28 +89,26 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-        $(".order-column").removeClass('o-sort-up');
+        setDataTableMain("#DataTableFabs");
+        /*$(".order-column").removeClass('o-sort-up');
         $(".order-column").removeClass('o-sort-down');
         $(".order-column").each(function(){
             //$(this).css("width", $("."+$(this).attr('id')).css('width'));
 
-            if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
-                if("<%= key.split('-')[1]%>" == "ASC"){
+            if($(this).data('order').split('-')[0] == "< key.split('-')[0]>" ){
+                if("< key.split('-')[1]>" == "ASC"){
                     $(this).addClass('o-sort-up');
-                    $(this).data('order', '<%= key.split("-")[0]%>-DESC');
+                    $(this).data('order', '< key.split("-")[0]>-DESC');
                 }
 				else{
                     $(this).addClass('o-sort-down');
 
-                    $(this).data('order', '<%= key.split("-")[0]%>-ASC');
+                    $(this).data('order', '< key.split("-")[0]>-ASC');
                 }
             }
-            /*$(".cabecera").each(function(){
-                $(this).css("width", ("."+$(this).attr('id')).css('width')+"px");
-            });*/
-        });
+        });*/
     });
-	$(".order-column").on('click', function(e){
+	/*$(".order-column").on('click', function(e){
 		e.preventDefault();
 		var item = this;
 		var orden = $(this).data('order');
@@ -122,7 +120,7 @@
 				$(".main-page").html(data);
 			}
 		});
-	});
+	});*/
 
 
 	function submit_form(yo){
@@ -147,12 +145,16 @@
                 if(lock == '1'){
                     $(yo).children('i').removeClass('fa-lock');
                     $(yo).children('i').addClass('fa-unlock');
+                    $(yo).removeClass('btn-danger');
+                    $(yo).addClass('btn-primary');
                     $(yo).data('state', '0');
                     emitToastCount();
                 }
                 else{
                     $(yo).children('i').removeClass('fa-unlock');
                     $(yo).children('i').addClass('fa-lock');
+                    $(yo).removeClass('btn-primary');
+                    $(yo).addClass('btn-danger');
                     $(yo).data('state', '1');
                 }
             }
