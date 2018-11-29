@@ -1,0 +1,103 @@
+<%
+    function fechaLatino(string){
+        if(string.split('-').length == 3){
+            return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+        }
+        else{
+            return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+        }
+    }
+
+    var etapas = [
+        "Jefe de Producción",
+        "Moldeo",
+        "Fusión",
+        "Quiebre",
+        "Terminación",
+        "Tratamiento Térmico",
+        "Maestranza",
+        "Control de Calidad",
+        "Mantención",
+        "Externo",
+        "Otros"
+    ];
+%>
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="receps_table">
+    <thead>
+    <tr>
+        <th id="numof" class="cabecera o_column_sortable order-column" data-order="recepcion_detalle.idrecepcion-ASC">N° GDD</th>
+        <th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
+        <th id="solicitados" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="recepcion_detalle.cantidad*1-ASC">Cantidad</th>
+        <th id="sin_produccion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
+        <th id="f_entrega" class="cabecera o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="recepcion.fecha-DESC">Fecha de Registro</th>
+    </tr>
+    </thead>
+    <tbody class="ui-sortable">
+    <%for(var i=0; i < data.length; i++){%>
+        <tr class="o_data_row">
+            <td class="o_data_cell o_readonly_modifier o_required_modifier"  style="text-align: center"><%=data[i].numgd%></td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad%></td>
+            <td class="o_data_cell" style="text-align: center;"><%=data[i].u_medida%></td>
+            <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
+                <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].fecha).toLocaleDateString())%></span>
+            </td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".order-column").removeClass('o-sort-up');
+        $(".order-column").removeClass('o-sort-down');
+        $(".order-column").removeClass('columna-activa');
+        $(".order-column").each(function(){
+            //$(this).css("width", $("."+$(this).attr('id')).css('width'));
+
+            if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
+                if("<%= key.split('-')[1]%>" == "ASC"){
+                    $(this).addClass('o-sort-up');
+                    $(this).addClass('columna-activa');
+                    $(this).data('order', '<%= key.split("-")[0]%>-DESC');
+
+                }
+                else{
+                    $(this).addClass('o-sort-down');
+                    $(this).addClass('columna-activa');
+                    $(this).data('order', '<%= key.split("-")[0]%>-ASC');
+                }
+            }
+            /*$(".cabecera").each(function(){
+                $(this).css("width", ("."+$(this).attr('id')).css('width')+"px");
+            });*/
+        });|
+    });
+    $(".order-column").on('click', function(e){
+        e.preventDefault();
+        var item = this;
+        var orden = $(this).data('order');
+        $.ajax({
+            type: 'POST',
+            data: {orden: orden, clave: $("#buscar_movimiento").val()},
+            url: '/matprimas/table_recepcion',
+            success: function(data){
+                $(".main-page").html(data);
+                setDataTable("#receps_table");
+            }
+        });
+    });
+</script>
