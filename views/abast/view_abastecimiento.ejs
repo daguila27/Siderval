@@ -224,11 +224,13 @@
         buscar_oda(false);
 	}
 
+
+
     function despInput(event){
         var char = event.which || event.keyCode;
         var item = $(".o_searchview_autocomplete").data('item');
         //BORRAR LABEL
-        if(char == 8 && ($("#buscar_abastecimiento").val()==null || $("#buscar_abastecimiento").val()=='' || $("#buscar_abastecimiento").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+        if(char == 8 && ($("#buscar_fabricaciones").val()==null || $("#buscar_fabricaciones").val()=='' || $("#buscar_fabricaciones").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
             var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
             eliminarEtiqueta($("#label"+labels).children('div'));
         }
@@ -265,6 +267,7 @@
         }
 
     }
+
 
 
     function buscar_oda(onlylist){
