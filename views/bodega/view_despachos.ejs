@@ -76,7 +76,7 @@
 		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
 			$.ajax({
 				type: 'POST',
-				data: {clave: $("#buscar_despacho").val(), orden: $(".active-sort").data('order'), tipo: $("#select_tipo_despacho").val()},
+				data: {clave: $("#buscar_despacho").val(), orden: '', tipo: $("#select_tipo_despacho").val()},
 				url: '/bodega/table_despachos',
 				success: function(data){
 					$(".main-page").html(data);
