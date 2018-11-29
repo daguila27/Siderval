@@ -5,13 +5,13 @@
 	}
 %>
 
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
 		<thead>
 			<tr>
-				<th class="o_column_sortable order-column o-sort-up" data-order="despacho.iddespacho-ASC">Número de GD</th>
-				<th class="o_column_sortable order-column" data-order="despacho.mat_token-ASC">Descripción</th>
+				<th class="o_column_sortable" data-order="despacho.iddespacho-ASC">Número de GD</th>
+				<th class="o_column_sortable" data-order="despacho.mat_token-ASC">Descripción</th>
 				<th class="o_column_sortable" data-order="pedido.cantidad-ASC">Despachados</th>
-				<th class="o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="despacho.fecha-DESC">Fecha de Despacho</th>
+				<th class="o_column_sortable" style="text-align: center;" data-order="despacho.fecha-DESC">Fecha de Despacho</th>
 				<th class="o_column_sortable" data-order="cliente.razon-ASC">Tipo</th>
 				<th class="o_column_sortable" data-order="" style="width:80px" >Accion</th>
 			</tr>
@@ -114,23 +114,24 @@
     }
 
 	$(document).ready(function(){
-		$(".order-column").removeClass('o-sort-up');
+		/*$(".order-column").removeClass('o-sort-up');
 		$(".order-column").removeClass('o-sort-down');
 		$(".order-column").each(function(){
-			if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
-				if("<%= key.split('-')[1]%>" == "ASC"){
+			if($(this).data('order').split('-')[0] == "< key.split('-')[0]>" ){
+				if("< key.split('-')[1] >" == "ASC"){
 					$(this).addClass('o-sort-up');
 					$(this).addClass('active-sort');
-                    $(this).data('order', '<%= key.split("-")[0]%>-DESC');
+                    $(this).data('order', '< key.split("-")[0] >-DESC');
 				}
 				else{
 					$(this).addClass('o-sort-down');
                     $(this).addClass('active-sort');
-					$(this).data('order', '<%= key.split("-")[0]%>-ASC');
+					$(this).data('order', '< key.split("-")[0] >-ASC');
 					
 				}
 			}
-		});
+		});*/
+		setDataTableMain("#despachosTable");
 	});
 
     function activarGD(yo){
