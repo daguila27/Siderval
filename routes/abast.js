@@ -1441,7 +1441,9 @@ router.get('/insumos_list/:token', function(req, res, next){
                 // LEFT JOIN (sum_devs) AS devs -- solicitadas
                 " LEFT JOIN (SELECT bom.idmaterial_slave,SUM(enprod.enprod*bom.cantidad) as necesarios FROM (SELECT fabricaciones.idmaterial, SUM(produccion.cantidad) as enprod FROM produccion" +
                 " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-				" WHERE produccion.cantidad != produccion.`8` GROUP BY fabricaciones.idmaterial) AS enprod" +
+				" WHERE produccion.cantidad != produccion.`8` AND (produccion.f_gen" +
+                " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
+				" GROUP BY fabricaciones.idmaterial) AS enprod" +
                 " LEFT JOIN bom ON bom.idmaterial_master = enprod.idmaterial" +
 				" LEFT JOIN material ON bom.idmaterial_slave = material.idmaterial" +
                 " WHERE material.e_abast != 4" +
