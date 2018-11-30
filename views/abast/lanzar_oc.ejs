@@ -34,10 +34,17 @@
     <div class="panel panel-primary panel-defecto">
             <div class="panel-heading" style="display: flex">
                 <div style="width: 45%">
-                <h3>Lanzar Orden de Compra: #<%=last%></h3>
-                <div>
-                        <button class="btn btn-primary" onclick="saveState()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
-                        <button class="btn btn-primary" onclick="loadState()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                    <h3>Lanzar Orden de Compra: #<%=last%></h3>
+                    <div style="display: flex">
+                        <button class="btn btn-primary" onclick="saveState(false)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+                        <button class="btn btn-primary" onclick="loadState(false)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                        <div class="dropdown">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li data-toggle="modal" data-target="#SaveOdaModal"><a href="#">Guardar Como Plantilla</a></li>
+                                <li data-toggle="modal" data-target="#LoadOdaModal" onclick="renderPlantillasModal()"><a href="#">Cargar Plantilla</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div style="width: 20%">
@@ -284,6 +291,57 @@
 </div>
 <div  class="hidden" style="display: none" ></div>
 
+
+
+
+<!-- Modal Guardar Plantilla de ODA-->
+<div id="SaveOdaModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Guardar como Plantilla</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="namePlant" style="width: 100%;">
+                        Ingrese nombre:
+                        <input type="text" id="namePlant" class="form-control">
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveState(true)">Guardar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Modal Cargar Plantilla de ODA-->
+<div id="LoadOdaModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Seleccionar Plantilla</h4>
+            </div>
+            <div class="modal-body panel-body grid-plantillas">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="loadState(true)">Selecccionar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 <style type="text/css">
     .predic_text div{  
         background-color: white;
@@ -437,8 +495,7 @@
      }
 
      
-    function saveState(){
-
+    function saveState(plantilla){
         var lista = $("#send_of").serializeArray();
         var data = {
             idm: [],
@@ -470,6 +527,8 @@
             //console.log($(this).val());
         });
         console.log(data);
+        data.plantilla = plantilla;
+        data.namePlant = $("#namePlant").val();
         $.ajax({
             type: 'POST',
             data: data,
@@ -485,11 +544,18 @@
 
             }
         });
+
     }
 
-    function loadState(){
+    function loadState(plantilla){
+         /*
+         * EL CONTROLADOR ACEPTA plantilla (booleano que indica si se esta cargando un plantilla o no)
+         *  Y idplant (id de plantilla en el caso de utilizar una). SI plantilla ES false ENTONCES SE CARGA
+         *  EL ULTIMO ESTADO GUARDADO.
+         * */
         $.ajax({
-            type: 'GET',
+            type: 'POST',
+            data: {plantilla: plantilla, idplant: $(".select-plant").data('id')},
             url: '/abastecimiento/loadStateODABD',
             beforeSend: function(xhr){
                 $(".guardado_automatico").css('display', 'none');
@@ -507,6 +573,16 @@
         });
     }
     $(document).ready(function(){
-      loadState();
+      loadState(false);
     });
+
+  function renderPlantillasModal(){
+      $.ajax({
+          type: 'GET',
+          url: '/abastecimiento/show_plantillas',
+          success: function(data){
+              $(".grid-plantillas").html(data);
+          }
+      });
+  }
 </script>
