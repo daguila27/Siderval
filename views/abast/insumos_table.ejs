@@ -39,6 +39,7 @@
         <tr>
             <th>Código</th>
             <th>Detalle</th>
+            <th>Solicitados</th>
             <th>Virtuales</th>
             <th>Ingreso</th>
             <th>Salidas</th>
@@ -51,6 +52,7 @@
         <tr data-idmat="<%= data[i].idmaterial%>" data-detalle="<%= data[i].detalle%>" style="cursor: pointer;">
             <td><%= data[i].codigo%></td>
             <td><%= letraMayus(data[i].detalle)%></td>
+            <td><%= data[i].sum_sol.toString()%></td>
             <td><%= numberFormat(data[i].sum_virtual.toString())%></td>
             <td><%= numberFormat( (data[i].sum_ing + data[i].sum_dev).toString() )%></td>
             <td><%= numberFormat(data[i].sum_sal.toString())%></td>
