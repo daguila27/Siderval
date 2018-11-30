@@ -41,6 +41,7 @@
                         <tr>
                             <th>Detalle</th>
                             <th>Solicitados</th>
+                            <th>Virtuales</th>
                             <th>Ingresados</th>
                             <th>Despachados</th>
                         </tr>
@@ -51,6 +52,7 @@
                                 <tr data-idmat="<%= prods[r].idmaterial%>" data-detalle="<%= prods[r].detalle%>">
                                     <td><%= prods[r].detalle%></td>
                                     <td><%= numberFormat(prods[r].solicitados.toString())%></td>
+                                    <td><%= numberFormat(prods[r].virtuales.toString())%></td>
                                     <td><%= numberFormat(prods[r].fabricados.toString())%></td>
                                     <td><%= numberFormat(prods[r].despachados.toString())%></td>
                                     <% total_fabricados += prods[r].fabricados;%>
@@ -66,5 +68,5 @@
 
     <button type="button" class="btn btn-success" onclick="cierreMensual()">Cierre mensual</button>
 <script type="text/javascript">
-    setDataTable("#insumos_tabl");
+    setDataTable("#fabrs_tabl");
 </script>

@@ -1354,30 +1354,20 @@ router.get('/abast_ops_page/:page', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
-router.get('/ops_close', function(req, res, next){
+//Renderizar vista de INFORME DE STOCK para FABRICACIONES.
+router.get('/fabrs_ids', function(req, res, next){
     if(verificar(req.session.userData)){
-        req.getConnection(function(err, connection){
-        	if(err)
-        		console.log("Error Connection : %s", err);
-        	//SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
-
-        	connection.query("SELECT material.idmaterial,material.detalle,salidas.sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing,material.u_medida" +
-				" FROM (" +
-				"SELECT ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(ops_abastecidas.cantidad) as sum_sal" +
-				" from ops_abastecidas WHERE ops_abastecidas.ingreso = false AND ops_abastecidas.cont = false AND ops_abastecidas.fecha" +
-				" BETWEEN '2018-07-01 00:00:00' AND '2018-07-31 23:59:59' GROUP BY ops_abastecidas.idmaterial) as salidas" +
-				" LEFT JOIN (" +
-				" SELECT ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(ops_abastecidas.cantidad) as sum_ing " +
-				" FROM ops_abastecidas WHERE ops_abastecidas.ingreso = true AND ops_abastecidas.cont = false AND ops_abastecidas.fecha BETWEEN '2018-07-01 00:00:00' AND '2018-07-31 23:59:59' group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial" ,function(err, ops){
-        		if(err)
-        			console.log("Error Selecting : %s", err);
-        		console.log(ops);
-        		res.render('abast/cierre_ops');	
-        	});
-        });
+        res.render('plan/fabrs_ids');
     } else res.redirect("/bad_login");
 });
+//Renderizar vista de INFORME DE STOCK para INSUMOS.
+router.get('/ops_close', function(req, res, next){
+    if(verificar(req.session.userData)){
+
+        res.render('abast/cierre_ops');
+    } else res.redirect("/bad_login");
+});
+//Cargar Datos de INFORME DE STOCK para FABRICACIONES
 router.get("/fabrs_list/:token",function(req,res){
     if(verificar(req.session.userData)){
         console.log(req.params.token);
@@ -1387,7 +1377,7 @@ router.get("/fabrs_list/:token",function(req,res){
             //SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
 			connection.query("select material.detalle, material.precio,material.u_medida," +
 				"COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
-				",COALESCE(peds.despachados,0) as despachados FROM material" +
+				",COALESCE(peds.despachados,0) as despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
 				//LEFT JOIN produccion history
 				" LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
 				" LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
@@ -1398,7 +1388,12 @@ router.get("/fabrs_list/:token",function(req,res){
 				" LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados,SUM(pedido.despachados) AS despachados" +
 				" FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
 				" GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
-				" WHERE material.codigo LIKE 'P%' GROUP BY material.idmaterial",function(err, prods){
+                //LEFT JOIN produccion
+                " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby) as virtuales" +
+                " FROM produccion" +
+				" LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+                " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
+				" WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND peds.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, prods){
 				if(err)
 					console.log("Error Selecting : %s", err);
 				console.log(prods);
@@ -1407,7 +1402,7 @@ router.get("/fabrs_list/:token",function(req,res){
         });
     } else res.redirect("/bad_login");
 });
-//Cargar
+//Cargar Datos de INFORME DE STOCK para INSUMOS
 router.get('/insumos_list/:token', function(req, res, next){
     if(verificar(req.session.userData)){
     	console.log(req.params.token);
@@ -1452,11 +1447,11 @@ router.get('/insumos_list/:token', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
-
-router.get('/xlsx_mensual/:token', function (req, res, next) {
+// Descargar xlsx de insumos
+router.get('/xlsx_ids_ins/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
         console.log(req.params.token);
-		let nombre = req.params.token + '.xlsx';
+        let nombre = "IDS-pedidos&producidos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
 		let Excel = require('exceljs');
 		let workbook = new Excel.Workbook();
 		let sheet = workbook.addWorksheet('stockmaster');
@@ -1477,52 +1472,122 @@ router.get('/xlsx_mensual/:token', function (req, res, next) {
         req.getConnection(function(err, connection){
             if(err)
                 console.log("Error Connection : %s", err);
-			connection.query("SELECT material.codigo,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
-				",coalesce(devs.sum_devs,0) as sum_dev,coalesce(virtuales.sum_virtual,0) as sum_virtual,material.u_medida" +
-				// FROM (sum_sal) AS salidas -- salidas desde movimientos tipo 0
-				" FROM material LEFT JOIN (select movimiento_detalle.idmaterial, sum(movimiento_detalle.cantidad) as sum_sal FROM movimiento" +
-				" LEFT JOIN movimiento_detalle on movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
-				" WHERE movimiento.tipo = 0 AND movimiento.f_gen" +
-				" BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-				" GROUP BY movimiento_detalle.idmaterial) as salidas ON salidas.idmaterial = material.idmaterial" +
-				// FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
-				" LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
-				" LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
-				" WHERE oda.creacion" +
-				" BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-				" GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
-				// LEFT JOIN (sum_ing) AS ingresos -- entradas desde recepción de OCA
-				" LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing FROM recepcion" +
-				" LEFT JOIN recepcion_detalle on recepcion_detalle.idrecepcion = recepcion.idrecepcion" +
-				" LEFT JOIN abastecimiento ON abastecimiento.idabast = recepcion_detalle.idabast" +
-				" LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial" +
-				" WHERE recepcion.fecha BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-				" GROUP BY material.idmaterial) as ingresos ON ingresos.idmaterial = material.idmaterial" +
-				// LEFT JOIN (sum_devs) AS devs -- entradas desde movimientos tipo 1
-				" LEFT JOIN (SELECT material.idmaterial, SUM(coalesce(movimiento_detalle.cantidad,0)) as sum_devs FROM material" +
-				" LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
-				" LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
-				" WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-				" GROUP BY material.idmaterial) AS devs ON devs.idmaterial = material.idmaterial" +
-				" WHERE NOT (virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial", function(err, ops){
+			connection.query("SELECT material.codigo,material.s_inicial,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
+                ",coalesce(devs.sum_devs,0) as sum_dev,coalesce(virtuales.sum_virtual,0) as sum_virtual,material.u_medida" +
+                // FROM (sum_sal) AS salidas -- salidas desde movimientos tipo 0
+                " FROM material LEFT JOIN (select movimiento_detalle.idmaterial, sum(movimiento_detalle.cantidad) as sum_sal FROM movimiento" +
+                " LEFT JOIN movimiento_detalle on movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
+                " WHERE movimiento.tipo = 0 AND movimiento.f_gen" +
+                " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY movimiento_detalle.idmaterial) as salidas ON salidas.idmaterial = material.idmaterial" +
+                // LEFT JOIN (sum_ing) AS ingresos -- entradas desde recepción de OCA
+                " LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing FROM recepcion" +
+                " LEFT JOIN recepcion_detalle on recepcion_detalle.idrecepcion = recepcion.idrecepcion" +
+                " LEFT JOIN abastecimiento ON abastecimiento.idabast = recepcion_detalle.idabast" +
+                " LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial" +
+                " WHERE recepcion.fecha BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY material.idmaterial) as ingresos ON ingresos.idmaterial = material.idmaterial" +
+                // LEFT JOIN (sum_devs) AS devs -- entradas desde movimientos tipo 1
+                " LEFT JOIN (SELECT material.idmaterial, SUM(coalesce(movimiento_detalle.cantidad,0)) as sum_devs FROM material" +
+                " LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
+                " LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
+                " WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY material.idmaterial) AS devs ON devs.idmaterial = material.idmaterial" +
+                // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
+                " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
+                " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
+                " WHERE oda.creacion" +
+                " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
+                " WHERE NOT (virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial" , function(err, ops){
 
 				//Inicio de la funcion post query.
 				for(var i = 2; i < ops.length+2; i++){
 					sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 					sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
 					sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
-					//Stock Inicial
+                    //Stock Inicial
+                    sheet.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
+
 					//Cantidad Solicitada
 					sheet.getCell('F'+i.toString()).value = ops[i-2].sum_virtual;
-                    sheet.getCell('G'+i.toString()).value = ops[i-2].sum_ing;
+                    sheet.getCell('G'+i.toString()).value = ops[i-2].sum_ing + ops[i-2].sum_dev;
                     sheet.getCell('H'+i.toString()).value = ops[i-2].sum_sal;
+                    sheet.getCell('I	'+i.toString()).value = ops[i-2].s_inicial + ops[i-2].sum_ing + ops[i-2].sum_dev - ops[i-2].sum_sal;
 				}
 
 				workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
 					console.log('new xlsx');
-					res.send('looks like something saved');
+					res.send(nombre);
 				});
 			});
+        });
+    }
+});
+// Descargar xlsx de insumos
+router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
+    if(verificar(req.session.userData)){
+        let nombre = "IDS-pedidos&producidos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
+        let Excel = require('exceljs');
+        let workbook = new Excel.Workbook();
+        let sheet = workbook.addWorksheet('stockmaster');
+        let ident  = new Date().toLocaleDateString().replace(' ','');
+        ident = ident.replace('/','');
+        ident = ident.replace(':','');
+        sheet.columns = [
+            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Detalle', key: 'name', width: 50 },
+            { header: 'Unidad Med.', key: 'unit', width: 10},
+            { header: 'Stock Inicial', key: 'initial', width: 15},
+            { header: 'Cantidad Solicitada', key: 'asked', width: 15},
+            { header: 'Stock Virtual', key: 'virtual', width: 15},
+            { header: 'Ingresos', key: 'income', width: 15},
+            { header: 'Salidas', key: 'departures', width: 15},
+            { header: 'Stock Final', key: 'final', width: 15}
+        ];
+        req.getConnection(function(err, connection){
+            if(err)
+                console.log("Error Connection : %s", err);
+            connection.query("select material.detalle,material.s_inicial, material.precio,material.u_medida," +
+                "COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
+                ",COALESCE(peds.despachados,0) as despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
+                //LEFT JOIN produccion history
+                " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
+                " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
+                " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+                " WHERE produccion_history.to='8' AND (produccion_history.fecha between '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
+                " GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
+                //LEFT JOIN pedidos
+                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados,SUM(pedido.despachados) AS despachados" +
+                " FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
+                //LEFT JOIN produccion
+                " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby) as virtuales" +
+                " FROM produccion" +
+                " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+                " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
+                " WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND peds.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial" , function(err, ops){
+
+                //Inicio de la funcion post query.
+                for(var i = 2; i < ops.length+2; i++){
+                    sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
+                    sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
+                    sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
+                    //Stock Inicial
+                    sheet.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
+                    sheet.getCell('E'+i.toString()).value = ops[i-2].solicitados;
+                    //Cantidad Solicitada
+                    sheet.getCell('F'+i.toString()).value = ops[i-2].virtuales;
+                    sheet.getCell('G'+i.toString()).value = ops[i-2].fabricados;
+                    sheet.getCell('H'+i.toString()).value = ops[i-2].despachados;
+                    sheet.getCell('I'+i.toString()).value = ops[i-2].s_inicial + ops[i-2].fabricados - ops[i-2].despachados;
+                }
+
+                workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                    console.log('new xlsx');
+                    res.send(nombre);
+                });
+            });
         });
     }
 });
