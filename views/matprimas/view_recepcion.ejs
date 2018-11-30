@@ -1,57 +1,45 @@
+
 <div class="row" style="margin: 0; padding: 0;">
     <div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%">
         <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
             <li class="active">Recepcion de Materias Primas</li>
         </ol>
         <div style="width: 50%;">
-            <input type="text" id="buscar_movimiento" class="form-control pull-right" placeholder="Buscar...">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+                <div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
+                    <div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
+                    </div>
+                    <input id="buscar_recepcion" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
+                    <input id="buscar_recepcion-value" style="display: none" type="text">
+                </div>
+                <ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
+                    <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Guías de Despacho</em> para: <strong></strong></a></li>
+                    <li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripción</em> para: <strong></strong></a></li>
+                    <li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Fecha de Registro</em> para: <strong></strong></a></li>
+                </ul>
+            </div>
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
                 <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_movimientos' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-                <!--<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_odcs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-                <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
-
-                <button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
-                    <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
-
-                <!--
-                <div class="search-option-list" style="display: flex;">
-                    <div class="dropdown fill_cc" style="margin-left: 200%">
-                        <button class="btn btn-default dropdown-toggle dropdown_btn_ccfill" type="button" data-toggle="dropdown">Filtrar por Etapa<span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="max-height: 230px;  padding: 4px 10px; width: 200px">
-                            <div class="form-group" style="height: 230px;">
-                                <!--
-                                    Un SELECT MULTIPLE para filtrar los item de ODA según CC (centro de costo).
-                                    En la función buscar_oda() (script de abajo) se obtiene mediante $(".select_cc").val()
-                                     lo cual entrega una lista con los identificadores de CC. (EJ : [ '120307','310102', '310103','310104'])
-
-                                <select multiple class="form-control select_cc" onchange="change_mulselected(this)" data-allbeforecheck="0" style="height: 180px">
-                                    <option value="all" id="all_option_cc" class="option_multiple_select"> Todos</option>
-                                    <option value="0" class="option_multiple_select"> Jefe de Producción</option>
-                                    <%for(var e=0; e < etp.length; e++){%>
-                                        <option value="<%= etp[e].value%>" class="option_multiple_select"> <%= etp[e].nombre_etapa%></option>
-                                    <%}%>
-                                </select>
-                                <spam class="pull-left">
-                                    <button class="btn btn-xs btn-success" style="margin: 10px 2px;" onclick="fill_oda_cc(this)">Aplicar</button>
-                                </spam>
-                            </div>
-                        </ul>
-                    </div>
-                </div>-->
             </div>
         </div>
     </div>
 </div>
 <div class="row row-main" style=" margin: 0; padding: 0;">
-    <div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5;">
+    <div class="col-sm-12 col-md-12 main-page" style="margin: 0; padding: 0; z-index: 5; width: 100%">
     </div>
 </div>
 
 <script type="text/javascript">
+    var filtros_seleccionados = [];
+    var array_fill = [
+        "GD@success",
+        "Descripción@warning",
+        "Registro@default"
+    ];
     $(document).ready(function(){
         $.ajax({
             type: 'POST',
-            data:{ orden: 'recepcion_detalle.idrecepcion-DESC', clave: $("#buscar_movimiento").val()},
+            data:{ orden: 'recepcion_detalle.idrecepcion-DESC', clave: filtros_seleccionados.join(',')},
             url: '/matprimas/table_recepcion',
             success: function(data){
                 $(".main-page").html(data);
@@ -63,31 +51,121 @@
     $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
         e.stopPropagation();
     });
-    $("#buscar_movimiento").on('keyup', function(e){
+
+    function buscar_recepcion(){
+        $.ajax({
+            type: 'POST',
+            data:{ orden: 'recepcion_detalle.idrecepcion-DESC', clave: filtros_seleccionados.join(',')},
+            url: '/matprimas/table_recepcion',
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
+
+    $("#buscar_recepcion").on('keyup', function(e){
         e.preventDefault();
-        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
-            //ENVIAR AJAX PARA RENDERIZAR TABLA
-            var orden = $(".columna-activa").data('order').split('-');
-            if(orden[1] == 'ASC'){
-                orden[1] = 'DESC';
-            }
-            else{
-                orden[1] = 'ASC';
-            }
-            $.ajax({
-                type: 'POST',
-                data:{ orden: orden.join('-'), clave: $(this).val()},
-                url: '/matprimas/table_recepcion',
-                success: function(data){
-                    $(".main-page").html(data);
-                    setDataTable("#receps_table");
-                }
-            });
+        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
+            $(".o_searchview_autocomplete").css('display', 'none');
+            $(".o_searchview_autocomplete strong").html('');
         }
         else{
-            //ENVIAR AJAX PARA RENDERIZAR ITEMS
+            $(".o_searchview_autocomplete").css('display', 'block');
+            $(".o_searchview_autocomplete strong").html($(this).val());
+
         }
+
     });
+
+    $(".fill-item-abast").on('click', function(e){
+        e.preventDefault();
+        var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
+        var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
+        $(".etiqueta-filtro-div").append(
+            "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_recepcion").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
+            +$("#buscar_recepcion").val()+
+            "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+        );
+        $(".etiqueta-filtro-div").data('cant', labels+1);
+        if($("#buscar_recepcion-value").val() == '' || $("#buscar_recepcion-value").val() == null || $("#buscar_recepcion-value").val() == undefined){
+            $("#buscar_recepcion-value").val($(this).data('searchcol')+"@"+$("#buscar_recepcion").val());
+        }
+        else{
+            $("#buscar_recepcion-value").val([$("#buscar_recepcion-value").val(),$(this).data('searchcol')+"@"+$("#buscar_recepcion").val()].join(','));
+        }
+        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_recepcion").val());
+        $(".o_searchview_autocomplete").css('display', 'none');
+        $(".o_searchview_autocomplete strong").html('');
+        $("#buscar_recepcion").val('');
+        $("#buscar_recepcion").focus();
+        buscar_recepcion();
+        //buscar_oda(false);
+    });
+
+
+    function eliminarEtiqueta(yo){
+        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
+        $(yo).parent().remove();
+        $(".etiqueta-filtro").removeAttr('id');
+        var count = 0;
+        $(".etiqueta-filtro").each(function(){
+            $(this).attr("id","label"+count);
+            count++;
+        });
+        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        buscar_recepcion();
+    }
+
+
+
+    function despInput(event){
+        var char = event.which || event.keyCode;
+        var item = $(".o_searchview_autocomplete").data('item');
+        //BORRAR LABEL
+        if(char == 8 && ($("#buscar_recepcion").val()==null || $("#buscar_recepcion").val()=='' || $("#buscar_recepcion").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
+            eliminarEtiqueta($("#label"+labels).children('div'));
+        }
+        //ENTER
+        else if(char == 13){
+            $(".fill-item-abast.o-selection-focus").click();
+        }
+        //ARRIBA
+        else if(char == 38){
+            item = parseInt(item) - 1;
+        }
+        //ABAJO
+        else if(char == 40){
+            item = parseInt(item) + 1;
+        }
+
+
+        //SI SOBREPASA EL LIMITE INFERIOR
+        if(parseInt(item) >= 3){
+            $(".o_searchview_autocomplete").data('item', "0");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item0").addClass("o-selection-focus");
+        }
+        //SI SOBREPASA EL LIMITE SUPERIOR
+        else if(parseInt(item) < 0){
+            $(".o_searchview_autocomplete").data('item', "2");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item2").addClass("o-selection-focus");
+        }
+        else{
+            $(".o_searchview_autocomplete").data('item', item);
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item"+item).addClass("o-selection-focus");
+        }
+
+    }
 
 
     $('.view-option').on('click', function(e){
@@ -97,7 +175,7 @@
         if($(this).data('view') == 'table_recepcion'){
             $.ajax({
                 type: 'POST',
-                data: {orden: 'recepcion_detalle.idrecepcion-DESC', clave: $("#buscar_movimiento").val()},
+                data: {orden: 'recepcion_detalle.idrecepcion-DESC', clave: filtros_seleccionados.join(',')},
                 url: '/matprimas/table_recepcion',
                 success: function(data){
                     $(".main-page").html(data);

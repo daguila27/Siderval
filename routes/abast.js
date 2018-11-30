@@ -576,19 +576,42 @@ router.post('/saveStateODABD', function(req,res,next){
             console.log("Error Connection : %s", err);
 
         //INSERT INTO `siderval`.`save` (`token`) VALUES ('DDQWD');
-        connection.query("INSERT INTO save (llave,token) VALUES ?",[[['oda',token]]], function(err, inSave){
-            if(err)
-                console.log("Error Insert : %s", err);
-            res.send('ok');
-        });
+        if(data.plantilla == 'false'){
+            console.log("GUARDANDO ESTADO");
+            connection.query("INSERT INTO save (llave,token) VALUES ?",[[['oda',token]]], function(err, inSave){
+                if(err)
+                    console.log("Error Insert : %s", err);
+                res.send('ok');
+            });
+		}
+		else if(data.plantilla == 'true'){
+			console.log("GUARDANDO COMO PLANTILLA");
+            connection.query("INSERT INTO plantilla (nombre, llave,token) VALUES ?",[[[data.namePlant, 'oda',token]]], function(err, inSave){
+                if(err)
+                    console.log("Error Insert : %s", err);
+                res.send('ok');
+            });
+        }
+
     });
 
 });
-router.get('/loadStateODABD', function(req,res,next){
+router.post('/loadStateODABD', function(req,res,next){
+    var data = JSON.parse(JSON.stringify(req.body));
+	console.log(data);
+	var query;
+	if(data.plantilla == 'true'){
+		console.log("Abriendo Plantilla");
+		query = "select plantilla.* from plantilla where idplant = "+data.idplant;
+	}
+	else{
+        console.log("Abriendo Estado");
+		query = "select save.* from save inner join (SELECT max(idsave) as ids, max(ult_save) as last_save FROM save where llave = 'oda' group by save.llave) as ult on ult.ids = save.idsave";
+	}
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Selecting : %s",err);
-        connection.query("select save.* from save inner join (SELECT max(idsave) as ids, max(ult_save) as last_save FROM save where llave = 'oda' group by save.llave) as ult on ult.ids = save.idsave", function(err,estado){
+        connection.query(query, function(err,estado){
             if(err)
                 console.log("Error Selecting : %s", err);
             var token = estado[0].token;
@@ -652,7 +675,6 @@ router.get('/loadStateODABD', function(req,res,next){
                                     }
                                 }
                             }
-                            console.log(datos);
                             connection.query("SELECT numoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, last){
                                 if(err)
                                     console.log("Error Selecting : %s", err);
@@ -702,6 +724,19 @@ router.get('/loadStateODABD', function(req,res,next){
                 });    
             }
         }); 
+    });
+});
+
+router.get('/show_plantillas', function(req,res,next){
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Selecting : %s",err);
+        connection.query("SELECT idplant,nombre,ult_save FROM plantilla", function(err,plantillas){
+            if(err)
+                console.log("Error Selecting : %s", err);
+			console.log(plantillas);
+            res.render('abast/plantillas_list', {plant: plantillas});
+        });
     });
 });
 

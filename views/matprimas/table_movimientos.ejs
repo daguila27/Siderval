@@ -22,7 +22,7 @@
         "Otros"
     ];
 %>
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="tablaMovimientos">
     <thead>
     <tr>
         <th id="numof" class="cabecera o_column_sortable order-column" data-order="movimiento_detalle.idmovimiento-ASC">N° Mov</th>
@@ -31,6 +31,7 @@
         <th id="sin_produccion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
         <th id="sin_produccion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="etapafaena.nombre_etapa-ASC">Etapa</th>
         <th id="movimiento" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="movimiento.tipo-ASC">Movimiento</th>
+        <th id="receptor" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="movimiento.tipo-ASC">Receptor</th>
         <th id="f_entrega" class="cabecera o_column_sortable order-column o-sort-up" style="text-align: center;" data-order="movimiento.f_gen-DESC">Fecha de Registro</th>
     </tr>
     </thead>
@@ -49,6 +50,7 @@
                     Devolución
                 <%}%>
             </td>
+            <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%= data[i].receptor%></td>
             <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
                 <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_gen).toLocaleDateString())%></span>
             </td>
@@ -71,44 +73,7 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    $(document).ready(function(){
-        $(".order-column").removeClass('o-sort-up');
-        $(".order-column").removeClass('o-sort-down');
-        $(".order-column").removeClass('columna-activa');
-        $(".order-column").each(function(){
-            //$(this).css("width", $("."+$(this).attr('id')).css('width'));
-
-            if($(this).data('order').split('-')[0] == "<%= key.split('-')[0]%>" ){
-                if("<%= key.split('-')[1]%>" == "ASC"){
-                    $(this).addClass('o-sort-up');
-                    $(this).addClass('columna-activa');
-                    $(this).data('order', '<%= key.split("-")[0]%>-DESC');
-
-                }
-                else{
-                    $(this).addClass('o-sort-down');
-                    $(this).addClass('columna-activa');
-                    $(this).data('order', '<%= key.split("-")[0]%>-ASC');
-                }
-            }
-            /*$(".cabecera").each(function(){
-                $(this).css("width", ("."+$(this).attr('id')).css('width')+"px");
-            });*/
-        });|
-    });
-    $(".order-column").on('click', function(e){
-        e.preventDefault();
-        var item = this;
-        var orden = $(this).data('order');
-        $.ajax({
-            type: 'POST',
-            data: {orden: orden, clave: $("#buscar_movimiento").val()},
-            url: '/matprimas/table_movimientos',
-            success: function(data){
-                $(".main-page").html(data);
-            }
-        });
-    });
+    setDataTableMain("#tablaMovimientos");
 
 
     function submit_form(yo){

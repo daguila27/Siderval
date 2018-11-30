@@ -415,12 +415,12 @@ However, delay the fade out process for 2.5 seconds */
        }
    });
 
-  function selectCCModal(yo){
+    function selectCCModal(yo){
      //alert($(yo).parent('td').children('input').val());
      $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
      $("#SCModal").val(null);
   }
-      function finSelectCCModal(){
+    function finSelectCCModal(){
         if( ($("#SCModal").val() != null || $("#SCModal").val() != '') || $(".SCModal").css('display') != 'none' ){
           $("#"+$("#auxCC").val()).val($("#subcuentasModal").val()+"-"+$("#SCModal").val().split('-')[1]);
           $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
@@ -451,6 +451,8 @@ However, delay the fade out process for 2.5 seconds */
                 }
             });     
    }
+
+
    $.ajax({
             type: 'GET',
             url: '/abastecimiento/abast_myself',

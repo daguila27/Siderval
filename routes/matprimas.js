@@ -243,16 +243,88 @@ router.post("/table_movimientos",function(req,res,next){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
         var orden = input.orden.replace('-', ' ');
-        var clave = input.clave;
-        var where = " WHERE movimiento_detalle.idmovimiento like '%"+clave+"%' OR material.detalle like '%"+clave+"%'";
+        var etapas = [
+            "jefe de produccion",
+            "moldeo",
+            "fusion",
+            "quiebre",
+            "terminación",
+            "tratamiento termico",
+            "maestranza",
+            "control de calidad",
+            "mantencion",
+            "externo",
+            "otros"
+        ];
+        var array_fill = [
+            "all_data.idmovimiento",
+            "all_data.detalle",
+            "all_data.nombre_etapa",
+            "all_data.tipo",
+            "all_data.receptor"
+        ];
+        var clave;
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        var where = "";
+        var condiciones_where = [];
+        var coalesce_in = [];
+        var coalesce_tip = [];
+
+        for(var a=0; a < clave.length; a++){
+            if(clave[a].split('@')[0] == '2'){
+                for(var b=0; b < etapas.length; b++){
+                    if(etapas[b].includes(clave[a].split('@')[1].toLowerCase())){
+                        if(coalesce_in.indexOf(b) == -1){
+                            coalesce_in.push(b);
+                        }
+                    }
+                }
+            }
+            else if(clave[a].split('@')[0] == '3'){
+                if("devolucion".includes(clave[a].split('@')[1].toLowerCase())){
+                    coalesce_tip.push(1);
+                }
+                else if("retiro".includes(clave[a].split('@')[1].toLowerCase())){
+                    coalesce_tip.push(0);
+                }
+            }
+        }
+        coalesce_in = "("+coalesce_in.join(',')+")";
+        coalesce_tip = "("+coalesce_tip.join(',')+")";
+        var firts_etp = false;
+        var firts_tip = false;
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[0] != '2' && clave[e].split('@')[0] != '3') {
+                    condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else if(!firts_etp && clave[e].split('@')[0] == '2' && coalesce_in != "()"){
+                    condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])] + " in " + coalesce_in);
+                    firts_etp = true;
+                }
+                else if(!firts_tip && clave[e].split('@')[0] == '3' && coalesce_tip != "()"){
+                    condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])] + " in " + coalesce_tip);
+                    firts_tip = true;
+                }
+            }
+        }
+        if(condiciones_where.length>0){
+            where = " WHERE ("+condiciones_where.join(' AND ')+")";
+        }
+        console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select movimiento.*,movimiento.tipo as tipo_mov, movimiento_detalle.*, material.*,"
+            connection.query("SELECT * FROM (select movimiento.*, movimiento.tipo as tipo_mov, movimiento_detalle.cantidad, material.detalle,"
                 +"movimiento.etapa as nombre_etapa"
                 +" from movimiento_detalle"
                 +" left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento"
                 +" left join material on material.idmaterial=movimiento_detalle.idmaterial"
-                +" left join etapafaena on etapafaena.value = movimiento.etapa"+where+" ORDER BY "+orden, function(err, mov){
+                +" left join etapafaena on etapafaena.value = movimiento.etapa) as all_data "+where/*+" ORDER BY "+orden*/, function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
             });
@@ -278,8 +350,29 @@ router.post("/table_recepcion",function(req,res,next){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
         var orden = input.orden.replace('-', ' ');
-        var clave = input.clave;
-        var where = " WHERE recepcion_detalle.idrecepcion like '%"+clave+"%' OR material.detalle like '%"+clave+"%'";
+        var array_fill = [
+            "recepcion.numgd",
+            "material.detalle",
+            "recepcion.fecha"
+        ];
+        var clave;
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        var where = "";
+        var condiciones_where = [];
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+        }
+        if(condiciones_where.length>0){
+            where = " WHERE "+condiciones_where.join(' AND ');
+        }
+        console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select recepcion.*, recepcion_detalle.*, material.*"
@@ -287,7 +380,7 @@ router.post("/table_recepcion",function(req,res,next){
                 +" left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion"
                 +" left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast"
                 +" left join material on material.idmaterial=abastecimiento.idmaterial"
-                + where + " ORDER BY "+orden, function(err, mov){
+                + where/* + " ORDER BY "+orden*/, function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_recepcion', {data: mov, key: orden.replace(' ', '-')});
             });
