@@ -1674,7 +1674,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     + " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast"
                     + " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion"
 	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
-	        		+ " GROUP BY abastecimiento.idabast" /*ORDER BY " + orden + " LIMIT " + page_now + ",50"*/, function(err, abs){
+	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC" /*+ orden + " LIMIT " + page_now + ",50"*/, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1});
