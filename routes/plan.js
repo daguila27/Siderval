@@ -200,22 +200,54 @@ router.post('/buscar_fabricaciones_item', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-router.get('/table_fabricaciones/:orden/:showPend', function(req, res, next){
+router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var array_fill = [
+            "ordenfabricacion.idordenfabricacion",
+            "odc.numoc",
+            "material.detalle",
+            "pedido.f_entrega",
+            "ordenfabricacion.creacion"
+        ];
+        var clave;
+        var where;
+        var condiciones_where = [];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+              condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+        }
         orden = orden.replace('-', ' ');
         console.log(req.params.showPend);
         var where = " ";
         if(req.params.showPend == 'true'){
-            where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
+            condiciones_where.push("pedido.externo = '0'");
+            condiciones_where.push("fabricaciones.restantes>0");
+            //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
         }
-        req.getConnection(function(err, connection){
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+      console.log(where);
+      req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,pedido.externo, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
-                +"on material.idmaterial=fabricaciones.idmaterial"+where+"ORDER BY "+orden,
+                +"on material.idmaterial=fabricaciones.idmaterial"+where+" ORDER BY "+orden,
                 function(err, of){
                     if(err) throw err;
 
