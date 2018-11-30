@@ -1380,7 +1380,7 @@ router.get("/fabrs_list/:token",function(req,res){
             if(err)
                 console.log("Error Connection : %s", err);
             //SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
-			connection.query("select material.detalle, material.precio,material.u_medida," +
+			connection.query("select material.codigo,material.s_inicial,material.detalle, material.precio,material.u_medida," +
 				"COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
 				",COALESCE(peds.despachados,0) as despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
 				//LEFT JOIN produccion history
@@ -1416,7 +1416,7 @@ router.get('/insumos_list/:token', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	//SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
 
-        	connection.query("SELECT material.codigo,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
+        	connection.query("SELECT material.s_inicial,material.codigo,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
 				",coalesce(devs.sum_devs,0) as sum_dev,coalesce(virtuales.sum_virtual,0) as sum_virtual" +
 				",material.u_medida,coalesce(solicitados.necesarios,0) as sum_sol" +
                 // FROM (sum_sal) AS salidas -- salidas desde movimientos tipo 0
@@ -1467,7 +1467,7 @@ router.get('/insumos_list/:token', function(req, res, next){
 router.get('/xlsx_ids_ins/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
         console.log(req.params.token);
-        let nombre = "IDS-pedidos&producidos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
+        let nombre = "IDS-Insumos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
 		let Excel = require('exceljs');
 		let workbook = new Excel.Workbook();
 		let sheet = workbook.addWorksheet('stockmaster');
@@ -1488,8 +1488,9 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
         req.getConnection(function(err, connection){
             if(err)
                 console.log("Error Connection : %s", err);
-			connection.query("SELECT material.codigo,material.s_inicial,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
-                ",coalesce(devs.sum_devs,0) as sum_dev,coalesce(virtuales.sum_virtual,0) as sum_virtual,material.u_medida" +
+			connection.query("SELECT material.s_inicial,material.codigo,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
+                ",coalesce(devs.sum_devs,0) as sum_dev,coalesce(virtuales.sum_virtual,0) as sum_virtual" +
+                ",material.u_medida,coalesce(solicitados.necesarios,0) as sum_sol" +
                 // FROM (sum_sal) AS salidas -- salidas desde movimientos tipo 0
                 " FROM material LEFT JOIN (select movimiento_detalle.idmaterial, sum(movimiento_detalle.cantidad) as sum_sal FROM movimiento" +
                 " LEFT JOIN movimiento_detalle on movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
@@ -1509,13 +1510,23 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
                 " LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
                 " WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY material.idmaterial) AS devs ON devs.idmaterial = material.idmaterial" +
+                // LEFT JOIN (sum_devs) AS devs -- solicitadas
+                " LEFT JOIN (SELECT bom.idmaterial_slave,SUM(enprod.enprod*bom.cantidad) as necesarios FROM (SELECT fabricaciones.idmaterial, SUM(produccion.cantidad) as enprod FROM produccion" +
+                " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+                " WHERE produccion.cantidad != produccion.`8` AND (produccion.f_gen" +
+                " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
+                " GROUP BY fabricaciones.idmaterial) AS enprod" +
+                " LEFT JOIN bom ON bom.idmaterial_master = enprod.idmaterial" +
+                " LEFT JOIN material ON bom.idmaterial_slave = material.idmaterial" +
+                " WHERE material.e_abast != 4" +
+                " GROUP BY bom.idmaterial_slave) AS solicitados ON solicitados.idmaterial_slave = material.idmaterial" +
                 // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
                 " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
                 " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
                 " WHERE oda.creacion" +
                 " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
-                " WHERE NOT (virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial" , function(err, ops){
+                " WHERE NOT (solicitados.necesarios = 0 AND virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial", function(err, ops){
 
 				//Inicio de la funcion post query.
 				for(var i = 2; i < ops.length+2; i++){
@@ -1524,7 +1535,7 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
 					sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
                     //Stock Inicial
                     sheet.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
-
+                    sheet.getCell('E'+i.toString()).value = ops[i-2].sum_sol;
 					//Cantidad Solicitada
 					sheet.getCell('F'+i.toString()).value = ops[i-2].sum_virtual;
                     sheet.getCell('G'+i.toString()).value = ops[i-2].sum_ing + ops[i-2].sum_dev;
@@ -1564,7 +1575,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         req.getConnection(function(err, connection){
             if(err)
                 console.log("Error Connection : %s", err);
-            connection.query("select material.detalle,material.s_inicial, material.precio,material.u_medida," +
+            connection.query("select material.detalle,material.s_inicial,material.codigo,material.precio,material.u_medida," +
                 "COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
                 ",COALESCE(peds.despachados,0) as despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
                 //LEFT JOIN produccion history
