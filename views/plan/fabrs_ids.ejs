@@ -95,7 +95,7 @@
     function cierreMensual(){
         $.ajax({
             type: 'get',
-            url: '/abastecimiento/xlsx_ids_ins/' + $("#dateSelect").val(),
+            url: '/abastecimiento/xlsx_ids_fabrs/' + $("#dateSelect").val(),
             success: function(data){
                 window.open("/csvs/" + data,'_blank');
                 chargeList("#dateSelect");
@@ -107,7 +107,7 @@
     function chargeList(yo){
         $.ajax({
                 type: 'GET',
-                url: '/abastecimiento/insumos_list/'+$(yo).val(),
+                url: '/abastecimiento/fabrs_list/'+$(yo).val(),
                 success: function(data){ 
                     $(".renderDiv").html(data); 
                 }
