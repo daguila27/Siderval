@@ -1,0 +1,32 @@
+
+<div class="row container" style="margin: 0; padding: 0; width: 100%">
+    <div class="form-group">
+    <% for(var e=0; e < plant.length; e++){%>
+        <a href="#" class="list-group-item plant-item col-md-offset-0 col-md-4" data-id="<%=plant[e].idplant%>">
+            <h4>
+                <%=plant[e].nombre%>
+                <br>
+                <small>Guardado el: <%= new Date(plant[e].ult_save).toLocaleString()%></small>
+            </h4>
+        </a>
+    <%}%>
+    </div>
+</div>
+
+<script>
+    $(".plant-item").hover(
+        function(){
+            $(this).addClass('active');
+        },
+        function(){
+            $(this).removeClass('active');
+        }
+    );
+
+    $(".plant-item").on('click', function(){
+        $(this).addClass('active');
+        $(".plant-item").removeClass('select-plant');
+        $(this).addClass('select-plant');
+    });
+
+</script>

@@ -43,78 +43,22 @@
 
 	}
 </style>
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="font-size: 12px;" id="dataTableOdoo">
+
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;font-size: 12px" id="dataTableOdoo">
 	<thead>
 		<tr>
 			<th class="cabecera o_column_sortable" data-order="abastecimiento.idabast-ASC">N° OC</th>
 			<th class="cabecera o_column_sortable" data-order="oda.creacion-ASC">Creación</th>
-			<th class="cabecera o_column_sortable" >Facturas</th>
-			<th class="cabecera o_column_sortable" >Guías</th>
-			<th class="cabecera o_column_sortable" data-order="cliente.sigla-ASC" style="text-align: center ;">
-				<!--<div class="dropdown filtro-tabla">
-					<button class="pull-left dropdown-toggle btn btn-default btn-xs" type="button" data-toggle="dropdown"><i class='fa fa-filter'></i></button>
-					<ul class="dropdown-menu" style="width: 150px; padding: 4px 10px; margin-top: 20px">
-						<div class="form-group">
-							<select multiple class="form-control select_cc" data-allbeforecheck="0">
-								<option value="all"> Todos</option>
-							</select>
-							<spam>
-								<button class="btn btn-xs btn-success" style="margin-top: 10px" onclick="fill_apply(this)">Aplicar</button>
-							</spam>
-						</div>
-					</ul>
-				</div>-->
-				Proveedor
-			</th>
+			<th class="cabecera o_column_sortable">Facturas</th>
+			<th class="cabecera o_column_sortable">Guías</th>
+			<th class="cabecera o_column_sortable" data-order="cliente.sigla-ASC" style="text-align: center ;">Proveedor</th>
 			<th class="cabecera o_column_sortable" data-order="abastecimiento.cantidad-ASC">Solicitados</th>
 			<th class="cabecera o_column_sortable" data-order="material.detalle-ASC">Detalle</th>
 			<th class="cabecera o_column_sortable" data-order="abastecimiento.recibidos-ASC">Recibidos</th>
 			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo-ASC">Costo</th>
 			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo*abastecimiento.cantidad-ASC">Total</th>
-			<th class="cabecera o_column_sortable" style="text-align: center ;">
-				<!--<div class="dropdown filtro-tabla">
-					<button class="pull-left dropdown-toggle btn btn-xs btn-default" type="button" data-toggle="dropdown"><i class='fa fa-filter'></i></button>
-					<ul class="dropdown-menu" style="width: 150px; padding: 4px 10px; margin-top: 20px">
-						<li style="padding: 4px 10px; margin-top: 5px">
-							<div class="form-group">
-								<select multiple class="form-control">
-									<option value="all"> Todos</option>
-								</select>
-								<spam>
-									<button class="btn btn-xs btn-success" style="margin-top: 10px" onclick="fill_apply(this)">Aplicar</button>
-								</spam>
-							</div>
-						</li>
-					</ul>
-				</div>-->
-				CC
-			</th>
-			<th class="cabecera o_column_sortable" style="text-align: right" data-order="material.u_medida-ASC">
-				<!--<div class="dropdown filtro-tabla">
-					<button class="pull-left dropdown-toggle btn btn-xs btn-default" type="button" data-toggle="dropdown" style="z-index: 10"><i class='fa fa-filter'></i></button>
-					<ul class="dropdown-menu" style="width: 150px;">
-						<li>
-							<div class="form-group">
-								<select class="form-control">
-									<option value="all"> Menor a Mayor</option>
-									<option value="all"> Mayor a Menor</option>
-								</select>
-							</div>
-						</li>
-						<li style="padding: 4px 10px; margin-top: 5px">
-							<div class="form-group">
-								<select multiple class="form-control">
-									<option value="all"> Todos</option>
-								</select>
-								<spam>
-									<button class="btn btn-xs btn-success" style="margin-top: 10px" onclick="fill_apply(this)">Aplicar</button>
-								</spam>
-							</div>
-						</li>
-					</ul>
-				</div>-->
-				Unidad
-			</th>
+			<th class="cabecera o_column_sortable" style="text-align: center ;">CC</th>
+			<th class="cabecera o_column_sortable order-column" style="text-align: right;" data-order="material.u_medida-ASC">Unidad</th>
 		</tr>
 	</thead>
 	<tbody class="ui-sortable">
@@ -153,9 +97,9 @@
 				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" onclick="submit_form(this)" style="text-align: center;" data-idoda="<%= data[i].idoda%>">
 					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
 				</td>
-				<td class="o_data_cell" style="text-align: center; width: 100px">
-					<%if(lista.length>3){
-						for(var j=0;j<3;j++){%>
+				<td class="o_data_cell" style="text-align: center; width: 13%">
+					<%if(lista.length>2){
+						for(var j=0;j<2;j++){%>
 							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
 						<%}%>
 					    <a class="label label-primary pull-right" type="button"  onclick="changeIcon(this)" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>" data-state="close">
@@ -172,9 +116,9 @@
 						<%}
 					}%>
 				</td>
-				<td class="o_data_cell" style="text-align: center;">
-					<%if(gd_lista.length>3){
-						for(var j=0;j<3;j++){%>
+				<td class="o_data_cell" style="text-align: center; width: 13%">
+					<%if(gd_lista.length>2){
+						for(var j=0;j<2;j++){%>
 							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" >
 								<%= gd_lista[j][0]%>
 							</a>
@@ -193,13 +137,13 @@
 					<%}
 					}%>
 				</td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=textFormat( data[i].sigla)%></td>
+				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].sigla)%>" style="text-align: center;"><%=truncateWord(textFormat( data[i].sigla),10)%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].cantidad %></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].detalle%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" data-toggle="tooltip" title="<%= data[i].detalle%>" style="white-space: nowrap;"><%=truncateWord(data[i].detalle,25)%></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].recibidos %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].costo %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].cuenta)%>" style="text-align: center;"><%=truncateWord( textFormat(data[i].cuenta),4)%></td>
+				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].cuenta)%>" style="text-align: center; white-space: nowrap"><%=truncateWord( textFormat(data[i].cuenta),7)%></td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].u_medida%></td>
 			</tr>
 		<%}%>
@@ -243,11 +187,11 @@
 	$(".collapseLabel").each(function(){
 		$(this).parent().css('width', $(this).css('width'));
 	});
-	$(document).ready(function(){
-	    setDataTableMain("#dataTableOdoo");
-        $('[data-toggle="tooltip"]').tooltip({
+    setDataTableMain("#dataTableOdoo");
+    $(document).ready(function(){
+        /*$('[data-toggle="tooltip"]').tooltip({
             container: 'body'
-        });
+        });*/
         /*$(".order-column").removeClass('o-sort-up');
         $(".order-column").removeClass('o-sort-down');
         $(".order-column").each(function(){

@@ -108,24 +108,47 @@ However, delay the fade out process for 2.5 seconds */
 
       </div>
     </div>
-
-
-
-
-<div class="footer-hidden"></div>
-
-
-
-
-
-     <!-- Use a button to open the snackbar -->
-   <!-- <button onclick="showToast()">Show Snackbar</button>-->
-
-    <!-- The actual snackbar -->
+    <div class="footer-hidden"></div>
     <div id="snackbar" data-newid="0" onclick="clickSnackbar(this)" style="cursor: pointer;">Se ha creado una nueva OF. <button class="btn btn-success">RECARGAR</button></div>
-        </body>
+</body>
 
-
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+</style>
 <script type="text/javascript">
             
 
@@ -161,7 +184,37 @@ However, delay the fade out process for 2.5 seconds */
     }
 
 
+    function setDataTableMain(str){
+        return $(str).DataTable({
+            responsive: true,
+            lengthChange: false,
+            pageLength: 20,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
 
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
 
     function foundSC(yo){
         $.ajax({

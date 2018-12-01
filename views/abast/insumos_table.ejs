@@ -39,10 +39,12 @@
         <tr>
             <th>Código</th>
             <th>Detalle</th>
+            <th>Stock inicial</th>
+            <th>Solicitados</th>
             <th>Virtuales</th>
             <th>Ingreso</th>
             <th>Salidas</th>
-            <th>Unidad</th>
+            <th>Stock final</th>
         </tr>
         </thead>
         <tbody>
@@ -51,10 +53,12 @@
         <tr data-idmat="<%= data[i].idmaterial%>" data-detalle="<%= data[i].detalle%>" style="cursor: pointer;">
             <td><%= data[i].codigo%></td>
             <td><%= letraMayus(data[i].detalle)%></td>
+            <td><%= data[i].s_inicial.toString()%></td>
+            <td><%= data[i].sum_sol.toString()%></td>
             <td><%= numberFormat(data[i].sum_virtual.toString())%></td>
-            <td><%= numberFormat( (data[i].sum_ing + data[i].sum_dev).toString() )%></td>
+            <td><%= numberFormat((data[i].sum_ing + data[i].sum_dev).toString() )%></td>
             <td><%= numberFormat(data[i].sum_sal.toString())%></td>
-            <td><%= data[i].u_medida%></td>
+            <td><%= numberFormat((data[i].s_inicial + data[i].sum_ing + data[i].sum_dev - data[i].sum_sal).toString() )%></td>
             <% total += data[i].precio*(data[i].sum_sal - data[i].sum_ing);%>
         </tr>
         <!--    <tr id="c<%= i%>" class="panel-collapse collapse dd<%=i%> warning" role="tabpanel" aria-labelledby="h<%= i%>" >

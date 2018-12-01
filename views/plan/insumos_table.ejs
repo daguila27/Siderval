@@ -39,20 +39,28 @@
             <table class="table table-hover table-striped table-inverse table-bordered" id="fabrs_tabl">
                         <thead>
                         <tr>
+                            <th>Código</th>
                             <th>Detalle</th>
+                            <th>Stock inicial</th>
                             <th>Solicitados</th>
+                            <th>Virtuales</th>
                             <th>Ingresados</th>
                             <th>Despachados</th>
+                            <th>Stock final</th>
                         </tr>
                         </thead>
                         <tbody>
                         <% 
                             for(var r = 0;r < prods.length; r++){%>
                                 <tr data-idmat="<%= prods[r].idmaterial%>" data-detalle="<%= prods[r].detalle%>">
+                                    <td><%= prods[r].codigo%></td>
                                     <td><%= prods[r].detalle%></td>
+                                    <td><%= numberFormat(prods[r].s_inicial.toString())%></td>
                                     <td><%= numberFormat(prods[r].solicitados.toString())%></td>
+                                    <td><%= numberFormat(prods[r].virtuales.toString())%></td>
                                     <td><%= numberFormat(prods[r].fabricados.toString())%></td>
                                     <td><%= numberFormat(prods[r].despachados.toString())%></td>
+                                    <td><%= numberFormat((prods[r].s_inicial + prods[r].fabricados - prods[r].despachados).toString())%></td>
                                     <% total_fabricados += prods[r].fabricados;%>
                                 </tr>
                             <%}%>
@@ -66,5 +74,5 @@
 
     <button type="button" class="btn btn-success" onclick="cierreMensual()">Cierre mensual</button>
 <script type="text/javascript">
-    setDataTable("#insumos_tabl");
+    setDataTable("#fabrs_tabl");
 </script>

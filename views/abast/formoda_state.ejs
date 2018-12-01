@@ -6,15 +6,22 @@
         </div>
     </div>
     <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
-        <form id="send_of">
+    <form id="send_of">
     <div class="panel panel-primary panel-defecto" style="display: block;">
             <div class="panel-heading" style="display: flex">
                 <div style="width: 45%">
                 <h3>Lanzar Orden de Compra: #<%=last%></h3>
-                <div>
-                        <button class="btn btn-primary" onclick="saveState()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
-                        <button class="btn btn-primary" onclick="loadState()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                <div style="display: flex">
+                    <button class="btn btn-primary" onclick="saveState(false)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+                    <button class="btn btn-primary" onclick="loadState(false)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu">
+                            <li data-toggle="modal" data-target="#SaveOdaModal"><a href="#">Guardar Como Plantilla</a></li>
+                            <li data-toggle="modal" data-target="#LoadOdaModal" onclick="renderPlantillasModal()"><a href="#">Cargar Plantilla</a></li>
+                        </ul>
                     </div>
+                </div>
                 </div>
                 <div style="width: 20%">
                         <label>Proveedor: </label>
@@ -147,12 +154,20 @@
 
             </div>
     </div>
-        </form>
+    </form>
+
+
+
+
+
 
     <script type="text/javascript">
       $(document).ready(function(){
         refreshAllCost();
       });
+
+
+
   function moveArrow(){
     $(".desp-arrow").css('transform', 'rotate(180deg)');  
   }
