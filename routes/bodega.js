@@ -99,8 +99,6 @@ router.post('/buscar_despacho_list', function(req, res, next){
         var clave = input.clave;
         var orden = input.orden;
         var tipo = input.tipo;
-        console.log(clave);
-        console.log(tipo);
 
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
@@ -118,13 +116,11 @@ router.post('/buscar_despacho_list', function(req, res, next){
 router.post('/table_despachos', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var orden = input.orden.replace('-', ' ');
         var clave = input.clave;
         var tipo = input.tipo;
         var where = " WHERE (despacho.mat_token LIKE '%"+clave+"%' OR despacho.iddespacho LIKE '%"+clave+"%') AND despacho.estado LIKE '%"+tipo+"%'";
         var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
-        console.log(query);
         req.getConnection(function(err, connection){
             connection.query("SELECT * FROM despacho"+where/*+" ORDER BY "+orden*/,function(err, desp){
                 if(err)
@@ -146,7 +142,6 @@ router.post('/item_gd', function(req, res, next){
         var clave = input.clave;
         var tipo = input.tipo;
         var where = '';
-        console.log(clave);
         if(clave != '' && clave != null) {
             where = " WHERE (despacho.mat_token LIKE '%" + clave + "%' OR despacho.iddespacho LIKE '%"+clave+"%')";
         }
@@ -158,7 +153,6 @@ router.post('/item_gd', function(req, res, next){
                 where = " WHERE despacho.estado='"+tipo+"'";
             }
         }
-        console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("SELECT despacho.*, coalesce(odc.idodc, 'OC indefinida') as idodc, coalesce(cliente.sigla, 'Cliente indefinido') as sigla FROM despacho "
@@ -214,7 +208,6 @@ router.get('/loadStateGDBD', function(req, res, next){
                     console.log("Error Selecting : %s", err);
                 var token = estado[0].token;
                 var datos;
-                console.log(token.split('@'));
                 if(token.split('@').length > 2){
                     console.log("Con productos");
                     token = token.split('@');
@@ -284,7 +277,6 @@ router.get('/loadStateGDBD', function(req, res, next){
 router.post('/crear_gdd_fill', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var where = "WHERE internalquery.detalle LIKE '%"+input.detalle+"%' OR concat(repeat('0', abs(6 - length(internalquery.numordenfabricacion))),internalquery.numordenfabricacion ) LIKE '%"+input.detalle+"%' OR internalquery.anom LIKE '%"+input.detalle+"%' OR internalquery.f_entrega LIKE '%"+input.detalle+"%' OR internalquery.cantidad-internalquery.despachados LIKE '%"+input.detalle+"%' OR concat(repeat('0', abs(6 - length(internalquery.numof))),internalquery.numof ) LIKE '%"+input.detalle+"%'";
         if(input.detalle != ''){
             where += " OR internalquery.detalle = '"+input.detalle+"' OR concat(repeat('0', abs(6 - length(internalquery.numordenfabricacion))),internalquery.numordenfabricacion ) = '"+input.detalle+"' OR internalquery.anom = '"+input.detalle+"' OR internalquery.f_entrega = '"+input.detalle+"' OR internalquery.cantidad-internalquery.despachados = '"+input.detalle+"' OR concat(repeat('0', abs(6 - length(internalquery.numof))),internalquery.numof ) = '"+input.detalle+"'";
@@ -302,7 +294,6 @@ router.post('/crear_gdd_fill', function(req, res, next){
                         if(err)
                             console.log("Error Selecting :%s", err);
 
-                        console.log(rows);
                         res.render('bodega/g_despacho_table', {data: rows});
                         //res.render('jefeprod/ordenes_produccion', {data: rows});
 
@@ -392,7 +383,6 @@ router.post('/save_gdd', function(req, res, next){
         tokenid = tokenid.substring(0, tokenid.length-1)+'';
         tokenidf = tokenidf.substring(0, tokenidf.length-1)+'';
         var idof;
-        console.log(query);
         if(req.session.arraydespacho.length==0){idof=0;}
         else{idof=req.session.arraydespacho[0].idof;}
         arrayDBP.push([new Date().toLocaleString(),idof,token,token2,tokenid,tokenidf, input.estado,input.obs]);
@@ -426,7 +416,6 @@ router.post('/save_gdd', function(req, res, next){
                             function (err,odc){
                                 if(err) console.log("Select Error: %s",err);
                                 if(odc[0].completo){
-                                    console.log(odc);
                                     /*SI SE HA COMPLETADO LA ODC SE MARCA COMO ATRASO O A TIEMPO*/
                                     if(odc[0].ult_desp > odc[0].ult_fecha){
                                         /*SE MARCA ATRASADO*/
