@@ -200,7 +200,6 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var array_fill = [
             "ordenfabricacion.idordenfabricacion",
             "odc.numoc",
@@ -223,7 +222,6 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
             }
         }
         orden = orden.replace('-', ' ');
-        console.log(req.params.showPend);
         var where = " ";
         if(req.params.showPend == 'true'){
             condiciones_where.push("pedido.externo = '0'");
@@ -236,7 +234,6 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         else{
             where = " WHERE "+ condiciones_where.join(" AND ");
         }
-      console.log(where);
       req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,pedido.externo, material.detalle, odc.numoc"
