@@ -1233,7 +1233,7 @@ router.get('/parse_producciones', function(req, res, next){
                                         if(err) throw err;
                                         console.log(inProds);
                                         console.log("EXITO!");
-                                        console.log(sinid_prod);
+                                        res.redirect('/');
                                     });
                                 });
                             });
@@ -1287,6 +1287,7 @@ router.get('/parse_bodegaPT', function(req, res, next){
                     if (err) throw  err;
                     console.log(up);
                     console.log("EXITO!");
+                    res.redirect('/');
                 });
             });
         });
