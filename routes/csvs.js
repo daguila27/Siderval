@@ -1276,8 +1276,8 @@ router.get('/parse_bodegaPT', function(req, res, next){
                 if(rows[i][3] == 'X'){
                     if(ids.indexOf(rows[i][0]) == -1){
                         ids.push(rows[i][0]);
-                        update += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][2];
-                        update2 += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][2];
+                        update += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
+                        update2 += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
                     }
                 }
             }
@@ -1298,7 +1298,7 @@ router.get('/parse_bodegaPT', function(req, res, next){
                 });
             });
         });
-    var input = fs.createReadStream('csvs/Inventario_BPT1.csv');
+    var input = fs.createReadStream('csvs/stock_abastecimiento.csv');
     input.pipe(parser);
 
     /*input.pipe(parse(function(err, rows){
