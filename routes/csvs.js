@@ -1154,7 +1154,7 @@ router.get('/parse_producciones', function(req, res, next){
                 var of = [9000];
                 var fabs = [];
                 var sinid_prod = [];
-                var autoincrement = 0;
+                var autoincrement = 21;
                 // idmaterial-0
                 // op-1
                 // detalle-2
