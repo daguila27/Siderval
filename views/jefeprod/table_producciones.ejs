@@ -15,6 +15,7 @@ function fechaLatino(string){
     <thead>
     <tr>
         <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="N° OF" style="text-align: center">N° OP</th>
         <th data-toggle="tooltip" data-placement="bottom" title="N° OF" style="text-align: center">N° OF</th>
         <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
         <!--<th data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center">Abastecidos</th>-->
@@ -36,6 +37,7 @@ function fechaLatino(string){
     %>
     <tr>
         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
+        <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].idordenproduccion %></td>
         <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].numordenfabricacion %></td>
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad %></td>
         <!--<td data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center"><%= datalen[i].abastecidos %></td>-->

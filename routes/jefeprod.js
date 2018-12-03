@@ -54,7 +54,7 @@ router.post('/table_producciones', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         var clave = input.clave;
-        var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND material.detalle LIKE '%"+clave+"%'";
+        var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND (material.detalle LIKE '%"+clave+"%' OR produccion.idordenproduccion LIKE '%"+clave+"%')";
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
