@@ -1273,12 +1273,10 @@ router.get('/parse_bodegaPT', function(req, res, next){
             var update2 = "UPDATE material SET s_inicial = CASE";
             //idmaterial 0 ,detalle 1 ,cant 2 ,Ocurrencias 3
             for(var i=1; i < rows.length; i++){
-                if(rows[i][3] == 'X'){
-                    if(ids.indexOf(rows[i][0]) == -1){
-                        ids.push(rows[i][0]);
-                        update += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
-                        update2 += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
-                    }
+                if(ids.indexOf(rows[i][0]) == -1){
+                    ids.push(rows[i][0]);
+                    update += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
+                    update2 += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
                 }
             }
             update += " ELSE stock END WHERE idmaterial IN ("+ids.join(',')+")";
