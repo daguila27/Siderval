@@ -5,18 +5,14 @@ var mysql = require('mysql');
 
 
 router.use(
-
     connection(mysql,{
-
         host: '127.0.0.1',
         user: 'user',
         password : '1234',
         port : 3306,
         database:'siderval',
         insecureAuth : true
-
     },'pool')
-
 );
 function verificar(usr){
   if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento'){

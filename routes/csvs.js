@@ -1,4 +1,21 @@
 
+var express = require('express');
+var router = express.Router();
+var connection  = require('express-myconnection');
+var mysql = require('mysql');
+
+router.use(
+    connection(mysql,{
+        host: '127.0.0.1',
+        user: 'user',
+        password : '1234',
+        port : 3306,
+        database:'siderval',
+        insecureAuth : true
+    },'pool')
+);
+
+
 
 router.get('/parsecsv_inventario', function(req, res, next){
     if(req.session.isUserLogged){
@@ -1121,3 +1138,166 @@ router.get('/comprobar_codigos', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 
+
+
+
+router.get('/parse_producciones', function(req, res, next){
+        var fs = require('fs')
+        var parse = require('csv-parse');
+
+        var parser = parse(
+            function(err,rows){
+                if(err) throw err;
+                var prods = [];
+                var ops = [];
+                var idop = [];
+                var of = [9000];
+                var fabs = [];
+                var sinid_prod = [];
+                var autoincrement = 0;
+                // idmaterial-0
+                // op-1
+                // detalle-2
+                // cantidad-3
+                // moldeo-4
+                // fusion-5
+                // quiebre-6
+                // terminacion-7
+                // t.termico-8
+                // maestranza-9
+                // control calidad-10
+                // bpt-11
+                var cuent = 1;
+                for(var e=1; e < rows.length; e++){
+                    if(parseInt(rows[e][3]) > 0){
+                        rows[e][1] = parseInt(rows[e][1]) + autoincrement;
+                        if (idop.indexOf(rows[e][1]) == -1) {
+                            //IDOP
+                            ops.push([rows[e][1]]);
+                            idop.push(rows[e][1])
+                        }
+                        //idordenproduccion, cantidad,  1, 2, 3, 4, 5, 6, 7, 8, standby
+                        prods.push([
+                            rows[e][1], rows[e][3], rows[e][4],
+                            rows[e][5], rows[e][6], rows[e][7],
+                            rows[e][8], rows[e][9], rows[e][10],
+                            rows[e][11], 0
+                        ]);
+                        //FALTA UNIR CON idfabricaciones
+
+                        //numitem, cantidad, f_entrega, restantes, idmaterial, despachados, idpedido
+                        fabs.push([cuent, parseInt(rows[e][3]), new Date().toLocaleString(), 0, rows[e][0], parseInt(rows[e][3]), 0, rows[e][2]]);
+                        // FALTA UNIR CON EL idproducto y el idordenfabricacion
+                        cuent++;
+                    }
+                }
+                req.getConnection(function(err, connection){
+                    if(err) throw err;
+                    connection.query("SELECT * FROM producido", function(err, mats){
+                        if(err) throw err;
+                        for(var i=0; i < fabs.length; i++){
+                            for(var t=0; t < mats.length; t++){
+                                if(mats[t].idmaterial == fabs[i][4]){
+                                    fabs[i][7] = mats[t].idproducto;
+                                    break;
+                                }
+                                else if(t == mats.length-1){
+                                    sinid_prod.push(fabs[i]);
+                                    fabs.splice(i, 1);
+                                    prods.splice(i, 1);
+                                    i--;
+                                }
+                            }
+                        }
+                        console.log(fabs);
+                        console.log(of);
+                        connection.query("INSERT INTO ordenfabricacion (numordenfabricacion) VALUES ('9000')", function(err, inOF){
+                            if(err) throw err;
+                            console.log(inOF);
+                            for(var w=0; w < fabs.length; w++){
+                                fabs[w][8] = inOF.insertId;
+                            }
+                            //numitem, cantidad, f_entrega, restantes, idmaterial, despachados, idpedido
+                            connection.query("INSERT INTO fabricaciones (numitem, cantidad, f_entrega, restantes, idmaterial, despachados, idpedido, idproducto, idorden_f) VALUES ?",[fabs], function(err, inFabs){
+                                if(err) throw err;
+                                console.log(inFabs);
+                                for(var w=0; w < prods.length; w++){
+                                    prods[w][11] = inFabs.insertId + w;
+                                }
+                                connection.query("INSERT INTO ordenproduccion (idordenproduccion) VALUES ?", [ops], function(err, inOP){
+                                    if(err) throw err;
+                                    console.log(inOP);
+                                    console.log(prods);
+                                    //idordenproduccion, cantidad,  1, 2, 3, 4, 5, 6, 7, 8, standby, idfabricaciones
+                                    connection.query("INSERT INTO produccion (`idordenproduccion`, `cantidad`,  `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `standby`, `idfabricaciones`) VALUES ?",[prods], function(err, inProds){
+                                        if(err) throw err;
+                                        console.log(inProds);
+                                        console.log("EXITO!");
+                                        console.log(sinid_prod);
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        var input = fs.createReadStream('csvs/PRODUCCIONES_01-12.csv');
+        input.pipe(parser);
+
+        /*input.pipe(parse(function(err, rows){
+            if(err) throw err;
+            console.log(rows);
+        }));*/
+});
+
+
+
+
+router.get('/parse_bodegaPT', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
+
+    var parser = parse(
+        function(err,rows){
+            if(err) throw err;
+            /* * UPDATE `table` SET `uid` = CASE
+                WHEN id = 1 THEN 2952
+                WHEN id = 2 THEN 4925
+                WHEN id = 3 THEN 1592
+                ELSE `uid`
+                END
+            WHERE id  in (1,2,3)
+            * */
+            var ids = [];
+            var update = "UPDATE material SET stock = CASE";
+            //idmaterial 0 ,detalle 1 ,cant 2 ,Ocurrencias 3
+            for(var i=1; i < rows.length; i++){
+                if(rows[i][3] == 'X'){
+                    if(ids.indexOf(rows[i][0]) == -1){
+                        ids.push(rows[i][0]);
+                        update += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][2];
+                    }
+                }
+            }
+            update += " ELSE stock END WHERE idmaterial IN ("+ids.join(',')+")";
+            console.log(update);
+            req.getConnection(function(err, connection){
+                if (err) throw  err;
+                connection.query(update, function(err, up){
+                    if (err) throw  err;
+                    console.log(up);
+                    console.log("EXITO!");
+                });
+            });
+        });
+    var input = fs.createReadStream('csvs/Inventario_BPT.csv');
+    input.pipe(parser);
+
+    /*input.pipe(parse(function(err, rows){
+        if(err) throw err;
+        console.log(rows);
+    }));*/
+});
+
+
+module.exports = router;
