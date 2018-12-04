@@ -1270,28 +1270,33 @@ router.get('/parse_bodegaPT', function(req, res, next){
             * */
             var ids = [];
             var update = "UPDATE material SET stock = CASE";
+            var update2 = "UPDATE material SET s_inicial = CASE";
             //idmaterial 0 ,detalle 1 ,cant 2 ,Ocurrencias 3
             for(var i=1; i < rows.length; i++){
-                if(rows[i][3] == 'X'){
-                    if(ids.indexOf(rows[i][0]) == -1){
-                        ids.push(rows[i][0]);
-                        update += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][2];
-                    }
+                if(ids.indexOf(rows[i][0]) == -1){
+                    ids.push(rows[i][0]);
+                    update += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
+                    update2 += " WHEN idmaterial = "+rows[i][0]+" THEN "+rows[i][1];
                 }
             }
             update += " ELSE stock END WHERE idmaterial IN ("+ids.join(',')+")";
+            update2 += " ELSE s_inicial END WHERE idmaterial IN ("+ids.join(',')+")";
             console.log(update);
             req.getConnection(function(err, connection){
                 if (err) throw  err;
                 connection.query(update, function(err, up){
                     if (err) throw  err;
                     console.log(up);
-                    console.log("EXITO!");
-                    res.redirect('/');
+                    connection.query(update2, function(err, up){
+                        if (err) throw  err;
+                        console.log(up);
+                        console.log("EXITO!");
+                        res.redirect('/');
+                    });
                 });
             });
         });
-    var input = fs.createReadStream('csvs/Inventario_BPT.csv');
+    var input = fs.createReadStream('csvs/stock_abastecimiento.csv');
     input.pipe(parser);
 
     /*input.pipe(parse(function(err, rows){
