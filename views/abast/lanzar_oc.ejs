@@ -53,7 +53,7 @@
                 </div>
                 <div style="width: 30%; margin-left: 2%">
                         <label>Moneda: </label>
-                        <select class="form-control" name="money" id="money" onchange="conversor(this)">
+                        <select class="form-control" name="money" id="money">
                           <option value="usd">Dolares (USD)</option>
                           <option value="eur">Euro (EUR)</option>
                           <option value="clp" selected>Pesos Chilenos (CLP)</option>
@@ -413,6 +413,7 @@
 
      $("#send_of").submit(function(e){
         e.preventDefault();
+        alert("enviando");
         lista = $(this).serializeArray();
         var data = {
             idm: [],

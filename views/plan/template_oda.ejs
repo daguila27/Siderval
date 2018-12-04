@@ -183,29 +183,32 @@
                 var ex = false;
                 for(var t=0; t < 13; t++){%>
 		                <tr>
-		                	<%if(mats[t]){
-		                	%>
+							<%if(mats[t]){
+							%>
 			                    <td><%= t+1%></td>
-			                    <td><%= mats[t].cantidad.toLocaleString() %></td>
-			                    <td style="text-align: right;"><span style="float:left"><%= mats[t].detalle%></span>  <%=mats[t].subcuenta%></td>
-			                    <% if(oda[0].tokenoda.split('@')[6] == 'clp'){%>
+								<%if(mats[t].cantidad.toLocaleString().split('.').length > 1){%>
+									<td><%= mats[t].cantidad.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].cantidad.toLocaleString().split('.')[1] %></td>
+								<%}else{%>
+									<td><%= mats[t].cantidad.toLocaleString().split('.')[0].split(',').join('.') %></td>
+								<%}%>
+								<td style="text-align: right;"><span style="float:left"><%= mats[t].detalle%></span>  <%=mats[t].subcuenta%></td>
+				                <%if(mats[t].precio.toLocaleString().split('.').length > 1){%>
+				                	<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].precio.toLocaleString().split('.')[1] %></td>
+				                <%}else{%>
 				                	<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.') %></td>
-				                	<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%></td>
-				               <%}else{%>
-				                	<%if(mats[t].precio.toLocaleString().split('.').length > 1){%>
-				                		<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].precio.toLocaleString().split('.')[1] %></td>
-				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%>
-											,<% if((mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1] != null){%>
-												<%= (mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1]%>
-											<%} else {%>
-												0
-											<%}%></td>
-				                	<%}else{%>
-				                		<td><%= mats[t].precio.toLocaleString().split('.')[0].split(',').join('.') %></td>
-				                		<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%></td>
-				                	<%}%>
-                 				<%}%>
-                 				<%if(mats[t].exento){
+				                <%}%>
+								<%if( mats[t].precio.toLocaleString().split('.').length > 1 || mats[t].cantidad.toLocaleString().split('.').length > 1 ){%>
+									<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%>
+										,<% if((mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1] != null){%>
+											<%= (mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[1]%>
+										<%} else {%>
+											0
+										<%}%>
+									</td>
+								<%}else{%>
+									<td style="text-align: right;"><%=(mats[t].precio*mats[t].cantidad).toLocaleString().split('.')[0].split(',').join('.')%></td>
+								<%}%>
+								<%if(mats[t].exento){
 		                			nototal += mats[t].precio*mats[t].cantidad;
 		                			ex = true;
                  				}else{
@@ -243,11 +246,7 @@
                  		<td></td>
                  		<td class='fund'>DESCUENTO </td>
 	                 		<%
-	                 		var monto_descontado = 0;
-	                 		if(oda[0].tokenoda[6] == 'clp'){%>
-	                 			<td class='fund' style="text-align: right;"><%= ((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.')[0].split(',').join('.')%></td>
-	                 			
-	                 		<%}else{%>
+	                 		var monto_descontado = 0;%>
 		                 		<%if(((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.').length > 1){%>
 	                 				<td class='fund' style="text-align: right;">
 	                 					<%= ((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.')[0].split(',').join('.')+','+((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.')[1] %>
@@ -257,8 +256,7 @@
 		                 				<%= ((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.')[0].split(',').join('.')%>
 	                 				</td>
 		                 		<%}%>
-		                 		<%monto_descontado = (total+nototal)*(parseInt(oda[0].tokenoda[8])/100);
-		                 	}%>
+		                 		<%monto_descontado = (total+nototal)*(parseInt(oda[0].tokenoda[8])/100);%>
                  	</tr>     
                 </tbody>
                  <tfoot>
@@ -267,35 +265,34 @@
 			            <td></td>
 			            <td></td>
 			            <td>NETO </td>
-			            <%if(oda[0].tokenoda[6] == 'clp'){%>
-			            	<td class='fund' style="text-align: right;">
-		                 		<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
-	                 		</td>	
-			            <%}else{%>
-                 			<%if((total+nototal).toLocaleString().split('.').length > 1){%>
-	                 			<td class='fund' style="text-align: right;">
-	                 				<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')+','+(total+nototal).toLocaleString().split('.')[1] %>
-                 				</td>
-		                 	<%}else{%>
-		                 		<td class='fund' style="text-align: right;">
-		                 			<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
-	                 			</td>
-		                 	<%}%>
-                 		<%}%>
+						<%if(oda[0].tokenoda[6] == 'clp'){%>
+							<td class='fund' style="text-align: right;">
+								<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
+							</td>
+						<%}else{
+							if((total+nototal).toLocaleString().split('.').length > 1){%>
+								<td class='fund' style="text-align: right;">
+									<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')+','+(total+nototal).toLocaleString().split('.')[1] %>
+								</td>
+							<%}else{%>
+								<td class='fund' style="text-align: right;">
+									<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
+								</td>
+							<%}
+						}%>
 	                </tr>
                  	<tr>
                  		<td></td>
                  		<td></td>
                  		<td style="text-align: left;">MONEDA <%=oda[0].tokenoda[6].toUpperCase()%></td>
                  		<td class='fund'>IVA </td>
-                 		<%if(oda[0].tokenoda[7] == 'off'){%>
-	                 		<%if(oda[0].tokenoda[6] == 'clp'){%>
-	                 				<td class='fund' style="text-align: right;">
-		                 				<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
-	                 				</td>
-	                 			<%total += (total*0.19);
-	                 		}else{%>
-	                 			<%if((total*0.19).toLocaleString().split('.').length > 1){%>
+                 		<%if(oda[0].tokenoda[7] == 'off'){
+                 		    if(oda[0].tokenoda[6] == 'clp'){%>
+								<td class='fund' style="text-align: right;">
+									<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
+								</td>
+							<%}else{%>
+								<%if((total*0.19).toLocaleString().split('.').length > 1){%>
 	                 				<td class='fund' style="text-align: right;">
 	                 					<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')+','+(total*0.19).toLocaleString().split('.')[1] %>
                  					</td>
@@ -304,7 +301,8 @@
 		                 				<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
 	                 				</td>
 		                 		<%}%>
-	                 			<%total += (total*0.19);}%>
+	                 			<%total += (total*0.19);%>
+							<%}%>
                  		<%}else{%>
                  			<td class="fund" style="text-align: right;">0</td>
                  		<%}%>
@@ -315,21 +313,21 @@
                  		<td style="text-align: left"></td>
                  		<!--<td style="text-align: left">CUENTA: <%= oda[0].tokenoda[5]%></td>-->
                  		<td class='fund'>TOTAL </td>
-                 		<%if(oda[0].tokenoda[6] == 'clp'){%>
-		                 	<td class='fund' style="text-align: right;">
+						<%if(oda[0].tokenoda[6] == 'clp'){%>
+                 			<td class='fund' style="text-align: right;">
 		                 		<%= (total-monto_descontado+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
 	                 		</td>
-                 		<%}else{%>
-                 			<%if((total-monto_descontado+nototal).toLocaleString().split('.').length > 1){%>
-	                 			<td class='fund' style="text-align: right;">
-	                 				<%= (total-monto_descontado+nototal).toLocaleString().split('.')[0].split(',').join('.')+','+(total-monto_descontado+nototal).toLocaleString().split('.')[1] %>
-                 				</td>
-		                 	<%}else{%>
-		                 		<td class='fund' style="text-align: right;">
-		                 			<%= (total-monto_descontado+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
-	                 			</td>
-		                 	<%}%>
-                 		<%}%>
+						<%}else{
+							if((total-monto_descontado+nototal).toLocaleString().split('.').length > 1){%>
+								<td class='fund' style="text-align: right;">
+									<%= (total-monto_descontado+nototal).toLocaleString().split('.')[0].split(',').join('.')+','+(total-monto_descontado+nototal).toLocaleString().split('.')[1] %>
+								</td>
+							<%}else{%>
+								<td class='fund' style="text-align: right;">
+									<%= (total-monto_descontado+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
+								</td>
+							<%}
+						}%>
                  	</tr>
                  </tfoot>
             </table>

@@ -70,7 +70,7 @@
                             <td><%= data['dets[]'][t]%><input type="hidden" name="idm" value="<%=data['idm[]'][t]%>"></td>
                             <td style="align-content: center;"><%= data['u_compra[]'][t]%></td>
                             <td style="display: flex" class="td-cant">
-                              <input class="form-control cant_compra" type="number" name="cants" min="0" onkeyup="refreshAllCost()" onchange="refreshAllCost()" step="1" value="<%= data['cants[]'][t]%>">
+                              <input class="form-control cant_compra" type="float" name="cants" min="0" onkeyup="refreshAllCost()" onchange="refreshAllCost()" step="1" value="<%= data['cants[]'][t]%>">
                               <b style="margin-left: 2%"><%= data['u_med[]'][t]%></b>
                             </td>
                             <td class="td-money">
@@ -156,11 +156,6 @@
     </div>
     </form>
 
-
-
-
-
-
     <script type="text/javascript">
       $(document).ready(function(){
         refreshAllCost();
@@ -168,9 +163,9 @@
 
 
 
-  function moveArrow(){
-    $(".desp-arrow").css('transform', 'rotate(180deg)');  
-  }
+      function moveArrow(){
+        $(".desp-arrow").css('transform', 'rotate(180deg)');
+      }
     function getPredictions(yo){
         if($(yo).children('input').val()!=''){
                $.ajax({
@@ -206,7 +201,7 @@
        for(var i =0;i<$(this).serializeArray().length;i++){
            if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
                data[lista[i].name].push(lista[i].value);
-            } else{
+           } else{
                data[lista[i].name] = lista[i].value;
            }
        }

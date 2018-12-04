@@ -430,7 +430,7 @@ router.get('/abast_myself', function(req, res, next) {
 						if(err)
 							console.log("Error Selecting : %s", err);					
 
-						connection.query("SELECT numoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, id){
+						connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, id){
 							if(err)
 								console.log("Error Selecting : %s", err);
 							if(id.length){
@@ -675,19 +675,18 @@ router.post('/loadStateODABD', function(req,res,next){
                                     }
                                 }
                             }
-                            connection.query("SELECT numoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, last){
+                            connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, last){
                                 if(err)
                                     console.log("Error Selecting : %s", err);
                                 
                                 var numero;
                                 if(last.length > 0){
-				                    numero = last[0].numoda+1;
+				                    numero = last[0].idoda+1;
 			                    }
 			                    else{
 				                    numero = 1;
 			                    	
 			                    }
-
 								res.render('abast/formoda_state',{data: datos, last: numero});
                                 
                             });
@@ -707,18 +706,19 @@ router.post('/loadStateODABD', function(req,res,next){
 					obs:  '',
 					desc: ''
                 };
-                connection.query("SELECT numoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, last){
+                connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, last){
                     if(err)
                         console.log("Error Selecting : %s", err);
                     
                    var numero;
                    if(last.length > 0){
-				       numero = last[0].numoda+1;
+				       numero = last[0].idoda+1;
 			       }
 			       else{
 				       numero = 1;
 			       	
 			       }
+			       console.log(numero);
                     res.render('abast/formoda_state',{data: datos, last: numero});
                     
                 });    
@@ -752,22 +752,54 @@ router.post('/addsession_prepeds', function(req, res, next){
                     console.log(details);
                     if(req.body.cant){
                     	if(details[0].subcuenta == null || details[0].subcuenta == ''){
-                    		res.send("<tr><td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td><td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td><td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-                        		"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='number' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td><td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td><td class='costo-total'></td><td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>");	
+                    		res.send("<tr>" +
+									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
+									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
+									"<td class='costo-total'></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+								"</tr>");
                     	}
                     	else{
-                    		res.send("<tr><td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td><td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td><td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-                        		"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='number' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td><td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td><td class='costo-total'></td><td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>");	
+                    		res.send("<tr>" +
+									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
+									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
+									"<td class='costo-total'></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+								"</tr>");
                     	}
                     }
                     else{
                     	if(details[0].subcuenta == null || details[0].subcuenta == ''){
-                    		res.send("<tr><td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td><td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td><td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-                        		"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='number' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td><td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td><td class='costo-total'></td><td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>");
+                    		res.send("<tr>" +
+									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
+									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
+									"<td class='costo-total'></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+								"</tr>");
                     	}
                     	else{
-                    		res.send("<tr><td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td><td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td><td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-                        		"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='number' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td><td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td><td class='costo-total'></td><td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>");
+                    		res.send("<tr>" +
+									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
+									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
+									"<td class='costo-total'></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+								"</tr>");
                     	}
                     }
                 });

@@ -4544,7 +4544,6 @@ router.get('/get_client_pred/:text', function(req,res,next){
             function(err, datos){
                 if(err)
                     console.log("Error Selecting : %s", err);
-                console.log(datos);
                 res.render('plan/predict_stream', {info : datos});
 
             });

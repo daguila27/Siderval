@@ -525,7 +525,8 @@ However, delay the fade out process for 2.5 seconds */
         var neto = 0;
         var count = 0;
         $(".costo-total").each(function(){
-            auxc = $(this).parent().children('.td-cant').children('.cant_compra').val();  
+            alert("hola mundo");
+            auxc = parseFloat($(this).parent().children('.td-cant').children('.cant_compra').val().toString().replace(',','.'));
             //console.log($(this).parent().children('.td-money').children('.key_money').val().indexOf(','));
             if($(this).parent().children('.td-money').children('.key_money').val().indexOf(',') == -1){
                 //auxm = $(this).parent().children('.td-money').children('.key_money').val(); 
@@ -555,6 +556,7 @@ However, delay the fade out process for 2.5 seconds */
             neto += auxm*auxc;
             count++;
         });
+
         total = neto + iva;
         total = total - (($(".descView").val()/100)*total);
         $(".total-neto").html("<small>Neto: "+neto.toLocaleString()+"</small>");
