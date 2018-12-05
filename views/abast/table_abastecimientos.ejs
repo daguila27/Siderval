@@ -15,16 +15,16 @@
 		return string.join(' ');
 	}
 	function truncateWord(string, max){
-		if(string != '' || string != null || string){
+		if(string == '' || string == null || !string){
+			return '';
+		}
+		else{
 			if(string.length <= max){
 				return string;
 			}
 			else{
 				return string.substring(0, max)+"...";
 			}
-		}
-		else{
-		    return '';
 		}
 
 	}
