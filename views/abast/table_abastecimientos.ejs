@@ -15,8 +15,7 @@
 		return string.join(' ');
 	}
 	function truncateWord(string, max){
-		if(string == '' || string == null || !string){
-
+		if(string != '' || string != null || string){
 			if(string.length <= max){
 				return string;
 			}
