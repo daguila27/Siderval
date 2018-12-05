@@ -1306,4 +1306,76 @@ router.get('/parse_bodegaPT', function(req, res, next){
 });
 
 
+router.get('/convert_despachos', function(req, res, next){
+    req.getConnection(function(err, connection){
+        if(err) throw err;
+        connection.query("SELECT * FROM despacho", function(err, desp){
+           if(err) throw err;
+
+           /*
+           *
+           * SQL's para crear tablas.
+           *
+           * create table gd(
+                idgd int not null auto_increment,
+                estado varchar(11) not null default 'Venta',
+                fecha datetime default current_timestamp,
+                last_mod datetime default current_timestamp,
+                obs varchar(100) default null,
+                primary key(idgd)
+            );
+
+            create table despachos(
+                iddespacho int(10) not null auto_increment,
+                idgd int(10) not null,
+                idfabricacion int(10) default 0,
+                idmaterial int(10) not null,
+                cantidad int default 0,
+                primary key(iddespacho),
+                foreign key (idgd) references gd (idgd) on delete cascade
+            );
+           * */
+
+           //BD actual (concatenada):
+           //   iddespacho, idorden_f, mat_token, cant_token, id_token, idf_token, fecha, estado, obs, last_mod
+           //Nueva BD:
+           //   idgd (auto_increment), estado, fecha despacho, fecha ultima modificación, observación
+           var gds = [];
+           //   idgd, idmaterial, idfabricacion, cantidad
+           var despachos = [];
+           for(var a=0; a < desp.length; a++){
+               gds.push([desp[a].iddespacho, desp[a].estado, desp[a].fecha, desp[a].last_mod, desp[a].obs]);
+               desp[a].id_token = desp[a].id_token.split('@');
+               desp[a].cant_token = desp[a].cant_token.split(',');
+               desp[a].idf_token = desp[a].idf_token.split('@');
+               for(var b=0; b < desp[a].cant_token.length; b++){
+                   if(isNaN(parseInt(desp[a].idf_token[b]))){
+                       desp[a].idf_token[b] = '0';
+                   }
+                   if(isNaN(parseInt(desp[a].id_token[b]))){
+                       desp[a].id_token[b] = '0';
+                   }
+                   if(isNaN(parseInt(desp[a].cant_token[b]))){
+                       desp[a].cant_token[b] = '0';
+                   }
+                   despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].idf_token[b]), parseInt(desp[a].cant_token[b])]);
+                   console.log(desp[a].idf_token[b]);
+                   console.log(despachos[b]);
+               }
+           }
+           connection.query("INSERT INTO gd (idgd, estado, fecha, last_mod, obs) VALUES ?", [gds],function(err, inGD){
+               if(err) throw err;
+               console.log(inGD);
+               console.log(despachos);
+               connection.query("INSERT INTO despachos (idgd, idfabricacion, idmaterial, cantidad) VALUES ?", [despachos],function(err, inDesp){
+                   if(err) throw err;
+                   console.log(inDesp);
+                   res.redirect('/');
+               });
+           });
+        });
+    })
+});
+
+
 module.exports = router;
