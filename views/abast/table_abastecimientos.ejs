@@ -139,7 +139,7 @@
 				</td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].sigla)%>" style="text-align: center;"><%=truncateWord(textFormat( data[i].sigla),10)%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].cantidad %></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" data-toggle="tooltip" title="<%= data[i].detalle%>" style="white-space: nowrap;"><%=truncateWord(data[i].detalle,25)%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" data-toggle="tooltip" title="<%= data[i].detalle%>" style="white-space: nowrap;"><% if(data[i].detalle === null){%><%= truncateWord(data[i].detalle,25)%><%}%></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].recibidos %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].costo %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
