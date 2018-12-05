@@ -1328,11 +1328,13 @@ router.get('/convert_despachos', function(req, res, next){
             create table despachos(
                 iddespacho int(10) not null auto_increment,
                 idgd int(10) not null,
-                idfabricacion int(10) default 0,
+                idpedido int(10) default 0,
                 idmaterial int(10) not null,
                 cantidad int default 0,
                 primary key(iddespacho),
-                foreign key (idgd) references gd (idgd) on delete cascade
+                foreign key (idgd) references gd (idgd) on delete cascade,
+                FOREIGN KEY (`idpedido`)  REFERENCES `siderval`.`pedido` (`idpedido`)  ON DELETE cascade,
+                FOREIGN KEY (`idmaterial`)  REFERENCES `siderval`.`material` (`idmaterial`)  ON DELETE cascade
             );
            * */
 
@@ -1344,30 +1346,33 @@ router.get('/convert_despachos', function(req, res, next){
            //   idgd, idmaterial, idfabricacion, cantidad
            var despachos = [];
            for(var a=0; a < desp.length; a++){
-               gds.push([desp[a].iddespacho, desp[a].estado, desp[a].fecha, desp[a].last_mod, desp[a].obs]);
                desp[a].id_token = desp[a].id_token.split('@');
                desp[a].cant_token = desp[a].cant_token.split(',');
                desp[a].idf_token = desp[a].idf_token.split('@');
-               for(var b=0; b < desp[a].cant_token.length; b++){
-                   if(isNaN(parseInt(desp[a].idf_token[b]))){
-                       desp[a].idf_token[b] = '0';
+               gds.push([desp[a].iddespacho, desp[a].estado, desp[a].fecha, desp[a].last_mod, desp[a].obs]);
+               //Si esta anulada, solo agregar gd pero no despachos.
+               if(desp[a].estado != 'Anulado'){
+                   for(var b=0; b < desp[a].cant_token.length; b++){
+                       if(isNaN(parseInt(desp[a].idf_token[b]))){
+                           desp[a].idf_token[b] = '0';
+                       }
+                       if(isNaN(parseInt(desp[a].id_token[b]))){
+                           desp[a].id_token[b] = '0';
+                       }
+                       if(isNaN(parseInt(desp[a].cant_token[b]))){
+                           desp[a].cant_token[b] = '0';
+                       }
+                       despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].idf_token[b]), parseInt(desp[a].cant_token[b])]);
+                       console.log(desp[a].idf_token[b]);
+                       console.log(despachos[b]);
                    }
-                   if(isNaN(parseInt(desp[a].id_token[b]))){
-                       desp[a].id_token[b] = '0';
-                   }
-                   if(isNaN(parseInt(desp[a].cant_token[b]))){
-                       desp[a].cant_token[b] = '0';
-                   }
-                   despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].idf_token[b]), parseInt(desp[a].cant_token[b])]);
-                   console.log(desp[a].idf_token[b]);
-                   console.log(despachos[b]);
                }
            }
            connection.query("INSERT INTO gd (idgd, estado, fecha, last_mod, obs) VALUES ?", [gds],function(err, inGD){
                if(err) throw err;
                console.log(inGD);
                console.log(despachos);
-               connection.query("INSERT INTO despachos (idgd, idfabricacion, idmaterial, cantidad) VALUES ?", [despachos],function(err, inDesp){
+               connection.query("INSERT INTO despachos (idgd, idmaterial, idfabricacion, cantidad) VALUES ?", [despachos],function(err, inDesp){
                    if(err) throw err;
                    console.log(inDesp);
                    res.redirect('/');
