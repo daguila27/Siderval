@@ -15,13 +15,19 @@
 		return string.join(' ');
 	}
 	function truncateWord(string, max){
+		if(string == '' || string == null || !string){
 
-	    if(string.length <= max){
-	        return string;
+			if(string.length <= max){
+				return string;
+			}
+			else{
+				return string.substring(0, max)+"...";
+			}
 		}
 		else{
-		    return string.substring(0, max)+"...";
+		    return '';
 		}
+
 	}
 %>
 <!-- Oculta cantidad de datos -->
