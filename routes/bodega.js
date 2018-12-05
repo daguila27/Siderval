@@ -119,6 +119,10 @@ router.post('/table_despachos', function(req, res, next){
         var orden = input.orden.replace('-', ' ');
         var clave = input.clave;
         var tipo = input.tipo;
+        //clave ES EL TEXTO QUE SE ENCUENTRA EN LA BARRA BUSCAR . Por ejemplo : "Inserto"
+        //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
+        // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
+        //
         var where = " WHERE (despacho.mat_token LIKE '%"+clave+"%' OR despacho.iddespacho LIKE '%"+clave+"%') AND despacho.estado LIKE '%"+tipo+"%'";
         var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
