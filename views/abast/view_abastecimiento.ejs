@@ -109,13 +109,11 @@
 	$(document).ready(function(){
 
 		$.ajax({
-
 			type: 'POST',
             data: {
                 clave: filtros_seleccionados.join(','),
                 orden: $(".o_cp_switch_buttons .active").data('view'),
                 showPend: $("#pend").is(':checked')
-                /*cc_selected: $(".select_cc").val().join(',')*/
             },
             beforeSend: function(){
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
@@ -140,6 +138,7 @@
     $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
         e.stopPropagation();
     });
+
     $('.fill-item-abast').hover(function() {
         $(this).css('cursor','pointer');
         $('.fill-item-abast').removeClass("o-selection-focus");
@@ -158,8 +157,6 @@
             $(".o_searchview_autocomplete strong").html($(this).val());
 
 		}
-
-		//buscar_oda(false);
 	});
 
 	$(".fill-item-abast").on('click', function(e){
@@ -279,8 +276,7 @@
 				$.ajax({
 					type: 'POST',
 					data: {
-						clave: $("#buscar_abastecimiento").val(),
-                        cc_selected: $(".select_cc").val()
+						clave: $("#buscar_abastecimiento").val()
 					},
 					url: '/abastecimiento/buscar_abastecimiento_item',
 					success: function(data){
@@ -307,8 +303,7 @@
                 data: {
                     clave: $("#buscar_abastecimiento").val(),
                     orden: $(".o_cp_switch_buttons .active").data('view'),
-                    showPend: $("#pend").is(':checked'),
-                    cc_selected: $(".select_cc").val().join(',')
+                    showPend: $("#pend").is(':checked')
                 },
                 url: '/abastecimiento/table_abastecimientos/' + global_page,
                 success: function(data){
@@ -323,7 +318,7 @@
 			// Quita el nav de paginacion
 			$("#paginacion").css('display','none');
             $.ajax({
-                type: 'GET',
+                type: 'POST',
                 url: '/abastecimiento/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
                 success: function(data){
                     $(".main-page").html(data);
@@ -362,8 +357,7 @@
             data: {
                 clave: filtros_seleccionados.join(','),
                 orden: $(this).data('order'),
-                showPend: $("#pend").is(':checked'),
-                cc_selected: $(".select_cc").val().join(',')
+                showPend: $("#pend").is(':checked')
             },
             url: '/abastecimiento/table_abastecimientos/'+ global_page,
             success: function(data){
@@ -388,8 +382,7 @@
                 	data: {
 	                    clave: filtros_seleccionados.join(','),
 	                    orden: $(".o_cp_switch_buttons .active").data('view'),
-	                    showPend: $("#pend").is(':checked'),
-	                    cc_selected: $(".select_cc").val().join(',')
+	                    showPend: $("#pend").is(':checked')
 	                },
                 	url: '/abastecimiento/table_abastecimientos/' + page,
                 	success: function(data){
