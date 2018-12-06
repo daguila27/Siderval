@@ -1362,7 +1362,7 @@ router.get('/convert_despachos', function(req, res, next){
                        if(isNaN(parseInt(desp[a].cant_token[b]))){
                            desp[a].cant_token[b] = '0';
                        }
-                       despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].idf_token[b]), parseInt(desp[a].cant_token[b])]);
+                       despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].cant_token[b])]);
                        console.log(desp[a].idf_token[b]);
                        console.log(despachos[b]);
                    }
@@ -1372,7 +1372,7 @@ router.get('/convert_despachos', function(req, res, next){
                if(err) throw err;
                console.log(inGD);
                console.log(despachos);
-               connection.query("INSERT INTO despachos (idgd, idmaterial, idfabricacion, cantidad) VALUES ?", [despachos],function(err, inDesp){
+               connection.query("INSERT INTO despachos (idgd, idmaterial, cantidad) VALUES ?", [despachos],function(err, inDesp){
                    if(err) throw err;
                    console.log(inDesp);
                    res.redirect('/');

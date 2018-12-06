@@ -123,10 +123,12 @@ router.post('/table_despachos', function(req, res, next){
         //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
         // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
         //
-        var where = " WHERE (despacho.mat_token LIKE '%"+clave+"%' OR despacho.iddespacho LIKE '%"+clave+"%') AND despacho.estado LIKE '%"+tipo+"%'";
-        var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
+        var where = " WHERE despachos.idmaterial>0 AND (material.detalle LIKE '%" + clave + "%' OR despachos.idgd LIKE '%" + clave + "%') AND gd.estado LIKE '%" + tipo + "%'";
+        //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
-            connection.query("SELECT * FROM despacho"+where/*+" ORDER BY "+orden*/,function(err, desp){
+            connection.query("SELECT despachos.*, gd.estado, gd.fecha, gd.last_mod, gd.obs, material.detalle, (SELECT COUNT(gd.idgd) FROM gd) as total_guias FROM despachos"
+                + " LEFT JOIN gd ON despachos.idgd=gd.idgd"
+                + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial"+where,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
 
@@ -540,48 +542,46 @@ router.post('/act_gdd', function(req, res, next){
 
 router.post('/anular_gdd', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
-    var iddespacho = input.id;
-    var value = parseInt(input.val);
+    var iddespacho = input.iddespacho;
     req.getConnection(function(err, connection){
-        if(err)
-            console.log("Error Selecting : %s", err);
-        connection.query("SELECT * FROM despacho WHERE iddespacho = ?", [iddespacho], function(err, desp){
-            if(err)
-                console.log("Error Selecting : %s", err);
-            var upf = desp[0].idf_token.split('@');
-            var upc = desp[0].cant_token.split(',');
-            var upm = desp[0].id_token.split('@');
-            var upfquery = '';
-            var upmquery = '';
-            var oper; 
-            if(value == 1){oper = '-';}
-            else{oper = '+';}
-            for(var i=0; i < upf.length; i++){
-                upfquery += "UPDATE pedido SET despachados = despachados "+oper+" "+upc[i]+" WHERE idpedido = "+upf[i]+"@";
-                upmquery += "UPDATE material SET stock = stock + "+upc[i]+" WHERE idmaterial = "+upm[i]+"@";
-            }
-            upfquery = upfquery.substring(0, upfquery.length-1)+'';
-            upmquery = upmquery.substring(0, upmquery.length-1)+'';
-            upfquery = upfquery.split('@');
-            upmquery = upmquery.split('@');
-            console.log(upfquery);
-            console.log(upmquery);
-            connection.query("UPDATE despacho SET estado = ? WHERE iddespacho = ?", ["Anulado",iddespacho],function(err, up){
-                if(err)
-                    console.log("Error Selecting : %s", err);
-                for(var j=0; j < upfquery.length;  j++){
-                    connection.query(upfquery[j], function(err, upf){
-                        if(err)
-                            console.log("Error Selecting : %s", err);
-                    });
+        if(err) console.log("Error Selecting despacho: %s", err);
+        connection.query("SELECT * FROM despachos WHERE iddespacho = ?", [iddespacho], function(err, data){
+            connection.query("SELECT * FROM despachos WHERE idgd = ?", data[0].idgd, function(err, desp){
+            if(err) console.log("Error Selecting : %s", err);
+                console.log(iddespacho);
+                console.log(desp);
+                var ped_query = "UPDATE pedido SET pedido.despachados = CASE";
+                var ped_where = "WHERE pedido.idpedido in (";
+                for(var i=0; i < desp.length; i++){
+                    ped_query += " WHEN pedido.idpedido=" + desp[i].idpedido + " THEN pedido.despachados-" + desp[i].cantidad;
+                    ped_where += "" + desp[i].idpedido;
+                    if(i+1 != desp.length){
+                        ped_where += ",";
+                    }
                 }
-                for(var k=0; k < upmquery.length;  k++){
-                    connection.query(upmquery[k], function(err, upm){
-                        if(err)
-                            console.log("Error Selecting : %s", err);
+                ped_query += " END " + ped_where + ")";
+                console.log(ped_query);
+                connection.query(ped_query, function(err, ped){
+                    if(err) console.log("Error Selecting : %s", err);
+                    var mat_query = "UPDATE material SET material.stock = CASE";
+                    var mat_where = "WHERE material.idmaterial in (";
+                    for(var i=0; i < desp.length; i++){
+                        mat_query += " WHEN material.idmaterial=" + desp[i].idmaterial + " THEN material.stock+" + desp[i].cantidad;
+                        mat_where += "" + desp[i].idmaterial;
+                        if(i+1 != desp.length){
+                            mat_where += ",";
+                        }
+                    }
+                    mat_query += " END " + mat_where + ")";
+                    console.log(mat_query);
+                    connection.query(mat_query, function(err, ped){
+                        if(err) console.log("Error Selecting : %s", err);
+                        connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
+                            if(err) console.log("Error Selecting : %s", err);
+                            res.send('/Guia anulada');
+                        });
                     });
-                }
-                res.send('/Guia anulada');
+                });
             });
         });
 
