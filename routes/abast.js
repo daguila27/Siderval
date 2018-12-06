@@ -1721,12 +1721,12 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
         var array_fill = [
-            "oda.idoda",
-            "factura.numfac",
-            "recepcion.numgd",
-            "cliente.sigla",
-            "material.detalle",
-            "cuenta.detalle"
+            "abastecimiento.idodabast",
+            "abastecimiento.factura_token",
+            "abastecimiento.gd_token",
+            "abastecimiento.sigla",
+            "abastecimiento.detalle",
+            "abastecimiento.cuenta"
         ];
         var clave;
         if(input.clave == '' || input.clave == null || input.clave == undefined){
@@ -1743,7 +1743,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
             orden = input.orden;
 		}
         var showPend = input.showPend;
-        var cc_selected = input.cc_selected.split(',');
+        //var cc_selected = input.cc_selected.split(',');
         var where = " WHERE ";
         var condiciones_where = [];
         var condiciones_cc = [];
@@ -1754,11 +1754,12 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 			}
         }
         var cc_cond = " ";
-        if(showPend == 'true'){
-            condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
+        if(showPend == 'false'){
+            //condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
+            condiciones_where.push("abastecimiento.cantidad > abastecimiento.facturados");
         }
         where += condiciones_where.join(" AND ");
-        if(cc_selected.length>0){
+        /*if(cc_selected.length>0){
             for(var cc=0; cc <  cc_selected.length ; cc++){
                 if(cc_selected[cc] == 'all'){
                     condiciones_cc.push(" abastecimiento.cc LIKE '%%'");
@@ -1768,7 +1769,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     condiciones_cc.push(" abastecimiento.cc LIKE '%"+cc_selected[cc]+"%'");
                 }
             }
-        }
+        }*/
         console.log(condiciones_where);
 
         if(condiciones_where.length==0){
@@ -1783,8 +1784,8 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
-                    + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,sum(facturacion.cantidad) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
+                    + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
 	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
@@ -1792,8 +1793,8 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
                     + " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast"
                     + " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion"
-	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
-	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC" /*+ orden + " LIMIT " + page_now + ",50"*/, function(err, abs){
+	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"
+	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC) AS abastecimiento "+where, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1},function(err,html){

@@ -108,7 +108,7 @@
 				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 30%;float:left; text-align: center;font-weight: 500; font-size: 25px'>
 				<% switch(tipo){
 					case 'oda':%>
-					Orden de Compra <br> <b>N° <%=oda[0].numoda%> </b>
+					Orden de Compra <br> <b>N° <%=oda[0].idoda%> </b>
 				<% break;
 					case 'factura':%>
 					Factura<br> <b>N° <%=oda[0].numfactura%> </b>
@@ -291,7 +291,8 @@
 								<td class='fund' style="text-align: right;">
 									<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
 								</td>
-							<%}else{%>
+								<%total += (total*0.19);
+                 		    }else{%>
 								<%if((total*0.19).toLocaleString().split('.').length > 1){%>
 	                 				<td class='fund' style="text-align: right;">
 	                 					<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')+','+(total*0.19).toLocaleString().split('.')[1] %>
