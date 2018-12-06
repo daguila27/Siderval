@@ -24,16 +24,16 @@
 				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].detalle%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= desp[i].cantidad %></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
-				<td id="est<%=desp[i].iddespacho%>" data-id="<%=desp[i].cantidad%>" class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
+				<td id="est<%=desp[i].idgd%>" data-id="<%=desp[i].cantidad%>" class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 					<%if(desp[i].estado != 'Anulado'){%>
-						<div id="btns<%=desp[i].iddespacho%>">
+						<div id="btns<%=desp[i].idgd%>">
 							<%if(desp[i].estado == 'Blanco'){%>
-								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].iddespacho%>">AC</a>
+								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].idgd%>">AC</a>
 							<%}else{%>
-								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].iddespacho%>">GD</a>
+								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].idgd%>">GD</a>
 							<%}%>
-							<a class="btn btn-xs btn-warning anular" onclick="anulate(this)" data-id="<%=desp[i].iddespacho%>"><i class="fa fa-ban"></i></a>
+							<a class="btn btn-xs btn-warning anular" onclick="anulate(this)" data-id="<%=desp[i].idgd%>"><i class="fa fa-ban"></i></a>
 						</div>
 					<%} %>
 				</td>
@@ -85,7 +85,7 @@
         if(resp){
             $.ajax({
                 type: 'POST',
-                data: {iddespacho: $(file).data('id')},
+                data: {idgd: $(file).data('id')},
                 url: 'bodega/anular_gdd',
                 success: function(){
 					$("#btns"+$(file).data('id')).html('');

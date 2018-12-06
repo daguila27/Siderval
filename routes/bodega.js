@@ -542,44 +542,37 @@ router.post('/act_gdd', function(req, res, next){
 
 router.post('/anular_gdd', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
-    var iddespacho = input.iddespacho;
+    var idgd = input.idgd;
     req.getConnection(function(err, connection){
-        if(err) console.log("Error Selecting despacho: %s", err);
-        connection.query("SELECT * FROM despachos WHERE iddespacho = ?", [iddespacho], function(err, data){
-            connection.query("SELECT * FROM despachos WHERE idgd = ?", data[0].idgd, function(err, desp){
-            if(err) console.log("Error Selecting : %s", err);
-                console.log(iddespacho);
-                console.log(desp);
-                var ped_query = "UPDATE pedido SET pedido.despachados = CASE";
-                var ped_where = "WHERE pedido.idpedido in (";
+        connection.query("SELECT * FROM despachos WHERE idgd = ?", idgd, function(err, desp){
+        if(err) console.log("Error Selecting : %s", err);
+            var ped_query = "UPDATE pedido SET pedido.despachados = CASE";
+            var ped_where = "WHERE pedido.idpedido in (";
+            for(var i=0; i < desp.length; i++){
+                ped_query += " WHEN pedido.idpedido=" + desp[i].idpedido + " THEN pedido.despachados-" + desp[i].cantidad;
+                ped_where += "" + desp[i].idpedido;
+                if(i+1 != desp.length){
+                    ped_where += ",";
+                }
+            }
+            ped_query += " END " + ped_where + ")";
+            connection.query(ped_query, function(err, ped){
+                if(err) console.log("Error Selecting : %s", err);
+                var mat_query = "UPDATE material SET material.stock = CASE";
+                var mat_where = "WHERE material.idmaterial in (";
                 for(var i=0; i < desp.length; i++){
-                    ped_query += " WHEN pedido.idpedido=" + desp[i].idpedido + " THEN pedido.despachados-" + desp[i].cantidad;
-                    ped_where += "" + desp[i].idpedido;
+                    mat_query += " WHEN material.idmaterial=" + desp[i].idmaterial + " THEN material.stock+" + desp[i].cantidad;
+                    mat_where += "" + desp[i].idmaterial;
                     if(i+1 != desp.length){
-                        ped_where += ",";
+                        mat_where += ",";
                     }
                 }
-                ped_query += " END " + ped_where + ")";
-                console.log(ped_query);
-                connection.query(ped_query, function(err, ped){
+                mat_query += " END " + mat_where + ")";
+                connection.query(mat_query, function(err, ped){
                     if(err) console.log("Error Selecting : %s", err);
-                    var mat_query = "UPDATE material SET material.stock = CASE";
-                    var mat_where = "WHERE material.idmaterial in (";
-                    for(var i=0; i < desp.length; i++){
-                        mat_query += " WHEN material.idmaterial=" + desp[i].idmaterial + " THEN material.stock+" + desp[i].cantidad;
-                        mat_where += "" + desp[i].idmaterial;
-                        if(i+1 != desp.length){
-                            mat_where += ",";
-                        }
-                    }
-                    mat_query += " END " + mat_where + ")";
-                    console.log(mat_query);
-                    connection.query(mat_query, function(err, ped){
+                    connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
                         if(err) console.log("Error Selecting : %s", err);
-                        connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
-                            if(err) console.log("Error Selecting : %s", err);
-                            res.send('/Guia anulada');
-                        });
+                        res.send('/Guia anulada');
                     });
                 });
             });
@@ -836,6 +829,7 @@ router.post('/activar_gdd', function(req,res,next){
 router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
     if(verificar(req.session.userData)){
         var id = parseInt(req.params.iddespacho);
+        console.log(id);
         var meses = new Array ("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
@@ -848,78 +842,54 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
         sheet.mergeCells('H13:I13');
         sheet.mergeCells('A15:I18');
         req.getConnection(function(err, connection) {
-            if(err)
-                console.log("Error connection : %s", err);
-            connection.query("SELECT despacho.*, odc.numoc as numordenfabricacion, odc.numoc,cliente.* FROM despacho LEFT JOIN odc ON odc.idodc = despacho.idorden_f left join cliente on cliente.idcliente = odc.idcliente WHERE iddespacho = ?",
-                [id],function(err, rows)
-                {
-
-                    if (err)
-                        console.log("Error Select : %s ",err );
+            if(err) console.log("Error connection : %s", err);
+            connection.query("SELECT despachos.*, gd.estado, gd.fecha, gd.last_mod, gd.obs, material.detalle, material.codigo, cliente.* FROM despachos"
+                + " LEFT JOIN gd ON despachos.idgd=gd.idgd"
+                + " LEFT JOIN cliente ON cliente.idcliente=gd.idcliente"
+                + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial"
+                + " WHERE despachos.idgd ="+ id,function(err, rows) {
+                    if (err) console.log("Error Select : %s ",err );
                     if(rows.length>0){
-                        var nombre = 'csvs/gdd' + rows[0].iddespacho + '.xlsx';
-                        var cond = '';
-                        for(var u=0; u < rows[0].id_token.split('@').length; u++){
-                            cond += " idmaterial = "+rows[0].id_token.split('@')[u]+" OR";
-                            
+                        var nombre = 'csvs/gdd' + rows[0].idgd + '.xlsx';
+                        sheet.getCell('B9').value = rows[0].sigla+"-"+rows[0].razon;
+                        sheet.getCell('G9').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
+                        sheet.getCell('B11').value = rows[0].direccion;
+                        sheet.getCell('H11').value = rows[0].ciudad;
+                        sheet.getCell('B13').value = rows[0].giro;
+                        sheet.getCell('H13').value = rows[0].rut;
+                        var count = 0;
+                        for(var j=0; j<rows.length; j++){
+                            sheet.mergeCells('C' + (20 + count).toString() + ':F' + (20 + count).toString());
+                            sheet.getCell('B' + (20 + count).toString()).value = rows[j].codigo;
+                            sheet.getCell('C' + (20 + count).toString()).value = rows[j].detalle;
+                            sheet.getCell('G' + (20 + count).toString()).value = rows[j].cantidad;
+                            count++;
                         }
-                        cond = "SELECT idmaterial,codigo FROM material WHERE"+cond;
-                        cond = cond.substring(0, cond.length-2);
-                        connection.query(cond, function(err, prod){
-                            if(err){console.log("Error Selecting : %s", err);}
-                            sheet.getCell('B9').value = rows[0].sigla+"-"+rows[0].razon;
-                            sheet.getCell('G9').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
-                            sheet.getCell('B11').value = rows[0].direccion;
-                            sheet.getCell('H11').value = rows[0].ciudad;
-                            sheet.getCell('B13').value = rows[0].giro;
-                            sheet.getCell('H13').value = rows[0].rut;
+                        sheet.mergeCells('B36:H36');
+                        sheet.mergeCells('B37:H37');
+                        if(rows[0].estado == 'Traslado'){
+                            sheet.getCell('B36').value = "NO CONSTITUYE VENTA SOLO TRASLADO";
+                            sheet.getCell('B37').value = "En virtud del Art. 55 D.L. 825";
+                        }
+                        sheet.mergeCells('C38:D38');
+                        sheet.mergeCells('F38:G38');
+                        sheet.mergeCells('C39:D39')
+                        sheet.getCell('B38').value = "OF:";
+                        sheet.getCell('C38').value = "No se puede vincular a OF";
+                        sheet.getCell('E38').value = "OC: ";
+                        sheet.getCell('F38').value = "No se puede vincular a OC";
+                        sheet.getCell('B39').value = "CHOFER";
+                        sheet.getCell('B40').value = "PATENTE";
+                        sheet.getCell('H40').value = "NETO";
+                        sheet.getCell('H41').value = "IVA";
+                        sheet.getCell('H44').value = "TOTAL";
 
-                            rows[0].mat_token = rows[0].mat_token.split('@@');
-                            rows[0].cant_token = rows[0].cant_token.split(',');
-                            var count = 0;
-                            var auxrow;
-                            for(var j=0; j<rows[0].mat_token.length; j++){
-                                for(var c=0; c<prod.length; c++){
-                                    if(prod[c].idmaterial == rows[0].id_token.split('@')[j]){
-                                        auxrow = 20 + count;
-                                        sheet.mergeCells('C' + auxrow.toString() + ':F' + auxrow.toString());
-                                        sheet.getCell('B' + auxrow.toString()).value = prod[c].codigo;
-                                        sheet.getCell('C' + auxrow.toString()).value = rows[0].mat_token[j].replace(",",".");
-                                        sheet.getCell('G' + auxrow.toString()).value = rows[0].cant_token[j];
-                                        count++;
-                                    }
-                                }
-                            }
-                            sheet.mergeCells('B36:H36');
-                            sheet.mergeCells('B37:H37');
-                            if(rows[0].estado == 'Traslado'){
-                                sheet.getCell('B36').value = "NO CONSTITUYE VENTA SOLO TRASLADO";
-                                sheet.getCell('B37').value = "En virtud del Art. 55 D.L. 825";
-                            }
-                            sheet.mergeCells('C38:D38');
-                            sheet.mergeCells('F38:G38');
-                            sheet.mergeCells('C39:D39')
-                            sheet.getCell('B38').value = "OF:";
-                            sheet.getCell('C38').value = rows[0].numordenfabricacion;
-                            sheet.getCell('E38').value = 'OC: ';
-                            sheet.getCell('B38').value = rows[0].numoc;
-                            sheet.getCell('B39').value = "CHOFER";
-                            sheet.getCell('B40').value = "PATENTE";
-                            sheet.getCell('H40').value = "NETO";
-                            sheet.getCell('H41').value = "IVA";
-                            sheet.getCell('H44').value = "TOTAL";
+                        workbook.xlsx.writeFile('public/' + nombre)
+                            .then(function() {
+                                res.send('/csvs/gdd'+ rows[0].idgd + '.xlsx');
 
-                            workbook.xlsx.writeFile('public/' + nombre)
-                                .then(function() {
-                                    res.send('/csvs/gdd'+ rows[0].iddespacho + '.xlsx');
-
-                                });
-
-                        });
-
-                
+                            });
                     }
-
                 });
             });
     }
