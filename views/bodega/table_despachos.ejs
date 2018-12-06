@@ -29,11 +29,11 @@
 					<%if(desp[i].estado != 'Anulado'){%>
 						<div id="btns<%=desp[i].iddespacho%>">
 							<%if(desp[i].estado == 'Blanco'){%>
-								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].iddespacho%>">AC</a>
+								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].idgd%>">AC</a>
 							<%}else{%>
-								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].iddespacho%>">GD</a>
+								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].idgd%>">GD</a>
 							<%}%>
-							<a class="btn btn-xs btn-warning anular" onclick="anulate(this)" data-id="<%=desp[i].iddespacho%>"><i class="fa fa-ban"></i></a>
+							<a class="btn btn-xs btn-warning anular" onclick="anulate(this)" data-id="<%=desp[i].idgd%>"><i class="fa fa-ban"></i></a>
 						</div>
 					<%} %>
 				</td>
