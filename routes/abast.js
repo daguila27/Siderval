@@ -1618,7 +1618,7 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
         });
     }
 });
-// Descargar xlsx de insumos
+// Descargar xlsx de fabrs
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
         let nombre = "IDS-pedidos&producidos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
@@ -1796,7 +1796,10 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC" /*+ orden + " LIMIT " + page_now + ",50"*/, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
-		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1});
+		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1},function(err,html){
+		        			if(err) console.log(err);
+		        			res.send(html);
+						});
 		        	}
 	        	});
 	        }
