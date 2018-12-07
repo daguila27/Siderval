@@ -245,8 +245,7 @@
                  		<td></td>
                  		<td></td>
                  		<td class='fund'>DESCUENTO </td>
-	                 		<%
-	                 		var monto_descontado = 0;%>
+	                 		<%var monto_descontado = 0;%>
 		                 		<%if(((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.').length > 1){%>
 	                 				<td class='fund' style="text-align: right;">
 	                 					<%= ((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.')[0].split(',').join('.')+','+((total+nototal)*(parseInt(oda[0].tokenoda[8])/100)).toLocaleString().split('.')[1] %>
@@ -267,16 +266,16 @@
 			            <td>NETO </td>
 						<%if(oda[0].tokenoda[6] == 'clp'){%>
 							<td class='fund' style="text-align: right;">
-								<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
+								<%= (total+nototal-monto_descontado).toLocaleString().split('.')[0].split(',').join('.')%>
 							</td>
 						<%}else{
 							if((total+nototal).toLocaleString().split('.').length > 1){%>
 								<td class='fund' style="text-align: right;">
-									<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')+','+(total+nototal).toLocaleString().split('.')[1] %>
+									<%= (total+nototal-monto_descontado).toLocaleString().split('.')[0].split(',').join('.')+','+(total+nototal).toLocaleString().split('.')[1] %>
 								</td>
 							<%}else{%>
 								<td class='fund' style="text-align: right;">
-									<%= (total+nototal).toLocaleString().split('.')[0].split(',').join('.')%>
+									<%= (total+nototal-monto_descontado).toLocaleString().split('.')[0].split(',').join('.')%>
 								</td>
 							<%}
 						}%>
@@ -289,20 +288,20 @@
                  		<%if(oda[0].tokenoda[7] == 'off'){
                  		    if(oda[0].tokenoda[6] == 'clp'){%>
 								<td class='fund' style="text-align: right;">
-									<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
+									<%= ((total-monto_descontado)*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
 								</td>
-								<%total += (total*0.19);
+								<%total += ((total-monto_descontado)*0.19);
                  		    }else{%>
 								<%if((total*0.19).toLocaleString().split('.').length > 1){%>
 	                 				<td class='fund' style="text-align: right;">
-	                 					<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')+','+(total*0.19).toLocaleString().split('.')[1] %>
+	                 					<%= ((total-monto_descontado)*0.19).toLocaleString().split('.')[0].split(',').join('.')+','+(total*0.19).toLocaleString().split('.')[1] %>
                  					</td>
 		                 		<%}else{%>
 		                 			<td class='fund' style="text-align: right;">
-		                 				<%= (total*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
+		                 				<%= ((total-monto_descontado)*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
 	                 				</td>
 		                 		<%}%>
-	                 			<%total += (total*0.19);%>
+	                 			<%total += ((total-monto_descontado)*0.19);%>
 							<%}%>
                  		<%}else{%>
                  			<td class="fund" style="text-align: right;">0</td>
