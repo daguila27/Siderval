@@ -37,15 +37,11 @@ router.get('/crear_gdd', function(req, res, next){
     if(verificar(req.session.userData)){
         req.session.arraydespacho = [];
         req.getConnection(function(err, connection){
-            connection.query("SELECT MAX(iddespacho) as id FROM despacho", function(err, num){
-                if(err)
-                    console.log("Error Selecting : %s", err);
-
+            connection.query("SELECT MAX(idgd) as id FROM gd", function(err, num){
+                if(err){console.log("Error Selecting : %s", err);}
                 num = num[0].id+1;
-                connection.query("SELECT * FROM cliente", function(err, cli){
-                    if(err)
-                        console.log("Error Selecting : %s", err);
-
+                connection.query("SELECT * FROM cliente", function(err, cli) {
+                    if (err) {console.log("Error Selecting : %s", err);}
                     connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,pedido.idpedido as idfabricaciones,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                         +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
                         +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
@@ -339,7 +335,80 @@ router.post('/drop_despacho', function(req,res,next){
     
 });
 
-router.post('/save_gdd', function(req, res, next){
+
+router.post('/save_gdd', function (req, res, next) {
+    var input = JSON.parse(JSON.stringify(req.body));
+    req.getConnection(function (err,connection) {
+        //Insertamos los valores de una GD
+        let values = [[input.estado, new Date().toLocaleDateString(), new Date().toLocaleDateString() , input.obs]];
+        connection.query("INSERT INTO gd (estado, fecha, last_mod, obs) VALUES ?", [values], function (err, results) {
+            if(err) {throw err;}
+            if (input.estado !== "Blanco") {
+                //ID ultima GD y lista vacia que contendra pedidos
+                let idgd = results.insertId;
+                let despachos = [];
+                for (let i = 0; i < Object.keys(input).length - 2; i++) {
+                    //despachoss([idgd, iddespacho, idmaterial, cantidad])
+                    despachos.push([idgd, input['list[' + i + '][]'][0], input['list[' + i + '][]'][1], input['list[' + i + '][]'][2]]);
+                    if (despachos[i][1] === "0") {
+                        despachos[i][1] = null;
+                    }
+                }
+                //Insertamos cada Despacho asociado a la GD
+                connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?", [despachos], function () {
+                    if (err) {throw err;}
+                    //Variables necesarias para definir la operacion de la query
+                    let update_saldo = "";
+                    let op1, op2;
+                    if (input.estado === "Venta" || input.estado === "Traslado") {
+                        op1 = "+";
+                        op2 = "-";
+                    } else if (input.estado === "Devolucion") {
+                        op1 = ""
+                    }
+                    //Si la operacion es de Traslado, no existen pedidos.
+                    if (input.estado !== "Traslado") {
+                        //Creamos la Query para actualizar despachados de pedido
+                        update_saldo = 'UPDATE pedido SET pedido.despachados = CASE ';
+                        let stringIds = '(';
+                        for (let i = 0; i < despachos.length; i++) {
+                            update_saldo += 'WHEN pedido.idpedido=' + despachos[i][1] + ' THEN pedido.despachados' + op1 + despachos[i][3] + ' ';
+                            stringIds += despachos[i][1];
+                            if (i !== despachos.length - 1) {
+                                stringIds += ','
+                            }
+                        }
+                        stringIds += ')';
+                        update_saldo += 'ELSE pedido.despachados END WHERE pedido.idpedido IN ' + stringIds;
+                    }
+                    //Actualizamos la cantidad de despachados del pedido
+                    connection.query(update_saldo, function () {
+                        //Creamos el Query para actualizar stock de materiales
+                        let update_stock = 'UPDATE material SET material.stock = CASE ';
+                        let idmaterial = '(';
+                        for (var i = 0; i < despachos.length; i++) {
+                            update_stock += 'WHEN material.idmaterial=' + despachos[i][2] + ' THEN material.stock' + op2 + despachos[i][3] + ' ';
+                            idmaterial += despachos[i][2];
+                            if (i !== despachos.length - 1) {
+                                idmaterial += ',';
+                            }
+                        }
+                        idmaterial += ')';
+                        update_stock += 'ELSE material.stock END WHERE material.idmaterial IN ' + idmaterial;
+                        //Actualizamos el stock de material
+                        connection.query(update_stock, function () {
+                            res.redirect('/bodega/view_despachos');
+                        });
+                    });
+                });
+            } else {
+                res.redirect('/bodega/view_despachos');
+            }
+        });
+    });
+});
+
+router.post('/save_gdd2', function(req, res, next){
     var arrayDBP = [];
     var query = '';
     var token = "";
