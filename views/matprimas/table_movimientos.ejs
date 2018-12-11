@@ -27,23 +27,23 @@
     <tr>
         <th class="cabecera o_column_sortable ">N° Mov</th>
         <th class="cabecera o_column_sortable " data-order="material.detalle-ASC">Descripción</th>
-        <th id="solicitados" class="cabecera o_column_sortable " style="text-align: center;" data-order="movimiento_detalle.cantidad*1-ASC">Solicitados</th>
-        <th id="sin_produccion" class="cabecera o_column_sortable " style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
-        <th id="sin_produccion" class="cabecera o_column_sortable " style="text-align: center;" data-order="etapafaena.nombre_etapa-ASC">Etapa</th>
-        <th id="movimiento" class="cabecera o_column_sortable " style="text-align: center;" >Movimiento</th>
-        <th id="receptor" class="cabecera o_column_sortable " style="text-align: center;">Receptor</th>
+        <th class="cabecera o_column_sortable " style="text-align: center;" data-order="movimiento_detalle.cantidad*1-ASC">Solicitados</th>
+        <th class="cabecera o_column_sortable " style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
+        <th class="cabecera o_column_sortable " style="text-align: center;" data-order="etapafaena.nombre_etapa-ASC">Etapa</th>
+        <th class="cabecera o_column_sortable " style="text-align: center;" >Movimiento</th>
+        <th class="cabecera o_column_sortable " style="text-align: center;">Receptor</th>
         <th class="cabecera o_column_sortable" style="text-align: center;" >Fecha de Registro</th>
     </tr>
     </thead>
     <tbody class="ui-sortable">
     <%for(var i=0; i < data.length; i++){%>
         <tr class="o_data_row">
-            <td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>" style="text-align: center"><%=data[i].idmovimiento%></td>
-            <td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].detalle%></td>
-            <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%= data[i].cantidad%></td>
-            <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=data[i].u_medida%></td>
-            <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%=etapas[parseInt(data[i].nombre_etapa)]%></td>
-            <td class="o_data_cell" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
+            <td class="o_data_cell o_readonly_modifier o_required_modifier"  style="text-align: center"><%=data[i].idmovimiento%></td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad%></td>
+            <td class="o_data_cell" style="text-align: center;" ><%=data[i].u_medida%></td>
+            <td class="o_data_cell" style="text-align: center;" ><%=etapas[parseInt(data[i].nombre_etapa)]%></td>
+            <td class="o_data_cell" style="text-align: center;" >
                 <%if(data[i].tipo_mov == '0'){%>
                     Retiro
                 <%}else{%>
@@ -74,8 +74,6 @@
 
 <script type="text/javascript">
     setDataTableMain("#tablaMovimientos");
-
-
     function submit_form(yo){
         //$("#form"+$(yo).data('idodc')).submit();
         $.ajax({

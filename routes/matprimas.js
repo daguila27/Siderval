@@ -380,7 +380,7 @@ router.post("/table_recepcion",function(req,res,next){
                 +" left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion"
                 +" left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast"
                 +" left join material on material.idmaterial=abastecimiento.idmaterial"
-                + where/* + " ORDER BY "+orden*/, function(err, mov){
+                + where + " GROUP BY recepcion_detalle.idrecepcion_d ORDER BY recepcion.fecha DESC", function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_recepcion', {data: mov, key: orden.replace(' ', '-')});
             });
