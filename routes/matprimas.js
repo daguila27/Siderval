@@ -324,7 +324,7 @@ router.post("/table_movimientos",function(req,res,next){
                 +" from movimiento_detalle"
                 +" left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento"
                 +" left join material on material.idmaterial=movimiento_detalle.idmaterial"
-                +" left join etapafaena on etapafaena.value = movimiento.etapa) as all_data "+where/*+" ORDER BY "+orden*/, function(err, mov){
+                +" left join etapafaena on etapafaena.value = movimiento.etapa) as all_data "+where+" ORDER BY all_data.f_gen DESC", function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
             });
