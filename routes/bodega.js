@@ -119,12 +119,12 @@ router.post('/table_despachos', function(req, res, next){
         //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
         // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
         //
-        var where = " WHERE despachos.idmaterial>0 AND (material.detalle LIKE '%" + clave + "%' OR despachos.idgd LIKE '%" + clave + "%') AND gd.estado LIKE '%" + tipo + "%'";
+        var where = " WHERE gd.idgd LIKE '%" + clave + "%' OR gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
         //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
-            connection.query("SELECT despachos.*, gd.estado, gd.fecha, gd.last_mod, gd.obs, material.detalle, (SELECT COUNT(gd.idgd) FROM gd) as total_guias FROM despachos"
-                + " LEFT JOIN gd ON despachos.idgd=gd.idgd"
-                + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial"+where,function(err, desp){
+            connection.query("SELECT gd.*,COUNT(despachos.iddespacho) as total_desp,COALESCE(cliente.razon,'SIN CLIENTE') AS cliente FROM gd"
+                + " LEFT JOIN despachos ON despachos.idgd=gd.idgd"
+                + " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente"+where,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
 
@@ -337,19 +337,19 @@ router.post('/drop_despacho', function(req,res,next){
     
 });
 
-
 router.post('/save_gdd', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input);
     req.getConnection(function (err,connection) {
         //Insertamos los valores de una GD
-        let values = [[input.estado, new Date().toLocaleDateString(), new Date().toLocaleDateString() , input.obs]];
-        connection.query("INSERT INTO gd (estado, fecha, last_mod, obs) VALUES ?", [values], function (err, results) {
+        let values = [[input.estado, new Date(), new Date() , input.obs,input.idcliente]];
+        connection.query("INSERT INTO gd (estado, fecha, last_mod, obs,idcliente) VALUES ?", [values], function (err, results) {
             if(err) {throw err;}
             if (input.estado !== "Blanco") {
                 //ID ultima GD y lista vacia que contendra pedidos
                 let idgd = results.insertId;
                 let despachos = [];
-                for (let i = 0; i < Object.keys(input).length - 2; i++) {
+                for (let i = 0; i < Object.keys(input).length - 3; i++) {
                     //despachoss([idgd, iddespacho, idmaterial, cantidad])
                     despachos.push([idgd, input['list[' + i + '][]'][0], input['list[' + i + '][]'][1], input['list[' + i + '][]'][2]]);
                     if (despachos[i][1] === "0") {
@@ -360,7 +360,6 @@ router.post('/save_gdd', function (req, res, next) {
                 connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?", [despachos], function () {
                     if (err) {throw err;}
                     //Variables necesarias para definir la operacion de la query
-                    let update_saldo = "";
                     let op1, op2;
                     if (input.estado === "Venta" || input.estado === "Traslado") {
                         op1 = "+";
@@ -368,43 +367,46 @@ router.post('/save_gdd', function (req, res, next) {
                     } else if (input.estado === "Devolucion") {
                         op1 = ""
                     }
-                    //Si la operacion es de Traslado, no existen pedidos.
-                    if (input.estado !== "Traslado") {
-                        //Creamos la Query para actualizar despachados de pedido
-                        update_saldo = 'UPDATE pedido SET pedido.despachados = CASE ';
-                        let stringIds = '(';
-                        for (let i = 0; i < despachos.length; i++) {
-                            update_saldo += 'WHEN pedido.idpedido=' + despachos[i][1] + ' THEN pedido.despachados' + op1 + despachos[i][3] + ' ';
-                            stringIds += despachos[i][1];
-                            if (i !== despachos.length - 1) {
-                                stringIds += ','
-                            }
+                    //Creamos el Query para actualizar stock de materiales
+                    let update_stock = 'UPDATE material SET material.stock = CASE ';
+                    let idmaterial = '(';
+                    for (var i = 0; i < despachos.length; i++) {
+                        update_stock += 'WHEN material.idmaterial=' + despachos[i][2] + ' THEN material.stock' + op2 + despachos[i][3] + ' ';
+                        idmaterial += despachos[i][2];
+                        if (i !== despachos.length - 1) {
+                            idmaterial += ',';
                         }
-                        stringIds += ')';
-                        update_saldo += 'ELSE pedido.despachados END WHERE pedido.idpedido IN ' + stringIds;
                     }
-                    //Actualizamos la cantidad de despachados del pedido
-                    connection.query(update_saldo, function () {
-                        //Creamos el Query para actualizar stock de materiales
-                        let update_stock = 'UPDATE material SET material.stock = CASE ';
-                        let idmaterial = '(';
-                        for (var i = 0; i < despachos.length; i++) {
-                            update_stock += 'WHEN material.idmaterial=' + despachos[i][2] + ' THEN material.stock' + op2 + despachos[i][3] + ' ';
-                            idmaterial += despachos[i][2];
-                            if (i !== despachos.length - 1) {
-                                idmaterial += ',';
+                    idmaterial += ')';
+                    update_stock += 'ELSE material.stock END WHERE material.idmaterial IN ' + idmaterial;
+                    //Actualizamos el stock de material
+                    connection.query(update_stock, function () {
+                        //Si la operacion es de Traslado, no existen pedidos.
+                        if (input.estado !== "Traslado") {
+                            let update_saldo = "";
+                            //Creamos la Query para actualizar despachados de pedido
+                            update_saldo = 'UPDATE pedido SET pedido.despachados = CASE ';
+                            let stringIds = '(';
+                            for (let i = 0; i < despachos.length; i++) {
+                                update_saldo += 'WHEN pedido.idpedido=' + despachos[i][1] + ' THEN pedido.despachados' + op1 + despachos[i][3] + ' ';
+                                stringIds += despachos[i][1];
+                                if (i !== despachos.length - 1) {
+                                    stringIds += ','
+                                }
                             }
+                            stringIds += ')';
+                            update_saldo += 'ELSE pedido.despachados END WHERE pedido.idpedido IN ' + stringIds;
+                            //Actualizamos la cantidad de despachados del pedido
+                            connection.query(update_saldo, function () {
+                                res.redirect('/bodega/crear_gdd');
+                            });
+                        } else {
+                            res.redirect('/bodega/crear_gdd');
                         }
-                        idmaterial += ')';
-                        update_stock += 'ELSE material.stock END WHERE material.idmaterial IN ' + idmaterial;
-                        //Actualizamos el stock de material
-                        connection.query(update_stock, function () {
-                            res.redirect('/bodega/view_despachos');
-                        });
                     });
                 });
             } else {
-                res.redirect('/bodega/view_despachos');
+                res.redirect('/bodega/crear_gdd');
             }
         });
     });
@@ -529,14 +531,39 @@ router.post('/save_gdd2', function(req, res, next){
 	});
 });
 
+//Renderizar la página de GDD específica de odoo.
+router.get('/page_gdd/:idgd', function(req, res, next){
+    if(verificar(req.session.userData)){
+        if(req.session.isUserLogged){
+            var idgd = req.params.idgd;
+            req.getConnection(function(err,connection){
+                if(err) console.log("Connection Error: %s",err);
+                connection.query("SELECT gd.*,cliente.razon,cliente.sigla FROM gd" +
+                    " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" +
+                    " WHERE gd.idgd = ? GROUP BY gd.idgd",[idgd], function(err, gd){
+                    if(err) console.log("Select Error: %s",err);
+                    connection.query("SELECT despachos.*,material.detalle,material.u_medida" +
+                        " FROM despachos LEFT JOIN material ON material.idmaterial = despachos.idmaterial" +
+                        " WHERE despachos.idgd = ?" +
+                        " GROUP BY despachos.iddespacho",[idgd], function(err ,despachos){
+                        if(err) console.log("Select Error: %s",err);
+                        //res.redirect('/plan');
+                        //console.log(abast);
+                        //console.log(oda);
+                        res.render('bodega/page_gd', {oda:gd[0], abast: despachos});
+                    });
+                });
+            });
+        } else res.redirect("/bad_login");
+    }
+    else{res.redirect('bad_login');}
+
+});
+//Contralador que guarda la activacion de una GDD en Blanco
 router.post('/act_gdd', function(req, res, next){
-    var arrayDBP = [];
-    var query = '';
-    var token = "";
-    var token2 = "";
-    var tokenid = "";
-    var tokenidf = "";
     var input = JSON.parse(JSON.stringify(req.body));
+    var query ="UPDATE pedido SET despachados = CASE ";
+    var query2 ="UPDATE material SET stock = CASE ";
     var ope;
     var ope2;
     switch(input.estado){
@@ -556,54 +583,59 @@ router.post('/act_gdd', function(req, res, next){
     if(typeof req.body['list[]'] == "string"){
         req.body['list[]'] = [req.body['list[]']];
     }
-
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Selecting : %s", err);
+        var d_list = [];
         for(var i=0; i<req.session.arraydespacho.length; i++ ){
-            query += "UPDATE pedido SET despachados=despachados"+ope2+req.body['list[]'][i]+
-                " WHERE idpedido="+req.session.arraydespacho[i].id+"@";
-            query += "UPDATE material SET stock=stock"+ope+req.body['list[]'][i]+
-                " WHERE idmaterial="+req.session.arraydespacho[i].idmat+"@";
-            token += req.session.arraydespacho[i].detalle + "@@";
-            token2 += req.body['list[]'][i] + ",";
-            tokenid += req.session.arraydespacho[i].idmat + "@";
-            tokenidf += req.session.arraydespacho[i].id + "@";
+            query2 += "WHEN material.idmaterial = "+req.session.arraydespacho[i].idmat
+                + " THEN material.stock " + ope+ " " + req.body['list[]'][i]+ " ";
+            if(input.estado == 'Venta'){
+                query += "WHEN idpedido = "+req.session.arraydespacho[i].id
+                    + " THEN despachados " + ope2+ " " + req.body['list[]'][i]+ " ";
+                d_list.push([input.idgdd,req.session.arraydespacho[i].id,req.session.arraydespacho[i].idmat,req.body['list[]'][i]]);
+            } else {
+                d_list.push([input.idgdd,null,req.session.arraydespacho[i].idmat,req.body['list[]'][i]]);
+            }
         }
-        query = query.substring(0, query.length-1) + '';
-        token = token.substring(0, token.length-2) + '';
-        token2 = token2.substring(0, token2.length-1) + '';
-        tokenid = tokenid.substring(0, tokenid.length-1)+'';
-        tokenidf = tokenidf.substring(0, tokenidf.length-1)+'';
-        var idof;
-        if(req.session.arraydespacho.length==0){idof=0;}
-        else{idof=req.session.arraydespacho[0].idof;}
-        //arrayDBP.push([idof,token,token2,tokenid,tokenidf, input.estado,input.obs]);
-
-        query = query.split('@');
-        connection.query("UPDATE despacho SET  `last_mod` = CURRENT_TIMESTAMP, `idorden_f`=?, `mat_token`=?,`cant_token`=?, `id_token`=?, `idf_token`=?,`estado`=?,`obs`=?  WHERE iddespacho = ?",
-            [idof, token, token2, tokenid, tokenidf, input.estado, input.obs, input.idgdd], function(err, producciones){
+        query += 'ELSE despachados END where idpedido > 0';
+        query2 += 'ELSE stock END where idmaterial > 0';
+        connection.query("UPDATE gd SET `last_mod` = CURRENT_TIMESTAMP,`estado`=?,`obs`=?,`idcliente` = ?  WHERE idgd = ?",
+            [input.estado, input.obs,input.idcliente, input.idgdd], function(err, producciones){
             if(err){
                 console.log("Error Selecting : %s", err);
                 res.send("Error");
-            }
-            else{
-                if(input.estado != "Blanco"){
+            } else {
+                if(input.estado != "Blanco" && req.session.arraydespacho.length){
                     console.log("No es blanco!");
-                    for(var j=0; j < query.length; j++){
-                        connection.query(query[j], function(err, rows){
+                    connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?",[d_list],function(err,rows){
+                        if(err){
+                            console.log("Error Selecting : %s", err);
+                        }
+                        connection.query(query2, function(err, rows){
                             if(err){
                                 console.log("Error Selecting : %s", err);
                             }
-                        });
+                            if(input.estado == 'Venta'){
+                                connection.query(query, function(err, rows){
+                                    if(err){
+                                        console.log("Error Selecting : %s", err);
+                                    }
+                                    req.session.arraydespacho = [];
+                                    res.redirect('/bodega/crear_gdd');
+                                });
+                            } else {
+                                req.session.arraydespacho = [];
+                                res.redirect('/bodega/crear_gdd');
 
-                    }
-                }
-                else{
+                            }
+                        });
+                    });
+                } else{
                     console.log("es blanco!");
+                    req.session.arraydespacho = [];
+                    res.redirect('/bodega/crear_gdd');
                 }
-                req.session.arraydespacho = [];
-                res.redirect('/bodega/view_despachos');
             }
         });
     });
@@ -839,56 +871,24 @@ router.post('/activar_gdd', function(req,res,next){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
         req.getConnection(function(err, connection){
-            connection.query("SELECT * FROM despacho WHERE iddespacho = ?", [input.id], function(err, desp){
+            connection.query("SELECT * FROM gd WHERE idgd = ?", [input.id], function(err, desp){
                 if(err){console.log("Error Selecting : %s", err);}
                 desp = desp[0];
                 connection.query("SELECT * FROM cliente", function(err, cli){
                     if(err){console.log("Error Selecting : %s", err);}
                     // console.log(desp);
-                    if(desp.mat_token != ''){
-                        desp.mat_token = desp.mat_token.split('@@');
-                        desp.id_token = desp.id_token.split('@');
-                        desp.idf_token = desp.idf_token.split('@');
-                        desp.cant_token = desp.cant_token.split(',');
-                        // console.log(desp);
-                        connection.query("SELECT odc.* FROM pedido LEFT JOIN odc ON odc.idodc=pedido.idodc WHERE pedido.idpedido = ?", [desp.idf_token[0]],
-                            function(err, odc){
-                                if(err){console.log("Error Selecting : %s", err);}
-                                connection.query("select pedido.idpedido as idfabricaciones,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
-                                    +"odc.numoc as numordenfabricacion, aleacion.nom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                                    +" left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion"
-                                    +" left join aleacion on aleacion.idaleacion=subaleacion.idaleacion where pedido.despachados!=pedido.cantidad AND pedido.idodc="+odc[0].idodc+" group by pedido.idpedido order by pedido.f_entrega asc",
-                                    function(err, rows){
-                                        if(err)
-                                            console.log("Error Selecting :%s", err);
-
-                                        console.log(rows);
-                                        req.session.arraydespacho = [];
-                                        console.log("HOLADAHDOAJDOAJ");
-                                        res.render('bodega/g_despacho', {data: rows, num: desp.iddespacho, blanco: 1, cli:cli});
-                                        //res.render('jefeprod/ordenes_produccion', {data: rows});
-
-                                });
-
-
-                            });
-
-                    }
-                    else{
-                        connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,pedido.idpedido as idfabricaciones,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
-                                    +" odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                                    +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
-                                    +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
-                                    +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by pedido.f_entrega asc",
-                                    function(err, rows){
-                                        if(err)
-                                            console.log("Error Selecting :%s", err);
-
-                                        console.log(rows);
-                                        req.session.arraydespacho = [];
-                                        res.render('bodega/g_despacho', {data: rows, num: desp.iddespacho, blanco: 1, cli: cli});
-                                });
-                    }
+                    connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,pedido.idpedido as idfabricaciones,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                                +" odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
+                                +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
+                                +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
+                                +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by pedido.f_entrega asc",
+                                function(err, rows){
+                                    if(err)
+                                        console.log("Error Selecting :%s", err);
+                                    //console.log(rows);
+                                    req.session.arraydespacho = [];
+                                    res.render('bodega/g_despacho', {data: rows, num: desp.idgd, blanco: 1, cli: cli});
+                    });
                 });
 
             }); 
