@@ -1350,7 +1350,6 @@ router.get('/convert_despachos', function(req, res, next){
                desp[a].cant_token = desp[a].cant_token.split(',');
                desp[a].idf_token = desp[a].idf_token.split('@');
                gds.push([desp[a].iddespacho, desp[a].estado, desp[a].fecha, desp[a].last_mod, desp[a].obs]);
-               console.log(desp[a].iddespacho);
                //Si esta anulada, solo agregar gd pero no despachos.
                if(desp[a].estado != 'Anulado'){
                    for(var b=0; b < desp[a].cant_token.length; b++){
@@ -1363,8 +1362,6 @@ router.get('/convert_despachos', function(req, res, next){
                        if(isNaN(parseInt(desp[a].cant_token[b]))){
                            desp[a].cant_token[b] = '0';
                        }
-                       console.log(desp[a].idf_token[b]);
-                       console.log(despachos[b]);
                        despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].cant_token[b])]);
                    }
                }
@@ -1372,7 +1369,6 @@ router.get('/convert_despachos', function(req, res, next){
            connection.query("INSERT INTO gd (idgd, estado, fecha, last_mod, obs) VALUES ?", [gds],function(err, inGD){
                if(err) throw err;
                console.log(inGD);
-               console.log(despachos);
                connection.query("INSERT INTO despachos (idgd, idmaterial, cantidad) VALUES ?", [despachos],function(err, inDesp){
                    if(err) throw err;
                    console.log(inDesp);
