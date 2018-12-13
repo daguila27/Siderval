@@ -348,6 +348,9 @@ router.post('/save_gdd', function(req, res, next){
     var tokenidf = "";
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input);
+    if(input.estado == "Blanco"){
+        input.idcliente = 0;
+    }
     var boolinsumo = input.insu;
     var ope;
     var ope2;
