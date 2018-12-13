@@ -347,6 +347,7 @@ router.post('/save_gdd', function(req, res, next){
     var tokenid = "";
     var tokenidf = "";
     var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input);
     var boolinsumo = input.insu;
     var ope;
     var ope2;
@@ -389,9 +390,9 @@ router.post('/save_gdd', function(req, res, next){
         var idof;
         if(req.session.arraydespacho.length==0){idof=0;}
         else{idof=req.session.arraydespacho[0].idof;}
-        arrayDBP.push([new Date().toLocaleString(),idof,token,token2,tokenid,tokenidf, input.estado,input.obs]);
+        arrayDBP.push([new Date().toLocaleString(),idof,token,token2,tokenid,tokenidf, input.estado,input.obs, input.idcliente]);
 		query = query.split('@');
-		connection.query("INSERT INTO despacho (`fecha`, `idorden_f`,`mat_token`,`cant_token`, `id_token`, `idf_token`,`estado`,`obs`) VALUES ?", [arrayDBP], function(err, producciones){
+		connection.query("INSERT INTO despacho (`fecha`, `idorden_f`,`mat_token`,`cant_token`, `id_token`, `idf_token`,`estado`, `obs`, `idcliente`) VALUES ?", [arrayDBP], function(err, producciones){
 			if(err){
 				console.log("Error Selecting : %s", err);
 				res.send("Error");

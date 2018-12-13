@@ -45,7 +45,7 @@ function letraMayus(string) {
 
                     <label style="width: 30%">
                         Cliente: 
-                        <select name="cliente_gd" class="form-control">
+                        <select name="cliente_gd" class="form-control" id="cliente_gd">
                             <%for(var w=0; w < cli.length; w++){%>
                                 <option value="<%= cli[w].idcliente%>" id="cli<%= cli[w].idcliente%>"><%= cli[w].sigla%> - <%= cli[w].razon%></option>
                             <%}%>
@@ -74,7 +74,6 @@ function letraMayus(string) {
             </table>
             <div class="panel-footer" style="display: flex;">
                 <div class="form-inline divSelect" style="margin-left: 70%;">
-
                     <select name="estado" id="estadoselect" class="form-control">
                         <option value="Venta" class="notT">Venta</option>
                         <option value="Traslado">Traslado</option>
@@ -82,7 +81,6 @@ function letraMayus(string) {
                         <option value="Otro" class="notT">Otro</option>
                         <option value="Blanco" class="notT">Blanco</option>
                     </select>
-
                     <button type="button" class="btn btn-info" data-target="#gddobs" data-toggle="collapse">+ <i class="fa fa-comment"></i></button>
                     <button class="btn btn-success" type="submit">+ Crear</button>
                 </div>
@@ -375,7 +373,8 @@ function letraMayus(string) {
                 data: {
                     list: aux,
                     estado: est,
-                    obs:$("#gddobs .form-control").val()
+                    obs:$("#gddobs .form-control").val(),
+                    idcliente: $("#cliente_gd").val()
                 },
                 url: 'bodega/save_gdd',
                 success: function(data){
