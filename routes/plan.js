@@ -224,7 +224,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         }
         orden = orden.replace('-', ' ');
         var where = " ";
-        if(input.pendientes == 'off'){
+        if(input.pendientes == 'true'){
             condiciones_where.push("pedido.externo = '0'");
             condiciones_where.push("fabricaciones.restantes>0");
             //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
