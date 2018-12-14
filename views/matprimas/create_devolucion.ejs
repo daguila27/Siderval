@@ -106,7 +106,7 @@
     function add_session(idmaterial,stock,u_medida){
         var string_idm = idmaterial.toString();
         $("#tabla_session").append("<tr id='sess" + string_idm +"'>" + $("#row" + string_idm).html()
-            + "<td><input type='number' class='material-form form-control' min='1' max='" + stock + "' data-idmaterial='" + string_idm + "'></td><td>" + u_medida + "</td></tr>");
+            + "<td><input type='number' class='material-form form-control' min='1' data-idmaterial='" + string_idm + "'></td><td>" + u_medida + "</td></tr>");
         $("#sess" + string_idm + " > td > .selector").attr("onclick","drop_session(" + string_idm + ")");
         $("#sess" + string_idm + " > td > .selector > i").attr("class","fa fa-remove");
         $("#row" + idmaterial.toString()).addClass("hidden");
