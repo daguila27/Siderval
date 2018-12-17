@@ -1,4 +1,6 @@
 <h1 class="page-header">Registrar Recepción de materiales</h1>
+
+<!--
 <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -18,51 +20,94 @@
                     No se ha seleccionado ninguna OC
                 </div>
             </form>
-        </div>
-    </div>
-    <script type="text/javascript">
-        //Formulario de Búsqueda
-        $("#oda_form").submit(function(e){
-            e.preventDefault();
-            $.ajax({
-                url: "/matprimas/search_oca",
-                data: { numoda: $("#oda_input").val()},
-                type: "POST",
-                success: function(data){
-                    if(!data.err){
-                        $("#oda_gdd").html(data.html);
-                    } else alert(data.err_msg);
-                }
-            })
-        });
-        //Formulario de Recepcion
-        $("#gdd_form").submit(function(e){
-            e.preventDefault();
-            var detalle = [];
-            $("#confirmar_gdd").modal("toggle");
-            //revisar todos los inputs de la tabla
-            $("input[name = 'rec']").each(function(e){
-                //Agregar a la lista sólo los inputs que sean distintos de cero.
-                if($(this).val() != 0){
-                    detalle.push([$(this).data('idabast'),$(this).val(),$(this).data('idmat')]);
-                }
-            });
 
-            //Enviar Ajax
-            $.ajax({
-                type: 'post',
-                url: "/matprimas/save_recepcion",
-                data: {
-                    numgdd: $("input[name = 'numgdd']").val(),
-                    detalle: detalle
-                },
-                success: function(data){
-                    if(!data.err){
-                        alert("Guía guardada correctamente");
-                        $("#page-wrapper").html(data);
-                    } else alert(data.err_msg);
-                }
-            });
-        });
-    </script>
+        </div>
+   </div>
+-->
+
+<div class="container-fluid">
+    <table id="odaTable" class="cell-border compact stripe">
+        <thead>
+        <tr>
+            <td>ID ODA</td>
+            <td>Detalle Mat.</td>
+            <td>Stock Mat.</td>
+            <td>Pedidos</td>
+            <td>Recibidos</td>
+            <td>Costo</td>
+            <td>Exento</td>
+            <td>Facturado</td>
+        </tr>
+        </thead>
+
+        <tbody>
+        <%for (var i = 0; i < abast.length; i++){ %>
+        <tr>
+            <td><%=abast[i]['idoda']%></td>
+            <td><%=abast[i]['detalle']%></td>
+            <td><%=abast[i]['stock']%></td>
+            <td><%=abast[i]['cantidad']%></td>
+            <td><%=abast[i]['recibidos']%></td>
+            <td><%=abast[i]['costo']%></td>
+            <td><%=abast[i]['exento']%></td>
+            <td><%=abast[i]['facturado']%></td>
+        </tr>
+
+        <%}%>
+        </tbody>
+    </table>
 </div>
+
+<script type="text/javascript">
+    //Ejecutar la DataTable
+    $(document).ready( function () {
+        $('#odaTable').DataTable({
+            lengthChange: false,
+            pageLength: 25
+        });
+    } );
+
+    //Formulario de Búsqueda
+    $("#oda_form").submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            url: "/matprimas/search_oca",
+            data: { numoda: $("#oda_input").val()},
+            type: "POST",
+            success: function(data){
+                if(!data.err){
+                    $("#oda_gdd").html(data.html);
+                } else alert(data.err_msg);
+            }
+        })
+    });
+    //Formulario de Recepcion
+    $("#gdd_form").submit(function(e){
+        e.preventDefault();
+        var detalle = [];
+        $("#confirmar_gdd").modal("toggle");
+        //revisar todos los inputs de la tabla
+        $("input[name = 'rec']").each(function(e){
+            //Agregar a la lista sólo los inputs que sean distintos de cero.
+            if($(this).val() != 0){
+                detalle.push([$(this).data('idabast'),$(this).val(),$(this).data('idmat')]);
+            }
+        });
+
+        //Enviar Ajax
+        $.ajax({
+            type: 'post',
+            url: "/matprimas/save_recepcion",
+            data: {
+                numgdd: $("input[name = 'numgdd']").val(),
+                detalle: detalle
+            },
+            success: function(data){
+                if(!data.err){
+                    alert("Guía guardada correctamente");
+                    $("#page-wrapper").html(data);
+                } else alert(data.err_msg);
+            }
+        });
+    });
+</script>

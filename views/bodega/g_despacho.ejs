@@ -364,9 +364,11 @@ function letraMayus(string) {
         var conf = true;
         var est = $("#estadoselect").val();
         if(aux.length == 0){
-            conf = confirm("¿Esta seguro que desea crear la gdd en blanco?");
+            conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
             est = "Blanco";
-        } 
+        } else {
+            conf = confirm("¿Esta seguro que desea crear esta GDD?")
+        }
         if(conf){
             $.ajax({
                 type: 'POST',
