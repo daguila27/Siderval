@@ -10,9 +10,10 @@
 			<tr>
 				<th class="o_column_sortable">Número de GD</th>
 				<th class="o_column_sortable">Cliente</th>
+				<th class="o_column_sortable">Descripción</th>
+				<th class="o_column_sortable">Cantidad</th>
 				<th class="o_column_sortable">Observación</th>
 				<th class="o_column_sortable" style="text-align: center;" data-order="gd.fecha-DESC">Fecha de Despacho</th>
-				<th class="o_column_sortable">Tipo</th>
 				<th class="o_column_sortable">Tipo</th>
 				<th class="o_column_sortable" style="width:80px" >Accion</th>
 			</tr>
@@ -23,10 +24,11 @@
 			<tr class="o_data_row" onclick="" data-idodc="">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" ><%=desp[i].idgd%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=desp[i].detalle%></td>
+				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].cantidad_despachada%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].estado%></td>
-				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].total_desp%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 					<%if(desp[i].estado != 'Anulado'){%>
 						<div id="btns<%=desp[i].idgd%>">
