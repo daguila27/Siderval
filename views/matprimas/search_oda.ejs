@@ -1,7 +1,5 @@
 <h1 class="page-header">Registrar Recepción de materiales</h1>
-
-<!--
-<div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+<div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1" id="panel_odaform">
     <div class="panel panel-default">
         <div class="panel-heading">
             Buscar OC
@@ -23,10 +21,9 @@
 
         </div>
    </div>
--->
-
-<div class="container-fluid">
-    <table id="odaTable" class="cell-border compact stripe">
+</div>
+<div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1">
+    <table id="odaTable" class="table table-responsive">
         <thead>
         <tr>
             <td>ID ODA</td>
@@ -34,9 +31,8 @@
             <td>Stock Mat.</td>
             <td>Pedidos</td>
             <td>Recibidos</td>
-            <td>Costo</td>
-            <td>Exento</td>
-            <td>Facturado</td>
+            <td></td>
+            <td></td>
         </tr>
         </thead>
 
@@ -48,11 +44,8 @@
             <td><%=abast[i]['stock']%></td>
             <td><%=abast[i]['cantidad']%></td>
             <td><%=abast[i]['recibidos']%></td>
-            <td><%=abast[i]['costo']%></td>
-            <td><%=abast[i]['exento']%></td>
-            <td><%=abast[i]['facturado']%></td>
+            <td><a class="btn btn-primary" onclick="send_search(<%=abast[i].idoda%>)"><i class="fa fa-plus"></i></a></td>
         </tr>
-
         <%}%>
         </tbody>
     </table>
@@ -61,12 +54,19 @@
 <script type="text/javascript">
     //Ejecutar la DataTable
     $(document).ready( function () {
-        $('#odaTable').DataTable({
-            lengthChange: false,
-            pageLength: 25
-        });
+        setDataTable("#odaTable");
     } );
-
+    function goToByScroll(id) {
+        // Scroll
+        $('html,#page-wrapper').animate({
+            scrollTop: $("#" + id).offset().top
+        }, 'slow');
+    }
+    function send_search(numero){
+        $("#oda_input").val(numero);
+        $("#oda_form button").trigger("click");
+        goToByScroll("panel_odaform");
+    }
     //Formulario de Búsqueda
     $("#oda_form").submit(function(e){
         e.preventDefault();
@@ -81,6 +81,7 @@
             }
         })
     });
+
     //Formulario de Recepcion
     $("#gdd_form").submit(function(e){
         e.preventDefault();
