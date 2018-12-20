@@ -276,6 +276,13 @@ router.post('/data_bom', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
+        var adjuntar;
+        if(input.addOCA){
+        	adjuntar = input.addOCA;
+		}
+		else{
+			adjuntar = false;
+		}
         req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
@@ -287,20 +294,18 @@ router.post('/data_bom', function(req, res, next) {
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
-								console.log(semi);
-								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab});
+								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
 				});
 			}
 			else{
-				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
+				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
 							+"mat2 on mat2.idmaterial=bom.idmaterial_slave where material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
-								console.log(semi);
-								res.render('abast/bom_mat_uni', {data: [], semi: semi});
+								res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
 				});
 			}
 
@@ -519,9 +524,7 @@ router.get('/stock_matp', function(req, res, next) {
 router.post('/buscar_matp', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         list_input = input.det.split(' ');
-        console.log(list_input.length);
         input.det = "WHERE ";
         //var wher = "WHERE (material.tipo = 'I' OR material.tipo='M') AND material.detalle LIKE ?";
         for (var i = 0; i < list_input.length; i++){
@@ -533,7 +536,6 @@ router.post('/buscar_matp', function(req, res, next){
         if(input.prod == 'false'){
         	input.det += " AND material.tipo != 'P'";
         }
-		console.log(input.det);
         req.getConnection(function(err,connection){
             connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
@@ -542,7 +544,6 @@ router.post('/buscar_matp', function(req, res, next){
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
-                console.log(rows);
                 /*console.log("SELECT material.*,caracteristica.cnom,producido.pdf,aleacion.nom,producido.idproducto as idprod,subaleacion.subnom FROM material LEFT JOIN producido ON material.idmaterial = producido.idmaterial" +
                 " LEFT JOIN subaleacion ON subaleacion.idsubaleacion = producido.idsubaleacion LEFT JOIN aleacion ON subaleacion.idaleacion = aleacion.idaleacion" +
                 " LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " + wher + " GROUP BY producido.idproducto");*/
@@ -3056,5 +3057,19 @@ router.get('/get_guiaAbast/:idgd', function(req, res, next) {
 });
 
 
+router.get('/visualizar_ofs', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+        connection.query("SELECT " +
+			"material.*,ordenfabricacion.*, pedido.externo, fabricaciones.* " +
+			"FROM fabricaciones " +
+			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
+			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
+			"left join material on material.idmaterial=fabricaciones.idmaterial", function (err, ofs) {
+            if (err) console.log('We got an error! - '+err);
+            res.render('abast/visualizar_ofs', {of: ofs});
+        });
+    });
+});
 
 module.exports = router;

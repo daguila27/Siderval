@@ -47,8 +47,12 @@ function numberFormat(numero){
                         <th>Cantidad</th>
                         <th>Costo</th>
                         <th>Stock</th>
-						<th>Stock Aviso</th>
-						<th>Stock Crítico</th>
+						<%if(add){%>
+							<th>Adjuntar</th>
+						<%}else{%>
+							<th>Stock Aviso</th>
+							<th>Stock Crítico</th>
+						<%}%>
                     </tr>
                     </thead>
                     <tbody>
@@ -62,6 +66,7 @@ function numberFormat(numero){
 						semi[0].si_token = semi[0].si_token.split('@');
 						semi[0].p_token = semi[0].p_token.split('@');
 						semi[0].u_token = semi[0].u_token.split('@');
+						semi[0].idm_token = semi[0].idm_token.split('@');
 						for(var n=0; n < semi[0].d_token.length; n++){
 							if(parseInt(semi[0].s_token[n]) <= parseInt(semi[0].sc_token[n])){
 								clase = 'danger';
@@ -77,12 +82,16 @@ function numberFormat(numero){
 								<td><%= trunc(semi[0].c_token[n], 2)%> <%= semi[0].u_token[n]%></td>
 								<td>$<%= numberFormat(semi[0].p_token[n])%></td>
 								<td><%= numberFormat(semi[0].s_token[n])%></td>
-								<%if(semi[0].si_token[n] == '0'){%>
-									<td>-</td>
-									<td>-</td>
+								<%if(add){%>
+									<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= semi[0].idm_token[n]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
 								<%}else{%>
-									<td><%= numberFormat(semi[0].si_token[n])%></td>
-									<td><%= semi[0].sc_token[n].toLocaleString()%></td>
+									<%if(semi[0].si_token[n] == '0'){%>
+										<td>-</td>
+										<td>-</td>
+									<%}else{%>
+										<td><%= numberFormat(semi[0].si_token[n])%></td>
+										<td><%= semi[0].sc_token[n].toLocaleString()%></td>
+									<%}%>
 								<%}%>
 						</tr>
 
