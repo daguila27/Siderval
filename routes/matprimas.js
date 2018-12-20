@@ -122,9 +122,21 @@ router.post("/save_movimiento",function(req,res,next){
 * */
 router.get("/busq_oda",function(req,res,next){
     if(req.session.userData){
-        res.render("matprimas/search_oda");
-    } else res.redirect("/bad_login");
+        req.getConnection(function (err,connection) {
+           if (err) {console.log('We got a problem dude');}
+           else {
+               connection.query('SELECT abastecimiento.*, material.detalle, material.stock FROM abastecimiento '+
+                   'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE cantidad != recibidos',
+                   function(err, abast) {
+                   console.log(abast);
+                   res.render("matprimas/search_oda", {abast: abast});
+               });
+           }
+        });
+
+    } else {res.redirect("/bad_login");}
 });
+
 /*
 * CONTROLADOR QUE ENVÍA VISTA PARA RECEPCIÓN DE OCA
 * */

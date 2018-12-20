@@ -3056,6 +3056,17 @@ router.get('/get_guiaAbast/:idgd', function(req, res, next) {
     });
 });
 
+router.post('/new_cliente/', function (req, res, next) {
+    var input = JSON.parse(JSON.stringify(req.body));
+	req.getConnection(function (err, connection) {
+		connection.query("INSERT INTO cliente SET ?", input, function (err, cliente) {
+			if (err) console.log("Error en la query cliente");
+            res.send("Se inserto nuevo cliente");
+        })
+
+    });
+});
+
 
 router.get('/visualizar_ofs', function(req, res, next) {
     req.getConnection(function(err, connection) {
