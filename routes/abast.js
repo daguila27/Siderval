@@ -3076,7 +3076,7 @@ router.get('/visualizar_ofs', function(req, res, next) {
 			"FROM fabricaciones " +
 			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
 			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
-			"left join material on material.idmaterial=fabricaciones.idmaterial", function (err, ofs) {
+			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0", function (err, ofs) {
             if (err) console.log('We got an error! - '+err);
             res.render('abast/visualizar_ofs', {of: ofs});
         });
