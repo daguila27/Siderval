@@ -54,7 +54,10 @@
 			text-align: center;
 		}
 
-
+		  .columna{
+			  float: left;
+			  width: 70px;
+		  }
 
 		.tabla tfoot{
 			border: 1px solid;
@@ -123,15 +126,16 @@
 
 		</div>
 		<div class='bodyss' style="font-size: 15px;font-weight: 600">
-			<div class='info' style="float: left">
+			<div class='info' style="float: left;margin-bottom: 10px">
 				<!-- Nombre y fecha -->
 				<div style="float: left;width: 100%">
+					<div style="float: left;">
+						<div class="columna">NOMBRE:</div>
+						<div style="float: left;font-weight: 400;margin-left: 10%"  class="columna2"><%= oda[0].razon%></div>
+					</div>
 					<div style="float: right;">
                         <% switch(tipo){
 							case 'oda':
-								var fecha_doc = new Date(oda[0].creacion);
-								break;
-							case 'of':
 								var fecha_doc = new Date(oda[0].creacion);
 								break;
 							case 'factura':
@@ -141,9 +145,25 @@
 								var fecha_doc = new Date();
 								break;
 						}%>
-						Fecha de Creación: <%= fecha_doc.getDate();%>/<%= parseInt(fecha_doc.getMonth()) + 1;%>/<%= fecha_doc.getFullYear();%>
+						Valparaíso, <%= fecha_doc.getDate();%>/<%= parseInt(fecha_doc.getMonth()) + 1;%>/<%= fecha_doc.getFullYear();%>
 					</div>
 				</div>
+				<!-- Rut y Ciudad-->
+				<div style='width: 100%;float: left'>
+					<div style='width: 60%;float:left;'><div class="columna">RUT: </div><div  class="columna2" style="float: left;font-weight: 400;"><%= oda[0].rut%></div></div>
+					<div style='width: 38%;float:left;'>CIUDAD: <div style="font-weight: 400;"><%=oda[0].ciudad%></div></div>
+				</div>
+				<!-- Direccion -->
+				<div style="float:left;">
+					<div class="columna">DIRECCION:</div>
+					<div  class="columna2" style="float: left;font-weight: 400;margin-left:10%;"><%= oda[0].direccion%></div>
+				</div>
+				<!-- AT y FONO -->
+				<div style='width: 100%;float: left' >
+					<div style='width: 60%;float:left;'><div class="columna">AT:</div> <div class="columna2" style="float: left;margin-left:15px;font-weight: 400;"><%= oda[0].contacto%></div></div>
+					<div style='width: 38%;float:left;'>FONO: <div style="font-weight: 400;"><%=oda[0].telefono%></div></div>
+				</div>
+				<div style="float: left;"><div class="columna">GIRO: </div> <div  class="columna2" style="float: left;font-weight: 400;"><%= oda[0].giro%></div></div>
 			</div>
 			<table style='width: 100%; font-size: 15px;font-weight: 700;' class='tabla' cellspacing="3">
                 <thead>
