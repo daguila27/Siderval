@@ -100,12 +100,12 @@
         %>
 	<body>
 		<div class='headerss' style="width: 100%; margin-bottom: 20px;float: left;">
-				<img style='width: 30%; margin: 0;float:left;' src='/assets/img/logo.png'>
-				<p style='text-align: center; width: 40%; font-size: 15px;margin:0;float:left;font-weight: 200;'>
+				<img style='width: 35%; margin: 0;float:left;' src='/assets/img/logo.png'>
+				<p style='text-align: center; width: 30%; font-size: 15px;margin:0;float:left;font-weight: 200;'>
 					Fundición y Maestranza<br> Calle Décima - Parcela N° 474 <br> Placilla - Valparaíso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
 				</p>
 				<!-- Se setea el numero de documento -->
-				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 30%;float:left; text-align: center;font-weight: 500; font-size: 25px'>
+				<p style='padding: 0% 10%; padding-top: 2%;margin: 0;width: 35%;float:left; text-align: center;font-weight: 500; font-size: 20px'>
 				<% switch(tipo){
 					case 'oda':%>
 					Orden de Compra <br> <b>N° <%=oda[0].idoda%> </b>
@@ -114,7 +114,7 @@
 					Factura<br> <b>N° <%=oda[0].numfactura%> </b>
 				<% break;
 					case 'of':%>
-					Orden de Fabricación<br> <b>N° <%=oda[0].numordenfabricacion%> </b>
+					Orden de Fabricación <br> <b>N° <%=oda[0].numordenfabricacion%></b>
 				<% break;
 					default:%>
 
@@ -145,11 +145,12 @@
 					</div>
 				</div>
 			</div>
+			<div style="width: 100%; height: 20px; float: left"></div>
 			<table style='width: 100%; font-size: 15px;font-weight: 700;' class='tabla' cellspacing="3">
                 <thead>
                 <tr class='cab_table'>
-                	<th style='width: 15%;text-align: center;'>Cantidad</th>
                 	<th style='width: 45%;text-align: center;'>Descripción</th>
+					<th style='width: 15%;text-align: center;'>Cantidad</th>
 					<th style='width: 20%;text-align: center;'>Forma de fabricación</th>
 					<th style='width: 20%;text-align: center;'>Fecha Entrega</th>
                 </tr>
@@ -159,16 +160,16 @@
                 for(var t=0; t < mats.length; t++){%>
 		                <tr>
 						<% if(mats[t]){ %>
+							<td style="text-align: right;"><span style="float:left"><%= mats[t].detalle%></span></td>
 							<%if(mats[t].cantidad.toLocaleString().split('.').length > 1){%>
 								<td><%= mats[t].cantidad.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].cantidad.toLocaleString().split('.')[1] %></td>
 							<%}else{%>
 								<td><%= mats[t].cantidad.toLocaleString().split('.')[0].split(',').join('.') %></td>
 							<%}%>
-							<td style="text-align: right;"><span style="float:left"><%= mats[t].detalle%></span></td>
-							<% if(mats[t]){%>
-							<td>Externo</td>
-							<%} else {%>
-							<td>Interno</td>
+							<%if(mats[t].exento){%>
+								<td>Externo</td>
+							<%}else{%>
+								<td>Interno</td>
 							<%}%>
 							<td><%= mats[t].f_entrega%></td>
 						<%}else{%>
@@ -183,7 +184,13 @@
                 </tbody>
             </table>
             <div class='firma' style='width: 100%; padding-left: 75%; padding-top: 2%'>
-            	<img style='width: 100%' src='/assets/img/firma.png'>
+				<% switch(tipo){
+					case 'of':
+						break;
+					default:%>
+						<img style='width: 100%' src='/assets/img/firma.png'>
+						<%break;
+				}%>
             </div>
 		</div>
 	</body>
