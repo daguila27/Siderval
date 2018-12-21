@@ -41,7 +41,10 @@
                     <td style="text-align: center">Interna</td>
                 <%}%>
                 <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" onclick="renderBOM(this)"><i class="fa fa-eye"></i></button></td>
-                <td style="text-align: center"><button class="btn btn-xs btn-danger" data-idmat="<%= of[e].idmaterial%>"><i class="fa fa-remove"></i></button></td>
+                <td style="text-align: center" class="btn-group">
+                    <button class="btn btn-xs btn-success" onclick="obtener_pdf(<%= of[e].idordenfabricacion%>)"><i class="fa fa-file-pdf-o"></i></button>
+                    <button class="btn btn-xs btn-danger" data-idmat="<%= of[e].idmaterial%>"><i class="fa fa-remove"></i></button>
+                </td>
             </tr>
         <%}%>
         </tbody>
@@ -103,7 +106,15 @@
         });
     });
 
-
+    function obtener_pdf(idof){
+        $.ajax({
+            type: 'get',
+            url: '/plan/view_ofpdf/' + idof.toString(),
+            success: function(data){
+                window.open(data,'_blank');
+            }
+        })
+    }
     function renderBOM(yo){
        $.ajax({
            type: 'POST',
