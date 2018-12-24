@@ -482,7 +482,7 @@ router.get('/stock_matp', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			connection.query("select material.idmaterial as idmatpri, detalle"
 				+" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
-				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor where tipo = 'I' or tipo= 'M' or tipo= 'O' or tipo= 'C'",
+				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor where tipo = 'I' or tipo= 'M' or tipo= 'O' or tipo= 'C' or tipo= 'X'",
 				 function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);
@@ -3073,7 +3073,7 @@ router.get('/visualizar_ofs', function(req, res, next) {
 			"FROM fabricaciones " +
 			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
 			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
-			"left join material on material.idmaterial=fabricaciones.idmaterial", function (err, ofs) {
+			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0", function (err, ofs) {
             if (err) console.log('We got an error! - '+err);
             res.render('abast/visualizar_ofs', {of: ofs});
         });

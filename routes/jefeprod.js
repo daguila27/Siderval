@@ -403,6 +403,14 @@ router.post('/lanzar_op_fill', function(req, res, next){
         if(input.detalle != ''){
             where += " OR internalquery.detalle = '"+input.detalle+"' OR concat(repeat('0', abs(6 - length(internalquery.idordenfabricacion)) ),internalquery.idordenfabricacion ) = '"+input.detalle+"' OR internalquery.subnom = '"+input.detalle+"' OR internalquery.f_entrega = '"+input.detalle+"' OR internalquery.cantidad = '"+input.detalle+"'";
         }
+        var query = "select * from (select fabricaciones.*,ordenfabricacion.idordenfabricacion, ordenfabricacion.numordenfabricacion,aleacion.nom as anom,coalesce(subaleacion.subnom,'Sin') as subnom , material.detalle from fabricaciones "
+            + "left join ordenfabricacion on (ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f)"
+            + " left join material on (material.idmaterial=fabricaciones.idmaterial)"
+            + " left join producido on (fabricaciones.idproducto=producido.idproducto)"+
+            " left join subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
+            " left join aleacion ON aleacion.idaleacion = subaleacion.idsubaleacion left join pedido on pedido.idpedido = fabricaciones.idpedido WHERE fabricaciones.restantes > 0 and coalesce(pedido.externo, false) = false AND fabricaciones.lock = false"
+            + " GROUP BY fabricaciones.idfabricaciones ORDER BY "+input.fill+" "+input.orden+") as internalquery "+where;
+        console.log(query);
         req.getConnection(function(err, connection){
             connection.query("select * from (select fabricaciones.*,ordenfabricacion.idordenfabricacion, ordenfabricacion.numordenfabricacion,aleacion.nom as anom,coalesce(subaleacion.subnom,'Sin') as subnom , material.detalle from fabricaciones "
                 + "left join ordenfabricacion on (ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f)"
@@ -611,7 +619,8 @@ router.post('/search_op', function(req, res, next){
 router.post('/add_produccion', function(req, res, next){
 	var input = JSON.parse(JSON.stringify(req.body));
 	req.session.arrayProduccion.push([input.idfabricaciones,input.detalle,input.restantes,input.ruta]);
-	res.render('jefeprod/session_stream',{data:req.session.arrayProduccion});
+	input.cantidades[input.cantidades.length] = 0;
+	res.render('jefeprod/session_stream',{data:req.session.arrayProduccion, cants: input.cantidades});
 });
 
 router.post('/lista_materiales', function(req, res, next){
@@ -672,14 +681,17 @@ router.post('/lista_materiales', function(req, res, next){
 });
 
 router.post('/del_produccion', function(req, res, next){
-    var idf = JSON.parse(JSON.stringify(req.body)).idf;
+    var input = JSON.parse(JSON.stringify(req.body));
+    var idf = input.idf;
+    var cants = input["cantidades[]"];
     for(var t=0; t < req.session.arrayProduccion.length; t++){
        if(req.session.arrayProduccion[t][0] == idf){
         req.session.arrayProduccion.splice(t,1);
+        cants.splice(t,1);
        } 
     }
     //req.session.arrayProduccion.push([input.idfabricaciones,input.detalle,input.restantes,input.ruta]);
-    res.render('jefeprod/session_stream',{data:req.session.arrayProduccion});
+    res.render('jefeprod/session_stream',{data:req.session.arrayProduccion, cants: cants});
 });
 
 router.post('/view_produccion', function(req, res, next){
