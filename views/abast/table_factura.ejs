@@ -75,6 +75,7 @@ function trunc (x, posiciones = 0) {
             <th style="text-align: left;">Precio Unidad</th>
               <th style="text-align: left;">Unidades Facturadas</th>
             <th>Moneda</th>
+              <th style="align-content: center;">Recepcionar</th>
           </tr>
         </thead>
         <tbody>
@@ -105,6 +106,7 @@ function trunc (x, posiciones = 0) {
               <%}}%>
               </select>
             </td>
+              <td><input type="checkbox" name="recepcion" data-maxrec="<%= oda[e].cantidad - oda[e].recibidos%>"></td>
           </tr>
           <%}
           }%>
@@ -132,3 +134,4 @@ function trunc (x, posiciones = 0) {
       <textarea style="width: 100%" type="textarea" class="form-control" name="comentario" placeholder="Ingresar comentario ..."></textarea>
     </div>
 </div>
+
