@@ -619,7 +619,8 @@ router.post('/search_op', function(req, res, next){
 router.post('/add_produccion', function(req, res, next){
 	var input = JSON.parse(JSON.stringify(req.body));
 	req.session.arrayProduccion.push([input.idfabricaciones,input.detalle,input.restantes,input.ruta]);
-	res.render('jefeprod/session_stream',{data:req.session.arrayProduccion});
+	input.cantidades[input.cantidades.length] = 0;
+	res.render('jefeprod/session_stream',{data:req.session.arrayProduccion, cants: input.cantidades});
 });
 
 router.post('/lista_materiales', function(req, res, next){
@@ -680,14 +681,17 @@ router.post('/lista_materiales', function(req, res, next){
 });
 
 router.post('/del_produccion', function(req, res, next){
-    var idf = JSON.parse(JSON.stringify(req.body)).idf;
+    var input = JSON.parse(JSON.stringify(req.body));
+    var idf = input.idf;
+    var cants = input["cantidades[]"];
     for(var t=0; t < req.session.arrayProduccion.length; t++){
        if(req.session.arrayProduccion[t][0] == idf){
         req.session.arrayProduccion.splice(t,1);
+        cants.splice(t,1);
        } 
     }
     //req.session.arrayProduccion.push([input.idfabricaciones,input.detalle,input.restantes,input.ruta]);
-    res.render('jefeprod/session_stream',{data:req.session.arrayProduccion});
+    res.render('jefeprod/session_stream',{data:req.session.arrayProduccion, cants: cants});
 });
 
 router.post('/view_produccion', function(req, res, next){
