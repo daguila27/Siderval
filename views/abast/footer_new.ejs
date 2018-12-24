@@ -105,7 +105,7 @@ However, delay the fade out process for 2.5 seconds */
               <div class="modal-body table-factura">
                 
               </div>
-              <div class="modal-footer"> 
+              <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Confirmar</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
               </div>
@@ -475,12 +475,12 @@ However, delay the fade out process for 2.5 seconds */
             'costo_unid': [],
             'cantidad': [],
             'moneda-factura': [],
-            'complete': '',
+            'recepcion': [],
+            'maxrec': [],
             'comentario': '',
             'fecha-facturacion': ''
         };
         
-        console.log(lista);
         for(var i =0; i < lista.length;i++){
             if(lista[i].name != 'numeroFactura' && lista[i].name != 'comentario' && lista[i].name != 'idoda' && lista[i].name != 'fecha-facturacion' && lista[i].name != 'complete'){
                 data[lista[i].name].push(lista[i].value);
@@ -488,16 +488,15 @@ However, delay the fade out process for 2.5 seconds */
                 data[lista[i].name] = lista[i].value;
             }
         }
-        data.complete = '';
+        data.recepcion = [];
         $("#factura-form input:checkbox").each(function(){
+            data.maxrec.push($(this).data('maxrec'));
             if($(this).is(':checked')){
-              data.complete += 'on@';
-            }
-            else{
-              data.complete += 'off@';  
+              data.recepcion.push(true);
+            } else {
+              data.recepcion.push(false);
             }
         });
-        data.complete = data.complete.substring(0, data.complete.length-1);
         if(confirm("¿Está seguro que desea crear la siguiente Factura?")){
             $.ajax({
               type: 'POST',
@@ -728,7 +727,6 @@ However, delay the fade out process for 2.5 seconds */
             $(".moneda").prop('type', 'float');
         }
    }
-
 
     function refreshAllCost(){
         var ex_iva = '';
