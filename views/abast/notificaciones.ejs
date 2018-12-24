@@ -4,20 +4,21 @@
             var hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];
             
             if(desc[0] == 'aoc'){%>
-            <li style="cursor: pointer;">
+            <li style="cursor: pointer; display: flex">
                 <a class="notificacion" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-idoc="<%= desc[1]%>">
                     <div>
-                            <strong>Creación de OC</strong>
-                            <span class="pull-right text-muted">
+                        <strong>Creación de OC</strong>
+                        <span class="pull-right text-muted">
                             <em><%= hora%></em>
                             </span>
-                    </div>                    
+                    </div>
                     <div>Es necesaria la creación de una nueva OC para Pedido # <%= notif[u].numoc%></div>
                 </a>
+                <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
             </li>
             <li class="divider"></li>
         <%}else{%>
-            <li style="cursor: pointer;">
+            <li style="cursor: pointer; display: flex;">
                 <a class="notificacion-of" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-idof="<%= desc[1]%>">
                     <div>
                             <strong>Nueva OF</strong>
@@ -27,6 +28,7 @@
                     </div>                    
                     <div>Se ha creado la OF # <%= desc[1].split('-')[0]%> - <%= desc[1].split('-')[1].substring(0,1).toUpperCase() + desc[1].split('-')[1].substring(1, desc[1].split('-')[1].length).toLowerCase()%></div>
                 </a>
+                <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
             </li>
             <li class="divider"></li>
         <%}
@@ -85,4 +87,14 @@
             }
         });
     });
+
+    function removeNotif(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/drop_notifof/'+$(yo).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    }
 </script>

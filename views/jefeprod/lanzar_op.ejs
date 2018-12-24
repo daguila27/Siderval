@@ -278,13 +278,18 @@ However, delay the fade out process for 2.5 seconds */
     });*/
     function sendtoQueue(yo){
             var idfabricaciones = $(yo).data('id');
+            var cant_array = [];
+            $(".valor_cant").each(function(){
+                cant_array.push($(this).val());
+            });
             $.ajax({
                     type: 'POST',
                     data: JSON.stringify({
                         idfabricaciones: idfabricaciones,
                         restantes: $(yo).data('restantes'),
                         detalle:$(yo).data('detalle'),
-                        ruta:$(yo).data('aleacion')
+                        ruta:$(yo).data('aleacion'),
+                        cantidades: cant_array
                     }),
                     contentType: 'application/json',
                     url: 'jefeprod/add_produccion',
@@ -337,64 +342,95 @@ However, delay the fade out process for 2.5 seconds */
         e.preventDefault();
     });
     $("#send_op").on('submit', function(e){
-            e.preventDefault();
-            if(comprobarItems()){    
-                var aux = [];
-                var aux2 = [];
-                var c = 0;
-                $("#send_op :input.form-control").each(function(e){
-                    if(c > 0){
-                        if(c%2!=0){     
-                            aux.push(this.value);
-                        }
-                        else{
-                            if(this.value == ""){
-                                aux2.push(null);
-                            }
-                            else{                    
-                                aux2.push(this.value);
-                            }
-                        }
-                    }
-                    c++;
-                });
-                console.log(aux);
-                console.log(aux2);
-                if(confirm("¿Está seguro que desea crear la OP?")){
-                    if(aux.length>0){
-                        $.ajax({
-                            type: 'POST',
-                            data: JSON.stringify({list: aux, dates: aux2}),
-                            contentType: 'application/json',
-                            url: 'jefeprod/save_op',
-                            success: function(data){  
-                                if(data == 'Error'){
-                                    alert("Ha ocurrido un error");
-                                }  
-                                else{
-
-                                    alert("Orden de producción creada. Desplegando Lista de Insumos.");
-                                    $(".aux_formulario").html("<form method='post' action='jefeprod/ficha_abastecimiento' target='_blank'><input type='hidden' name='idop' value='"+data+"'></form>");
-                                    $(".aux_formulario form").submit();
-                                    $.ajax({
-                                        type: 'GET',
-                                        url: 'jefeprod/crear_op',
-                                        success: function(data){
-                                            $("#page-wrapper").html(data);
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
+        e.preventDefault();
+        var aux = [];
+        var aux2 = [];
+        var c = 0;
+        $("#send_op :input.form-control").each(function(e){
+            if(c > 0){
+                if(c%2!=0){
+                    aux.push(this.value);
                 }
                 else{
+                    if(this.value == ""){
+                        aux2.push(null);
+                    }
+                    else{
+                        aux2.push(this.value);
+                    }
+                }
+            }
+            c++;
+        });
+        var sobrantes = false;
+        $(".valor_cant").each(function(){
+            if($(this).val()>$(this).data('max')){
+                sobrantes = true;
+            }
+        });
+        if(sobrantes) {
+            if(confirm("Esta a punto de crear una OP con mas productos que los solicitados por la OF. \n ¿Está seguro?")) {
+                if (aux.length > 0) {
+                    $.ajax({
+                        type: 'POST',
+                        data: JSON.stringify({list: aux, dates: aux2}),
+                        contentType: 'application/json',
+                        url: 'jefeprod/save_op',
+                        success: function (data) {
+                            if (data == 'Error') {
+                                alert("Ha ocurrido un error");
+                            }
+                            else {
+
+                                alert("Orden de producción creada. Desplegando Lista de Insumos.");
+                                $(".aux_formulario").html("<form method='post' action='jefeprod/ficha_abastecimiento' target='_blank'><input type='hidden' name='idop' value='" + data + "'></form>");
+                                $(".aux_formulario form").submit();
+                                $.ajax({
+                                    type: 'GET',
+                                    url: 'jefeprod/crear_op',
+                                    success: function (data) {
+                                        $("#page-wrapper").html(data);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        else{
+            if (confirm("¿Está seguro que desea crear la OP?")) {
+                if (aux.length > 0) {
+                    $.ajax({
+                        type: 'POST',
+                        data: JSON.stringify({list: aux, dates: aux2}),
+                        contentType: 'application/json',
+                        url: 'jefeprod/save_op',
+                        success: function (data) {
+                            if (data == 'Error') {
+                                alert("Ha ocurrido un error");
+                            }
+                            else {
+
+                                alert("Orden de producción creada. Desplegando Lista de Insumos.");
+                                $(".aux_formulario").html("<form method='post' action='jefeprod/ficha_abastecimiento' target='_blank'><input type='hidden' name='idop' value='" + data + "'></form>");
+                                $(".aux_formulario form").submit();
+                                $.ajax({
+                                    type: 'GET',
+                                    url: 'jefeprod/crear_op',
+                                    success: function (data) {
+                                        $("#page-wrapper").html(data);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+                else {
                     alert("Debes adjuntar al menos 1 producto a la OP.");
                 }
             }
-            else{
-                alert("Alguno de los items excede la cantidad solicitada en OF.");
-            }
+        }
     });
 
     function comprobarItems(){
@@ -511,9 +547,16 @@ However, delay the fade out process for 2.5 seconds */
 
     function delProd(yo){
         var idf = $(yo).data('idf');
+
+        var cant_array = [];
+        $(".valor_cant").each(function(){
+            cant_array.push($(this).val());
+        });
         $.ajax({
             type: 'POST',
-            data: {idf: idf},
+            data: {
+                idf: idf,
+                cantidades: cant_array},
             url: '/jefeprod/del_produccion',
             success: function(data){
                 $("#session_prod").html(data);
