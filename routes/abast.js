@@ -1755,6 +1755,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 			}
         }
         var cc_cond = " ";
+        console.log(showPend);
         if(showPend == 'false'){
             //condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
             condiciones_where.push("abastecimiento.cantidad > abastecimiento.facturados");
@@ -1785,7 +1786,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,sum(facturacion.cantidad) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(facturacion.cantidad),0) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
                     + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
