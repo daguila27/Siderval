@@ -1111,7 +1111,7 @@ router.post('/get_table_fact', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	// Se consigue cada fila de la OCA, acompaada del nombre del material de cada fila y la cantidad ya facturada por fila, además de la razón
         	connection.query("select abastecimiento.idabast,oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
-        		+" abastecimiento.costo, abastecimiento.costo*abastecimiento.cantidad as odacosto,"
+        		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*abastecimiento.cantidad as odacosto,"
         		+" oda.tokenoda,SUM(COALESCE(facturacion.cantidad,0)) AS facturados from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
         		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor" +
 				" LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast WHERE abastecimiento.idoda = ? GROUP BY abastecimiento.idabast",[idoda],
@@ -1152,12 +1152,19 @@ router.post('/save_factura', function(req, res, next){
         var input = JSON.parse(JSON.stringify(req.body));
         var fact = [];
         var items = [];
+        var receps = [];
         if(typeof input['idabast[]'] == 'string' && input['costo_unid[]'] != '0' && input['costo_unid[]'] != '' && input['cantidad[]'] != '0'){
             items.push([input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
+            if(input['recepcion[]'] == 'true' && input['maxrec[]'] != '0'){
+            	receps.push([input['idabast[]'], Math.min(parseInt(input['cantidad[]']),parseInt(input['maxrec[]']))]);
+			}
         } else{
             for (var i = 0; i < input['idabast[]'].length; i++){
                 if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
                     items.push([input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
+                    if(input['recepcion[]'][i] == 'true' && input['maxrec[]'][i] != '0'){
+                        receps.push([input['idabast[]'][i], Math.min(parseInt(input['cantidad[]'][i]),parseInt(input['maxrec[]'][i]))]);
+                    }
                 }
             }
         }
@@ -1181,7 +1188,6 @@ router.post('/save_factura', function(req, res, next){
 						if(err)
 							console.log("Error Insert : %s", err);
 
-
 	/*					UPDATE `table` SET `uid` = CASE
 							WHEN id = 1 THEN 2952
 							WHEN id = 2 THEN 4925
@@ -1189,40 +1195,31 @@ router.post('/save_factura', function(req, res, next){
 							ELSE `uid`
 							END
 						WHERE id  in (1,2,3)*/
-						input['complete'] = input['complete'].split('@');
-						var update = "UPDATE abastecimiento SET facturado = CASE ";
-						var where = "(";
-						if(typeof input['idabast[]'] == 'string'){
-							if(input['complete'] == 'on'){
-								update += "WHEN idabast="+input['idabast[]']+" THEN true ";
-								where += input['idabast[]']+",";
-							}
-							else{
-								update += "WHEN idabast="+input['idabast[]']+" THEN false ";
-								where += input['idabast[]']+",";
-							}
-						}
-						else{
-							for (var i = 0; i < input['idabast[]'].length; i++){
-								if(input['complete'][i] == 'on'){
-									update += "WHEN idabast="+input['idabast[]'][i]+" THEN true ";
-									where += input['idabast[]'][i]+",";
-								}
-								else{
-									update += "WHEN idabast="+input['idabast[]'][i]+" THEN false ";
-									where += input['idabast[]'][i]+",";
-								}
-							}
-						}
-						where = where.substring(0, where.length-1);
-						where += ")";
-						update += 'ELSE false END WHERE idabast in '+where;
-						connection.query(update, function(err, upAbast){
-							if(err)
-								console.log("Error Updating : %s", err);
-
-							res.send({err:false,msg:'¡Factura registrada con exito!'});
-						});
+						if(receps.length){
+							connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura']}],function(err,row){
+                                if(err)
+                                    console.log("Error Inserting : %s", err);
+                                var update = "UPDATE abastecimiento SET recibidos = CASE";
+                                var where = "(";
+                                for (var i = 0; i < receps.length; i++){
+									update += " WHEN idabast = " + receps[i][0] + " THEN recibidos + " + parseInt(receps[i][1]);
+									where += receps[i][0] + ",";
+                                    receps[i].unshift(row.insertId);
+                                }
+                                where = where.substring(0, where.length-1);
+                                where += ")";
+                                update += ' ELSE recibidos END WHERE idabast in '+where;
+                                connection.query(update, function(err, upAbast){
+                                    if(err)
+                                        console.log("Error Updating : %s", err);
+									connection.query("INSERT INTO recepcion_detalle (idrecepcion,idabast,cantidad) VALUES ?",[receps],function(err,rows){
+                                        if(err)
+                                            console.log("Error inserting r_detalle : %s", err);
+                                        res.send({err:false,msg:'¡Factura registrada con exito!'});
+									});
+                                });
+							});
+						} else  res.send({err:false,msg:'¡Factura registrada con exito!'});
 					});
 				});
 			});
