@@ -366,39 +366,6 @@
         });
     });
 
-	// Paginacion
-	$(function(){
-        window.pagObj = $('.pagination').twbsPagination({
-            totalPages: <%=Math.ceil(largo/50)%>,
-            visiblePages: 4,
-            first:"Primero",
-            prev: '<span aria-hidden="true">&laquo;</span>',
-            next: '<span aria-hidden="true">&raquo;</span>',
-            last: "Ultimo",
-            loop: true,
-            onPageClick: function (event, page) {
-                $.ajax({
-                	type:'POST',
-                	data: {
-	                    clave: filtros_seleccionados.join(','),
-	                    orden: $(".o_cp_switch_buttons .active").data('view'),
-	                    showPend: $("#pend").is(':checked')
-	                },
-                	url: '/abastecimiento/table_abastecimientos/' + page,
-                	success: function(data){
-                        $(".main-page").html(data);
-                		global_page = page.toString();
-                		console.log(global_page);
-                		//Muestra la cantidad de pedidos
-						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                	}
-                });
-            }
-        }).on('page', function (event, page) {
-            console.info('Pagina ' + page + ' a sido presionada');
-        });
-    });
-
     // Muestra la tabla antes de ver una OC
     function mostrar_tabla(){
         if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
@@ -408,8 +375,8 @@
 		            data: {
 		                clave: filtros_seleccionados.join(','),
 		                orden: $(".o_cp_switch_buttons .active").data('view'),
-		                showPend: $("#pend").is(':checked'),
-		                cc_selected: $(".select_cc").val().join(',')
+		                showPend: $("#pend").is(':checked')
+		                //cc_selected: $(".select_cc").val().join(',')
 		            },
 					url: '/abastecimiento/table_abastecimientos/1',
 					success: function(data){
@@ -426,18 +393,11 @@
 	                data: {
 	                    clave: filtros_seleccionados.join(','),
 	                    orden: $(".o_cp_switch_buttons .active").data('view'),
-	                    showPend: $("#pend").is(':checked'),
-	                    cc_selected: $(".select_cc").val().join(',')
+	                    showPend: $("#pend").is(':checked')
+	                    //cc_selected: $(".select_cc").val().join(',')
 	                },
 	                url: '/abastecimiento/table_abastecimientos/1',
 	                success: function(data){
-
-	                    $(".page-item").each(function(){
-	                        if($(this).hasClass('first')){
-								$(this).click();
-
-	                        }
-	                    });
 	                    $(".main-page").html(data);
 	                    //Muestra la cantidad de pedidos
 						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
