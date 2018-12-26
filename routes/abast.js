@@ -1184,7 +1184,6 @@ router.post('/save_factura', function(req, res, next){
 							return items
 						});
 					}
-					console.log("abastecimiento");
 					//console.log(items);
 					connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
 						if(err) console.log("Error Insert : %s", err);
