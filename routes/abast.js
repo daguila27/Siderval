@@ -482,7 +482,7 @@ router.get('/stock_matp', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			connection.query("select material.idmaterial as idmatpri, detalle"
 				+" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
-				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor where tipo = 'I' or tipo= 'M' or tipo= 'O' or tipo= 'C' or tipo= 'X'",
+				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor where tipo = 'I' or tipo= 'M' or tipo= 'O' or tipo= 'C'",
 				 function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);
@@ -1752,7 +1752,6 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 			}
         }
         var cc_cond = " ";
-        console.log(showPend);
         if(showPend == 'false'){
             //condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
             condiciones_where.push("abastecimiento.cantidad > abastecimiento.facturados");
