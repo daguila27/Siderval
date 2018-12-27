@@ -276,6 +276,13 @@ router.post('/data_bom', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
+        var adjuntar;
+        if(input.addOCA){
+        	adjuntar = input.addOCA;
+		}
+		else{
+			adjuntar = false;
+		}
         req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
@@ -287,20 +294,18 @@ router.post('/data_bom', function(req, res, next) {
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
-								console.log(semi);
-								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab});
+								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
 				});
 			}
 			else{
-				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
+				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
 							+"mat2 on mat2.idmaterial=bom.idmaterial_slave where material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
-								console.log(semi);
-								res.render('abast/bom_mat_uni', {data: [], semi: semi});
+								res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
 				});
 			}
 
@@ -477,7 +482,7 @@ router.get('/stock_matp', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			connection.query("select material.idmaterial as idmatpri, detalle"
 				+" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
-				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor where tipo = 'I' or tipo= 'M' or tipo= 'O'",
+				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor where tipo = 'I' or tipo= 'M' or tipo= 'O' or tipo= 'C'",
 				 function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);
@@ -519,9 +524,7 @@ router.get('/stock_matp', function(req, res, next) {
 router.post('/buscar_matp', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         list_input = input.det.split(' ');
-        console.log(list_input.length);
         input.det = "WHERE ";
         //var wher = "WHERE (material.tipo = 'I' OR material.tipo='M') AND material.detalle LIKE ?";
         for (var i = 0; i < list_input.length; i++){
@@ -533,7 +536,6 @@ router.post('/buscar_matp', function(req, res, next){
         if(input.prod == 'false'){
         	input.det += " AND material.tipo != 'P'";
         }
-		console.log(input.det);
         req.getConnection(function(err,connection){
             connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
@@ -542,7 +544,6 @@ router.post('/buscar_matp', function(req, res, next){
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
-                console.log(rows);
                 /*console.log("SELECT material.*,caracteristica.cnom,producido.pdf,aleacion.nom,producido.idproducto as idprod,subaleacion.subnom FROM material LEFT JOIN producido ON material.idmaterial = producido.idmaterial" +
                 " LEFT JOIN subaleacion ON subaleacion.idsubaleacion = producido.idsubaleacion LEFT JOIN aleacion ON subaleacion.idaleacion = aleacion.idaleacion" +
                 " LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " + wher + " GROUP BY producido.idproducto");*/
@@ -1110,7 +1111,7 @@ router.post('/get_table_fact', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	// Se consigue cada fila de la OCA, acompaada del nombre del material de cada fila y la cantidad ya facturada por fila, además de la razón
         	connection.query("select abastecimiento.idabast,oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
-        		+" abastecimiento.costo, abastecimiento.costo*abastecimiento.cantidad as odacosto,"
+        		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*abastecimiento.cantidad as odacosto,"
         		+" oda.tokenoda,SUM(COALESCE(facturacion.cantidad,0)) AS facturados from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
         		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor" +
 				" LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast WHERE abastecimiento.idoda = ? GROUP BY abastecimiento.idabast",[idoda],
@@ -1151,12 +1152,19 @@ router.post('/save_factura', function(req, res, next){
         var input = JSON.parse(JSON.stringify(req.body));
         var fact = [];
         var items = [];
+        var receps = [];
         if(typeof input['idabast[]'] == 'string' && input['costo_unid[]'] != '0' && input['costo_unid[]'] != '' && input['cantidad[]'] != '0'){
             items.push([input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
+            if(input['recepcion[]'] == 'true' && input['maxrec[]'] != '0'){
+            	receps.push([input['idabast[]'], Math.min(parseInt(input['cantidad[]']),parseInt(input['maxrec[]']))]);
+			}
         } else{
             for (var i = 0; i < input['idabast[]'].length; i++){
                 if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
                     items.push([input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
+                    if(input['recepcion[]'][i] == 'true' && input['maxrec[]'][i] != '0'){
+                        receps.push([input['idabast[]'][i], Math.min(parseInt(input['cantidad[]'][i]),parseInt(input['maxrec[]'][i]))]);
+                    }
                 }
             }
         }
@@ -1176,10 +1184,9 @@ router.post('/save_factura', function(req, res, next){
 							return items
 						});
 					}
+					//console.log(items);
 					connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
-						if(err)
-							console.log("Error Insert : %s", err);
-
+						if(err) console.log("Error Insert : %s", err);
 
 	/*					UPDATE `table` SET `uid` = CASE
 							WHEN id = 1 THEN 2952
@@ -1188,39 +1195,61 @@ router.post('/save_factura', function(req, res, next){
 							ELSE `uid`
 							END
 						WHERE id  in (1,2,3)*/
-						input['complete'] = input['complete'].split('@');
-						var update = "UPDATE abastecimiento SET facturado = CASE ";
-						var where = "(";
-						if(typeof input['idabast[]'] == 'string'){
-							if(input['complete'] == 'on'){
-								update += "WHEN idabast="+input['idabast[]']+" THEN true ";
-								where += input['idabast[]']+",";
-							}
-							else{
-								update += "WHEN idabast="+input['idabast[]']+" THEN false ";
-								where += input['idabast[]']+",";
+						/* Actualizar precio de cada material facturado */
+						var where_idabast = " WHERE abastecimiento.idabast IN (";
+						for(var i=0; i<items.length; i++){
+							where_idabast += items[i][3];
+							if(i+1 != items.length){
+								where_idabast += ", ";
 							}
 						}
-						else{
-							for (var i = 0; i < input['idabast[]'].length; i++){
-								if(input['complete'][i] == 'on'){
-									update += "WHEN idabast="+input['idabast[]'][i]+" THEN true ";
-									where += input['idabast[]'][i]+",";
+						where_idabast += ")";
+						// Query para obtener los idmaterial
+						connection.query("SELECT abastecimiento.* FROM abastecimiento" + where_idabast, function(err,row){
+							if(err) console.log("Error Select : %s", err);
+							update_material = "UPDATE material SET precio = CASE";
+							where_material = " ELSE precio END WHERE idmaterial in (";
+							for(var i=0; i<row.length; i++){
+								for(var j=0; j<items.length; j++){
+									if(items[j][3] == row[i].idabast){
+										update_material += " WHEN idmaterial = " + row[i].idmaterial + " THEN " + items[j][1];
+									}
 								}
-								else{
-									update += "WHEN idabast="+input['idabast[]'][i]+" THEN false ";
-									where += input['idabast[]'][i]+",";
+								where_material += row[i].idmaterial;
+								if(i+1 != row.length){
+									where_material += " ,";
 								}
 							}
-						}
-						where = where.substring(0, where.length-1);
-						where += ")";
-						update += 'ELSE false END WHERE idabast in '+where;
-						connection.query(update, function(err, upAbast){
-							if(err)
-								console.log("Error Updating : %s", err);
-
-							res.send({err:false,msg:'¡Factura registrada con exito!'});
+							where_material += ")";
+							update_material += where_material;
+							connection.query(update_material, function(err,row){
+								if(err) console.log("Error Update : %s", err);
+								if(receps.length){
+									connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura']}],function(err,row){
+		                                if(err)
+		                                    console.log("Error Inserting : %s", err);
+		                                var update = "UPDATE abastecimiento SET recibidos = CASE";
+		                                var where = "(";
+		                                for (var i = 0; i < receps.length; i++){
+											update += " WHEN idabast = " + receps[i][0] + " THEN recibidos + " + parseInt(receps[i][1]);
+											where += receps[i][0] + ",";
+		                                    receps[i].unshift(row.insertId);
+		                                }
+		                                where = where.substring(0, where.length-1);
+		                                where += ")";
+		                                update += ' ELSE recibidos END WHERE idabast in '+where;
+		                                connection.query(update, function(err, upAbast){
+		                                    if(err)
+		                                        console.log("Error Updating : %s", err);
+											connection.query("INSERT INTO recepcion_detalle (idrecepcion,idabast,cantidad) VALUES ?",[receps],function(err,rows){
+		                                        if(err)
+		                                            console.log("Error inserting r_detalle : %s", err);
+		                                        res.send({err:false,msg:'¡Factura registrada con exito!'});
+											});
+		                                });
+									});
+								} else res.send({err:false,msg:'¡Factura registrada con exito!'});
+							});
 						});
 					});
 				});
@@ -1721,12 +1750,12 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
         var array_fill = [
-            "oda.idoda",
-            "factura.numfac",
-            "recepcion.numgd",
-            "cliente.sigla",
-            "material.detalle",
-            "cuenta.detalle"
+            "abastecimiento.idodabast",
+            "abastecimiento.factura_token",
+            "abastecimiento.gd_token",
+            "abastecimiento.sigla",
+            "abastecimiento.detalle",
+            "abastecimiento.cuenta"
         ];
         var clave;
         if(input.clave == '' || input.clave == null || input.clave == undefined){
@@ -1743,7 +1772,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
             orden = input.orden;
 		}
         var showPend = input.showPend;
-        var cc_selected = input.cc_selected.split(',');
+        //var cc_selected = input.cc_selected.split(',');
         var where = " WHERE ";
         var condiciones_where = [];
         var condiciones_cc = [];
@@ -1754,11 +1783,12 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
 			}
         }
         var cc_cond = " ";
-        if(showPend == 'true'){
-            condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
+        if(showPend == 'false'){
+            //condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
+            condiciones_where.push("abastecimiento.cantidad > abastecimiento.facturados");
         }
         where += condiciones_where.join(" AND ");
-        if(cc_selected.length>0){
+        /*if(cc_selected.length>0){
             for(var cc=0; cc <  cc_selected.length ; cc++){
                 if(cc_selected[cc] == 'all'){
                     condiciones_cc.push(" abastecimiento.cc LIKE '%%'");
@@ -1768,7 +1798,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     condiciones_cc.push(" abastecimiento.cc LIKE '%"+cc_selected[cc]+"%'");
                 }
             }
-        }
+        }*/
         console.log(condiciones_where);
 
         if(condiciones_where.length==0){
@@ -1783,8 +1813,8 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT abastecimiento.*,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
-                    + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.numoda, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(facturacion.cantidad),0) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
+                    + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
 	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
@@ -1792,8 +1822,8 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
                     + " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast"
                     + " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion"
-	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"+ where
-	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC" /*+ orden + " LIMIT " + page_now + ",50"*/, function(err, abs){
+	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"
+	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC) AS abastecimiento "+where, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1},function(err,html){
@@ -3054,6 +3084,31 @@ router.get('/get_guiaAbast/:idgd', function(req, res, next) {
     });
 });
 
+router.post('/new_cliente/', function (req, res, next) {
+    var input = JSON.parse(JSON.stringify(req.body));
+	req.getConnection(function (err, connection) {
+		connection.query("INSERT INTO cliente SET ?", input, function (err, cliente) {
+			if (err) console.log("Error en la query cliente");
+            res.send("Se inserto nuevo cliente");
+        })
 
+    });
+});
+
+
+router.get('/visualizar_ofs', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+        connection.query("SELECT " +
+			"material.*,ordenfabricacion.*, pedido.externo, fabricaciones.* " +
+			"FROM fabricaciones " +
+			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
+			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
+			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0", function (err, ofs) {
+            if (err) console.log('We got an error! - '+err);
+            res.render('abast/visualizar_ofs', {of: ofs});
+        });
+    });
+});
 
 module.exports = router;

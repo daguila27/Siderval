@@ -200,6 +200,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
         var array_fill = [
             "ordenfabricacion.idordenfabricacion",
             "odc.numoc",
@@ -223,7 +224,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         }
         orden = orden.replace('-', ' ');
         var where = " ";
-        if(req.params.showPend == 'true'){
+        if(input.pendientes == 'true'){
             condiciones_where.push("pedido.externo = '0'");
             condiciones_where.push("fabricaciones.restantes>0");
             //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
@@ -234,13 +235,14 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         else{
             where = " WHERE "+ condiciones_where.join(" AND ");
         }
+        console.log(where);
       req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,pedido.externo, material.detalle, odc.numoc"
+            connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
-                +"on material.idmaterial=fabricaciones.idmaterial"+where+" ORDER BY "+orden,
+                +"on material.idmaterial=fabricaciones.idmaterial"+where,
                 function(err, of){
                     if(err) throw err;
 
@@ -4758,8 +4760,60 @@ router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
         });        
     });    
 });
+//RENDERIZA LO QUE VA A APARECER EN EL PDF de la OF
+router.get('/view_ofpdf_get/:idof', function(req,res,next){
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
 
-
+        connection.query('SELECT material.detalle, fabricaciones.cantidad,DATE_FORMAT(fabricaciones.f_entrega,"%d-%m-%Y") AS f_entrega,COALESCE(pedido.externo,0) AS exento FROM fabricaciones' +
+            ' LEFT JOIN material on material.idmaterial = fabricaciones.idmaterial' +
+            ' LEFT JOIN pedido on pedido.idpedido = fabricaciones.idpedido' +
+            ' WHERE fabricaciones.idorden_f = ?', [req.params.idof],
+            function(err, mats){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                connection.query("SELECT ordenfabricacion.*,cliente.* FROM ordenfabricacion" +
+                    " LEFT JOIN odc ON ordenfabricacion.idodc = odc.idodc" +
+                    " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente WHERE ordenfabricacion.idordenfabricacion = ?", [req.params.idof], function(err, oda){
+                    if(err)
+                        console.log("Error Selecting : %s", err);
+                    console.log(mats);
+                    res.render('plan/template_of', {oda: oda,mats: mats,tipo: 'of'});
+                });
+            });
+    });
+});
+//Genera el PDF de una OF y retorna el PATH de guardado
+router.get('/view_ofpdf/:idof', function(req,res,next){
+    req.getConnection(function(err, connection){
+        if(err) console.log("Error Connection : %s", err);
+        // Se consigue el número de la factura
+        connection.query("SELECT numordenfabricacion AS numfac FROM ordenfabricacion WHERE idordenfabricacion = ?", [req.params.idof], function(err, oda){
+            if(err) console.log("Error Selecting : %s", err);
+            var phantom = require('phantom');
+            // Ubicacion donde se guardará el pdf
+            var path = '/pdf/OF_N' + oda[0].numfac + '-' + new Date().getTime() + '.pdf';
+            // Inicializa phantom y lo pone en 'ph'
+            phantom.create().then(function(ph) {
+                // Se Crea la 'promesa' o el ~canvas~ por decirlo de otra manera
+                ph.createPage().then(function(page) {
+                    //Setea las propiedades de la pagina donde se pegara el html
+                    page.property('viewportSize',{width:612,height:792});
+                    //Cargar html a pegar desde un request http
+                    page.open("http://localhost:4300/plan/view_ofpdf_get/"+req.params.idof).then(function(status) {
+                        // Guardar pdf en el 'path' especificado
+                        page.render('public' + path).then(function() {
+                            ph.exit();
+                            //Enviar
+                            res.send(path);
+                        });
+                    });
+                });
+            });
+        });
+    });
+});
 router.post('/saveStateOC', function(req,res,next){
     var data = JSON.parse(JSON.stringify(req.body));
     console.log(data);

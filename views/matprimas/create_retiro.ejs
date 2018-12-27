@@ -119,24 +119,25 @@
            lista_v.push(this.value);
 		});
         if(lista_m.length){
-            $.ajax({
-                type: 'post',
-				data: {
-                    lista_m: lista_m,
-					lista_v: lista_v,
-					tipo: 0,
-					etapa: $("#etapa_r").val(),
-					receptor: $("#receptor_r").val()
-				},
-                url: '/matprimas/save_movimiento',
-                success: function(data) {
-                    if(!data.err){
-                        alert(data.msg);
-                        $("#create_retiro").trigger("click");
-					} else alert(data.msg);
-                }
-            });
-
+            if(confirm("¿Está seguro?")) {
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        lista_m: lista_m,
+                        lista_v: lista_v,
+                        tipo: 0,
+                        etapa: $("#etapa_r").val(),
+                        receptor: $("#receptor_r").val()
+                    },
+                    url: '/matprimas/save_movimiento',
+                    success: function (data) {
+                        if (!data.err) {
+                            alert(data.msg);
+                            $("#create_retiro").trigger("click");
+                        } else alert(data.msg);
+                    }
+                });
+            }
 		} else alert("No hay Materiales seleccionados")
 	})
 </script>

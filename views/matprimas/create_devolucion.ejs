@@ -106,7 +106,7 @@
     function add_session(idmaterial,stock,u_medida){
         var string_idm = idmaterial.toString();
         $("#tabla_session").append("<tr id='sess" + string_idm +"'>" + $("#row" + string_idm).html()
-            + "<td><input type='number' class='material-form form-control' min='1' max='" + stock + "' data-idmaterial='" + string_idm + "'></td><td>" + u_medida + "</td></tr>");
+            + "<td><input type='number' class='material-form form-control' min='1' data-idmaterial='" + string_idm + "'></td><td>" + u_medida + "</td></tr>");
         $("#sess" + string_idm + " > td > .selector").attr("onclick","drop_session(" + string_idm + ")");
         $("#sess" + string_idm + " > td > .selector > i").attr("class","fa fa-remove");
         $("#row" + idmaterial.toString()).addClass("hidden");
@@ -120,23 +120,25 @@
             lista_v.push(this.value);
         });
         if(lista_m.length){
-            $.ajax({
-                type: 'post',
-                data: {
-                    lista_m: lista_m,
-                    lista_v: lista_v,
-                    tipo: 1,
-                    etapa: $("#etapa_r").val(),
-                    receptor: $("#receptor_r").val()
-                },
-                url: '/matprimas/save_movimiento',
-                success: function(data) {
-                    if(!data.err){
-                        alert(data.msg);
-                        $("#create_devolucion").trigger("click");
-                    } else alert(data.msg);
-                }
-            });
+            if(confirm("¿Está seguro?")) {
+                $.ajax({
+                    type: 'post',
+                    data: {
+                        lista_m: lista_m,
+                        lista_v: lista_v,
+                        tipo: 1,
+                        etapa: $("#etapa_r").val(),
+                        receptor: $("#receptor_r").val()
+                    },
+                    url: '/matprimas/save_movimiento',
+                    success: function (data) {
+                        if (!data.err) {
+                            alert(data.msg);
+                            $("#create_devolucion").trigger("click");
+                        } else alert(data.msg);
+                    }
+                });
+            }
 
         } else alert("No hay Materiales seleccionados")
     })

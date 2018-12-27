@@ -159,16 +159,7 @@
             <h3>Añadir Productos</h3><!--<button onclick="refreshAllCost()">Mostrar función</button>-->
             <ul class="nav nav-tabs">
               <li class="active"><a href="#buscador" aria-controls="home" role="tab" data-toggle="tab">Buscador</a></li>
-              <!--<li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#"> Necesario para OF
-                <span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                  <li><a href="#">Submenu 1-1</a></li>
-                  <li><a href="#">Submenu 1-2</a></li>
-                  <li><a href="#">Submenu 1-3</a></li> 
-                </ul>
-              </li>-->
-              <li><a href="#segunOF" aria-controls="home" role="tab" data-toggle="tab">Necesario para OF</a></li>
+              <li><a href="#segunOF" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación</a></li>
             </ul>
         </div>
         <div class="tab-content">
@@ -176,7 +167,7 @@
                   <div class="panel-body">
                       <form id="strimform">
                           <div class="form-inline">
-                               
+
                                 <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
                                 <label style="font-weight: normal; margin-left: 20px; margin-right: 20px">
                                   <input type="checkbox" name="showProd" id="showProd">
@@ -204,7 +195,7 @@
                <div class="panel panel-info">
                   <div class="panel-heading">
                       <div style="display: flex;">
-                          <div style="width: 45%; margin-right: 5%;">
+                          <!--<div style="width: 45%; margin-right: 5%;">
                               <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
                               <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
                           </div>
@@ -222,67 +213,12 @@
                                   <option value="ASC" selected="selected">Ascendente</option>
                                   <option value="DESC">Descendente</option>
                                 </select>
-                                </div>
+                                </div>-->
                       </div>
               </div>
                   </div>
-                  <div class="panel-body">
-                     <div id="accordion" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
-                        <%for(var i=0; i <  ofs.length; i++){%>
-                        <div class="panel panel-default">
-                            <div class="panel-heading" role="tab" id="h<%= ofs[i].idordenfabricacion%>" style="display: flex;">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#c<%= ofs[i].idordenfabricacion%>" aria-expanded="true" aria-controls="collapseOne" style="width: 98%; font-family: 'Oswald';" onclick="renderInsumos(<%= ofs[i].idordenfabricacion%>)">
-                                    <h3 style="width: 100%">OF N°<%= ofs[i].idordenfabricacion%>
-                                        <small>creada el <%= new Date(ofs[i].creacion).toLocaleDateString()%> 
-                                        </small>
-                                        <small class="pull-right">
-                                          <%=Math.trunc(ofs[i].porcentaje)%>% de OF vinculada a OP 
-                                        </small>
-                                    </h3>
-                                </a>
+                  <div class="panel-body renderizar_ofs">
 
-
-                                
-                                </div>
-                            </div>
-                            <div id="c<%=ofs[i].idordenfabricacion%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= ofs[i].idordenfabricacion%>">
-                                <table class="table table-striped">
-                                    <thead>
-                                    <tr>
-                                      <th>Insumo</th>
-                                  <!--<th>Sin OP</th>
-                                      <th>Cantidad x pieza</th>-->
-                                      <th>Total</th>
-                                      <th>En Stock</th>
-                                      <th>Unidad</th>
-                                      <th></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="ins<%= ofs[i].idordenfabricacion%>">
-                                    
-                                    </tbody>
-                                </table>
-                            </div>
-                            <%}%>
-                        </div>
-                    </div>
-                      <!--<table class="table table-striped table-hover table-bordered">
-                          <thead>
-                          <tr>
-                              <th>N°OF</th>
-                              <th>Sin OP</th>
-                              <th>Insumo</th>
-                              <th>Cantidad x pieza</th>
-                              <th>Total</th>
-                              <th>En Stock</th>
-                              <th>Unidad</th>
-                              <th></th>
-                          </tr>
-                          </thead>
-                          <tbody id="tbody">
-                            
-                          </tbody>
-                      </table>-->
                   </div>
               </div>   
           </div>
@@ -356,122 +292,130 @@
     }
 </style>
 <script>
-  
+  $(document).ready(function(){
+     $.ajax({
+         type: 'GET',
+         url: '/abastecimiento/visualizar_ofs',
+         success: function(data){
+             $(".renderizar_ofs").html(data)
+         }
+     });
+  });
   function moveArrow(){
     $(".desp-arrow").css('transform', 'rotate(180deg)');  
   }
-    function getPredictions(yo){
-        if($(yo).children('input').val()!=''){
-               $.ajax({
-                    type: 'GET',
-                    url: '/plan/get_client_pred/'+$(yo).children('input').val(),
-                    success: function(data){
-                        $(yo).children('div').css('width', $(yo).width()+"px");
-                        $(yo).children('div').html(data);
-                    }
-                }); 
-        }
-        else{
-            $(yo).children('div').html('');         
-        }
-    }
-    function refresh(){
-        var data ={};
-        data.det = $("#det").val();
-        data.prod = $("#showProd").is(':checked');
-        $.ajax({
-            type: 'POST',
-            data: data,
-            url: '/abastecimiento/buscar_matp',
-            success: function(data){
-                $("#prefabrs").html(data);
-                //$("#caract").val('0');
-            }
-        });
+  function getPredictions(yo){
+      if($(yo).children('input').val()!=''){
+             $.ajax({
+                  type: 'GET',
+                  url: '/plan/get_client_pred/'+$(yo).children('input').val(),
+                  success: function(data){
+                      $(yo).children('div').css('width', $(yo).width()+"px");
+                      $(yo).children('div').html(data);
+                  }
+              });
+      }
+      else{
+          $(yo).children('div').html('');
+      }
+  }
+  function refresh(){
+      var data ={};
+      data.det = $("#det").val();
+      data.prod = $("#showProd").is(':checked');
+      $.ajax({
+          type: 'POST',
+          data: data,
+          url: '/abastecimiento/buscar_matp',
+          success: function(data){
+              $("#prefabrs").html(data);
+              //$("#caract").val('0');
+          }
+      });
 
-    }
-    function add_prefabr(yo) {
-        var items = 0;
-        $("#session_fabrs tr").each(function(){
-          items++;
-        });
-        $(yo).data('items', items);
-        $.ajax({
-            type: 'POST',
-            data: $(yo).data(),
-            url: '/abastecimiento/addsession_prepeds',
-            success: function(data){
-                $("#session_fabrs").append(data);
-            }
-        });
-    }
-    function drop(yo){
-        $(yo).closest('tr').remove();
-         refreshAllCost();
-    }
+  }
+  function add_prefabr(yo) {
+      var items = 0;
+      $("#session_fabrs tr").each(function(){
+        items++;
+      });
+      $(yo).data('items', items);
+      $.ajax({
+          type: 'POST',
+          data: $(yo).data(),
+          url: '/abastecimiento/addsession_prepeds',
+          success: function(data){
+              $("#session_fabrs").append(data);
+          }
+      });
+  }
+  function drop(yo){
+      $(yo).closest('tr').remove();
+       refreshAllCost();
+  }
     
 
-     $("#send_of").submit(function(e){
-        e.preventDefault();
-        alert("enviando");
-        lista = $(this).serializeArray();
-        var data = {
-            idm: [],
-            idp: [],
-            fechas: [],
-            cants: [],
-            cliente: $("#cliente").val(),
-            prov: [],
-            costo: [],
-            ex_iva: [],
-            centroc: []
-        }
-        
-        console.log(lista);
-        for(var i =0;i<$(this).serializeArray().length;i++){
-            if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
-                //console.log(lista[i].name);
-                data[lista[i].name].push(lista[i].value);
-            } else{
-                //console.log(lista[i].name);
-                data[lista[i].name] = lista[i].value;
-            }
-        }
-        data.ex_iva = [];
-        $("#send_of :checkbox").each(function(){
-            if($(this).is(':checked')){
-              data.ex_iva.push('on');
-            }
-            else{
-              data.ex_iva.push('off');  
-            }
-            //console.log($(this).val());
-        });
-        console.log(data);
-        if(confirm("¿Esta segúro que desea crear la OC?")){
-        $.ajax({
-            type: 'POST',
-            data: data,
-            url: '/abastecimiento/crear_oda',
-            success: function(data){
-                if(data == 'error'){
-                    alert("La OC que esta intentando crear es inválida.");
-                } else {
-                    alert("La OC fue creada exitosamente.");
-                    $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-                    $(".hidden form").submit();
-                    $.ajax({
-                        type: 'GET',
-                        url: '/abastecimiento/abast_myself',
-                        success: function(data){
-                            $("#page-wrapper").html(data);
-                        }
-                    });
-                }
-            }
-        });
-        }
-    });
+   $("#send_of").submit(function(e){
+      e.preventDefault();
+      alert("enviando");
+      lista = $(this).serializeArray();
+      var data = {
+          idm: [],
+          idp: [],
+          fechas: [],
+          cants: [],
+          cliente: $("#cliente").val(),
+          prov: [],
+          costo: [],
+          ex_iva: [],
+          centroc: []
+      }
+
+      console.log(lista);
+      for(var i =0;i<$(this).serializeArray().length;i++){
+          if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
+              //console.log(lista[i].name);
+              data[lista[i].name].push(lista[i].value);
+          } else{
+              //console.log(lista[i].name);
+              data[lista[i].name] = lista[i].value;
+          }
+      }
+      data.ex_iva = [];
+      $("#send_of :checkbox").each(function(){
+          if($(this).is(':checked')){
+            data.ex_iva.push('on');
+          }
+          else{
+            data.ex_iva.push('off');
+          }
+          //console.log($(this).val());
+      });
+      console.log(data);
+      if(confirm("¿Esta segúro que desea crear la OC?")){
+      $.ajax({
+          type: 'POST',
+          data: data,
+          url: '/abastecimiento/crear_oda',
+          success: function(data){
+              if(data == 'error'){
+                  alert("La OC que esta intentando crear es inválida.");
+              } else {
+                  alert("La OC fue creada exitosamente.");
+                  $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+                  $(".hidden form").submit();
+                  $.ajax({
+                      type: 'GET',
+                      url: '/abastecimiento/abast_myself',
+                      success: function(data){
+                          $("#page-wrapper").html(data);
+                      }
+                  });
+              }
+          }
+      });
+      }
+  });
 
      function renderInsumos(idof){
       //alert("AJAX");

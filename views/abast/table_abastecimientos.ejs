@@ -15,13 +15,18 @@
 		return string.join(' ');
 	}
 	function truncateWord(string, max){
-
-	    if(string.length <= max){
-	        return string;
+		if(string == '' || string == null || !string){
+			return '';
 		}
 		else{
-		    return string.substring(0, max)+"...";
+			if(string.length <= max){
+				return string;
+			}
+			else{
+				return string.substring(0, max)+"...";
+			}
 		}
+
 	}
 %>
 <!-- Oculta cantidad de datos -->
@@ -55,6 +60,7 @@
 			<th class="cabecera o_column_sortable" data-order="abastecimiento.cantidad-ASC">Solicitados</th>
 			<th class="cabecera o_column_sortable" data-order="material.detalle-ASC">Detalle</th>
 			<th class="cabecera o_column_sortable" data-order="abastecimiento.recibidos-ASC">Recibidos</th>
+			<th class="cabecera o_column_sortable" data-order="abastecimiento.recibidos-ASC">Facturados</th>
 			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo-ASC">Costo</th>
 			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo*abastecimiento.cantidad-ASC">Total</th>
 			<th class="cabecera o_column_sortable" style="text-align: center ;">CC</th>
@@ -139,8 +145,9 @@
 				</td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].sigla)%>" style="text-align: center;"><%=truncateWord(textFormat( data[i].sigla),10)%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].cantidad %></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" data-toggle="tooltip" title="<%= data[i].detalle%>" style="white-space: nowrap;"><%=truncateWord(data[i].detalle,25)%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" data-toggle="tooltip" title="<%= data[i].detalle%>" style="white-space: nowrap;"><%= truncateWord(data[i].detalle,25)%></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].recibidos %></td>
+				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].facturados %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].costo %></td>
 				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].cuenta)%>" style="text-align: center; white-space: nowrap"><%=truncateWord( textFormat(data[i].cuenta),7)%></td>

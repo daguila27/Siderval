@@ -46,7 +46,7 @@
 						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString())%></span>
 					</td>
 					<%
-					if(data[i].externo == '0'){
+					if(data[i].externo == '0' && data[i].restantes > 0 ){
 						if(data[i].lock == '0'){%>
 							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 								<button class="btn btn-xs btn-primary" onclick="habFabricacion(this)" data-state="0" data-id="<%= data[i].idfabricaciones%>">

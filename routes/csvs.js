@@ -1306,6 +1306,8 @@ router.get('/parse_bodegaPT', function(req, res, next){
 });
 
 
+
+
 router.get('/convert_despachos', function(req, res, next){
     req.getConnection(function(err, connection){
         if(err) throw err;
@@ -1341,7 +1343,7 @@ router.get('/convert_despachos', function(req, res, next){
            //BD actual (concatenada):
            //   iddespacho, idorden_f, mat_token, cant_token, id_token, idf_token, fecha, estado, obs, last_mod
            //Nueva BD:
-           //   idgd (auto_increment), estado, fecha despacho, fecha ultima modificación, observación
+           //   idgd (auto_increment), estado, fecha despacho, fecha ultima modificaci�n, observaci�n
            var gds = [];
            //   idgd, idmaterial, idfabricacion, cantidad
            var despachos = [];
@@ -1355,9 +1357,6 @@ router.get('/convert_despachos', function(req, res, next){
                    for(var b=0; b < desp[a].cant_token.length; b++){
                        if(isNaN(parseInt(desp[a].id_token[b])) || isNaN(parseInt(desp[a].cant_token[b]))){
                            continue;
-                       }
-                       if(isNaN(parseInt(desp[a].id_token[b]))){
-                           desp[a].id_token[b] = '0';
                        }
                        if(isNaN(parseInt(desp[a].idf_token[b])) || desp[a].idf_token[b] == '' || desp[a].idf_token[b] == '0'){
                            desp[a].idf_token[b] = null;

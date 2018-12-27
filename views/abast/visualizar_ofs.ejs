@@ -1,0 +1,135 @@
+<%
+ function setZeros(str){
+     str = str.toString();
+     var dif = 6 - str.length;
+     var zeros;
+     if(dif < 0){
+         return str;
+     }
+     else{
+         zeros = Math.pow(10, dif).toString();
+         zeros = zeros.substring(1, zeros.length);
+         return zeros + str.toString();
+     }
+ }
+%>
+
+<table id="viewOF" class="table table-striped table-bordered" style="width:100%;">
+        <thead>
+        <tr>
+            <th>OF</th>
+            <th>Detalle</th>
+            <th>Cantidad</th>
+            <th>Restantes</th>
+            <th>Creación</th>
+            <th>Entrega</th>
+            <th>Fabricación</th>
+            <th>BOM</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(var e=0; e < of.length; e++){%>
+            <tr>
+                <td style="text-align: center"><%= setZeros(of[e].idordenfabricacion)%></td>
+                <td><%= of[e].detalle%></td>
+                <td style="text-align: center"><%= of[e].cantidad%></td>
+                <td style="text-align: center;"><%= of[e].restantes%></td>
+                <td style="text-align: center"><%= new Date(of[e].creacion).toLocaleDateString()%></td>
+                <td style="text-align: center"><%= new Date(of[e].f_entrega).toLocaleDateString()%></td>
+                <%if(of[e].externo){%>
+                    <td style="text-align: center">Externa</td>
+                <%}else{%>
+                    <td style="text-align: center">Interna</td>
+                <%}%>
+                <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" onclick="renderBOM(this)"><i class="fa fa-eye"></i></button></td>
+                <td style="text-align: center" class="btn-group">
+                    <button class="btn btn-xs btn-success" onclick="obtener_pdf(<%= of[e].idordenfabricacion%>, this)"><i class="fa fa-file-pdf-o"></i></button>
+                    <!--<button class="btn btn-xs btn-danger" data-idmat="<%= of[e].idmaterial%>"><i class="fa fa-remove"></i></button>-->
+                </td>
+            </tr>
+        <%}%>
+        </tbody>
+        <tfoot>
+        <!--<tr>
+            <th>Name</th>
+            <th>Position</th>
+            <th>Office</th>
+            <th>Age</th>
+            <th>Start date</th>
+            <th>Salary</th>
+        </tr>-->
+        </tfoot>
+    </table>
+<div id="visorInsumos" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Bill Of Materials</h4>
+            </div>
+            <div class="modal-body" id="modalbody-bom">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#viewOF').DataTable({
+            pageLength: 10,
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    });
+
+    function obtener_pdf(idof, yo){
+        $.ajax({
+            type: 'get',
+            url: '/plan/view_ofpdf/' + idof.toString(),
+            beforeSend: function(){
+                $(yo).html('<i class="fa fa-spinner"></i>');
+            },
+            success: function(data){
+                window.open(data,'_blank');
+                $(yo).html('<i class="fa fa-file-pdf-o"></i>');
+            }
+        })
+    }
+    function renderBOM(yo){
+       $.ajax({
+           type: 'POST',
+           data: {idmaterial: $(yo).data('idmat'), addOCA: true},
+           url: 'abastecimiento/data_bom',
+           success: function(data){
+               $("#modalbody-bom").html(data);
+               $("#visorInsumos").modal("show");
+           }
+       });
+    }
+</script>

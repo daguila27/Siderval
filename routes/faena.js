@@ -316,11 +316,55 @@ router.post('/report_error', function(req, res, next){
 		console.log(input);
 		req.getConnection(function(err, connection){
 			//UPDATE `siderval`.`produccion` SET `5`='4', `standby`='1' WHERE `idproduccion`='14';
-			connection.query("UPDATE produccion SET produccion."+input.thisetapa+"= produccion."+input.thisetapa+" - "+input.standby+" , standby= standby +"+input.standby+" WHERE idproduccion = ?",
-			 [input.idproduccion], function(err, rows){
-			 	if(err){console.log("Error Selecting : %s", err);}
-			 	res.redirect('/faena/confirm_notificacion/'+input.idnotificacion);
-			 });
+			connection.query("SELECT produccion.idproduccion, produccion.`"+input.thisetapa+"` AS cantidad  FROM produccion WHERE idproduccion IN ("+input.idproduccion.replace('-',',')+")", function(err, idprods){
+                if(err){console.log("Error Selecting : %s", err);}
+                console.log(idprods);
+                /*
+				* UPDATE `table` SET `uid` = CASE
+					WHEN id = 1 THEN 2952
+					WHEN id = 2 THEN 4925
+					WHEN id = 3 THEN 1592
+					ELSE `uid`
+					END
+				WHERE id  in (1,2,3)
+				* */
+                input.standby = parseInt(input.standby);
+                var upcase = "UPDATE produccion SET produccion.`"+input.thisetapa+"` = CASE";
+                var upcaseStand = "UPDATE produccion SET produccion.standby = CASE";
+                var idsp = [];
+                for(var e=0; e < idprods.length; e++){
+                    input.standby = input.standby - parseInt(idprods[e].cantidad);
+                    if(input.standby < 0){
+                        upcase += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN "+(input.standby*-1);
+                        upcaseStand += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN "+(input.standby + parseInt(idprods[e].cantidad));
+                    	idsp.push(idprods[e].idproduccion);
+                        break;
+                    }
+                    else{
+                        idsp.push(idprods[e].idproduccion);
+                        upcase += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN 0";
+                        upcaseStand += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN produccion.`"+input.thisetapa+"`";
+                    }
+                }
+                upcase += " ELSE produccion.`"+input.thisetapa+"` END WHERE produccion.idproduccion IN ("+idsp.join(',')+")";
+                upcaseStand += " ELSE produccion.standby END WHERE produccion.idproduccion IN ("+idsp.join(',')+")";
+                console.log(upcase);
+                console.log(upcaseStand);
+                connection.query(upcaseStand, function(err, upStand){
+                    if(err){console.log("Error Selecting : %s", err);}
+                    console.log(upStand);
+                    connection.query(upcase, function(err, upProds){
+                        if(err){console.log("Error Selecting : %s", err);}
+                        console.log(upProds);
+                        res.redirect('/faena/confirm_notificacion/'+input.idnotificacion);
+						/*connection.query("UPDATE produccion SET produccion."+input.thisetapa+"= produccion."+input.thisetapa+" - "+input.standby+" , standby= standby +"+input.standby+" WHERE idproduccion = ?",
+						 [input.idproduccion], function(err, rows){
+							if(err){console.log("Error Selecting : %s", err);}
+						});*/
+                    });
+                });
+
+            });
 		});
 	}
 	else{res.redirect('bad_login');}

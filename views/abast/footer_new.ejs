@@ -105,7 +105,7 @@ However, delay the fade out process for 2.5 seconds */
               <div class="modal-body table-factura">
                 
               </div>
-              <div class="modal-footer"> 
+              <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Confirmar</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
               </div>
@@ -151,6 +151,7 @@ However, delay the fade out process for 2.5 seconds */
 
       </div>
     </div>
+
     <!-- Modal Recepcionar OCA -->
     <div id="receivedModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -178,15 +179,63 @@ However, delay the fade out process for 2.5 seconds */
         <!-- La informacion de este modal es cargada con modal-factura.ejs. -->
     </div><!-- /.modal -->
 
+    <!-- Modal crear Proveedor-->
+    <div id="crearProv" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <form id="clienteForm">
+                <!-- addclientform     editclientform-->
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Agregar Cliente:</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                            <input id="rutForm" type="text" class="form-control" placeholder="Rut Cliente">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                            <input id="siglaForm" type="text" class="form-control" placeholder="Sigla">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                            <input id="razonForm" type="text" class="form-control" placeholder="Razon Social">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                            <input id="giroForm" type="text" class="form-control" placeholder="Giro">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                            <input id="direccionForm" type="text" class="form-control" placeholder="Direccion">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                            <input id="ciudadForm" type="text" class="form-control" placeholder="Ciudad / Comuna">
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                            <input id="telefonoForm" type="text" class="form-control" placeholder="Telefono">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                            <input id="contactoForm" type="text" class="form-control" placeholder="Contacto">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Registrar</button>
+                        <button type="button" class="btn btn-default" id="close-clientemodal" data-dismiss="modal">Cancelar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
 
 
 
 
 
 <div class="footer-hidden"></div>
-
-
-
 
 
      <!-- Use a button to open the snackbar -->
@@ -199,6 +248,35 @@ However, delay the fade out process for 2.5 seconds */
 
 
 <script type="text/javascript">
+
+    // Ajax para insertar clientes nuevos
+    $("#clienteForm").submit(function (event) {
+        event.preventDefault();
+        console.log("Llaman a submit")
+        if (confirm("¿Seguro que desea agregar este cliente?")){
+            $.ajax({
+                type: 'POST',
+                url: '/abastecimiento/new_cliente/',
+                data: {
+                    rut: $("#rutForm").val(),
+                    sigla: $("#siglaForm").val(),
+                    razon: $("#razonForm").val(),
+                    direccion: $("#direccionForm").val(),
+                    ciudad: $("#ciudadForm").val(),
+                    giro: $("#giroForm").val(),
+                    telefono: $("#telefonoForm").val(),
+                    contacto: $("#contactoForm").val(),
+                },
+                success: function () {
+                    $('#crearProv').modal('hide');
+                }
+            });
+        }
+    });
+    $('#crearProv').on('hidden.bs.modal', function(){
+        $(this).find('form')[0].reset();
+    });
+
 
     function modal_fact(label) {
         $.ajax({
@@ -313,6 +391,40 @@ However, delay the fade out process for 2.5 seconds */
         });
     }
 
+
+
+    function setDataTableOF(str){
+        return $(str).DataTable({
+            responsive: true,
+            lengthChange: false,
+            pageLength: 20,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
+
     function oda_data(yo){
         $.ajax({
             type: 'GET',
@@ -363,12 +475,12 @@ However, delay the fade out process for 2.5 seconds */
             'costo_unid': [],
             'cantidad': [],
             'moneda-factura': [],
-            'complete': '',
+            'recepcion': [],
+            'maxrec': [],
             'comentario': '',
             'fecha-facturacion': ''
         };
         
-        console.log(lista);
         for(var i =0; i < lista.length;i++){
             if(lista[i].name != 'numeroFactura' && lista[i].name != 'comentario' && lista[i].name != 'idoda' && lista[i].name != 'fecha-facturacion' && lista[i].name != 'complete'){
                 data[lista[i].name].push(lista[i].value);
@@ -376,16 +488,15 @@ However, delay the fade out process for 2.5 seconds */
                 data[lista[i].name] = lista[i].value;
             }
         }
-        data.complete = '';
+        data.recepcion = [];
         $("#factura-form input:checkbox").each(function(){
+            data.maxrec.push($(this).data('maxrec'));
             if($(this).is(':checked')){
-              data.complete += 'on@';
-            }
-            else{
-              data.complete += 'off@';  
+              data.recepcion.push(true);
+            } else {
+              data.recepcion.push(false);
             }
         });
-        data.complete = data.complete.substring(0, data.complete.length-1);
         if(confirm("¿Está seguro que desea crear la siguiente Factura?")){
             $.ajax({
               type: 'POST',
@@ -616,7 +727,6 @@ However, delay the fade out process for 2.5 seconds */
             $(".moneda").prop('type', 'float');
         }
    }
-
 
     function refreshAllCost(){
         var ex_iva = '';

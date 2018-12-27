@@ -1,27 +1,32 @@
+
 <h1 class="page-header" style="margin: 0; padding-top: 5%">Listado de clientes:</h1>
 
-	
+<div class="container" style="margin: 1%">
+	<div class="row">
+		<form id="form-prov">
+			<div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;display: flex;">
+				<input style="width: 80%" id="prov-detail" type="text" class="form-control" placeholder="Buscar cliente" tabindex="1">
+				<button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+				<button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_clientes()"><i class="glyphicon glyphicon-refresh"></i></button>
+			</div>
+		</form>
+	</div>
+	<div class="row">
+			<nav aria-label="Page navigation">
+				<ul class="pagination" id="paginationup">
+				</ul>
+			</nav>
+	</div>
+	<button style="position: fixed; z-index: 5; bottom: 50px;right: 50px;box-shadow: 7px 5px 10px #888888;" class="btn btn-success btn-circle btn-lg" data-toggle="modal" data-target="#crearProv"><i class="glyphicon glyphicon-plus"></i></button>
 
-<div class="row" style="margin: 1%">
-	<form id="form-prov">
-		<div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;display: flex;">
-	    	<input style="width: 80%" id="prov-detail" type="text" class="form-control" placeholder="Buscar cliente" tabindex="1">
-	    	<button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
-	    	<button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_clientes()"><i class="glyphicon glyphicon-refresh"></i></button>
-	  	</div>
-  	</form>
-	    <nav aria-label="Page navigation">
-	        <ul class="pagination" id="paginationup">
-	        </ul>
-	    </nav>
-  	<div class="pagina">
-  		
-  	</div>
+	<div class="pagina"></div>
+
   	<nav aria-label="Page navigation">
-	        <ul class="pagination" id="paginationdown">
-	        </ul>
-	    </nav>
+		<ul class="pagination" id="paginationdown">
+		</ul>
+	</nav>
 </div>
+
 <style type="text/css">
 	.caption a:hover{
 		cursor:pointer;
@@ -29,9 +34,6 @@
 </style>
 
 <script type="text/javascript">
-	
-
-
 
 	$("#form-prov").on('submit',function(e){
 		e.preventDefault();
@@ -60,7 +62,6 @@
 			}
 		});
 	}
-
 
 	$(function(){
         window.pagObj = $('.pagination').twbsPagination({

@@ -36,7 +36,7 @@ router.get("/crear_movimiento",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
                 if(err) console.log(err);
                 res.render("matprimas/create_retiro",{mat: materiales});
             });
@@ -48,7 +48,7 @@ router.get("/crear_movimiento_dev",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
                 if(err) console.log(err);
 
                 console.log(materiales.length);
@@ -122,9 +122,21 @@ router.post("/save_movimiento",function(req,res,next){
 * */
 router.get("/busq_oda",function(req,res,next){
     if(req.session.userData){
-        res.render("matprimas/search_oda");
-    } else res.redirect("/bad_login");
+        req.getConnection(function (err,connection) {
+           if (err) {console.log('We got a problem dude');}
+           else {
+               connection.query('SELECT abastecimiento.*, material.detalle, material.stock FROM abastecimiento '+
+                   'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE cantidad != recibidos',
+                   function(err, abast) {
+                   console.log(abast);
+                   res.render("matprimas/search_oda", {abast: abast});
+               });
+           }
+        });
+
+    } else {res.redirect("/bad_login");}
 });
+
 /*
 * CONTROLADOR QUE ENVÍA VISTA PARA RECEPCIÓN DE OCA
 * */
@@ -324,7 +336,7 @@ router.post("/table_movimientos",function(req,res,next){
                 +" from movimiento_detalle"
                 +" left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento"
                 +" left join material on material.idmaterial=movimiento_detalle.idmaterial"
-                +" left join etapafaena on etapafaena.value = movimiento.etapa) as all_data "+where/*+" ORDER BY "+orden*/, function(err, mov){
+                +" left join etapafaena on etapafaena.value = movimiento.etapa) as all_data "+where+" ORDER BY all_data.f_gen DESC", function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
             });
@@ -380,7 +392,7 @@ router.post("/table_recepcion",function(req,res,next){
                 +" left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion"
                 +" left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast"
                 +" left join material on material.idmaterial=abastecimiento.idmaterial"
-                + where/* + " ORDER BY "+orden*/, function(err, mov){
+                + where + " GROUP BY recepcion_detalle.idrecepcion_d ORDER BY recepcion.fecha DESC", function(err, mov){
                 if(err) throw err;
                 res.render('matprimas/table_recepcion', {data: mov, key: orden.replace(' ', '-')});
             });
