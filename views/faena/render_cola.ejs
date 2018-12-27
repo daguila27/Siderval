@@ -34,7 +34,7 @@
     </div>
   <%}else{
   for(var i=0; i< data.length; i++){%>
-    	<div class="col-sm-12 col-md-12 fabricacionItem">
+    	<div class="col-md-12 fabricacionItem">
     		<div id="<%= data[i].idproduccion%>" data-toggle="tooltip" title="Enviar a siguiente etapa" data-placement="bottom">
     			<div style="width: 83%">
     				<div style="display: flex;">
@@ -57,6 +57,10 @@
 						data-toggle="modal"
 						data-target="#send_step">
                   Enviar Producto</button>
+
+				<button class="btn btn-danger btn-sm" style="margin-top: 10px; margin-left: 25px">
+					<i class="fa fa-trash" style="size: x"></i>
+				</button>
 	        </div>
     	</div>
 	<%}}%>

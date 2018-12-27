@@ -154,12 +154,20 @@ router.get('/page_oda/:idoda', function(req, res, next){
 						//console.log(abast);
                         //console.log(oda);
                         var isFacturable = false;
+                        var isRecepcionable = true;
 						for(var w=0; w < abast.length; w++){
 							if(abast[w].cantidad > abast[w].facturados ){
 								isFacturable = true;
 							}
+
+							if (abast[w].cantidad === abast[w].recibidos ){
+								isRecepcionable = false;
+							} else {
+								isRecepcionable = true;
+							}
+
 						}
-                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable});
+                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable, isRecep: isRecepcionable});
                     });
                 });
             });
@@ -168,6 +176,45 @@ router.get('/page_oda/:idoda', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
+
+// Recepcionar todos
+router.get('/receiveAll/:idoda', function(req, res, next){
+	if(verificar(req.session.userData)) {
+        let idoda = req.params.idoda;
+        req.getConnection(function (err, connection) {
+            if (err) {
+                console.log('Error al Recepcionar: %s', err);
+            }
+            //Obtenemos informacion necesaria desde Abast
+            connection.query("SELECT idabast, cantidad, recibidos FROM abastecimiento WHERE idoda = ?", idoda, function (err, abast) {
+                console.log(abast);
+                //Actualizamos Matstock y el Abastecimiento
+                connection.query("UPDATE abastecimiento, material " +
+				"SET abastecimiento.recibidos = abastecimiento.cantidad, " +
+				"material.stock = material.stock + abastecimiento.cantidad - abastecimiento.recibidos " +
+				"WHERE abastecimiento.idoda = ? AND material.idmaterial = abastecimiento.idmaterial", idoda,
+				function (err, result) {
+					if (err) {console.log('Error al UPDATE: %s', err);}
+					//Creamos una repeccion
+					connection.query("INSERT INTO recepcion (numgd) VALUES (?)", ["R" + idoda], function (err, result2) {
+                        if (err) {console.log('Error al INSERT1: %s', err);}
+						let list = [];
+						for (let i = 0; i < abast.length; i++){
+							list.push([result2.insertId, abast[i]['idabast'], abast[i]['cantidad']-abast[i]['recibidos']]);
+						}
+						//Rellenamos los detalles de la recepcion.
+						connection.query("INSERT INTO recepcion_detalle (idrecepcion, idabast, cantidad) VALUES ?", [list],
+						function (err, result3) {
+                            if (err) {console.log('Error al INSERT2: %s', err);}
+							res.redirect('../page_oda/'+idoda);
+                        });
+					});
+                });
+            });
+        });
+    }
+});
+
 
 router.get('/sol_odc', function(req, res, next) {
 	if(verificar(req.session.userData)){
