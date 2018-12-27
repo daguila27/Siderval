@@ -699,7 +699,6 @@ router.post('/view_produccion', function(req, res, next){
     res.send(req.session.arrayProduccion);
 });
 
-
 router.post('/restore_fab', function(req, res, next){
     var idf = JSON.parse(JSON.stringify(req.body)).idf;
     req.getConnection(function(err, connection){
@@ -733,7 +732,6 @@ router.post('/restore_fab', function(req, res, next){
         });
     });
 });
-
 
 router.post('/save_op', function(req, res, next){
 	var arrayDBP = [];
@@ -796,7 +794,6 @@ router.post('/save_op', function(req, res, next){
 		});
 	});
 });
-
 
 router.get('/ordenes_produccion', function(req, res, next){
 	req.getConnection(function(err, connection){
@@ -1103,7 +1100,6 @@ router.get('/xlsx_opdetalle', function(req,res){
 });
 
 
-
 router.post('/ficha_abastecimiento', function(req,res){
     var idop = JSON.parse(JSON.stringify(req.body)).idop;
     //var idop = req.params.idop;
@@ -1184,7 +1180,6 @@ router.get('/render_notificaciones', function(req, res, next){
     });
 });
 
-
 router.post('/predict_newop', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input);
@@ -1202,8 +1197,6 @@ router.post('/predict_newop', function(req, res, next){
         });
     });
 });
-
-
 
 router.post('/new_prod_prima', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
@@ -1249,8 +1242,6 @@ router.post('/new_prod_prima', function(req, res, next){
     });
 });
 
-
-
 router.post('/modif_op', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input);
@@ -1269,6 +1260,30 @@ router.post('/modif_op', function(req, res, next){
                 });
         });
     });
+});
+//Cargar Vista Historial de produccion.
+router.get("/phistory_view",function(req,res){
+   if(verificar(req.session.userData)){
+       res.render("jefeprod/view_phistory");
+   } else res.redirect("/bad_login");
+});
+//Conseguir filas historial de produccion.
+router.get("/phistory_data",function(req,res){
+   if(verificar(req.session.userData)){
+       req.getConnection(function(err,connection){
+          if(err) console.log(err);
+          connection.query("SELECT produccion_history.enviados,DATE_FORMAT(produccion_history.fecha,'%d/%m/%Y %r') AS fecha,etapafaena.nombre_etapa AS desde,ef2.nombre_etapa AS hacia,material.detalle FROM siderval.produccion_history " +
+              " LEFT JOIN etapafaena ON etapafaena.value = produccion_history.from" +
+              " LEFT JOIN etapafaena AS ef2 ON ef2.value = produccion_history.to" +
+              " LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion" +
+              " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+              " LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial",function(err,rows){
+                if(err) console.log(err);
+                res.send(rows)
+              }
+          )
+       });
+   } else res.redirect('/bad_login');
 });
 
 module.exports = router;

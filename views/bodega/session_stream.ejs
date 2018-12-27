@@ -8,7 +8,11 @@
                         <td><%=data[i].detalle%></td>
                         <td><%=data[i].sinenviar%></td>
                         <td><%=data[i].stock%></td>
-                        <td><input type="number" min="1" max="<%= Math.min(data[i].stock,data[i].sinenviar)%>" name="cants" class="form-control" value="<%= data[i].cants%>" required></td>
-                        <td><a class="drp_sess btn btn-danger" onclick="dropDespacho(this)" data-id="<%= data[i].id%>"><i class="fa fa-remove"></i></a></td>
+                        <td><input type="number" min="1" max="<%= Math.min(data[i].stock,data[i].sinenviar)%>" name="cants"
+                                   data-id="<%=data[i].id%>"
+                                   data-idmat="<%= data[i].idmat%>"
+                                   class="form-control" value="<%= data[i].cants%>" required></td>
+                        <td><a class="drp_sess btn btn-danger" onclick="dropDespacho(this)" data-id="<%= data[i].id%>"><i class="fa fa-remove"></i></a>
+                        </td>
                     </tr>
                     <%}%>

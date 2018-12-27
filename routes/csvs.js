@@ -1343,7 +1343,7 @@ router.get('/convert_despachos', function(req, res, next){
            //BD actual (concatenada):
            //   iddespacho, idorden_f, mat_token, cant_token, id_token, idf_token, fecha, estado, obs, last_mod
            //Nueva BD:
-           //   idgd (auto_increment), estado, fecha despacho, fecha ultima modificación, observación
+           //   idgd (auto_increment), estado, fecha despacho, fecha ultima modificaciï¿½n, observaciï¿½n
            var gds = [];
            //   idgd, idmaterial, idfabricacion, cantidad
            var despachos = [];
@@ -1353,21 +1353,20 @@ router.get('/convert_despachos', function(req, res, next){
                desp[a].idf_token = desp[a].idf_token.split('@');
                gds.push([desp[a].iddespacho, desp[a].estado, desp[a].fecha, desp[a].last_mod, desp[a].obs]);
                //Si esta anulada, solo agregar gd pero no despachos.
-               if(desp[a].estado != 'Anulado'){
+               if(desp[a].estado != 'Anulado' && desp[a].estado != 'Blanco'){
                    for(var b=0; b < desp[a].cant_token.length; b++){
-                       if(isNaN(parseInt(desp[a].id_token[b])) || isNaN(parseInt(desp[a].cant_token[b])) || desp[a].id_token == '0'){
+                       if(isNaN(parseInt(desp[a].id_token[b])) || isNaN(parseInt(desp[a].cant_token[b]))){
                            continue;
                        }
-                       if(isNaN(parseInt(desp[a].id_token[b]))){
-                           desp[a].id_token[b] = '0';
-                       }
-                       if(isNaN(parseInt(desp[a].idf_token[b]))){
-                           desp[a].idf_token[b] = '0';
+                       if(isNaN(parseInt(desp[a].idf_token[b])) || desp[a].idf_token[b] == '' || desp[a].idf_token[b] == '0'){
+                           desp[a].idf_token[b] = null;
                        }
                        if(isNaN(parseInt(desp[a].cant_token[b]))){
                            desp[a].cant_token[b] = '0';
                        }
-                       despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].cant_token[b]),parseInt(desp[a].idf_token[b])]);
+                       if(desp[a].id_token[b] == '0' || desp[a].id_token[b] == ''){
+                           gds[a][4] += " " + desp[a].cant_token[b] + " - " + desp[a].mat_token[b] + " \n";
+                       } else despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].cant_token[b]),null]);
                    }
                }
            }

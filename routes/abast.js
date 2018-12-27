@@ -1694,7 +1694,7 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
         });
     }
 });
-// Descargar xlsx de insumos
+// Descargar xlsx de fabrs
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
         let nombre = "IDS-pedidos&producidos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
