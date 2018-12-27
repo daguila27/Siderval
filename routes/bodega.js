@@ -115,20 +115,20 @@ router.post('/table_despachos', function(req, res, next){
         var orden = input.orden.replace('-', ' ');
         var clave = input.clave;
         var tipo = input.tipo;
+        console.log(input);
         //clave ES EL TEXTO QUE SE ENCUENTRA EN LA BARRA BUSCAR . Por ejemplo : "Inserto"
         //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
         // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
         //
-        var where = " WHERE gd.idgd LIKE '%" + clave + "%' OR gd.estado LIKE '%" + tipo + "%' GROUP BY despachos.iddespacho ORDER BY gd.fecha DESC";
+        var where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
         //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
-            connection.query("SELECT gd.*,material.detalle,COUNT(despachos.iddespacho) as total_desp, despachos.cantidad as cantidad_despachada,COALESCE(cliente.razon,'Sin Cliente') AS cliente FROM gd"
+            connection.query("SELECT gd.*,COUNT(despachos.iddespacho) as n_items,COALESCE(cliente.razon,'Sin Cliente') AS cliente FROM gd"
                 + " LEFT JOIN despachos ON despachos.idgd=gd.idgd"
-                + " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente"
-                + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial" + where,function(err, desp){
+                + " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" + where,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
-
+                console.log(desp);
                 //console.log(desp);
                 res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
             });         
