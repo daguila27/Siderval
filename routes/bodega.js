@@ -310,9 +310,7 @@ router.post('/crear_gdd_fill', function(req, res, next){
 });
 
 router.post('/add_despacho', function(req, res, next){
-    console.log(req.body);
     req.session.arraydespacho.push(req.body);
-    console.log(req.session.arraydespacho);
     res.render('bodega/session_stream',{data:req.session.arraydespacho});
 });
 
