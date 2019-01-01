@@ -1,4 +1,4 @@
-<div class="row" style="margin: 0 ;padding-top: 3%;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
 <!--<h1 class="page-header">Crear Guía de Despacho:</h1>-->
 <%
 function largeID(string, large){
@@ -19,7 +19,7 @@ function letraMayus(string) {
      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 } 
 %>
-<div class="col-md-10 col-md-offset-1 panel-creacion">
+<div class="col-md-12 panel-creacion">
     <div class="panel panel-primary cargando-panel" style="display: none;">
             <div class="panel-heading">
                 <div style="width: 100%;text-align: center;">
@@ -52,7 +52,7 @@ function letraMayus(string) {
                         </select>
                     </label>
             </div>
-            <table class="table table-striped">
+            <table id="DataTableCGD" class="table table-striped">
                 <thead>
                     <tr>
                         <th>N° OC</th>
@@ -61,11 +61,15 @@ function letraMayus(string) {
                         <th>Sin Enviar</th>
                         <th>En Stock</th>
                         <th>A Enviar</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody id="session_prod">
-                    <tr>
+                    <tr id="0">
                         <td>No hay productos añadidos</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -97,19 +101,128 @@ function letraMayus(string) {
     #nolanzados_wrapper{
         padding: 1%;
     }
+    .dataTables_filter {
+       position: relative;
+       left: -835px;
+       max-width: 100%;
+       width: 100%;
+    }
 </style>
 
 <div class="col-sm-12 col-md-12 col-md-offset-0">
         
     <ul class="nav nav-tabs" style="box-shadow: 0 0px 0px;">
-      <li class="pestana_xdespachar active"><a data-toggle="tab" href="#prodxdeps">Productos por Despachar</a></li>
-      <li class="pestana_insumos"><a data-toggle="tab" href="#insum">Insumos</a></li>
+        <li class="pestana_xdespachar active"><a data-toggle="tab" href="#prodxdeps">Productos por Despachar</a></li>
+        <li class="pestana_insumos"><a data-toggle="tab" href="#insum">Insumos</a></li>
     </ul>
 
     <div class="tab-content">     
         <div class="tab-pane fade in active" id="prodxdeps">                
             <div class="panel panel-default">
-                <div class="panel-heading">
+                <div class="panel-body" style="padding: 0; padding-top: 10px">
+                    <table id="DataTableGD" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>N°OC</th>
+                                <th>N°OF</th>
+                                <th>Item</th>
+                                <th>Detalle</th>
+                                <th>Aleación</th>
+                                <th>Sin Despachar</th>
+                                <th>En Stock</th>
+                                <th class="hidden">A Enviar</th>
+                                <th>Fecha de Entrega</th>
+                                <th></th>
+                                <th class="hidden"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        <%
+                        var stateButton;
+                        for(var i=0; i< data.length; i++){
+                            stateButton = 'true';
+                            if(data[i].stock <= 0){
+                                stateButton = 'false';
+                            }%>
+                            <tr id="<%=data[i].idfabricaciones%>">
+                                <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
+                                <td id="nof<%=data[i].idfabricaciones%>"><%= largeID(data[i].numof, 6)%></td>
+                                <td><%= data[i].numitem%></td>
+                                <td><%= letraMayus(data[i].detalle)%></td>
+                                <td id="anom<%=data[i].idfabricaciones%>" style="text-align: center;"><%=data[i].anom%></td>
+                                
+                                <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
+                                
+                                <td style="text-align: center;" class="parsear_nro"><%= data[i].stock %></td>
+                                
+                                <td class="hidden" id="in<%= data[i].idfabricaciones%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" class="form-control" placeholder="1" style="width: 80px;margin: 0"></td>
+                                
+                                <td id="date<%= data[i].idfabricaciones%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
+
+                                <td id="add<%= data[i].idfabricaciones%>">
+                                    <a onclick="add_row(this)" data-idfab="<%= data[i].idfabricaciones%>" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
+                                </td>
+                                
+                                <td class="hidden" id="rmv<%= data[i].idfabricaciones%>">
+                                    <a onclick="remove_row(this)" data-idfab="<%= data[i].idfabricaciones%>" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove" style="padding-left: 1px"></span></a>
+                                </td>
+                            </tr>
+                        <%}%>
+                        </tbody>
+                    </table>
+                    <!-- FILTRO PARA OBTENER LOS PRODUCTOS Y TABLA POR DESPACHAR, se cambio por Datatable!
+                    <table class="table table-striped table-hover table-bordered" id="nolanzados">
+                        <thead>
+                            <tr>
+                                <th>N°OC</th>
+                                <th>N°OF</th>
+                                <th>Item</th>
+                                <th>Detalle</th>
+                                <th>Aleación</th>
+                                <th>Sin Despachar</th>
+                                <th>En Stock</th>
+                                <th>Fecha de Entrega</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                            <%
+                            var stateButton;
+                            for(var i=0; i< data.length; i++){
+                                stateButton = 'true';
+                                if(data[i].stock <= 0){
+                                    stateButton = 'false';
+                                }%>
+                                <tr id="<%=data[i].idfabricaciones%>">
+                                    <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
+                                    <td><%= largeID(data[i].numof, 6)%></td>
+                                    <td><%= data[i].numitem%></td>
+                                    <td><%= letraMayus(data[i].detalle)%></td>
+                                    <td style="text-align: center;"><%=data[i].anom%></td>
+                                    <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
+                                    <td style="text-align: center;" class="parsear_nro"><%= data[i].stock %></td>
+                                    <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
+                                    <td><a onclick="send_queue(this)"
+                                           data-notstock="<%=stateButton%>"
+                                           data-num="<%=data[i].numordenfabricacion%>"
+                                           data-idmat="<%= data[i].idmaterial%>"
+                                           data-stock="<%= data[i].stock%>"
+                                           data-sinenviar="<%= data[i].cantidad - data[i].despachados%>"
+                                           data-cantidad="<%= data[i].cantidad%>"
+                                           data-detalle="<%=data[i].detalle%>"
+                                           data-id="<%= data[i].idfabricaciones%>"
+                                           data-idof="<%= data[i].idordenfabricacion%>"
+                                           data-numitem="<%= data[i].numitem%>"
+                                           data-idcli="<%= data[i].idcliente%>"
+                                           data-insu='0'
+                                           class="btn btn-success addqq">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            <%}%>
+                        </tbody>
+                    </table>
                         <div style="display: flex;">
                             <div style="width: 45%; margin-right: 5%;">
                                 <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
@@ -136,85 +249,24 @@ function letraMayus(string) {
                                     <label><input type="checkbox" id="only_one_odc">Solo una OC</label>
                                   </div>
                             </div>
-
                         </div>
-
+                     -->
                 </div>
-            </div>
-            <div class="panel-body">
-                <table class="table table-striped table-hover table-bordered" id="nolanzados">
-                    <thead>
-                    <tr>
-                        <th>N°OC</th>
-                        <th>N°OF</th>
-                        <th>Item</th>
-                        <th>Detalle</th>
-                        <th>Aleación</th>
-                        <th>Sin Despachar</th>
-                        <th>En Stock</th>
-                        <th>Fecha de Entrega</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody id="tbody">
-              <%
-                var stateButton;
-                for(var i=0; i< data.length; i++){
-                        stateButton = 'true';
-                        if(data[i].stock <= 0){
-                            stateButton = 'false';
-                        }
-                      %>
-                        <tr id="<%=data[i].idfabricaciones%>">
-                            <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
-                            <td><%= largeID(data[i].numof, 6)%></td>
-                            <td><%= data[i].numitem%></td>
-                            <td><%= letraMayus(data[i].detalle)%></td>
-                            <td style="text-align: center;"><%=data[i].anom%></td>
-                            <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
-                            <td style="text-align: center;" class="parsear_nro"><%= data[i].stock %></td>
-                            <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
-                            <td><a onclick="send_queue(this)"
-                                   data-notstock="<%=stateButton%>"
-                                   data-num="<%=data[i].numordenfabricacion%>"
-                                   data-idmat="<%= data[i].idmaterial%>"
-                                   data-stock="<%= data[i].stock%>"
-                                   data-sinenviar="<%= data[i].cantidad - data[i].despachados%>"
-                                   data-cantidad="<%= data[i].cantidad%>"
-                                   data-detalle="<%=data[i].detalle%>"
-                                   data-id="<%= data[i].idfabricaciones%>"
-                                   data-idof="<%= data[i].idordenfabricacion%>"
-                                   data-numitem="<%= data[i].numitem%>"
-                                   data-idcli="<%= data[i].idcliente%>"
-                                   data-insu='0'
-                                   class="btn btn-success addqq">
-                                    <i class="glyphicon glyphicon-plus"></i>
-                                </a>
-                            </td>
-                            <!--idordenfabricacion ES REALMENTE idodc-->
-                        </tr>
-
-              <%}%>
-                    </tbody>
-                </table>
             </div>
         </div>
         <div class="tab-pane fade in active" id="insum">
             <div class="panel panel-default">
-                <div class="panel-heading">
+                <div class="panel-heading" style="display: flex;">
+                    <div style="width: 45%; margin-right: 5%;">
+                        <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
                         <div style="display: flex;">
-                            <div style="width: 45%; margin-right: 5%;">
-                                <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
-                                <div style="display: flex;">
-                                    <input placeholder="Ej: Arena Cromita" class="form-control" style="width: 100%" id="detInsumo">
-                                    <button class="btn btn-primary buscar_insumo">Buscar <i class="fa fa-search"></i></button>
-                                </div>
-                            </div>
-                            <h3 style="width: 55%">
-                                <small class="pull-right">¡Guía de Despacho solo para Traslado!</small>
-                            </h3>
+                            <input placeholder="Ej: Arena Cromita" class="form-control" style="width: 100%" id="detInsumo">
+                            <button class="btn btn-primary buscar_insumo">Buscar <i class="fa fa-search"></i></button>
                         </div>
-
+                    </div>
+                    <h3 style="width: 55%">
+                        <small class="pull-right">¡Guía de Despacho solo para Traslado!</small>
+                    </h3>
                 </div>
                 <div class="panel-body">
                 <table class="table table-striped table-hover table-bordered">
@@ -227,7 +279,6 @@ function letraMayus(string) {
                     </tr>
                     </thead>
                     <tbody class="tabla_insumos" id="tbody">
-
                     </tbody>
                 </table>
             </div>
@@ -240,6 +291,47 @@ function letraMayus(string) {
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
+
+    // Tabla superior(TS)
+    $('#DataTableCGD').DataTable( {
+        "lengthChange": false,
+        "searching": false,
+        "bInfo": false,
+        "paging": false
+    });
+
+    // Tabla inferior(TI)
+    $('#DataTableGD').DataTable( {
+        "lengthChange": false,
+        "paging": false
+    });
+
+    //Funcion para agregar datos de la tabla inferior a la superior
+    function add_row(yo){
+        var row = $(yo);
+        $("#0").addClass("hidden");                             //Oculta la primera fila en TS
+        $("#" + row.data('idfab')).addClass("hidden");          //Oculta la fila en TI
+        $("#rmv" + row.data('idfab')).removeClass("hidden");    //Muestra el boton eliminar en TS
+        $("#nof" + row.data('idfab')).addClass("hidden");       //Oculta el N°OF en TS
+        $("#anom" + row.data('idfab')).addClass("hidden");      //Oculta la Aleacion en TS
+        $("#date" + row.data('idfab')).addClass("hidden");      //Oculta la fecha en TS
+        $("#add" + row.data('idfab')).addClass("hidden");       //Oculta el boton agregar en TS
+        $("#in" + row.data('idfab')).removeClass("hidden");     //Muestra input en TS
+        $("#session_prod").append("<tr id='TS" + row.data('idfab') + "'>"+$("#" + row.data('idfab')).html()+"</tr>"); //Agrega fila de TI en TS
+    }
+
+    //Funcion para eliminar datos de la tabla inferior a la superior
+    function remove_row(yo){
+        var row = $(yo);
+        $("#TS" + row.data('idfab')).remove(); //Elimina la fila
+        $("#" + row.data('idfab')).removeClass("hidden");       //Muestra la fila en TI
+        $("#rmv" + row.data('idfab')).addClass("hidden");    //Oculta el boton eliminar en TS
+        $("#nof" + row.data('idfab')).removeClass("hidden");       //Muestra el N°OF en TS
+        $("#anom" + row.data('idfab')).removeClass("hidden");      //Muestra la Aleacion en TS
+        $("#date" + row.data('idfab')).removeClass("hidden");      //Muestra la fecha en TS
+        $("#add" + row.data('idfab')).removeClass("hidden");       //Muestra el boton agregar en TS
+        $("#in" + row.data('idfab')).addClass("hidden");     //Oculta input en TS
+    }
 
     $('.nav-tabs a').click(function (e) {
       e.preventDefault();
@@ -297,7 +389,8 @@ function letraMayus(string) {
             });
         }
     }
-      function refreshGDList(){
+    
+    function refreshGDList(){
         $.ajax({
             type: 'POST',
             data: {fill: $("#filtro").val(),  orden: $("#orden").val() , detalle: $("#detProducto").val()},
@@ -330,6 +423,7 @@ function letraMayus(string) {
             }
         });
     }
+    
     function dropDespacho(yo){
         var idfab = $(yo).data('id');
         $.ajax({
