@@ -24,6 +24,7 @@
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
                 <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
             </div>
+            <label style="margin-left: 20px"><input type="checkbox" onclick="reSearch()" id="groupP">Agrupar Producciones</label>
         </div>
     </div>
 </div>
@@ -40,14 +41,7 @@
 <script type="text/javascript">
     // Carga la tabla de pedidos
     $(document).ready(function(){
-        $.ajax({
-            type: 'POST',
-            data: {clave: $("#buscar_produccion").val()},
-            url: '/jefeprod/table_producciones',
-            success: function(data){
-                $(".main-page").html(data);
-            }
-        });
+        reSearch();
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
 
@@ -55,34 +49,18 @@
         e.preventDefault();
         $(".vista-pill").removeClass('active');
         $(this).addClass('active');
-        if($(this).data('info') == 'ex'){
-            $.ajax({
-                type: 'POST',
-                data: {clave: $("#buscar_produccion").val()},
-                url: '/jefeprod/table_producciones',
-                success: function(data){
-                    $(".main-page").html(data);
-                }
-            });
-        }
-        else if($(this).data('info') == 'prog'){
-            $.ajax({
-                type: 'POST',
-                data: {clave: $("#buscar_produccion").val()},
-                url: '/jefeprod/table_producciones_progreso',
-                success: function(data){
-                    $(".main-page").html(data);
-                }
-            });
-        }
+        reSearch();
     });
 
     $("#buscar_produccion").on('keyup', function(e){
         e.preventDefault();
+        reSearch();
+    });
+    function reSearch(){
         if($(".vista-pill.active").data('info') == 'ex'){
             $.ajax({
                 type: 'POST',
-                data: {clave: $(this).val()},
+                data: {clave: $("#buscar_produccion").val(), agrupar: $("#groupP").is(':checked')},
                 url: '/jefeprod/table_producciones',
                 success: function(data){
                     $(".main-page").html(data);
@@ -92,14 +70,14 @@
         else if($(".vista-pill.active").data('info') == 'prog'){
             $.ajax({
                 type: 'POST',
-                data: {clave: $(this).val()},
+                data: {clave: $("#buscar_produccion").val(), agrupar: $("#groupP").is(':checked')},
                 url: '/jefeprod/table_producciones_progreso',
                 success: function(data){
                     $(".main-page").html(data);
                 }
             });
         }
-    });
+    }
 
 
 </script>
