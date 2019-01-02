@@ -174,7 +174,23 @@ function letraMayus(string) {
                             <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
                             <td style="text-align: center;" class="parsear_nro"><%= data[i].stock %></td>
                             <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
-                            <td><a onclick="send_queue(this)" data-notstock="<%=stateButton%>" data-num="<%=data[i].numordenfabricacion%>" data-idmat="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>" data-sinenviar="<%= data[i].cantidad - data[i].despachados%>" data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" data-idof="<%= data[i].idordenfabricacion%>" data-numitem="<%= data[i].numitem%>" data-idcli="<%= data[i].idcliente%>" data-insu='0' class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
+                            <td><a onclick="send_queue(this)"
+                                   data-notstock="<%=stateButton%>"
+                                   data-num="<%=data[i].numordenfabricacion%>"
+                                   data-idmat="<%= data[i].idmaterial%>"
+                                   data-stock="<%= data[i].stock%>"
+                                   data-sinenviar="<%= data[i].cantidad - data[i].despachados%>"
+                                   data-cantidad="<%= data[i].cantidad%>"
+                                   data-detalle="<%=data[i].detalle%>"
+                                   data-id="<%= data[i].idfabricaciones%>"
+                                   data-idof="<%= data[i].idordenfabricacion%>"
+                                   data-numitem="<%= data[i].numitem%>"
+                                   data-idcli="<%= data[i].idcliente%>"
+                                   data-insu='0'
+                                   class="btn btn-success addqq">
+                                    <i class="glyphicon glyphicon-plus"></i>
+                                </a>
+                            </td>
                             <!--idordenfabricacion ES REALMENTE idodc-->
                         </tr>
 
@@ -195,7 +211,7 @@ function letraMayus(string) {
                                 </div>
                             </div>
                             <h3 style="width: 55%">
-                                <small class="pull-right">¡Guia de Despacho solo para Traslado!</small>
+                                <small class="pull-right">¡Guía de Despacho solo para Traslado!</small>
                             </h3>
                         </div>
 
@@ -359,9 +375,8 @@ function letraMayus(string) {
         e.preventDefault();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
-            aux.push(this.value);
+            aux.push([$(this).data('id'),$(this).data('idmat'), this.value]);
         });
-        var conf = true;
         var est = $("#estadoselect").val();
         if(aux.length == 0){
             conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
@@ -402,7 +417,8 @@ function letraMayus(string) {
                     list: aux,
                     estado: est,
                     idgdd: <%= num%>,
-                    obs:$("#gddobs .form-control").val()
+                    obs:$("#gddobs .form-control").val(),
+                    idcliente: $("select[name = 'cliente_gd']").val()
                 },
                 url: 'bodega/act_gdd',
                 success: function(data){

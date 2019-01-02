@@ -8,61 +8,45 @@
 <table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
 		<thead>
 			<tr>
-				<th class="o_column_sortable" data-order="despacho.iddespacho-ASC">Número de GD</th>
-				<th class="o_column_sortable" data-order="despacho.mat_token-ASC">Descripción</th>
-				<th class="o_column_sortable" data-order="pedido.cantidad-ASC">Despachados</th>
-				<th class="o_column_sortable" style="text-align: center;" data-order="despacho.fecha-DESC">Fecha de Despacho</th>
-				<th class="o_column_sortable" data-order="cliente.razon-ASC">Tipo</th>
-				<th class="o_column_sortable" data-order="" style="width:80px" >Accion</th>
+				<th class="o_column_sortable">Número de GD</th>
+				<th class="o_column_sortable">Cliente</th>
+				<th class="o_column_sortable">N° Items</th>
+				<th class="o_column_sortable">Observación</th>
+				<th class="o_column_sortable" style="text-align: center;" data-order="gd.fecha-DESC">Fecha de Despacho</th>
+				<th class="o_column_sortable">Tipo</th>
+				<th class="o_column_sortable" style="width:80px" >Accion</th>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
 		<%
-		for(var i=0; i < desp.length; i++){
-			desp[i].cant_token = desp[i].cant_token.split(',');
-			desp[i].mat_token = desp[i].mat_token.split('@@');
-			for(var j=0; j < desp[i].cant_token.length; j++){%>
-			<tr class="o_data_row" onclick="" data-idodc="" <%if(j+1 == desp[i].cant_token.length){%>style="border-bottom: 2px dashed grey"<%}%>>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].iddespacho%></td>
-				<%if(desp[i].mat_token[j] == '' || desp[i].mat_token[j] == null){%>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier">Nulo</td>
-				<%}else{%>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].mat_token[j]%></td>
-				<%}%>
-				<%if(desp[i].mat_token[j] == '' || desp[i].mat_token[j] == null){%>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"> - </td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">Anulado</td>
-				<%}else{%>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= desp[i].cant_token[j] %></td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
-				<%}%>
-				<td id="est<%=desp[i].iddespacho+"-"+j%>" <%if(j==0){%>data-id=<%=desp[i].cant_token.length%><%}%> class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=desp[i].estado%></td>
+		for(var i=0; i < desp.length; i++){ %>
+			<tr class="o_data_row" onclick="" data-idodc="">
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" ><%=desp[i].idgd%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
+				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
+				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].estado%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
-					<%if(desp[i].estado != 'Anulado' && j+1 == desp[i].cant_token.length){%>
-						<div id="btns<%=desp[i].iddespacho%>">
+					<%if(desp[i].estado != 'Anulado'){%>
+						<div id="btns<%=desp[i].idgd%>">
 							<%if(desp[i].estado == 'Blanco'){%>
-								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].iddespacho%>">AC</a>
+								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].idgd%>">AC</a>
 							<%}else{%>
-								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].iddespacho%>">GD</a>
+								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].idgd%>">GD</a>
 							<%}%>
-							<a class="btn btn-xs btn-warning anular" onclick="anulate(this)" data-id="<%=desp[i].iddespacho%>"><i class="fa fa-ban"></i></a>
+							<a class="btn btn-xs btn-danger anular" onclick="anulate(this)" data-id="<%=desp[i].idgd%>"><i class="fa fa-ban"></i></a>
 						</div>
 					<%} %>
 				</td>
-				<% %>
 			</tr>
-						
-			<%
-			}
-			count = count + desp[i].cant_token.length;
-		}%>
+		<% } %>
 	</tbody>
 	<tfoot>
 		<tr>
 			<td></td>
 			<td></td>
 			<td></td>
-			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
 			<td></td>
 			<td></td>
 			<td></td>
@@ -71,14 +55,18 @@
 </table>
 
 <!-- Oculta cantidad de datos, va al final para contar la cantidad de materiales -->
-<div id="registros" style="display: none"><%= desp.length %> <%= count %></div>
+<% if(desp.length != 0){ %>
+	<div id="registros" style="display: none"> <%=desp.length%></div>
+<%} else{%>
+	<div id="registros" style="display: none">0 0</div>
+<%}%>
 
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
 
-    function getxlsx(file){
+	function getxlsx(file){
 		$.ajax({
 			type: 'GET',
 			url: 'bodega/gen_pdfgdd/'+$(file).attr("data-id"),
@@ -93,18 +81,18 @@
 			}
 		});
     }
-
     function anulate(file){
         var resp = confirm("Anular la Guia de despacho retorna el stock a los materiales involucrados y ademas es irreversible. \n\n                         ¿Esta seguro que desea continuar?");
         if(resp){
             $.ajax({
                 type: 'POST',
-                data: {id: $(file).data('id'), val: $(this).data('val')},
+                data: {idgd: $(file).data('id')},
                 url: 'bodega/anular_gdd',
                 success: function(){
 					$("#btns"+$(file).data('id')).html('');
 					//Por cada material, de la GD de despacho.
-					for(var i = 0; i < $('#est'+$(file).data('id')+"-0").data('id'); i++){
+					console.log($('#est'+$(file).data('id')).data('id'));
+					for(var i = 0; i < $('#est'+$(file).data('id')).data('id'); i++){
 					    console.log('#est'+$(file).data('id')+"-"+String(i))
                         $('#est'+$(file).data('id')+"-"+String(i)).html("Anulado");
 					}
@@ -113,27 +101,16 @@
         }
     }
     setDataTableMain("#despachosTable");
-
-    $(document).ready(function(){
-		/*$(".order-column").removeClass('o-sort-up');
-		$(".order-column").removeClass('o-sort-down');
-		$(".order-column").each(function(){
-			if($(this).data('order').split('-')[0] == "< key.split('-')[0]>" ){
-				if("< key.split('-')[1] >" == "ASC"){
-					$(this).addClass('o-sort-up');
-					$(this).addClass('active-sort');
-                    $(this).data('order', '< key.split("-")[0] >-DESC');
-				}
-				else{
-					$(this).addClass('o-sort-down');
-                    $(this).addClass('active-sort');
-					$(this).data('order', '< key.split("-")[0] >-ASC');
-					
-				}
+	function ver_gdd(yo){
+		//$("#form"+$(yo).data('idodc')).submit();
+		$.ajax({
+			type: 'GET',
+			url: '/bodega/page_gdd/'+$(yo).data('idgd'),
+			success: function(data){
+				$(".main-page").html(data);
 			}
-		});*/
-	});
-
+		});
+	}
     function activarGD(yo){
         $.ajax({
             type: 'POST',
@@ -144,25 +121,4 @@
             }
         });
 	}
-	$(".order-column").on('click', function(e){
-		e.preventDefault();
-		var item = this;
-		/*$.ajax({
-			type: 'GET',
-			url: '/bodega/table_despachos/'+orden,
-			success: function(data){
-				$(".main-page").html(data);
-			}
-		});*/
-        $.ajax({
-            type: 'POST',
-            data: {clave: $("#buscar_despacho").val(), orden: $(this).data('order'), tipo: $("#select_tipo_despacho").val()},
-            url: '/bodega/table_despachos',
-            success: function(data){
-                $(".main-page").html(data);
-            }
-        });
-	});
-
-
 </script>

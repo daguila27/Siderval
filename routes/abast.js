@@ -154,12 +154,20 @@ router.get('/page_oda/:idoda', function(req, res, next){
 						//console.log(abast);
                         //console.log(oda);
                         var isFacturable = false;
+                        var isRecepcionable = true;
 						for(var w=0; w < abast.length; w++){
 							if(abast[w].cantidad > abast[w].facturados ){
 								isFacturable = true;
 							}
+
+							if (abast[w].cantidad === abast[w].recibidos ){
+								isRecepcionable = false;
+							} else {
+								isRecepcionable = true;
+							}
+
 						}
-                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable});
+                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable, isRecep: isRecepcionable});
                     });
                 });
             });
@@ -168,6 +176,45 @@ router.get('/page_oda/:idoda', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
+
+// Recepcionar todos
+router.get('/receiveAll/:idoda', function(req, res, next){
+	if(verificar(req.session.userData)) {
+        let idoda = req.params.idoda;
+        req.getConnection(function (err, connection) {
+            if (err) {
+                console.log('Error al Recepcionar: %s', err);
+            }
+            //Obtenemos informacion necesaria desde Abast
+            connection.query("SELECT idabast, cantidad, recibidos FROM abastecimiento WHERE idoda = ?", idoda, function (err, abast) {
+                console.log(abast);
+                //Actualizamos Matstock y el Abastecimiento
+                connection.query("UPDATE abastecimiento, material " +
+				"SET abastecimiento.recibidos = abastecimiento.cantidad, " +
+				"material.stock = material.stock + abastecimiento.cantidad - abastecimiento.recibidos " +
+				"WHERE abastecimiento.idoda = ? AND material.idmaterial = abastecimiento.idmaterial", idoda,
+				function (err, result) {
+					if (err) {console.log('Error al UPDATE: %s', err);}
+					//Creamos una repeccion
+					connection.query("INSERT INTO recepcion (numgd) VALUES (?)", ["R" + idoda], function (err, result2) {
+                        if (err) {console.log('Error al INSERT1: %s', err);}
+						let list = [];
+						for (let i = 0; i < abast.length; i++){
+							list.push([result2.insertId, abast[i]['idabast'], abast[i]['cantidad']-abast[i]['recibidos']]);
+						}
+						//Rellenamos los detalles de la recepcion.
+						connection.query("INSERT INTO recepcion_detalle (idrecepcion, idabast, cantidad) VALUES ?", [list],
+						function (err, result3) {
+                            if (err) {console.log('Error al INSERT2: %s', err);}
+							res.redirect('../page_oda/'+idoda);
+                        });
+					});
+                });
+            });
+        });
+    }
+});
+
 
 router.get('/sol_odc', function(req, res, next) {
 	if(verificar(req.session.userData)){
@@ -1144,7 +1191,7 @@ router.post('/get_table_fact', function(req, res, next){
 				}
         	});
         });
-    } else res.send({isfacturbale: false,err_msg: "MALDITO HACKER, BASTA"});
+    } else res.send({isfacturbale: false, err_msg: "MALDITO HACKER, BASTA"});
 });
 // Controlador que Guarda la factura en la bdd
 router.post('/save_factura', function(req, res, next){
@@ -1153,6 +1200,7 @@ router.post('/save_factura', function(req, res, next){
         var fact = [];
         var items = [];
         var receps = [];
+        console.log(input);
         if(typeof input['idabast[]'] == 'string' && input['costo_unid[]'] != '0' && input['costo_unid[]'] != '' && input['cantidad[]'] != '0'){
             items.push([input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
             if(input['recepcion[]'] == 'true' && input['maxrec[]'] != '0'){
@@ -1168,6 +1216,7 @@ router.post('/save_factura', function(req, res, next){
                 }
             }
         }
+        console.log(receps);
         fact.push([input['fecha-facturacion'], input['numeroFactura'], input['idoda'], input['comentario']]);
         if(items.length){
 			req.getConnection(function(err, connection){
@@ -1184,10 +1233,9 @@ router.post('/save_factura', function(req, res, next){
 							return items
 						});
 					}
+					//console.log(items);
 					connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
-						if(err)
-							console.log("Error Insert : %s", err);
-
+						if(err) console.log("Error Insert : %s", err);
 	/*					UPDATE `table` SET `uid` = CASE
 							WHEN id = 1 THEN 2952
 							WHEN id = 2 THEN 4925
@@ -1195,31 +1243,99 @@ router.post('/save_factura', function(req, res, next){
 							ELSE `uid`
 							END
 						WHERE id  in (1,2,3)*/
-						if(receps.length){
-							connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura']}],function(err,row){
-                                if(err)
-                                    console.log("Error Inserting : %s", err);
-                                var update = "UPDATE abastecimiento SET recibidos = CASE";
-                                var where = "(";
-                                for (var i = 0; i < receps.length; i++){
-									update += " WHEN idabast = " + receps[i][0] + " THEN recibidos + " + parseInt(receps[i][1]);
-									where += receps[i][0] + ",";
-                                    receps[i].unshift(row.insertId);
-                                }
-                                where = where.substring(0, where.length-1);
-                                where += ")";
-                                update += ' ELSE recibidos END WHERE idabast in '+where;
-                                connection.query(update, function(err, upAbast){
-                                    if(err)
-                                        console.log("Error Updating : %s", err);
-									connection.query("INSERT INTO recepcion_detalle (idrecepcion,idabast,cantidad) VALUES ?",[receps],function(err,rows){
-                                        if(err)
-                                            console.log("Error inserting r_detalle : %s", err);
-                                        res.send({err:false,msg:'¡Factura registrada con exito!'});
+						/* Actualizar precio de cada material facturado */
+						var where_idabast = " WHERE abastecimiento.idabast IN (";
+						for(var i=0; i<items.length; i++){
+							where_idabast += items[i][3];
+							if(i+1 != items.length){
+								where_idabast += ", ";
+							}
+						}
+						where_idabast += ")";
+						// Query para obtener los idmaterial
+						connection.query("SELECT abastecimiento.* FROM abastecimiento" + where_idabast, function(err,row){
+							if(err) console.log("Error Select : %s", err);
+							update_material = "UPDATE material SET precio = CASE";
+							where_material = " ELSE precio END WHERE idmaterial in (";
+							for(var i=0; i<row.length; i++){
+								for(var j=0; j<items.length; j++){
+									if(items[j][3] == row[i].idabast){
+										update_material += " WHEN idmaterial = " + row[i].idmaterial + " THEN " + items[j][1];
+									}
+								}
+								where_material += row[i].idmaterial;
+								if(i+1 != row.length){
+									where_material += " ,";
+								}
+							}
+							where_material += ")";
+							update_material += where_material;
+							connection.query(update_material, function(err,row){
+								if(err) console.log("Error Update : %s", err);
+								if(receps.length){
+									connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura']}],function(err,row){
+		                                if(err)
+		                                    console.log("Error Inserting : %s", err);
+		                                var update = "UPDATE abastecimiento SET recibidos = CASE";
+		                                var where = "(";
+		                                for (var i = 0; i < receps.length; i++){
+											update += " WHEN idabast = " + receps[i][0] + " THEN recibidos + " + parseInt(receps[i][1]);
+											where += receps[i][0] + ",";
+											receps[i].push(row.insertId);
+		                                }
+		                                where = where.substring(0, where.length-1);
+		                                where += ")";
+		                                update += ' ELSE recibidos END WHERE idabast in '+where;
+
+
+		                                connection.query(update, function(err, upAbast){
+                                            if(err) console.log("Error Updating : %s", err);
+											let matselect = "";
+		                                	if (receps.length){
+		                                		matselect += "SELECT idmaterial FROM abastecimiento WHERE idabast IN (";
+		                                		for (let i = 0; i < receps.length; i++){
+													matselect+= receps[i][0];
+													if (i === receps.length-1){
+														matselect += ")";
+													} else{
+														matselect += ",";
+													}
+		                                		}
+											}
+											console.log(matselect);
+											connection.query(matselect, function (err, recepMats) {
+												console.log(recepMats);
+												let stockupdate = "";
+												if (recepMats.length){
+													stockupdate += "UPDATE material SET stock = CASE ";
+													let where = "";
+													for (let i = 0; i < recepMats.length; i++){
+														stockupdate += "WHEN idmaterial = "+recepMats[i]['idmaterial']+" THEN material.stock+"+receps[i][1];
+                                                        where += recepMats[i]['idmaterial'];
+														if (i === recepMats.length-1){
+                                                            //stockupdate += ")";
+                                                        } else{
+                                                            stockupdate += ",";
+                                                            where += ",";
+                                                        }
+													}
+													stockupdate += " ELSE stock END WHERE idmaterial IN ("+where+")";
+												}
+                                                console.log(stockupdate);
+												connection.query(stockupdate, function (err, updresults) {
+
+													connection.query("INSERT INTO recepcion_detalle (idabast,cantidad,idrecepcion) VALUES ?",[receps],function(err,rows){
+														if(err)
+															console.log("Error inserting r_detalle : %s", err);
+														res.send({err:false,msg:'¡Factura registrada con exito!'});
+													});
+                                                });
+                                            });
+		                                });
 									});
-                                });
+								} else res.send({err:false,msg:'¡Factura registrada con exito!'});
 							});
-						} else  res.send({err:false,msg:'¡Factura registrada con exito!'});
+						});
 					});
 				});
 			});
@@ -1616,7 +1732,7 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
         });
     }
 });
-// Descargar xlsx de insumos
+// Descargar xlsx de fabrs
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
         let nombre = "IDS-pedidos&producidos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
