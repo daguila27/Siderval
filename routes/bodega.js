@@ -67,7 +67,7 @@ router.get('/crear_gdd', function(req, res, next){
 router.get('/buscar_insumos/:detalle', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("select * from material where (material.tipo='M' OR material.tipo='I' OR material.tipo='O' OR material.tipo='X') AND detalle like ? ORDER BY idmaterial",
+            connection.query("select * from material where (material.tipo='M' OR material.tipo='I' OR material.tipo='O' OR material.tipo='X' OR material.tipo='P') AND detalle like ? ORDER BY idmaterial",
                 ["%"+req.params.detalle+"%"],
                 function(err, insum){
                     if(err)
@@ -590,7 +590,7 @@ router.post('/act_gdd', function(req, res, next){
         if(err)
             console.log("Error Selecting : %s", err);
         var d_list = [];
-        for(var i=0; i<req.session.arraydespacho.length; i++ ){
+        for(var i=0; i < req.session.arraydespacho.length; i++ ){
             query2 += "WHEN material.idmaterial = "+req.session.arraydespacho[i].idmat
                 + " THEN material.stock " + ope+ " " + req.body['list[]'][i]+ " ";
             if(input.estado == 'Venta'){
