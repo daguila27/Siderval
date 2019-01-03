@@ -67,7 +67,7 @@ router.get('/crear_gdd', function(req, res, next){
 router.get('/buscar_insumos/:detalle', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("select * from material where (material.tipo='M' OR material.tipo='I' OR material.tipo='O' OR material.tipo='X' OR material.tipo='P') AND detalle like ? ORDER BY idmaterial",
+            connection.query("select * from material where (material.tipo='M' OR material.tipo='I' OR material.tipo='O' OR material.tipo='X' OR material.tipo='P' OR material.tipo='C') AND detalle like ? ORDER BY idmaterial",
                 ["%"+req.params.detalle+"%"],
                 function(err, insum){
                     if(err)
