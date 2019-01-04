@@ -1563,23 +1563,28 @@ router.get("/fabrs_list/:token",function(req,res){
             //SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
 			connection.query("select material.codigo,material.s_inicial,material.detalle, material.precio,material.u_medida," +
 				"COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
-				",COALESCE(peds.despachados,0) as despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
-				//LEFT JOIN produccion history
+				",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
+				//LEFT JOIN produccion history AKA salidas de producción hacia BPT
 				" LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
 				" LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
 				" LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
 				" WHERE produccion_history.to='8' AND (produccion_history.fecha between '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
 				" GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
-				//LEFT JOIN pedidos
-				" LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados,SUM(pedido.despachados) AS despachados" +
+				//LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
+				" LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados" +
 				" FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
 				" GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
-                //LEFT JOIN produccion
+				// LEFT JOIN despachos AKA cantidad en GDD
+				" LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados" +
+				" FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
+				" LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE gd.fecha BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '" + req.params.token.split('@')[1]+" 23:59:59'" +
+				" GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
+                //LEFT JOIN produccion AKA cantidad en produccion
                 " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby) as virtuales" +
                 " FROM produccion" +
 				" LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
                 " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
-				" WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND peds.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, prods){
+				" WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, prods){
 				if(err)
 					console.log("Error Selecting : %s", err);
 				console.log(prods);
@@ -1648,7 +1653,8 @@ router.get('/insumos_list/:token', function(req, res, next){
 router.get('/xlsx_ids_ins/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
         console.log(req.params.token);
-        let nombre = "IDS-Insumos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
+        let fecha = new Date();
+        let nombre = "IDS-Insumos-" + fecha.getDate()  + "/" + (fecha.getMonth() + 1).toString() + "/" + fecha.getYear() + " - " + fecha.getTime() + '.xlsx';
 		let Excel = require('exceljs');
 		let workbook = new Excel.Workbook();
 		let sheet = workbook.addWorksheet('stockmaster');
@@ -1735,7 +1741,8 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
 // Descargar xlsx de fabrs
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
-        let nombre = "IDS-pedidos&producidos-" +  new Date().getTime() + '-' + req.params.token + '.xlsx';
+    	let fecha = new Date();
+        let nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "/" + (fecha.getMonth() + 1).toString() + "/" + fecha.getYear() + " - " + fecha.getTime() + '.xlsx';
         let Excel = require('exceljs');
         let workbook = new Excel.Workbook();
         let sheet = workbook.addWorksheet('stockmaster');
@@ -1756,25 +1763,30 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         req.getConnection(function(err, connection){
             if(err)
                 console.log("Error Connection : %s", err);
-            connection.query("select material.detalle,material.s_inicial,material.codigo,material.precio,material.u_medida," +
+            connection.query("select material.codigo,material.s_inicial,material.detalle, material.precio,material.u_medida," +
                 "COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
-                ",COALESCE(peds.despachados,0) as despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
-                //LEFT JOIN produccion history
+                ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
+                //LEFT JOIN produccion history AKA salidas de producción hacia BPT
                 " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
                 " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
                 " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
                 " WHERE produccion_history.to='8' AND (produccion_history.fecha between '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
                 " GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
-                //LEFT JOIN pedidos
-                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados,SUM(pedido.despachados) AS despachados" +
+                //LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
+                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados" +
                 " FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
-                //LEFT JOIN produccion
+                // LEFT JOIN despachos AKA cantidad en GDD
+                " LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados" +
+                " FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
+                " LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE gd.fecha BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '" + req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
+                //LEFT JOIN produccion AKA cantidad en produccion
                 " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby) as virtuales" +
                 " FROM produccion" +
                 " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
                 " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
-                " WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND peds.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial" , function(err, ops){
+                " WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, prods){
 
                 //Inicio de la funcion post query.
                 for(var i = 2; i < ops.length+2; i++){
