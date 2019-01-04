@@ -1767,7 +1767,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
-            { header: 'Stock Inicial', key: 'initial', width: 15},
+            { header: 'Stock Inicio Mes', key: 'initial', width: 15},
             { header: 'Cantidad Solicitada', key: 'asked', width: 15},
             { header: 'Stock Virtual', key: 'virtual', width: 15},
             { header: 'Ingresos', key: 'income', width: 15},
@@ -1784,7 +1784,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 console.log("Error Connection : %s", err);
             connection.query("select material.codigo,material.s_inicial,material.detalle, material.precio,material.u_medida," +
                 "COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
-                ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales" +
+                ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
 				",coalesce(devs.sum_devs,0) as sum_dev,coalesce(ing_oda.sum_ing,0) as ing_oda FROM material" +
                 //LEFT JOIN produccion history AKA salidas de producción hacia BPT
                 " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
@@ -1796,6 +1796,10 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados" +
                 " FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
+                //LEFT JOIN pedidos atrasados AKA cantidad pedida según OC entrantes
+                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.recibidos) as solicitados" +
+                " FROM pedido WHERE f_entrega NOT BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY pedido.idmaterial) AS peds_atrasados ON peds_atrasados.idmaterial = material.idmaterial" +
                 // LEFT JOIN (sum_devs) AS devs -- entradas desde movimientos tipo 1
                 " LEFT JOIN (SELECT material.idmaterial, SUM(coalesce(movimiento_detalle.cantidad,0)) as sum_devs FROM material" +
                 " LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
