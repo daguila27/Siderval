@@ -1562,7 +1562,7 @@ router.get("/fabrs_list/:token",function(req,res){
                 console.log("Error Connection : %s", err);
             //SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
 			connection.query("select material.codigo,material.stock,material.s_inicial,material.detalle, material.precio,material.u_medida," +
-				"COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
+				"COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
 				",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales" +
 				",coalesce(devs.sum_devs,0) as sum_dev,coalesce(ing_oda.sum_ing,0) as ing_oda FROM material" +
 				//LEFT JOIN produccion history AKA salidas de producción hacia BPT
@@ -1588,6 +1588,10 @@ router.get("/fabrs_list/:token",function(req,res){
 				" LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados" +
 				" FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
 				" GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
+                //LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
+                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.recibidos) as solicitados" +
+                " FROM pedido WHERE f_entrega NOT BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
+                " GROUP BY pedido.idmaterial) AS peds_atrasados ON peds_atrasados.idmaterial = material.idmaterial" +
 				// LEFT JOIN despachos AKA cantidad en GDD
 				" LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados" +
 				" FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
