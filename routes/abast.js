@@ -1589,7 +1589,7 @@ router.get("/fabrs_list/:token",function(req,res){
 				" FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
 				" GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
                 //LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
-                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.recibidos) as solicitados" +
+                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.despachados) as solicitados" +
                 " FROM pedido WHERE f_entrega NOT BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY pedido.idmaterial) AS peds_atrasados ON peds_atrasados.idmaterial = material.idmaterial" +
 				// LEFT JOIN despachos AKA cantidad en GDD
@@ -1801,7 +1801,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 " FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
                 //LEFT JOIN pedidos atrasados AKA cantidad pedida según OC entrantes
-                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.recibidos) as solicitados" +
+                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.despachados) as solicitados" +
                 " FROM pedido WHERE f_entrega NOT BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY pedido.idmaterial) AS peds_atrasados ON peds_atrasados.idmaterial = material.idmaterial" +
                 // LEFT JOIN (sum_devs) AS devs -- entradas desde movimientos tipo 1
