@@ -1561,7 +1561,7 @@ router.get("/fabrs_list/:token",function(req,res){
             if(err)
                 console.log("Error Connection : %s", err);
             //SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
-			connection.query("select material.codigo,material.s_inicial,material.detalle, material.precio,material.u_medida," +
+			connection.query("select material.codigo,material.stock,material.s_inicial,material.detalle, material.precio,material.u_medida," +
 				"COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
 				",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales FROM material" +
 				//LEFT JOIN produccion history AKA salidas de producción hacia BPT
@@ -1602,7 +1602,7 @@ router.get('/insumos_list/:token', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	//SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
 
-        	connection.query("SELECT material.s_inicial,material.codigo,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
+        	connection.query("SELECT material.s_inicial,material.stock,material.codigo,material.idmaterial,material.detalle,COALESCE(salidas.sum_sal,0) AS sum_sal,coalesce(ingresos.sum_ing,0) as sum_ing" +
 				",coalesce(devs.sum_devs,0) as sum_dev,coalesce(virtuales.sum_virtual,0) as sum_virtual" +
 				",material.u_medida,coalesce(solicitados.necesarios,0) as sum_sol" +
                 // FROM (sum_sal) AS salidas -- salidas desde movimientos tipo 0

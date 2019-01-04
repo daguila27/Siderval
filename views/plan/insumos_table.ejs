@@ -46,6 +46,7 @@
                             <th>Virtuales</th>
                             <th>Ingresados</th>
                             <th>Despachados</th>
+                            <th>Stock actual</th>
                             <th>Stock final</th>
                         </tr>
                         </thead>
@@ -60,6 +61,7 @@
                                     <td><%= numberFormat(prods[r].virtuales.toString())%></td>
                                     <td><%= numberFormat(prods[r].fabricados.toString())%></td>
                                     <td><%= numberFormat(prods[r].despachados.toString())%></td>
+                                    <td><%= prods[r].stock%></td>
                                     <td><%= numberFormat((prods[r].s_inicial + prods[r].fabricados - prods[r].despachados).toString())%></td>
                                     <% total_fabricados += prods[r].fabricados;%>
                                 </tr>
