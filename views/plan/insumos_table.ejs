@@ -59,7 +59,7 @@
                                     <td><%= numberFormat(prods[r].s_inicial.toString())%></td>
                                     <td><%= numberFormat(prods[r].solicitados.toString())%></td>
                                     <td><%= numberFormat(prods[r].virtuales.toString())%></td>
-                                    <td><%= numberFormat(prods[r].fabricados.toString())%></td>
+                                    <td><%= numberFormat((prods[r].fabricados + prods[r].ing_oda + prods[r].sum_dev).toString())%></td>
                                     <td><%= numberFormat(prods[r].despachados.toString())%></td>
                                     <td><%= prods[r].stock%></td>
                                     <td><%= numberFormat((prods[r].s_inicial + prods[r].fabricados - prods[r].despachados).toString())%></td>
