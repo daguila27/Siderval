@@ -277,6 +277,7 @@ router.get('/loadStateGDBD', function(req, res, next){
 
 });
 
+// Retorna lista de despachos segun filtro, NO SE USA, SE CAMBIO A DATATABLE
 router.post('/crear_gdd_fill', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -299,43 +300,11 @@ router.post('/crear_gdd_fill', function(req, res, next){
 
                         res.render('bodega/g_despacho_table', {data: rows});
                         //res.render('jefeprod/ordenes_produccion', {data: rows});
-
                     });
             });
-            
         });
     }
     else{res.redirect('bad_login');}
-
-});
-
-router.post('/add_despacho', function(req, res, next){
-    console.log(req.body);
-    req.session.arraydespacho.push(req.body);
-    console.log(req.session.arraydespacho);
-    res.render('bodega/session_stream',{data:req.session.arraydespacho});
-});
-
-router.post('/drop_despacho', function(req,res,next){
-    var idfab = JSON.parse(JSON.stringify(req.body)).idfab;
-    console.log(idfab);
-    console.log(req.session.arraydespacho);
-    if(req.session.arraydespacho.length == 1){
-        req.session.arraydespacho = [];
-        console.log(req.session.arraydespacho);
-        res.render('bodega/session_stream',{data:req.session.arraydespacho});
-    }
-    else{
-        for(var e=0; e < req.session.arraydespacho.length; e++){
-            if(idfab == req.session.arraydespacho[e].id ){
-                req.session.arraydespacho = req.session.arraydespacho.splice(e,1);
-                break;
-            }
-        }
-        console.log(req.session.arraydespacho);
-        res.render('bodega/session_stream',{data:req.session.arraydespacho});
-    }
-    
 });
 
 router.post('/save_gdd', function (req, res, next) {
@@ -562,9 +531,9 @@ router.get('/page_gdd/:idgd', function(req, res, next){
         } else res.redirect("/bad_login");
     }
     else{res.redirect('bad_login');}
-
 });
-//Contralador que guarda la activacion de una GDD en Blanco
+
+//Controlador que guarda la activacion de una GDD en Blanco
 router.post('/act_gdd', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     var query ="UPDATE pedido SET despachados = CASE ";
