@@ -1654,7 +1654,7 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
         console.log(req.params.token);
         let fecha = new Date();
-        let nombre = "IDS-Insumos-" + fecha.getDate()  + "/" + (fecha.getMonth() + 1).toString() + "/" + fecha.getYear() + " - " + fecha.getTime() + '.xlsx';
+        let nombre = "IDS-Insumos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + " --- " + fecha.getTime() + '.xlsx';
 		let Excel = require('exceljs');
 		let workbook = new Excel.Workbook();
 		let sheet = workbook.addWorksheet('stockmaster');
@@ -1742,7 +1742,7 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
     	let fecha = new Date();
-        let nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "/" + (fecha.getMonth() + 1).toString() + "/" + fecha.getYear() + " - " + fecha.getTime() + '.xlsx';
+        let nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
         let Excel = require('exceljs');
         let workbook = new Excel.Workbook();
         let sheet = workbook.addWorksheet('stockmaster');
@@ -1786,7 +1786,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 " FROM produccion" +
                 " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
                 " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
-                " WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, prods){
+                " WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, ops){
+                	if(err) console.log(err);
 
                 //Inicio de la funcion post query.
                 for(var i = 2; i < ops.length+2; i++){
