@@ -4766,20 +4766,20 @@ router.get('/view_ofpdf_get/:idof', function(req,res,next){
         if(err)
             console.log("Error Connection : %s", err);
 
-        connection.query('SELECT material.detalle, fabricaciones.cantidad,DATE_FORMAT(fabricaciones.f_entrega,"%d-%m-%Y") AS f_entrega,COALESCE(pedido.externo,0) AS exento FROM fabricaciones' +
+        connection.query('SELECT material.detalle,material.codigo, fabricaciones.cantidad,DATE_FORMAT(fabricaciones.f_entrega,"%d-%m-%Y") AS f_entrega,COALESCE(pedido.externo,0) AS exento FROM fabricaciones' +
             ' LEFT JOIN material on material.idmaterial = fabricaciones.idmaterial' +
             ' LEFT JOIN pedido on pedido.idpedido = fabricaciones.idpedido' +
             ' WHERE fabricaciones.idorden_f = ?', [req.params.idof],
             function(err, mats){
                 if(err)
                     console.log("Error Selecting : %s", err);
-                connection.query("SELECT ordenfabricacion.*,cliente.* FROM ordenfabricacion" +
+                connection.query("SELECT ordenfabricacion.*,cliente.*, odc.numoc FROM ordenfabricacion" +
                     " LEFT JOIN odc ON ordenfabricacion.idodc = odc.idodc" +
                     " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente WHERE ordenfabricacion.idordenfabricacion = ?", [req.params.idof], function(err, oda){
                     if(err)
                         console.log("Error Selecting : %s", err);
                     console.log(mats);
-                    res.render('plan/template_of', {oda: oda,mats: mats,tipo: 'of'});
+                    res.render('plan/template_of2', {oda: oda,mats: mats,tipo: 'of'});
                 });
             });
     });

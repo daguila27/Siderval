@@ -53,19 +53,32 @@ router.get('/view_producciones', function(req, res, next){
 router.post('/table_producciones', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
         var clave = input.clave;
         var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND (material.detalle LIKE '%"+clave+"%' OR produccion.idordenproduccion LIKE '%"+clave+"%')";
-        req.getConnection(function(err, connection){
-            if(err) throw err;
-            connection.query("SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
+        var query;
+        if(input.agrupar == 'true'){
+            query = "SELECT SUM(produccion.`1`) as `1`,SUM(produccion.`2`) as `2`,SUM(produccion.`3`) as `3`,SUM(produccion.`4`) as `4`,SUM(produccion.`5`) as `5`,"
+                + "SUM(produccion.`6`) as `6`,SUM(produccion.`7`) as `7`,SUM(produccion.`8`) as `8`, GROUP_CONCAT(produccion.idproduccion separator ' - ') as idproduccion, COALESCE(SUM(produccion_history.enviados),0) as trats, '-' as numordenfabricacion, '-' as idfabricaciones, '-' as idordenproduccion, sum(produccion.cantidad) as cantidad, material.detalle,  opQuery.tok ,opQuery.idordenfabricacion"
+                + " FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
+                +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
+                +" fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=ordenfabricacion.idordenfabricacion" +
+                " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial" +
+                where+" GROUP BY fabricaciones.idmaterial";
+        }
+        else{
+            query = "SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
                 +" as trats FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
                 +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
                 +" fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=ordenfabricacion.idordenfabricacion" +
                 " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial" +
-                where+" GROUP BY produccion.idproduccion",
+                where+" GROUP BY produccion.idproduccion";
+        }
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query(query,
                 function(err, prods){
                     if(err) throw err;
-
                     res.render('jefeprod/table_producciones', {datalen: prods});
 
                 });

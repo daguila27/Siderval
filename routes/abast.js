@@ -1587,7 +1587,7 @@ router.get("/fabrs_list/:token",function(req,res){
 				" WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, prods){
 				if(err)
 					console.log("Error Selecting : %s", err);
-				console.log(prods);
+
 				res.render("plan/insumos_table",{prods:prods});
 			});
         });
@@ -1643,8 +1643,8 @@ router.get('/insumos_list/:token', function(req, res, next){
                 " WHERE NOT (solicitados.necesarios = 0 AND virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial" ,function(err, ops){
         		if(err)
         			console.log("Error Selecting : %s", err);
-        		console.log(ops);
-                res.render('abast/insumos_table', {data: ops});
+
+        		res.render('abast/insumos_table', {data: ops});
         	});
         });
     } else res.redirect("/bad_login");
