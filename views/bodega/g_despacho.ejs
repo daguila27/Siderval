@@ -153,27 +153,27 @@ function letraMayus(string) {
                             if(data[i].stock <= 0){
                                 stateButton = 'false';
                             }%>
-                            <tr id="<%=data[i].idfabricaciones%>">
+                            <tr id="<%=data[i].idpedido%>">
                                 <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
-                                <td id="nof<%=data[i].idfabricaciones%>"><%= largeID(data[i].numof, 6)%></td>
+                                <td id="nof<%=data[i].idpedido%>"><%= largeID(data[i].numof, 6)%></td>
                                 <td><%= data[i].numitem%></td>
                                 <td><%= letraMayus(data[i].detalle)%></td>
-                                <td id="anom<%=data[i].idfabricaciones%>" style="text-align: center;"><%=data[i].anom%></td>
+                                <td id="anom<%=data[i].idpedido%>" style="text-align: center;"><%=data[i].anom%></td>
                                 
                                 <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
                                 
                                 <td style="text-align: center;" class="parsear_nro"><%= data[i].stock %></td>
                                 
-                                <td class="hidden data_gdd" id="in<%= data[i].idfabricaciones%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" data-idfab="<%= data[i].idfabricaciones%>" data-idmat="<%= data[i].idmaterial%>" class="form-control" value="1" style="width: 80px;margin: 0"></td>
+                                <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" class="form-control" value="1" style="width: 80px;margin: 0"></td>
                                 
-                                <td id="date<%= data[i].idfabricaciones%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
+                                <td id="date<%= data[i].idpedido%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
 
-                                <td id="add<%= data[i].idfabricaciones%>">
-                                    <a onclick="add_row(this)" data-idfab="<%= data[i].idfabricaciones%>" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
+                                <td id="add<%= data[i].idpedido%>">
+                                    <a onclick="add_row(this)" data-idpedido="<%= data[i].idpedido%>" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
                                 </td>
                                 
-                                <td class="hidden" id="rmv<%= data[i].idfabricaciones%>">
-                                    <a onclick="remove_row(this)" data-idfab="<%= data[i].idfabricaciones%>" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove" style="padding-left: 1px"></span></a>
+                                <td class="hidden" id="rmv<%= data[i].idpedido%>">
+                                    <a onclick="remove_row(this)" data-idpedido="<%= data[i].idpedido%>" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove" style="padding-left: 1px"></span></a>
                                 </td>
                             </tr>
                         <%}%>
@@ -305,27 +305,27 @@ function letraMayus(string) {
     function add_row(yo){
         var row = $(yo);
         $("#0").remove();                             //Elimina la primera fila en TS
-        $("#" + row.data('idfab')).addClass("hidden");          //Oculta la fila en TI
-        $("#rmv" + row.data('idfab')).removeClass("hidden");    //Muestra el boton eliminar en TS
-        $("#nof" + row.data('idfab')).addClass("hidden");       //Oculta el N°OF en TS
-        $("#anom" + row.data('idfab')).addClass("hidden");      //Oculta la Aleacion en TS
-        $("#date" + row.data('idfab')).addClass("hidden");      //Oculta la fecha en TS
-        $("#add" + row.data('idfab')).addClass("hidden");       //Oculta el boton agregar en TS
-        $("#in" + row.data('idfab')).removeClass("hidden");     //Muestra input en TS
-        $("#session_prod").append("<tr id='TS" + row.data('idfab') + "'>"+$("#" + row.data('idfab')).html()+"</tr>"); //Agrega fila de TI en TS
+        $("#" + row.data('idpedido')).addClass("hidden");          //Oculta la fila en TI
+        $("#rmv" + row.data('idpedido')).removeClass("hidden");    //Muestra el boton eliminar en TS
+        $("#nof" + row.data('idpedido')).addClass("hidden");       //Oculta el N°OF en TS
+        $("#anom" + row.data('idpedido')).addClass("hidden");      //Oculta la Aleacion en TS
+        $("#date" + row.data('idpedido')).addClass("hidden");      //Oculta la fecha en TS
+        $("#add" + row.data('idpedido')).addClass("hidden");       //Oculta el boton agregar en TS
+        $("#in" + row.data('idpedido')).removeClass("hidden");     //Muestra input en TS
+        $("#session_prod").append("<tr id='TS" + row.data('idpedido') + "'>"+$("#" + row.data('idpedido')).html()+"</tr>"); //Agrega fila de TI en TS
     }
 
     //Funcion para eliminar datos de la tabla inferior a la superior
     function remove_row(yo){
         var row = $(yo);
-        $("#TS" + row.data('idfab')).remove();                  //Elimina la fila
-        $("#" + row.data('idfab')).removeClass("hidden");       //Muestra la fila en TI
-        $("#rmv" + row.data('idfab')).addClass("hidden");       //Oculta el boton eliminar en TS
-        $("#nof" + row.data('idfab')).removeClass("hidden");    //Muestra el N°OF en TS
-        $("#anom" + row.data('idfab')).removeClass("hidden");   //Muestra la Aleacion en TS
-        $("#date" + row.data('idfab')).removeClass("hidden");   //Muestra la fecha en TS
-        $("#add" + row.data('idfab')).removeClass("hidden");    //Muestra el boton agregar en TS
-        $("#in" + row.data('idfab')).addClass("hidden");        //Oculta input en TS
+        $("#TS" + row.data('idpedido')).remove();                  //Elimina la fila
+        $("#" + row.data('idpedido')).removeClass("hidden");       //Muestra la fila en TI
+        $("#rmv" + row.data('idpedido')).addClass("hidden");       //Oculta el boton eliminar en TS
+        $("#nof" + row.data('idpedido')).removeClass("hidden");    //Muestra el N°OF en TS
+        $("#anom" + row.data('idpedido')).removeClass("hidden");   //Muestra la Aleacion en TS
+        $("#date" + row.data('idpedido')).removeClass("hidden");   //Muestra la fecha en TS
+        $("#add" + row.data('idpedido')).removeClass("hidden");    //Muestra el boton agregar en TS
+        $("#in" + row.data('idpedido')).addClass("hidden");        //Oculta input en TS
     }
 
     // Busca los insumos filtrados
@@ -344,7 +344,7 @@ function letraMayus(string) {
         e.preventDefault();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
-            aux.push([$(this).data("idfab"), $(this).data("idmat"), this.value]);
+            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value]);
         });
         var est = $("#estadoselect").val();
         if(aux.length == 0){
@@ -376,7 +376,7 @@ function letraMayus(string) {
         e.preventDefault();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
-            aux.push(this.value);
+            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value]);
         });
         var conf = true;
         var est = $("#estadoselect").val();
