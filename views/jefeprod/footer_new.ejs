@@ -155,6 +155,31 @@
     </div>
 </div>
 
+<div class="modal fade" id="rechazoQueue" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="enviarRechazo">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Registro de Rechazo: </h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="idproduccionRechazo" id="idproduccionRechazo">
+                    <h2 style="margin-top: 1px; margin-bottom: 12px" id="productoRechazado"></h2>
+                    <div class="form-group">
+                        <input class="form-control" type="number" name="cantidadRechazo" id="cantidadRechazo" placeholder="Cantidad Rechazada">
+                        <textarea class="form-control" name="comentarioRechazo" id="comentarioRechazo" rows="5" placeholder="Detalle ..." style="margin-top: 10px"></textarea>
+                    </div>
+                    <input type="hidden" name="thisetapa" id="thisetapa">
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                </div><!-- /.modal -->
+            </div><!-- /.modal-content -->
+        </form>
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <!-- jQuery -->
 <script src="/vendor/jquery/jquery.min.js"></script>
@@ -174,6 +199,7 @@
 <script src="/vendor/raphael/raphael.min.js"></script>
 <script src="/vendor/morrisjs/morris.min.js"></script>
 <script src="/data/morris-data.js"></script>
+
 <!-- DataTables JavaScript -->
 <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
@@ -186,6 +212,31 @@
 
 
 <script type="text/javascript">
+
+    $("#enviarRechazo").submit(function( event ) {
+        event.preventDefault();
+        var form = $(this).serializeArray();
+        var datos = {
+            idproduccion: form[0].value,
+            standby: form[1].value,
+            comentario: form[2].value,
+            thisetapa: form[3].value
+        };
+        $.ajax({
+            type: 'POST',
+            data: datos,
+            url: 'faena/report_error',
+            success: function(data){
+                show_faena();
+                $("#rechazoQueue").modal('hide');
+                $("#comentarioRechazo").val(null);
+                $("#cantidadRechazo").val(null);
+            }
+        });
+    });
+
+
+
     function setDataTable(str){
 
         return $(str).DataTable({
