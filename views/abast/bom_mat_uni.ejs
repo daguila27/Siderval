@@ -38,7 +38,7 @@ function numberFormat(numero){
     }
 %>
 <div class="ventana" style="margin: 0; padding: 0; overflow: hidden;">
-<%if(semi[0].d_token){%>
+<%if(semi.length>0){%>
 	<h3 style="margin-bottom: 35px; margin-left: 5%;"><%= semi[0].detalle.substring(0,1).toUpperCase() + semi[0].detalle.substring(1,semi[0].detalle.length).toLowerCase()%> <small><%=semi[0].codigo%></small></h3>
 	<table class="table table-striped table-hover">
 		<thead>
@@ -58,7 +58,7 @@ function numberFormat(numero){
                     <tbody>
 					<%
 					var clase;
-					if(semi.length){
+					if(semi.length>0){
 						semi[0].d_token = semi[0].d_token.split('@');
 						semi[0].c_token = semi[0].c_token.split('@');
 						semi[0].s_token = semi[0].s_token.split('@');
@@ -101,7 +101,8 @@ function numberFormat(numero){
 
 
 
-<%}else{%>
+<%}
+else{%>
 	<h2 style="text-align: center;">No existe B.O.M.</h2>
 <%}%>
 </div>

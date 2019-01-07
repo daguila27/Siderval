@@ -55,24 +55,58 @@ router.post('/table_producciones', function(req, res, next){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
         var clave = input.clave;
-        var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND (material.detalle LIKE '%"+clave+"%' OR produccion.idordenproduccion LIKE '%"+clave+"%')";
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var array_fill = [
+            "table_prod.detalle",
+            "table_prod.idordenproduccion",
+            "table_prod.numordenfabricacion"
+        ];
+        var where;
+        var condiciones_where = [];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+        }
+
+        if(input.agrupar != 'true'){
+            condiciones_where.push("table_prod.el = false");
+        }
+        var where = " ";
+        if(condiciones_where.length==0){
+            where = " WHERE table_prod.8 != table_prod.cantidad";
+        }
+        else{
+            where = " WHERE table_prod.8 != table_prod.cantidad AND ("+ condiciones_where.join(" AND ")+")";
+        }
+
+        console.log(where);
+        //var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND (material.detalle LIKE '%"+clave+"%' OR produccion.idordenproduccion LIKE '%"+clave+"%')";
         var query;
         if(input.agrupar == 'true'){
-            query = "SELECT SUM(produccion.`1`) as `1`,SUM(produccion.`2`) as `2`,SUM(produccion.`3`) as `3`,SUM(produccion.`4`) as `4`,SUM(produccion.`5`) as `5`,"
-                + "SUM(produccion.`6`) as `6`,SUM(produccion.`7`) as `7`,SUM(produccion.`8`) as `8`, GROUP_CONCAT(produccion.idproduccion separator ' - ') as idproduccion, COALESCE(SUM(produccion_history.enviados),0) as trats, '-' as numordenfabricacion, '-' as idfabricaciones, '-' as idordenproduccion, sum(produccion.cantidad) as cantidad, material.detalle,  opQuery.tok ,opQuery.idordenfabricacion"
+            query = "SELECT * FROM (SELECT material.idmaterial,SUM(produccion.`1`) as `1`,SUM(produccion.`2`) as `2`,SUM(produccion.`3`) as `3`,SUM(produccion.`4`) as `4`,SUM(produccion.`5`) as `5`,"
+                + "SUM(produccion.`6`) as `6`,SUM(produccion.`7`) as `7`,SUM(produccion.`8`) as `8`, GROUP_CONCAT(produccion.idproduccion separator ' - ') as idproduccion, COALESCE(SUM(produccion_history.enviados),0) as trats,"
+                + " '-' as numordenfabricacion, '-' as idfabricaciones, '-' as idordenproduccion, sum(produccion.cantidad) as cantidad, material.detalle,  opQuery.tok ,opQuery.idordenfabricacion"
                 + " FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
                 +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
                 +" fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=ordenfabricacion.idordenfabricacion" +
-                " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial" +
-                where+" GROUP BY fabricaciones.idmaterial";
+                " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial WHERE produccion.el=false GROUP BY material.idmaterial) AS table_prod" +
+                where+" GROUP BY table_prod.idmaterial";
         }
         else{
-            query = "SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
+            query = "SELECT * FROM (SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
                 +" as trats FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
                 +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
                 +" fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=ordenfabricacion.idordenfabricacion" +
-                " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial" +
-                where+" GROUP BY produccion.idproduccion";
+                " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial GROUP BY produccion.idproduccion) AS table_prod" +
+                where;
         }
         req.getConnection(function(err, connection){
             if(err) throw err;
@@ -100,7 +134,6 @@ router.post('/table_producciones_progreso', function(req, res, next){
                 if(err){
                     console.log("Select Error: %s",err);
                 }
-                console.log(progress);
                 res.render('jefeprod/table_producciones_progreso',{prog: progress},function (err,html){if(err)throw err;res.send(html);});
             });
         });
