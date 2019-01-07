@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Orden de fabricacion #<%=oda[0].numoda%></title>
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+</head>
+<style type='text/css'>
+    html{
+        padding: 0.5cm;
+    }
+    body{
+        display: block;
+        align-content: center;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        padding: 0;
+    }
+    .headerss{
+        margin: 0;
+        padding: 0;
+    }
+    .fecha{
+        text-align: right;
+    }
+    .info{
+        border: 1px solid;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        padding-left:1%;
+    }
+    .cab_table th{
+        padding-left: 1%;
+        border: 1px solid;
+    }
+    .tabla tbody > tr td{
+        border: 1px solid;
+        text-align: center;
+    }
+    .columna{
+        float: left;
+        width: 70px;
+    }
+
+    .tabla tfoot{
+        border: 1px solid;
+        text-align: center;
+    }
+    .fund{
+        border: 1px solid;
+    }
+    .obs{
+        margin-top: 2%;
+    }
+    .obs div{
+        border: 1px solid;
+    }
+</style>
+<%function numberFormat(numero){
+    var resultado = "";
+    if(numero[0]=="-")
+    {
+        nuevoNumero=numero.replace(/\./g,'').substring(1);
+    }else{
+        nuevoNumero=numero.replace(/\./g,'');
+    }
+    if(numero.indexOf(",")>=0)
+        nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+
+    for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+        resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+    if(numero.indexOf(",")>=0)
+        resultado+=numero.substring(numero.indexOf(","));
+    if(numero[0]=="-")
+    {
+        return "-"+resultado;
+    }else{
+        return resultado;
+    }
+}
+function toFixed(num, fixed) {
+    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+    return num.toString().match(re)[0];
+}
+
+%>
+<body>
+<div class='headerss' style="width: 100%; margin-bottom: 20px;float: left;">
+    <div style='width: 35%; margin: 0;float:left;'>
+        <img src='/assets/img/logo.png'>
+    </div>
+    <p style='text-align: center; width: 30%; font-size: 10px;margin:0;float:left;font-weight: 200;'>
+        Fundición y Maestranza<br> Calle Décima - Parcela N° 474 <br> Placilla - Valparaíso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
+    </p>
+    <!-- Se setea el numero de documento -->
+    <p style='padding: 0% 10%; padding-top: 5%;margin: 0;width: 35%;float:left; text-align: center;font-weight: 500; font-size: 13px'>
+        <% switch(tipo){
+        case 'oda':%>
+            Orden de Compra <br> <b>N° <%=oda[0].idoda%> </b>
+        <% break;
+        case 'factura':%>
+            Factura <br> <b>N° <%=oda[0].numfactura%> </b>
+        <% break;
+        case 'of':%>
+            N° <b><%=oda[0].idordenfabricacion%></b>
+        <% break;
+            default:%>
+        <%}%>
+    </p>
+
+</div>
+<div class='bodyss' style="font-size: 10px;font-weight: 600">
+
+    <div class='info' style="float: left;margin-bottom: 10px">
+        <div class="columna" style="text-align: center; width: 100%;">ORDEN DE FABRICACIÓN</div>
+    </div>
+
+    <div class='info' style="float: left;margin-bottom: 10px; border: none;">
+
+        <div class="columna" style="width: 50%;">
+            <div class="columna" style="width: 40%; border: 1px solid;margin-left: 20%">N° OC</div>
+            <div class="columna" style="width: 40%; border: 1px solid;text-align: center">
+                <%if(oda[0].numoc){
+                    var odc = 'ODC'%>
+                    <%= oda[0].numoc%>
+                <%}else{
+                    var odc = 'ODV'%>
+                    -
+                <%}%>
+            </div>
+        </div>
+        <div class="columna" style="width: 50%;padding-left: 20%">
+            <div class="columna" style="width: 40%; border: 1px solid">EMISIÓN:</div>
+            <div class="columna" style="width: 40%; border: 1px solid;text-align: center">
+                <% switch(tipo){
+                    case 'oda':
+                        var fecha_doc = new Date(oda[0].creacion);
+                        break;
+                    case 'factura':
+                        var fecha_doc = new Date(oda[0].fecha);
+                        break;
+                    default:
+                        var fecha_doc = new Date();
+                        break;
+                }%>
+                <%= fecha_doc.getDate();%>/<%= parseInt(fecha_doc.getMonth()) + 1;%>/<%= fecha_doc.getFullYear();%>
+            </div>
+        </div>
+
+        <div class="columna" style="width: 100%;">
+            <div class="columna" style="width: 20%;margin-left: 10%; border: 1px solid">ODV</div>
+            <div class="columna" style="width: 20%; border: 1px solid;text-align: center"><%= odc%></div>
+        </div>
+
+        <div class="columna" style="width: 100%;">
+            <div class="columna" style="width: 20%;margin-left: 10%; border: 1px solid">CLIENTE</div>
+            <div class="columna" style="width: 20%; border: 1px solid;text-align: center">
+                <%if(oda[0].sigla){%>
+                    <%= oda[0].sigla%>
+                <%}else{%>
+                    -
+                <%}%>
+            </div>
+        </div>
+
+    </div>
+
+    <div style="width: 100%; height: 20px; float: left"></div>
+    <table style='width: 100%; font-size: 10px;font-weight: 700;' class='tabla' cellspacing="3">
+        <thead>
+        <tr class='cab_table'>
+            <th style='width: 20%;text-align: center;'>Código</th>
+            <th style='width: 25%;text-align: center;'>Descripción</th>
+            <th style='width: 15%;text-align: center;'>Cantidad</th>
+            <th style='width: 20%;text-align: center;'>Forma de fabricación</th>
+            <th style='width: 20%;text-align: center;'>Fecha Entrega</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%
+        var cantidad_total = 0;
+        for(var t=0; t < mats.length; t++){%>
+            <tr>
+                <% if(mats[t]){ %>
+                    <td><span style="text-align: center"><%= mats[t].codigo%></span></td>
+                    <td style="text-align: right;"><span style="float:left"><%= mats[t].detalle%></span></td>
+                    <%cantidad_total += parseFloat(mats[t].cantidad)%>
+                    <%if(mats[t].cantidad.toLocaleString().split('.').length > 1){%>
+                        <td><%= mats[t].cantidad.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].cantidad.toLocaleString().split('.')[1] %></td>
+                    <%}else{%>
+                        <td><%= mats[t].cantidad.toLocaleString().split('.')[0].split(',').join('.') %></td>
+                    <%}%>
+                    <%if(mats[t].exento){%>
+                        <td>Externo</td>
+                    <%}else{%>
+                        <td>Interno</td>
+                    <%}%>
+                    <td><%= mats[t].f_entrega%></td>
+                <%}else{%>
+                    <td><%= t+1%></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                <%}%>
+            </tr>
+        <%}%>
+        <tr>
+        </tbody>
+        <tfoot style="border: 0px solid">
+        <tr>
+            <td></td>
+            <td></td>
+            <%if(cantidad_total.toLocaleString().split('.').length > 1){%>
+                <td style="border: 1px solid;text-align: center;"><%= cantidad_total.toLocaleString().split('.')[0].split(',').join('.')+','+cantidad_total.toLocaleString().split('.')[1] %></td>
+            <%}else{%>
+                <td style="border: 1px solid;text-align: center;"><%= cantidad_total.toLocaleString().split('.')[0].split(',').join('.') %></td>
+            <%}%>
+            <td></td>
+            <td></td>
+        </tr>
+        </tfoot>
+    </table>
+    <div class='firma' style='width: 100%; padding-left: 75%; padding-top: 2%'>
+        <% switch(tipo){
+            case 'of':
+                break;
+        default:%>
+        <img style='width: 100%' src='/assets/img/firma.png'>
+        <%break;
+        }%>
+    </div>
+</div>
+</body>
+
+</html>

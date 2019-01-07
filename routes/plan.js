@@ -67,18 +67,53 @@ router.get('/calendar_peds', function(req, res, next){
 /*  Funcion que busca los pedidos y los filtra segun paramentros pasados por url(orden,page).
     Renderiza una tabla con los pedidos en orden solicitado
 */
-router.get('/table_pedidos/:orden/:page', function(req, res, next){
+router.post('/table_pedidos/:orden/:page', function(req, res, next){
   if(verificar(req.session.userData)){
         var orden = req.params.orden;
         orden = orden.replace('-', ' ');
         var page = req.params.page - 1;
         var page_now = page*50;
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var array_fill = [
+            "odc.numoc",
+            "material.detalle",
+            "cliente.sigla"
+        ];
+        var clave;
+        var where;
+        var condiciones_where = [];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+        }
+
+        if(input.pendientes){
+            condiciones_where.push(['pedido.cantidad > pedido.despachados']);
+        }
+
+        var where = " ";
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+
+        console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
                 + " ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
-                + " WHERE pedido.cantidad > pedido.despachados LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden,
+                + where + " LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden,
                 function(err, odc){
                     if(err) throw err;
 
@@ -4766,20 +4801,20 @@ router.get('/view_ofpdf_get/:idof', function(req,res,next){
         if(err)
             console.log("Error Connection : %s", err);
 
-        connection.query('SELECT material.detalle, fabricaciones.cantidad,DATE_FORMAT(fabricaciones.f_entrega,"%d-%m-%Y") AS f_entrega,COALESCE(pedido.externo,0) AS exento FROM fabricaciones' +
+        connection.query('SELECT material.detalle,material.codigo, fabricaciones.cantidad,DATE_FORMAT(fabricaciones.f_entrega,"%d-%m-%Y") AS f_entrega,COALESCE(pedido.externo,0) AS exento FROM fabricaciones' +
             ' LEFT JOIN material on material.idmaterial = fabricaciones.idmaterial' +
             ' LEFT JOIN pedido on pedido.idpedido = fabricaciones.idpedido' +
             ' WHERE fabricaciones.idorden_f = ?', [req.params.idof],
             function(err, mats){
                 if(err)
                     console.log("Error Selecting : %s", err);
-                connection.query("SELECT ordenfabricacion.*,cliente.* FROM ordenfabricacion" +
+                connection.query("SELECT ordenfabricacion.*,cliente.*, odc.numoc FROM ordenfabricacion" +
                     " LEFT JOIN odc ON ordenfabricacion.idodc = odc.idodc" +
                     " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente WHERE ordenfabricacion.idordenfabricacion = ?", [req.params.idof], function(err, oda){
                     if(err)
                         console.log("Error Selecting : %s", err);
                     console.log(mats);
-                    res.render('plan/template_of', {oda: oda,mats: mats,tipo: 'of'});
+                    res.render('plan/template_of2', {oda: oda,mats: mats,tipo: 'of'});
                 });
             });
     });
