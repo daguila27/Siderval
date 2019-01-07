@@ -1629,7 +1629,7 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
         let nombre = "IDS-Insumos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + " --- " + fecha.getTime() + '.xlsx';
 		let Excel = require('exceljs');
 		let workbook = new Excel.Workbook();
-		let sheet = workbook.addWorksheet('stockmaster');
+		let sheet = workbook.addWorksheet('stockmaster',{properties:{tabColor:{argb:'FFC0000'}}});
 		let ident  = new Date().toLocaleDateString().replace(' ','');
 		ident = ident.replace('/','');
 		ident = ident.replace(':','');
@@ -1688,11 +1688,18 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
                 " WHERE NOT (solicitados.necesarios = 0 AND virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial", function(err, ops){
 
 				//Inicio de la funcion post query.
+
+                sheet.getCell('A1').fill = {
+                    type: 'pattern',
+                    pattern:'solid',
+                    bgColor:{argb:'blue'}
+                };
+
 				for(var i = 2; i < ops.length+2; i++){
 					sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 					sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
 					sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
-                    //Stock Inicial
+					//Stock Inicial
                     sheet.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
                     sheet.getCell('E'+i.toString()).value = ops[i-2].sum_sol;
 					//Cantidad Solicitada
