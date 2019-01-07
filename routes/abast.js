@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
+var adminModel = require('./xlsx');
 
 router.use(
     connection(mysql,{
@@ -1557,58 +1558,11 @@ router.get('/ops_close', function(req, res, next){
 router.get("/fabrs_list/:token",function(req,res){
     if(verificar(req.session.userData)){
         console.log(req.params.token);
-        req.getConnection(function(err, connection){
-            if(err)
-                console.log("Error Connection : %s", err);
-            //SELECT ordenproduccion.*,group_concat(material.detalle separator '@') as mat_token, group_concat(material.precio), group_concat(salidas.sum_sal) as sum_sal_token, group_concat(ingresos.sum_ing) as sum_ing_token FROM (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad)) as sum_sal from ops_abastecidas where ops_abastecidas.ingreso = false and ops_abastecidas.cont=false group by ops_abastecidas.idmaterial) as salidas left join (select ops_abastecidas.idop, ops_abastecidas.idmaterial, sum(coalesce(ops_abastecidas.cantidad,0)) as sum_ing from ops_abastecidas where ops_abastecidas.ingreso = true and ops_abastecidas.cont = false group by ops_abastecidas.idmaterial) as ingresos on (ingresos.idop = salidas.idop AND ingresos.idmaterial = salidas.idmaterial) left join material on material.idmaterial=salidas.idmaterial left join ordenproduccion on ordenproduccion.idordenproduccion=ops_abastecidas.idop group by ordenproduccion.idordenproduccion;
-			connection.query("select material.codigo,material.stock,material.s_inicial,material.detalle, material.precio,material.u_medida," +
-				"COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
-				",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales" +
-				",coalesce(devs.sum_devs,0) as sum_dev,coalesce(ing_oda.sum_ing,0) as ing_oda FROM material" +
-				//LEFT JOIN produccion history AKA salidas de producción hacia BPT
-				" LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
-				" LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
-				" LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-				" WHERE produccion_history.to='8' AND (produccion_history.fecha between '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
-				" GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
-                // LEFT JOIN (sum_devs) AS devs -- entradas desde movimientos tipo 1
-                " LEFT JOIN (SELECT material.idmaterial, SUM(coalesce(movimiento_detalle.cantidad,0)) as sum_devs FROM material" +
-                " LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
-                " LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
-                " WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY material.idmaterial) AS devs ON devs.idmaterial = material.idmaterial" +
-                // LEFT JOIN (sum_ing) AS ingresos -- entradas desde recepción de OCA
-                " LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing FROM recepcion" +
-                " LEFT JOIN recepcion_detalle on recepcion_detalle.idrecepcion = recepcion.idrecepcion" +
-                " LEFT JOIN abastecimiento ON abastecimiento.idabast = recepcion_detalle.idabast" +
-                " LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial" +
-                " WHERE recepcion.fecha BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY material.idmaterial) as ing_oda ON ing_oda.idmaterial = material.idmaterial" +
-				//LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
-				" LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados" +
-				" FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-				" GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
-                //LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
-                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.despachados) as solicitados" +
-                " FROM pedido WHERE f_entrega NOT BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY pedido.idmaterial) AS peds_atrasados ON peds_atrasados.idmaterial = material.idmaterial" +
-				// LEFT JOIN despachos AKA cantidad en GDD
-				" LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados" +
-				" FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
-				" LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE gd.fecha BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '" + req.params.token.split('@')[1]+" 23:59:59'" +
-				" GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
-                //LEFT JOIN produccion AKA cantidad en produccion
-                " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby) as virtuales" +
-                " FROM produccion" +
-				" LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-                " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
-				" WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, prods){
-				if(err)
-					console.log("Error Selecting : %s", err);
-
-				res.render("plan/insumos_table",{prods:prods});
-			});
-        });
+		adminModel.getdatos(req.params.token.split("@"),function(err,data){
+			if(err) console.log(err);
+			console.log(data);
+            res.render("plan/insumos_table",{prods:data});
+		});
     } else res.redirect("/bad_login");
 });
 //Cargar Datos de INFORME DE STOCK para INSUMOS
@@ -1652,7 +1606,7 @@ router.get('/insumos_list/:token', function(req, res, next){
 				" LEFT JOIN material ON bom.idmaterial_slave = material.idmaterial" +
                 " WHERE material.e_abast != 4" +
                 " GROUP BY bom.idmaterial_slave) AS solicitados ON solicitados.idmaterial_slave = material.idmaterial" +
-                // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
+                // FROM (sum_virtual) as virtuales -- Abastecimiento no recibidos.
                 " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
                 " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
                 " WHERE oda.creacion" +
@@ -1760,96 +1714,97 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
     	let fecha = new Date();
-        let nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
-        let Excel = require('exceljs');
-        let workbook = new Excel.Workbook();
-        let sheet = workbook.addWorksheet('stockmaster');
-        let ident  = new Date().toLocaleDateString().replace(' ','');
-        ident = ident.replace('/','');
-        ident = ident.replace(':','');
+        var nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        var Excel = require('exceljs');
+        var workbook = new Excel.Workbook();
+        var sheet = workbook.addWorksheet('stockmaster');
         sheet.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
+
             { header: 'Stock Inicio Mes', key: 'initial', width: 15},
-            { header: 'Cantidad Solicitada', key: 'asked', width: 15},
-            { header: 'Stock Virtual', key: 'virtual', width: 15},
-            { header: 'Ingresos', key: 'income', width: 15},
-            { header: 'Salidas', key: 'departures', width: 15},
-            { header: 'Stock Final', key: 'final', width: 15}
+
+            { header: 'Solicitado en OC', key: 'asked', width: 15},
+            { header: 'Solicitado en OC atrasado', key: 'asked', width: 20},
+            { header: 'Solicitada según BOM', key: 'asked', width: 20},
+			{ header: 'Solicitada según BOM y entradas a BPT', key: 'asked', width: 25},
+
+            { header: 'Stock en producción', key: 'virtual', width: 15},
+            { header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 20},
+
+            { header: 'Aceptados por CC', key: 'income', width: 15},
+            { header: 'Devolución a BMI', key: 'income', width: 15},
+            { header: 'Recepcion GDD', key: 'income', width: 15},
+
+            { header: 'Retiros en BMI', key: 'departures', width: 15},
+            { header: 'Salidas en GDD', key: 'departures', width: 15},
+            { header: 'Stock actual', key: 'final', width: 15}
         ];
-        sheet.getCell('A1').fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            bgColor: {argb: 'FFFF0000'}
-        };
-        req.getConnection(function(err, connection){
-            if(err)
-                console.log("Error Connection : %s", err);
-            connection.query("select material.codigo,material.s_inicial,material.detalle, material.precio,material.u_medida," +
-                "COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados" +
-                ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
-				",coalesce(devs.sum_devs,0) as sum_dev,coalesce(ing_oda.sum_ing,0) as ing_oda FROM material" +
-                //LEFT JOIN produccion history AKA salidas de producción hacia BPT
-                " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
-                " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
-                " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-                " WHERE produccion_history.to='8' AND (produccion_history.fecha between '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59')" +
-                " GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
-                //LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
-                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados" +
-                " FROM pedido WHERE f_entrega BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY pedido.idmaterial) AS peds ON peds.idmaterial = material.idmaterial" +
-                //LEFT JOIN pedidos atrasados AKA cantidad pedida según OC entrantes
-                " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.despachados) as solicitados" +
-                " FROM pedido WHERE f_entrega NOT BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY pedido.idmaterial) AS peds_atrasados ON peds_atrasados.idmaterial = material.idmaterial" +
-                // LEFT JOIN (sum_devs) AS devs -- entradas desde movimientos tipo 1
-                " LEFT JOIN (SELECT material.idmaterial, SUM(coalesce(movimiento_detalle.cantidad,0)) as sum_devs FROM material" +
-                " LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
-                " LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
-                " WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY material.idmaterial) AS devs ON devs.idmaterial = material.idmaterial" +
-                // LEFT JOIN (sum_ing) AS ingresos -- entradas desde recepción de OCA
-                " LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing FROM recepcion" +
-                " LEFT JOIN recepcion_detalle on recepcion_detalle.idrecepcion = recepcion.idrecepcion" +
-                " LEFT JOIN abastecimiento ON abastecimiento.idabast = recepcion_detalle.idabast" +
-                " LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial" +
-                " WHERE recepcion.fecha BETWEEN '" + req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY material.idmaterial) as ing_oda ON ing_oda.idmaterial = material.idmaterial" +
-                // LEFT JOIN despachos AKA cantidad en GDD
-                " LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados" +
-                " FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
-                " LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE gd.fecha BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '" + req.params.token.split('@')[1]+" 23:59:59'" +
-                " GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
-                //LEFT JOIN produccion AKA cantidad en produccion
-                " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby) as virtuales" +
-                " FROM produccion" +
-                " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-                " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
-                " WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND virts.virtuales = 0) GROUP BY material.idmaterial",function(err, ops){
-                	if(err) console.log(err);
+        adminModel.getdatos(req.params.token.split("@"),function(err,ops){
+            if(err) console.log(err);
+			for(var i = 2; i < ops.length+2; i++){
+				sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
+				sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
+				sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
 
-                //Inicio de la funcion post query.
-                for(var i = 2; i < ops.length+2; i++){
-                    sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
-                    sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
-                    sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
-                    //Stock Inicial
-                    sheet.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
-                    sheet.getCell('E'+i.toString()).value = ops[i-2].solicitados;
-                    //Cantidad Solicitada
-                    sheet.getCell('F'+i.toString()).value = ops[i-2].virtuales;
-                    sheet.getCell('G'+i.toString()).value = ops[i-2].fabricados + ops[i-2].sum_dev + ops[i-2].ing_oda;
-                    sheet.getCell('H'+i.toString()).value = ops[i-2].despachados;
-                    sheet.getCell('I'+i.toString()).value = ops[i-2].s_inicial + ops[i-2].fabricados - ops[i-2].despachados + ops[i-2].sum_dev + ops[i-2].ing_oda;
-                }
+				sheet.getCell('C'+i.toString()).border = {
+					right: {style:'double', color: {argb:'00000000'}}
+				};
+                /*
+                ops = [{
+                    solicitados: según OC entrantes, AS peds.solicitados
+                    sol_atr: pedidos anteriores a la fecha sin despachar, AS peds_atrasados.solicitados
+                    necesarios: Segun teorico de BOM de todas OP, AS necesario.necesarios
+                    necesario_neto: Teorico del BOM en base a BPT, AS necesario.neto
+                    virtuales: Cantidad en produccion, AS virts.virtuales,
+                    virtuales_oda: Cantidad no reccepcionada de ODA, AS virts_oda.sum_virtual
+                    fabricados: enviados desde CC a BPT, AS fabrs.fabricados
+                    sum_dev: movimiento de bodega de DEVOLUCION, AS devs.sum_devs
+                    ing_oda: Recepcion de GDD anexa a OCA (ODA) AS ing_oda.sum_ing
+                    despachados: segun guia de despacho SALIENTE, AS desps.despachados
+                    sum_sal: movimiento de bodega de SALIDA, AS salidas_mp.sum_sal
+                },(...)];
+                */
+				//Stock Inicial
+				sheet.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
+				sheet.getCell('D'+i.toString()).border = {
+                    right: {style:'double', color: {argb:'00000000'}}
+				};
+				sheet.getCell('E'+i.toString()).value = ops[i-2].solicitados;
+				//Cantidad Solicitada
+				sheet.getCell('F'+i.toString()).value = ops[i-2].sol_atr;
+				sheet.getCell('G'+i.toString()).value = ops[i-2].necesarios;
+				sheet.getCell('H'+i.toString()).value = ops[i-2].necesario_neto;
+				sheet.getCell('H'+i.toString()).border = {
+                    right: {style:'double', color: {argb:'00000000'}}
+				};
 
-                workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
-                    console.log('new xlsx');
-                    res.send(nombre);
-                });
-            });
+				sheet.getCell('I'+i.toString()).value = ops[i-2].virtuales;
+                sheet.getCell('J'+i.toString()).value = ops[i-2].virtuales_oda;
+
+				sheet.getCell('J'+i.toString()).border = {
+                    right: {style:'double', color: {argb:'00000000'}}
+				};
+
+                sheet.getCell('K'+i.toString()).value = ops[i-2].fabricados;
+                sheet.getCell('L'+i.toString()).value = ops[i-2].sum_dev;
+                sheet.getCell('M'+i.toString()).value = ops[i-2].ing_oda;
+				sheet.getCell('M'+i.toString()).border = {
+                    right: {style:'double', color: {argb:'00000000'}}
+				};
+	            sheet.getCell('N'+i.toString()).value = ops[i-2].sum_sal;
+                sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
+                sheet.getCell('P'+i.toString()).value = ops[i-2].stock;
+				sheet.getCell('P'+i.toString()).border = {
+					left: {style:'double', color: {argb:'00000000'}},
+				};
+			}
+
+			workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+				console.log('new xlsx');
+				res.send(nombre);
+			});
         });
     }
 });

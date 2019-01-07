@@ -44,9 +44,15 @@
                             <th>Stock inicial</th>
                             <th>Solicitados</th>
                             <th>Atrasados</th>
-                            <th>Virtuales</th>
-                            <th>Ingresados</th>
-                            <th>Despachados</th>
+                            <th>Necesarios según BOM (TODAS OP)</th>
+                            <th>Necesarios según BOM (BPT)</th>
+                            <th>Virtuales en produccion</th>
+                            <th>Virtuales de ODA</th>
+                            <th>Aceptados por CC</th>
+                            <th>Devoluciones BMI</th>
+                            <th>Recepción GDD</th>
+                            <th>Salidas con GDD</th>
+                            <th>Retiros BMI</th>
                             <th>Stock actual</th>
                             <th>Stock final</th>
                         </tr>
@@ -60,11 +66,17 @@
                                     <td><%= numberFormat(prods[r].s_inicial.toString())%></td>
                                     <td><%= numberFormat(prods[r].solicitados.toString())%></td>
                                     <td><%= numberFormat(prods[r].sol_atr.toString())%></td>
+                                    <td><%= prods[r].necesarios%></td>
+                                    <td><%= prods[r].necesario_neto%></td>
                                     <td><%= numberFormat(prods[r].virtuales.toString())%></td>
-                                    <td><%= numberFormat((prods[r].fabricados + prods[r].ing_oda + prods[r].sum_dev).toString())%></td>
+                                    <td><%= numberFormat(prods[r].virtuales_oda.toString())%></td>
+                                    <td><%= numberFormat((prods[r].fabricados).toString())%></td>
+                                    <td><%= numberFormat(prods[r].sum_dev.toString())%></td>
+                                    <td><%= numberFormat(prods[r].ing_oda.toString())%></td>
                                     <td><%= numberFormat(prods[r].despachados.toString())%></td>
+                                    <td><%= numberFormat(prods[r].sum_sal.toString())%></td>
                                     <td><%= prods[r].stock%></td>
-                                    <td><%= numberFormat((prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados).toString())%></td>
+                                    <td><%= numberFormat((prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados - prods[r].sum_sal).toString())%></td>
                                     <% total_fabricados += prods[r].fabricados;%>
                                 </tr>
                             <%}%>
@@ -78,5 +90,5 @@
 
     <button type="button" class="btn btn-success" onclick="cierreMensual()">Cierre mensual</button>
 <script type="text/javascript">
-    setDataTable("#fabrs_tabl");
+    setDataTableMain("#fabrs_tabl");
 </script>
