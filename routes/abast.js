@@ -1731,19 +1731,15 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Unidad Med.', key: 'unit', width: 10},
 
             { header: 'Stock Inicio Mes', key: 'initial', width: 15},
-
             { header: 'Solicitado en OC', key: 'asked', width: 15},
             { header: 'Solicitado en OC atrasado', key: 'asked', width: 20},
-            { header: 'Solicitada según BOM', key: 'asked', width: 20},
-			{ header: 'Solicitada según BOM y entradas a BPT', key: 'asked', width: 25},
-
+            { header: 'Solicitada según OP', key: 'asked', width: 20},
+			{ header: 'Solicitada según entradas a BPT', key: 'asked', width: 25},
             { header: 'Stock en producción', key: 'virtual', width: 15},
             { header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 20},
-
             { header: 'Aceptados por CC', key: 'income', width: 15},
             { header: 'Devolución a BMI', key: 'income', width: 15},
             { header: 'Recepcion GDD', key: 'income', width: 15},
-
             { header: 'Retiros en BMI', key: 'departures', width: 15},
             { header: 'Salidas en GDD', key: 'departures', width: 15},
             { header: 'Stock actual', key: 'final', width: 15}

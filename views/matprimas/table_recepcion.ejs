@@ -39,7 +39,7 @@
             <td class="o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad%></td>
             <td class="o_data_cell" style="text-align: center;"><%=data[i].u_medida%></td>
-            <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;">
+            <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" data-order="<%= new Date(data[i].fecha).getTime()%>">
                 <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].fecha).toLocaleDateString())%></span>
             </td>
         </tr>
