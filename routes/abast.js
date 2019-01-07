@@ -338,10 +338,14 @@ router.post('/data_bom', function(req, res, next) {
 				connection.query("select material.codigo,material.idmaterial,material.detalle, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token, group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave where material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
+
+								if(semi.length == 0){
+									console.log("SIN BOM");
+								}
 								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
 				});
 			}
@@ -349,10 +353,14 @@ router.post('/data_bom', function(req, res, next) {
 				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave where material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
+
+								if(semi.length == 0){
+									console.log("SIN BOM");
+								}
 								res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
 				});
 			}
@@ -1560,7 +1568,6 @@ router.get("/fabrs_list/:token",function(req,res){
         console.log(req.params.token);
 		adminModel.getdatos(req.params.token.split("@"),function(err,data){
 			if(err) console.log(err);
-			console.log(data);
             res.render("plan/insumos_table",{prods:data});
 		});
     } else res.redirect("/bad_login");
@@ -1763,7 +1770,19 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
-			for(var i = 2; i < ops.length+2; i++){
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
+            for(var i = 2; i < ops.length+2; i++){
 				sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 				sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
 				sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
@@ -1825,7 +1844,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				for(var i=0;i<prods.length;i++){
 					sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
 						,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
-
 				}
                 workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
                     console.log('new xlsx');
