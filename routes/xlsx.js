@@ -3,7 +3,7 @@ var mysql = require('mysql');
 //creamos la conexion a nuestra base de datos con los datos de acceso de cada uno
 var connection = mysql.createConnection({
 
-    host: '127.0.0.1',
+    host: '192.168.1.25',
     user: 'admin',
     password : 'tempo123',
     port : 3306,
@@ -109,44 +109,32 @@ informe.getdatos = function(fecha,callback){
 
 };
 
-informe.worksheet_ids = function(data,callback){
-    data.sheet.columns = [
-        { header: 'Código', key: 'id', width: 15 },
-        { header: 'Detalle', key: 'name', width: 50 },
-        { header: 'Unidad Med.', key: 'unit', width: 10},
-        { header: 'Stock Inicio Mes', key: 'initial', width: 15},
-        { header: 'Cantidad Solicitada', key: 'asked', width: 15},
-        { header: 'Stock Virtual', key: 'virtual', width: 15},
-        { header: 'Ingresos', key: 'income', width: 15},
-        { header: 'Salidas', key: 'departures', width: 15},
-        { header: 'Stock Final', key: 'final', width: 15}
-    ];
-    data.sheet.getCell('A2').fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        bgColor: {argb: 'FFFF0000'}
-    };
-    //Inicio de la funcion post query.
-    for(var i = 2; i < data.ops.length+2; i++){
-        data.sheet.getCell('A'+i.toString()).border = {
-            top: {style:'double', color: {argb:'FF00FF00'}},
-            left: {style:'double', color: {argb:'FF00FF00'}},
-            bottom: {style:'double', color: {argb:'FF00FF00'}},
-            right: {style:'double', color: {argb:'FF00FF00'}}
-        };
-        data.sheet.getCell('A'+i.toString()).value = data.ops[i-2].codigo;
-        data.sheet.getCell('B'+i.toString()).value = data.ops[i-2].detalle;
-        data.sheet.getCell('C'+i.toString()).value = data.ops[i-2].u_medida;
-        //Stock Inicial
-        data.sheet.getCell('D'+i.toString()).value = data.ops[i-2].s_inicial;
-        data.sheet.getCell('E'+i.toString()).value = data.ops[i-2].solicitados;
-        //Cantidad Solicitada
-        data.sheet.getCell('F'+i.toString()).value = data.ops[i-2].virtuales;
-        data.sheet.getCell('G'+i.toString()).value = data.ops[i-2].fabricados + data.ops[i-2].sum_dev + data.ops[i-2].ing_oda;
-        data.sheet.getCell('H'+i.toString()).value = data.ops[i-2].despachados;
-        data.sheet.getCell('I'+i.toString()).value = data.ops[i-2].s_inicial + data.ops[i-2].fabricados - data.ops[i-2].despachados + data.ops[i-2].sum_dev + data.ops[i-2].ing_oda;
-    }
-    callback(null,{shit:data.sheet});
+informe.produccion = function(fecha,callback){
+    if(connection){
+        connection.query("SELECT material.*,prods.*,COALESCE(rech.rechazados,0) AS rechazados,COALESCE(fabrs.fabricados,0) AS fabricados FROM material" +
+            //Salidas De CC a BPT - as fabrs.fabricados
+            " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
+            " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
+            " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+            " WHERE produccion_history.to='8' AND (produccion_history.fecha between '" + fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
+            //Rechazos en JefeProd - as rech.rechazados
+            " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as rechazados FROM produccion_history" +
+            " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
+            " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+            " WHERE produccion_history.to = 's' AND (produccion_history.fecha between '" + fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " GROUP BY fabricaciones.idmaterial) AS rech ON rech.idmaterial = material.idmaterial" +
+            //Materiales en produccion - AS prods.*
+            " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad) AS cant_total,sum(produccion.`1`) as moldeo,sum(produccion.`2`) as fusion,sum(produccion.`3`) as quiebre," +
+            "sum(produccion.`4`) as terminacion,sum(produccion.`5`) as tt,sum(produccion.`6`) as maestranza,sum(produccion.`7`) as cc FROM produccion" +
+            " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+            " WHERE (produccion.f_gen BETWEEN '" + fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " GROUP BY fabricaciones.idmaterial) AS prods ON prods.idmaterial = material.idmaterial" +
+            " WHERE prods.cant_total != 0 GROUP BY material.idmaterial",function(err,rows){
+            if(err) throw err;
+            else callback(null,rows);
+        });
+    } else callback("Error",{});
 };
 
 module.exports = informe;

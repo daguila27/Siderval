@@ -1724,7 +1724,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         var nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
-        var sheet = workbook.addWorksheet('stockmaster');
+        var sheet = workbook.addWorksheet('InformeTotal');
         sheet.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1743,6 +1743,23 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Retiros en BMI', key: 'departures', width: 15},
             { header: 'Salidas en GDD', key: 'departures', width: 15},
             { header: 'Stock actual', key: 'final', width: 15}
+        ];
+        var sheet2 = workbook.addWorksheet('Produccion');
+        sheet2.columns = [
+            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Detalle', key: 'name', width: 50 },
+            { header: 'Unidad Med.', key: 'unit', width: 10},
+
+            { header: 'Solicitado en OP', key: 'asked', width: 15},
+            { header: 'Moldeo', key: 'virtual', width: 10},
+            { header: 'Fusion', key: 'income', width: 10},
+            { header: 'Quiebre', key: 'income', width: 10},
+            { header: 'Terminación', key: 'departures', width: 10},
+            { header: 'Tratamiento Térmico', key: 'income', width: 15},
+            { header: 'Maestranza', key: 'departures', width: 10},
+            { header: 'Control de Calidad', key: 'final', width: 15},
+            { header: 'Rechazado', key: 'final', width: 15},
+            { header: 'Ingresado a BPT', key: 'final', width: 15}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
@@ -1803,11 +1820,20 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 					left: {style:'double', color: {argb:'00000000'}},
 				};
 			}
+			adminModel.produccion(req.params.token.split("@"),function(err,prods){
+				if(err) throw err;
+				for(var i=0;i<prods.length;i++){
+					sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
+						,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
 
-			workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
-				console.log('new xlsx');
-				res.send(nombre);
+				}
+                workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                    console.log('new xlsx');
+                    res.send(nombre);
+                });
 			});
+
+
         });
     }
 });
