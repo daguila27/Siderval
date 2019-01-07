@@ -36,15 +36,14 @@
         <%if(prods.length){
             total_fabricados = 0;
         %>
-            <table class="table table-hover table-striped table-inverse table-bordered" id="fabrs_tabl">
+            <table class="table table-hover table-striped table-bordered" id="fabrs_tabl">
                         <thead>
                         <tr>
                             <th>Código</th>
                             <th>Detalle</th>
                             <th>Stock inicial</th>
-                            <th>Solicitados</th>
+                            <th>Solicitados por OC</th>
                             <th>Atrasados</th>
-                            <th>Necesarios según BOM (TODAS OP)</th>
                             <th>Necesarios según BOM (BPT)</th>
                             <th>Virtuales en produccion</th>
                             <th>Virtuales de ODA</th>
@@ -68,7 +67,6 @@
                                     <td><%= numberFormat(prods[r].sol_atr.toString())%></td>
                                     <td><%= prods[r].necesarios%></td>
                                     <td><%= prods[r].necesario_neto%></td>
-                                    <td><%= numberFormat(prods[r].virtuales.toString())%></td>
                                     <td><%= numberFormat(prods[r].virtuales_oda.toString())%></td>
                                     <td><%= numberFormat((prods[r].fabricados).toString())%></td>
                                     <td><%= numberFormat(prods[r].sum_dev.toString())%></td>

@@ -215,7 +215,7 @@
                                                         <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=ped[e].cantidad%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].despachados%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].u_medida%></td>
-                                                        <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(ped[e].f_entrega).toLocaleDateString())%></td>
+                                                        <td class="o_data_cell o_list_text o_required_modifier" data-order="<%= new Date(ped[e].f_entrega).getTime()%>" style="text-align: center;"><%=fechaLatino(new Date(ped[e].f_entrega).toLocaleDateString())%></td>
                                                         <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=ped[e].dias%></td>
                                                         <!--<td class="o_data_cell o_many2many_tags_cell">
                                                             <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
