@@ -100,7 +100,7 @@
 			}%>
 			<tr class="o_data_row">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].idoda%></td>
-				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" onclick="submit_form(this)" style="text-align: center;" data-idoda="<%= data[i].idoda%>">
+				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" onclick="submit_form(this)" data-order="<%=new Date(data[i].creacion).getTime()%>"  style="text-align: center;" data-idoda="<%= data[i].idoda%>">
 					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
 				</td>
 				<td class="o_data_cell" style="text-align: center; width: 13%">
