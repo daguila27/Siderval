@@ -1749,7 +1749,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Recepcion GDD', key: 'income', width: 15},
             { header: 'Retiros en BMI', key: 'departures', width: 15},
             { header: 'Salidas en GDD', key: 'departures', width: 15},
-            { header: 'Stock actual', key: 'final', width: 15}
+            { header: 'Stock Final', key: 'final', width: 15}
         ];
         var sheet2 = workbook.addWorksheet('Produccion');
         sheet2.columns = [
@@ -1834,7 +1834,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				};
 	            sheet.getCell('N'+i.toString()).value = ops[i-2].sum_sal;
                 sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
-                sheet.getCell('P'+i.toString()).value = ops[i-2].stock;
+                sheet.getCell('P'+i.toString()).value = ops[i-2].s_inicial + ops[i-2].fabricados + ops[i-2].sum_dev + ops[i-2].ing_oda - ops[i-2].despachados - ops[i-2].sum_sal;
 				sheet.getCell('P'+i.toString()).border = {
 					left: {style:'double', color: {argb:'00000000'}},
 				};
