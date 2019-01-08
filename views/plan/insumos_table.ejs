@@ -73,7 +73,6 @@
                                     <td><%= numberFormat(prods[r].ing_oda.toString())%></td>
                                     <td><%= numberFormat(prods[r].despachados.toString())%></td>
                                     <td><%= numberFormat((prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados - prods[r].sum_sal).toString())%></td>
-                                    <td><%= prods[r].stock%></td>
                                     <td><%= numberFormat(prods[r].sum_dev.toString())%></td>
                                     <td><%= numberFormat(prods[r].sum_sal.toString())%></td>
                                     <% total_fabricados += prods[r].fabricados;%>
