@@ -128,7 +128,7 @@ informe.produccion = function(fecha,callback){
             " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad) AS cant_total,sum(produccion.`1`) as moldeo,sum(produccion.`2`) as fusion,sum(produccion.`3`) as quiebre," +
             "sum(produccion.`4`) as terminacion,sum(produccion.`5`) as tt,sum(produccion.`6`) as maestranza,sum(produccion.`7`) as cc FROM produccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-            " WHERE (produccion.f_gen BETWEEN '" + fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " WHERE (produccion.cantidad != produccion.`8`)" +
             " GROUP BY fabricaciones.idmaterial) AS prods ON prods.idmaterial = material.idmaterial" +
             " WHERE prods.cant_total != 0 GROUP BY material.idmaterial",function(err,rows){
             if(err) throw err;
