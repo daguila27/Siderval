@@ -44,7 +44,6 @@
                             <th>Stock inicial</th>
                             <th>Solicitados por OC</th>
                             <th>Atrasados</th>
-                            <th>Necesarios según OP</th>
                             <th>Necesarios según fabricados</th>
                             <th>Virtuales en produccion</th>
                             <th>Virtuales de ODA</th>
@@ -66,7 +65,6 @@
                                     <td><%= numberFormat(prods[r].solicitados.toString())%></td>
                                     <td><%= numberFormat(prods[r].sol_atr.toString())%></td>
                                     <td><%= prods[r].necesario_neto%></td>
-                                    <td><%= prods[r].necesarios%></td>
                                     <td><%= prods[r].virtuales%></td>
                                     <td><%= numberFormat(prods[r].virtuales_oda.toString())%></td>
                                     <td><%= numberFormat((prods[r].fabricados).toString())%></td>
