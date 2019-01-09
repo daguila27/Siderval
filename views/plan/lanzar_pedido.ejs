@@ -1,4 +1,4 @@
-<div class="row" style=" margin: 0 ;padding-top: 3%;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
 <!--<button id="button-a">Crear EXCEL</button>-->
 <script type="text/javascript">
     /*function s2ab(s) { 
@@ -25,7 +25,7 @@
         });*/
 
 </script>
-<div class="col-md-10 col-md-offset-1 panel-creacion">
+<div class="col-md-12 panel-creacion">
         <div class="panel panel-primary cargando-panel" style="display: none;">
             <div class="panel-heading">
                 <div style="width: 100%;text-align: center;">
@@ -113,10 +113,14 @@
             </table>
             </div>
             <div class="panel-footer">
-                <div class="form-inline">
-                    <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
-                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
-                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
+                    </div>
+                    <div class="col-md-1 col-md-offset-5" style="padding: 0; padding-right: 8px">
+                        <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
+                        <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                    </div>
                 </div>
 
             </div>
@@ -125,7 +129,7 @@
 
 
 </div>
-<div class="col-md-10 col-md-offset-1">
+<div class="col-md-12">
 
     <div class="panel panel-default">
         <div class="panel-heading">

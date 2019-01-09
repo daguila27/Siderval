@@ -22,7 +22,7 @@
         "Otros"
     ];
 %>
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="tablaMovimientos">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="tablaMovimientos" style="top: -7px">
     <thead>
     <tr>
         <th class="cabecera o_column_sortable ">N° Mov</th>
@@ -73,7 +73,13 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#tablaMovimientos");
+
+    $('#tablaMovimientos').DataTable( {
+        "scrollCollapse": true,
+        'searching': false,
+        "paging":         false
+    } );
+
     function submit_form(yo){
         //$("#form"+$(yo).data('idodc')).submit();
         $.ajax({

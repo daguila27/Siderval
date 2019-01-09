@@ -1,4 +1,3 @@
-    
     <%console.log(data)%>
         <div class="panel panel-primary cargando-panel" style="display: none;">
             <div class="panel-heading">
@@ -14,70 +13,70 @@
         </style>
         <div class="guardado_automatico" style="width: 100%;height: 20px"></div>
         <div class="panel panel-primary panel-defecto">
-                <div class="panel-heading">
-                    <div class="dropdown pull-right">
-                      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></button>
-                      <ul class="dropdown-menu">
-                        <li class="ped-option" onclick="saveState(this)"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                        <li class="ped-option" onclick="loadState(this)"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                        <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                        <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                      </ul>
-                    </div>
-                    <div style="display: flex;">
-                    <div style="width: 50%">
-                            <h3 style="width: 100%">Registrar Orden de Compra: 
-                        <!--<div>
-                            <button class="btn btn-primary" onclick="saveState(this)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
-                            <button class="btn btn-primary" onclick="loadState(this)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
-                        </div>-->
-                            </h3>
-                            <p style="margin-top: 7%; margin-left: 10px">
-                              <label>
-                                Numeración de Items:<br>  
-                                <input type="radio" name="factor_item" value="1" checked> De 1 en 1<br>
-                                <input type="radio" name="factor_item" value="10"> De 10 en 10
-                              </label>    
-                            </p>
-                    </div>
-                    <div style="width: 50%;">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="setdates">
-                                        Ingresar fecha para todos: 
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
-                                        <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos" style="height: 32px">
-                                    </div>
+            <div class="panel-heading">
+                <div class="dropdown pull-right">
+                  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></button>
+                  <ul class="dropdown-menu">
+                    <li class="ped-option" onclick="saveState(this)"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                    <li class="ped-option" onclick="loadState(this)"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                    <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                    <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                  </ul>
+                </div>
+                <div style="display: flex;">
+                <div style="width: 50%">
+                        <h3 style="width: 100%">Registrar Orden de Compra: 
+                    <!--<div>
+                        <button class="btn btn-primary" onclick="saveState(this)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+                        <button class="btn btn-primary" onclick="loadState(this)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+                    </div>-->
+                        </h3>
+                        <p style="margin-top: 7%; margin-left: 10px">
+                          <label>
+                            Numeración de Items:<br>  
+                            <input type="radio" name="factor_item" value="1" checked> De 1 en 1<br>
+                            <input type="radio" name="factor_item" value="10"> De 10 en 10
+                          </label>    
+                        </p>
+                </div>
+                <div style="width: 50%;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="setdates">
+                                    Ingresar fecha para todos: 
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
+                                    <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos" style="height: 32px">
                                 </div>
                             </div>
-                            <div class="form-group col-md-4" style="width: 50%">
-                                <label for="moneda">Seleccione Moneda:</label>
-                                <select class="form-control" id="moneda">
-                                    <option value="usd">Dolares (USD)</option>
-                                    <option value="eur">Euros (EUR)</option>
-                                    <option value="clp" selected>Pesos Chilenos (CLP)</option>
-                                    <option value="gbp">Libra (GBP)</option>
-                                </select>
-                            </div>
                         </div>
-                        <div class="form-group" style="width: 100%">
-                          <label for="cliente">Seleccione cliente:</label>
-                          <select class="form-control" id="cliente" onchange="compNum(this)">
-                          <%for(var e=0; e < cli.length; e++){
-                            if(cli[e].idcliente == data['cliente']){%>
-                            <option value="<%=cli[e].idcliente%>" selected="selected"><%=cli[e].sigla%> - <%=cli[e].razon%></option>
-                          <%}else{%>
-                            <option value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></option>
-                          <%}}%>
-                        </select>
+                        <div class="form-group col-md-4" style="width: 50%">
+                            <label for="moneda">Seleccione Moneda:</label>
+                            <select class="form-control" id="moneda">
+                                <option value="usd">Dolares (USD)</option>
+                                <option value="eur">Euros (EUR)</option>
+                                <option value="clp" selected>Pesos Chilenos (CLP)</option>
+                                <option value="gbp">Libra (GBP)</option>
+                            </select>
                         </div>
+                    </div>
+                    <div class="form-group" style="width: 100%">
+                      <label for="cliente">Seleccione cliente:</label>
+                      <select class="form-control" id="cliente" onchange="compNum(this)">
+                      <%for(var e=0; e < cli.length; e++){
+                        if(cli[e].idcliente == data['cliente']){%>
+                        <option value="<%=cli[e].idcliente%>" selected="selected"><%=cli[e].sigla%> - <%=cli[e].razon%></option>
+                      <%}else{%>
+                        <option value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></option>
+                      <%}}%>
+                    </select>
                     </div>
                 </div>
             </div>
-            <form id="send_of">
+        </div>
+        <form id="send_of">
             <div style="overflow-y: scroll; max-height: 300px;">
             <table class="table table-striped sectionSave" style="margin: 0">
                 <thead>
@@ -117,27 +116,30 @@
                             <td><%=data['dets[]'][e]%><input type="hidden" name="idm" value="<%=data['idm[]'][e]%>"><input type="hidden" name="idp" value="<%=data['idp[]'][e]%>"></td>
                             <td><strong><%=fabricacion%></strong></td>
                             <td><input type="text" value="<%=data['prov[]'][e]%>" name="prov" style="display:none;"> <%=data['alea[]'][e]%></td>
-                            <td><input type="date" name="fechas" class="form-control" min="<%= new Date().toLocaleDateString()%>" required="" value="<%= data['fechas[]'][e]%>"></td>
-                            <td style="width: 12%"><input class="form-control" type="number" name="cants" min="1" required="" value="<%= data['cants[]'][e]%>"></td>
+                            <td style="padding: 3px"><input type="date" name="fechas" class="form-control" min="<%= new Date().toLocaleDateString()%>" required="" value="<%= data['fechas[]'][e]%>"></td>
+                            <td style="width: 12%; padding: 3px"><input class="form-control" type="number" name="cants" min="1" required="" value="<%= data['cants[]'][e]%>"></td>
                             <td class="parsear_nro"><%= data['stock[]'][e]%></td>
-                            <td style="width: 12%"><input type="number" name="precio" class="form-control" min="0" placeholder="Precio" value="<%= data['precio[]'][e]%>"></td>
-                            <td style="text-align: center;"><input type="checkbox" name="lock"></td>
-                            <td><a onclick="drop(this)" class="btn btn-danger"><i class="fa fa-remove"></i></a></td>
+                            <td style="width: 12%; padding: 3px"><input type="number" name="precio" class="form-control" min="0" placeholder="Precio" value="<%= data['precio[]'][e]%>"></td>
+                            <td style="text-align: center; padding: 5px"><input class="form-control" style="margin-left: 30%; width: 20px; height: 20px;" type="checkbox" name="lock"></td>
+                            <td><a onclick="drop(this)" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a></td>
                         </tr>
                     <%}}%>
                 </tbody>
             </table>
             </div>
             <div class="panel-footer">
-                <div class="form-inline">
-                    <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required="" value="<%=data['nroordenfabricacion']%>">
-                    <button class="btn btn-success" style="width:10%" id="of_submit">+ Crear</button>
-                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required="" value="<%=data['nroordenfabricacion']%>">
+                    </div>
+                    <div class="col-md-1 col-md-offset-5" style="padding: 0; padding-right: 8px">
+                        <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
+                        <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                    </div>
                 </div>
-
             </div>
-            </form>
-        </div>
+        </form>
+    </div>
 
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js""></script>

@@ -1,72 +1,83 @@
-<h1 class="page-header">Registrar Recepción de materiales</h1>
-<div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1" id="panel_odaform">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            Buscar OC
-        </div>
-        <div class="panel-body">
-            <form id="oda_form">
-                <div class="form-inline input-group">
-                    <input type="text" id="oda_input" class="form-control" name="numoda">
-                    <div class="input-group-btn">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
+    <div class="col-md-12" id="panel_odaform" style="margin-top: 20px">
+        <div class="panel panel-primary panel-defecto">
+            <div class="panel-heading">
+                <h3>Registrar Recepción de materiales</h3>
+            </div>
+            <div class="panel-body">
+                <form id="oda_form">
+                    <div class="form-inline input-group">
+                        <input type="text" id="oda_input" class="form-control" name="numoda">
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-primary">Buscar <i class="fa fa-search"></i></button>
+                        </div>
                     </div>
-                </div>
-            </form>
-            <form id="gdd_form">
-                <div id="oda_gdd" class="well" style="margin-top: 20px">
-                    No se ha seleccionado ninguna OC
-                </div>
-            </form>
+                </form>
+                <form id="gdd_form">
+                    <div id="oda_gdd" class="well" style="margin-top: 20px">
+                        No se ha seleccionado ninguna OC
+                    </div>
+                </form>
 
+            </div>
+       </div>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body" style="padding: 0;">
+                <table id="odaTable" class="table table-striped" style="margin: 0; width: 100%">
+                    <thead>
+                    <tr>
+                        <td>ID ODA</td>
+                        <td>Detalle Mat.</td>
+                        <td>Stock Mat.</td>
+                        <td>Pedidos</td>
+                        <td>Recibidos</td>
+                        <td></td>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <%for (var i = 0; i < abast.length; i++){ %>
+                    <tr>
+                        <td><%=abast[i]['idoda']%></td>
+                        <td><%=abast[i]['detalle']%></td>
+                        <td><%=abast[i]['stock']%></td>
+                        <td><%=abast[i]['cantidad']%></td>
+                        <td><%=abast[i]['recibidos']%></td>
+                        <td><a class="btn btn-success btn-xs" onclick="send_search(<%=abast[i].idoda%>)"><i class="fa fa-plus"></i></a></td>
+                    </tr>
+                    <%}%>
+                    </tbody>
+                </table>
+            </div>
         </div>
-   </div>
-</div>
-<div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1">
-    <table id="odaTable" class="table table-responsive">
-        <thead>
-        <tr>
-            <td>ID ODA</td>
-            <td>Detalle Mat.</td>
-            <td>Stock Mat.</td>
-            <td>Pedidos</td>
-            <td>Recibidos</td>
-            <td></td>
-            <td></td>
-        </tr>
-        </thead>
-
-        <tbody>
-        <%for (var i = 0; i < abast.length; i++){ %>
-        <tr>
-            <td><%=abast[i]['idoda']%></td>
-            <td><%=abast[i]['detalle']%></td>
-            <td><%=abast[i]['stock']%></td>
-            <td><%=abast[i]['cantidad']%></td>
-            <td><%=abast[i]['recibidos']%></td>
-            <td><a class="btn btn-primary" onclick="send_search(<%=abast[i].idoda%>)"><i class="fa fa-plus"></i></a></td>
-        </tr>
-        <%}%>
-        </tbody>
-    </table>
+    </div>
 </div>
 
 <script type="text/javascript">
+    
     //Ejecutar la DataTable
-    $(document).ready( function () {
-        setDataTable("#odaTable");
-    } );
-    function goToByScroll(id) {
+    $('#odaTable').DataTable({
+        "lengthChange": false,
+        "searching": false,
+        "bInfo": false,
+        "paging": false
+    });
+
+    /*function goToByScroll(id) {
         // Scroll
         $('html,#page-wrapper').animate({
             scrollTop: $("#" + id).offset().top
         }, 'slow');
-    }
+    }*/
+
     function send_search(numero){
         $("#oda_input").val(numero);
         $("#oda_form button").trigger("click");
-        goToByScroll("panel_odaform");
+        // goToByScroll("panel_odaform");
     }
+
     //Formulario de Búsqueda
     $("#oda_form").submit(function(e){
         e.preventDefault();

@@ -14,216 +14,204 @@
     }
     %>
 <div id="help" class="panel-collapse collapse" role="tabpanel" aria-labelledby="help" style="margin: 0 5%;background-color: rgb(202,202,202);">
-              <p style="padding: 20px;font-style: italic;">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </p> 
-            </div>
+  <p style="padding: 20px;font-style: italic;">
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </p> 
+</div>
 
 
-
-<div class="col-md-10 col-md-offset-1 panel-creacion" style="margin-top: 20px">
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
+  <div class="col-md-12 panel-creacion" style="margin-top: 20px">
     <div class="panel panel-primary cargando-panel" style="display: none;">
-        <div class="panel-heading">
-            <div style="width: 100%;text-align: center;">
-                <img style="width: 25%" src="/loading.gif">
-            </div>
+      <div class="panel-heading">
+        <div style="width: 100%;text-align: center;">
+          <img style="width: 25%" src="/loading.gif">
         </div>
+      </div>
     </div>
     <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
-        <form id="send_of">
-    <div class="panel panel-primary panel-defecto">
-            <div class="panel-heading" style="display: flex">
-                <div style="width: 45%">
-                    <h3>Lanzar Orden de Compra: #<%=last%></h3>
-                    <div style="display: flex">
-                        <button class="btn btn-primary" onclick="saveState(false)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
-                        <button class="btn btn-primary" onclick="loadState(false)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
-                        <div class="dropdown">
-                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                            <ul class="dropdown-menu">
-                                <li data-toggle="modal" data-target="#SaveOdaModal"><a href="#">Guardar Como Plantilla</a></li>
-                                <li data-toggle="modal" data-target="#LoadOdaModal" onclick="renderPlantillasModal()"><a href="#">Cargar Plantilla</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div style="width: 20%">
-                        <label>Proveedor: </label>
-                        <div class='predic_text' onkeyup='getPredictions(this)'><input type='text' name='prov' autocomplete='off' required></input><div></div></div>         
-                </div>
-                <div style="width: 30%; margin-left: 2%">
-                        <label>Moneda: </label>
-                        <select class="form-control" name="money" id="money">
-                          <option value="usd">Dolares (USD)</option>
-                          <option value="eur">Euro (EUR)</option>
-                          <option value="clp" selected>Pesos Chilenos (CLP)</option>
-                          <option value="gbp">Libra (GBP)</option>
-                        </select>
-                        <!--<label>
-                          <input type="checkbox" name="exento"> Exento de IVA
-                        </label>-->
-                </div>
-            </div>
-             <div style="overflow-y: scroll; max-height: 300px;">
-                
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Exento</th>
-                    <th>Descripción</th>
-                    <th>Mínimo de Compra</th>
-                    <th>Cantidad</th>
-                    <th>Precio x Unidad</th>
-                    <th>Total</th>
-                    <th>C.C.</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody id="session_fabrs">
-
-                </tbody>
-            </table>
-
-                </div>
-            <div class="panel-footer">
-                <h4 style="width: 100%;display: flex;">
-                  <div style="margin-left: 10%;width: 30%;text-align: left" class="total-neto"><small>Neto: </small></div> 
-                  <div style="margin-left: 0%;width: 30%;text-align: left" class="total-iva"><small>IVA: </small></div>  
-                  <div style="margin-left: 0%;width: 30%;text-align: left" class="total-total"><small>Total: </small></div> 
-                </h4>
-                <div style="width: 100%;text-align: center; cursor: pointer; margin-bottom: 5px"><a data-toggle="collapse" data-target="#generalInfo"><b>Información general <i class="fa fa-caret-down desp-arrow"></i></b></a></div>
-                <div class="collapse" id="generalInfo">
-                      <div class="form-group" style="display: flex; width: 100%">
-                        <div style="display: none;">
-                          <label for="cuent">Cuenta:</label>
-                          <!--<input type="text" class="form-control" id="cuent" name='cuent'>-->
-                          <select type="text" class="form-control" id="cuent" name="cuent">
-                            <%for(var e=0; e < subc.length; e++){%>
-                              <option value="<%=subc[e].subcuenta%>"><%=subc[e].subcuenta%></option>
-                            <%}%>
-                              <option value="pordefinir">Por Definir</option>
-                            </select>
-                        </div>
-                        <div style="width: 50%; display: none">
-                            <label for="dest">Destino:</label>
-                            <!--<input type="text" class="form-control" id="dest" name='dest'>-->
-                        </div>
-                        <!--<div style="width: 50%">
-                        <label for="dest">Descuento (%):</label>
-                        <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()">
-                        </div>-->
-                    </div>
-                    <div class="form-group" style="display: flex; width: 100%">
-                      <div style="width: 33%">
-                      <label for="plae">Plazo de entrega:</label>
-                      <input type="date" class="form-control" id="plae" name="plae" required>
-                      </div>
-                      <div style="width: 33%">
-                      <label for="pag">Forma de pago:</label>
-                      <input type="text" class="form-control" id="pag" name="pag">
-                      </div>
-                      <div style="width: 33%">
-                      <label for="entr">Lugar de entrega:</label>
-                        <select type="text" class="form-control" id="entr" name="entr">
-                          <option value="siderval">Bodega Siderval</option>
-                          <option value="proveedor">Bodega Proveedor</option>
-                          <option value="Por definir">Por definir</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="form-group" style="display: flex;">
-                        <div style="width: 50%">
-                          <label for="obs">Observaciones:</label>
-                          <input type="text" class="form-control" id="obs" name="obs">
-                        </div>                  
-                        <div style="width: 50%">
-                          <label for="desc">Descuento (%):</label>
-                          <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()">
-                        </div>
-                    </div>
-                  </div>  
-                <div class="form-inline">
-                    <input type="text" name="nroordenfabricacion" id="num" style="width:80%; display: none" placeholder="N° Orden de Compra / N° Orden de Venta" class="form-control" value="<%=last%>" required>
-                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
-                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
-                </div>
-
-            </div>
-    </div>
-        </form>
-</div>
-<div class="col-md-10 col-md-offset-1">
-
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            <h3>Añadir Productos</h3><!--<button onclick="refreshAllCost()">Mostrar función</button>-->
-            <ul class="nav nav-tabs">
-              <li class="active"><a href="#buscador" aria-controls="home" role="tab" data-toggle="tab">Buscador</a></li>
-              <li><a href="#segunOF" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación</a></li>
-            </ul>
-        </div>
-        <div class="tab-content">
-          <div role="tabpanel" class="tab-pane active" id="buscador">
-                  <div class="panel-body">
-                      <form id="strimform">
-                          <div class="form-inline">
-
-                                <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
-                                <label style="font-weight: normal; margin-left: 20px; margin-right: 20px">
-                                  <input type="checkbox" name="showProd" id="showProd">
-                                  Mostrar Productos (Fundidos)
-                                </label>
-                              <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
-                          </div>
-                      </form>
-                  </div>
-
-                  <table class="table table-responsive">
-                      <thead>
-                      <tr>
-                          <th>Descripción</th>
-                          <th>Caracteristica</th>
-                          <th>Stock</th>
-                          <th></th>
-                      </tr>
-                      </thead>
-                      <tbody id="prefabrs">
-                      </tbody>
-                  </table>
-          </div>
-          <div role="tabpanel" class="tab-pane fade" id="segunOF">
-               <div class="panel panel-info">
-                  <div class="panel-heading">
-                      <div style="display: flex;">
-                          <!--<div style="width: 45%; margin-right: 5%;">
-                              <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
-                              <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
-                          </div>
-                          <div style="width: 50%;" class="form-group">
-                                <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
-                                <div style="display: flex;">
-                                <select style="width: 40%" class="form-control" id="filtro" onchange="refreshGDList()">
-                                  <option value="odc.numoc">N° OC</option>
-                                  <option value="material.detalle">Detalle</option>
-                                  <option value="subaleacion.subnom">Aleación</option>
-                                  <option value="pedido.cantidad - pedido.despachados">Sin Despachar</option>
-                                  <option value="pedido.f_entrega" selected="selected">Fecha de Entrega</option>
-                                </select>
-                                <select style="width: 40%" class="form-control" id="orden" onchange="refreshGDList()">
-                                  <option value="ASC" selected="selected">Ascendente</option>
-                                  <option value="DESC">Descendente</option>
-                                </select>
-                                </div>-->
-                      </div>
+    <form id="send_of">
+      <div class="panel panel-primary panel-defecto">
+        <div class="panel-heading" style="display: flex">
+          <div style="width: 45%">
+            <h3>Lanzar Orden de Compra: #<%=last%></h3>
+            <div style="display: flex">
+              <button class="btn btn-primary" onclick="saveState(false)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
+              <button class="btn btn-primary" onclick="loadState(false)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                  <li data-toggle="modal" data-target="#SaveOdaModal"><a href="#">Guardar Como Plantilla</a></li>
+                  <li data-toggle="modal" data-target="#LoadOdaModal" onclick="renderPlantillasModal()"><a href="#">Cargar Plantilla</a></li>
+                </ul>
               </div>
-                  </div>
-                  <div class="panel-body renderizar_ofs">
-
-                  </div>
-              </div>   
+            </div>
+          </div>
+          <div style="width: 20%">
+            <label>Proveedor: </label>
+            <div class='predic_text' onkeyup='getPredictions(this)'> 
+              <input type='text' class="form-control" name='prov' autocomplete='off' required></input>
+            </div>
+          </div>
+          <div style="width: 30%; margin-left: 2%">
+            <label>Moneda: </label>
+            <select class="form-control" name="money" id="money">
+              <option value="usd">Dolares (USD)</option>
+              <option value="eur">Euro (EUR)</option>
+              <option value="clp" selected>Pesos Chilenos (CLP)</option>
+              <option value="gbp">Libra (GBP)</option>
+            </select>
           </div>
         </div>
+        <div style="overflow-y: scroll; max-height: 300px;">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Exento</th>
+                <th>Descripción</th>
+                <th>Mínimo de Compra</th>
+                <th>Cantidad</th>
+                <th>Precio x Unidad</th>
+                <th>Total</th>
+                <th>C.C.</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="session_fabrs">
+
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer">
+          <h4 style="width: 100%;display: flex;">
+            <div style="margin-left: 10%;width: 30%;text-align: left" class="total-neto"><small>Neto: </small></div> 
+            <div style="margin-left: 0%;width: 30%;text-align: left" class="total-iva"><small>IVA: </small></div>  
+            <div style="margin-left: 0%;width: 30%;text-align: left" class="total-total"><small>Total: </small></div> 
+          </h4>
+          <div style="width: 100%;text-align: center; cursor: pointer; margin-bottom: 5px"><a data-toggle="collapse" data-target="#generalInfo"><b>Información general <i class="fa fa-caret-down desp-arrow"></i></b></a></div>
+          <div class="collapse" id="generalInfo">
+            <div class="form-group" style="display: flex; width: 100%">
+              <div style="display: none;">
+                <label for="cuent">Cuenta:</label>
+                <!--<input type="text" class="form-control" id="cuent" name='cuent'>-->
+                <select type="text" class="form-control" id="cuent" name="cuent">
+                  <%for(var e=0; e < subc.length; e++){%>
+                    <option value="<%=subc[e].subcuenta%>"><%=subc[e].subcuenta%></option>
+                  <%}%>
+                    <option value="pordefinir">Por Definir</option>
+                </select>
+              </div>
+              <div style="width: 50%; display: none">
+                <label for="dest">Destino:</label>
+              </div>
+            </div>
+            <div class="form-group" style="display: flex; width: 100%">
+              <div style="width: 33%">
+                <label for="plae">Plazo de entrega:</label>
+                <input type="date" class="form-control" id="plae" name="plae" required>
+              </div>
+              <div style="width: 33%">
+                <label for="pag">Forma de pago:</label>
+                <input type="text" class="form-control" id="pag" name="pag">
+              </div>
+              <div style="width: 33%">
+                <label for="entr">Lugar de entrega:</label>
+                <select type="text" class="form-control" id="entr" name="entr">
+                  <option value="siderval">Bodega Siderval</option>
+                  <option value="proveedor">Bodega Proveedor</option>
+                  <option value="Por definir">Por definir</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="display: flex;">
+              <div style="width: 50%">
+                <label for="obs">Observaciones:</label>
+                <input type="text" class="form-control" id="obs" name="obs">
+              </div>                  
+              <div style="width: 50%">
+                <label for="desc">Descuento (%):</label>
+                <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()">
+              </div>
+            </div>
+          </div>  
+          <div class="row">
+            <div class="col-md-1 col-md-offset-11" style="padding: 0">
+              <input type="text" name="nroordenfabricacion" id="num" style="width:80%; display: none" placeholder="N° Orden de Compra / N° Orden de Venta" class="form-control" value="<%=last%>" required>
+              <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
+              <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col-md-12">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+          <h3>Añadir Productos</h3><!--<button onclick="refreshAllCost()">Mostrar función</button>-->
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#buscador" aria-controls="home" role="tab" data-toggle="tab">Buscador</a></li>
+            <li><a href="#segunOF" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación</a></li>
+          </ul>
+      </div>
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="buscador">
+          <div class="panel-body">
+            <form id="strimform">
+              <div class="form-inline">
+                <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
+                <label style="font-weight: normal; margin-left: 20px; margin-right: 20px">
+                <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="showProd" id="showProd"> Mostrar Productos (Fundidos)
+                </label>
+                <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
+              </div>
+            </form>
+          </div>
+          <table class="table table-responsive">
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Caracteristica</th>
+                <th>Stock</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="prefabrs">
+            </tbody>
+          </table>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="segunOF">
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <div style="display: flex;">
+                  <!--<div style="width: 45%; margin-right: 5%;">
+                      <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
+                      <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
+                  </div>
+                  <div style="width: 50%;" class="form-group">
+                        <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
+                        <div style="display: flex;">
+                        <select style="width: 40%" class="form-control" id="filtro" onchange="refreshGDList()">
+                          <option value="odc.numoc">N° OC</option>
+                          <option value="material.detalle">Detalle</option>
+                          <option value="subaleacion.subnom">Aleación</option>
+                          <option value="pedido.cantidad - pedido.despachados">Sin Despachar</option>
+                          <option value="pedido.f_entrega" selected="selected">Fecha de Entrega</option>
+                        </select>
+                        <select style="width: 40%" class="form-control" id="orden" onchange="refreshGDList()">
+                          <option value="ASC" selected="selected">Ascendente</option>
+                          <option value="DESC">Descendente</option>
+                        </select>
+                        </div>-->
+              </div>
+            </div>
+          </div>
+          <div class="panel-body renderizar_ofs">
+          </div>
+        </div>   
+      </div>
     </div>
+  </div>
 </div>
 <div  class="hidden" style="display: none" ></div>
 

@@ -72,7 +72,7 @@
                 <td><%= mat[j].codigo%></td>
                 <td><%= mat[j].detalle%></td>
                 <td class="parsear_nro"><%= mat[j].stock %></td>
-                <td style="text-align: center"><a href="#" class="selector" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
+                <td style="text-align: center"><a href="#" class="selector btn btn-success btn-xs" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
             </tr>
         <%}
         }
@@ -91,7 +91,6 @@
 <script type="text/javascript">
     //setDataTable("#tablaStock");
     $('#tablaStock').DataTable( {
-        "scrollY":        "300px",
         "scrollCollapse": true,
         "paging":         false
 

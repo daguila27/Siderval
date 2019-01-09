@@ -33,7 +33,7 @@ function letraMayus(string) {
 <%}else{%>
     <form id="send_gdd" type="post">
 <%}%>    
-        <div class="panel panel-primary panel-defecto" >
+        <div class="panel panel-primary panel-defecto">
             <div class="panel-heading" style="display: flex;">
                 <div style="width: 50%">
                     <h3>Crear Guía de Despacho N° <%=num%></h3>
@@ -112,9 +112,12 @@ function letraMayus(string) {
     /* Estilo tablas Datatable */
     .dataTables_filter {
        position: relative;
-       left: -835px;
+       left: -160%;
        max-width: 100%;
        width: 100%;
+    }
+    .dataTables_filter#label#input{
+       width: 150%;
     }
 </style>
 

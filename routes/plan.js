@@ -755,7 +755,7 @@ router.post('/addsession_prefabr', function(req,res,next){
                 [req.body.idm],function(err, details){
                     if(err){console.log("Error Selecting : %s", err);}
                     res.send("<tr><td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'></td><td><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" +
-                        "<td><input class='form-control' type='number' name='cants' min='1' required></td><td style='text-align: center;'><input type='checkbox' name='lock'></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>");
+                        "<td><input class='form-control' type='number' name='cants' min='1' required></td><td style='text-align: center;'><input class='form-control' style='margin-left: 40%; width: 20px; height: 20px;' type='checkbox' name='lock'></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>");
                 });
         });
     } else res.redirect("/bad_login");

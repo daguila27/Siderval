@@ -27,7 +27,7 @@
                 <td data-toggle="tooltip" data-placement="bottom" title="Aleación" style="text-align: center"><%=data[i].subnom%></td>
                 <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Necesitados" style="text-align: center"><%= data[i].restantes %></td>
                 <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Entrega" style="text-align: center"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
-                <td><a data-aleacion="<%= data[i].subnom%>" data-restantes="<%= data[i].restantes%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" class="btn btn-success" onclick="sendtoQueue(this)"><i class="glyphicon glyphicon-plus"></i></a></td>
+                <td><a data-aleacion="<%= data[i].subnom%>" data-restantes="<%= data[i].restantes%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" class="btn btn-success btn-xs" onclick="sendtoQueue(this)"><i class="glyphicon glyphicon-plus"></i></a></td>
             </tr>
     <%}%>
         </tbody>

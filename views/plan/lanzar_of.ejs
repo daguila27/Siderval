@@ -1,4 +1,5 @@
-<div class="col-md-10 col-md-offset-1 panel-creacionOF">
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
+    <div class="col-md-12 panel-creacionOF">
         <div class="panel panel-primary cargando-panel" style="display: block;">
             <div class="panel-heading">
                 <div style="width: 100%;text-align: center;">
@@ -18,19 +19,17 @@
                         <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
                       </ul>
                     </div>
-                <div style="display: flex;">
-                    <div style="width: 50%">
+                <div class="row">
+                    <div class="col-md-6">
                         <h3>Crear Orden de Fabricación: </h3>
                        <!-- <div>
                             <button class="btn btn-primary" onclick="saveStateOF()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
                             <button class="btn btn-primary" onclick="loadStateOF()"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
                         </div>-->
                     </div>
-                    <div style="width: 50%">
-                        <label for="setdates">
-                            Ingresar fecha para todos: 
-                        </label>
-                        <div class="input-group"  style="width:30%;margin-left: 20%;margin-top: 5px"> 
+                    <div class="col-md-6">
+                        <label for="setdates">Ingresar fecha para todos</label>
+                        <div class="input-group"  style="width:40%; margin-top: 5px"> 
                                 <span class="input-group-addon" ><i class="fa fa-calendar-o"></i></span>
                                 <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">   
                         </div>   
@@ -55,53 +54,54 @@
                 </table>
             </div>
             <div class="panel-footer">
-                <div class="form-inline">
-                    <input type="hidden" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Fabricación" class="form-control" value='1' required>
-                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
-                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                <div class="row">
+                    <div class="col-md-1 col-md-offset-11" style="padding: 0; padding-right: 8px">
+                        <input type="hidden" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Fabricación" class="form-control" value='1' required>
+                        <button class="btn btn-success" style="width:80px" id="of_submit">Crear</button>
+                        <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                    </div>
                 </div>
 
             </div>
             </form>
         </div>
+    </div>
 
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3>Añadir Productos</h3>
+            </div>
+            <div class="panel-body">
+                <form id="strimform">
+                    <div class="form-inline">
+                        <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
+                        <select name="caract" class="form-control strim_input" id="caract">
+                            <option value="0">Cualquiera</option>
+                            <% for(var i = 0;i< caracts.length;i++){%>
+                            <option value="<%= caracts[i].idcaracteristica%>"><%= caracts[i].cnom%></option>
+                            <%}%>
+                        </select>
+                        <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
+                    </div>
+                </form>
+            </div>
 
-</div>
-<div class="col-md-10 col-md-offset-1">
+            <table class="table table-responsive">
+                <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <!--<th>Caracteristica</th>-->
+                    <th>Aleacion</th>
+                    <!--<th>Subaleacion</th>-->
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="prefabrs">
+                </tbody>
+            </table>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3>Añadir Productos</h3>
         </div>
-        <div class="panel-body">
-            <form id="strimform">
-                <div class="form-inline">
-                    <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
-                    <select name="caract" class="form-control strim_input" id="caract">
-                        <option value="0">Cualquiera</option>
-                        <% for(var i = 0;i< caracts.length;i++){%>
-                        <option value="<%= caracts[i].idcaracteristica%>"><%= caracts[i].cnom%></option>
-                        <%}%>
-                    </select>
-                    <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
-                </div>
-            </form>
-        </div>
-
-        <table class="table table-responsive">
-            <thead>
-            <tr>
-                <th>Descripción</th>
-                <!--<th>Caracteristica</th>-->
-                <th>Aleacion</th>
-                <!--<th>Subaleacion</th>-->
-                <th></th>
-            </tr>
-            </thead>
-            <tbody id="prefabrs">
-            </tbody>
-        </table>
-
     </div>
 </div>
 

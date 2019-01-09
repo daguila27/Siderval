@@ -18,9 +18,9 @@
         <td><%=data[i][1]%></td>
         <td><%=data[i][3]%></td>
         <td style="text-align: center;"><%=data[i][2]%></td>
-        <td><input type="number" min="1" data-max="<%= data[i][2]%>" name="cants" id="inpt<%=data[i][0]%>" class="form-control valor_cant" data-cant='<%=data[i][2]%>' value="<%= cants[i]%>" required></td>
-        <td><input type="date" name="programDate" class="form-control"></td>
-        <td><div class="btn btn-danger" id="delProd" data-idf="<%= data[i][0]%>" onclick="delProd(this)"><i class="fa fa-close"></i></div></td>
+        <td style="padding: 3px"><input type="number" min="1" data-max="<%= data[i][2]%>" name="cants" id="inpt<%=data[i][0]%>" class="form-control valor_cant" data-cant='<%=data[i][2]%>' value="<%= cants[i]%>" required></td>
+        <td style="padding: 3px"><input type="date" name="programDate" class="form-control"></td>
+        <td><div class="btn btn-danger btn-xs" id="delProd" data-idf="<%= data[i][0]%>" onclick="delProd(this)"><i class="fa fa-close"></i></div></td>
     </tr>
     <%}%>
     </tbody>

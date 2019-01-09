@@ -25,8 +25,8 @@
                         <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
                       </ul>
                     </div>
-                <div style="display: flex;">
-                    <div style="width: 50%">
+                <div class="row">
+                    <div class="col-md-6">
                         <h3>Crear Orden de Fabricación: </h3>
                         <!--<div>
                             <button class="btn btn-primary" onclick="saveStateOF()"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
@@ -40,20 +40,18 @@
                            </label>    
                         </p>
                     </div>
-                    <div style="width: 50%">
-                        <label for="setdates">
-                            Ingresar fecha para todos: 
-                        </label>
-                        <div class="input-group"  style="width:30%;margin-left: 20%;margin-top: 5px"> 
-                                <span class="input-group-addon" ><i class="fa fa-calendar-o"></i></span>
-                                <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">   
+                    <div class="col-md-6">
+                        <label for="setdates">Ingresar fecha para todos</label>
+                        <div class="input-group"  style="width:40%; margin-top: 5px"> 
+                            <span class="input-group-addon" ><i class="fa fa-calendar-o"></i></span>
+                            <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">   
                         </div>   
                     </div>
                 </div>
             </div>       
             <form id="send_of">
             <div style="overflow-y: scroll; max-height: 300px;">
-                <table class="table table-striped">
+                <table class="table table-striped" style="margin: 0">
                     <thead>
                     <tr>
                         <th>Descripción</th>
@@ -67,20 +65,22 @@
                         <%for(var t=0; t < data['idm[]'].length; t++){%>
                         <tr>
                             <td><%= data['dets[]'][t]%><input type="hidden" name="idm" value="<%=data['idm[]'][t]%>"><input type="hidden" name="idp" value="<%=data['idp[]'][t]%>"></td>
-                            <td><input type="date" name="fechas" class="form-control" min="<%new Date()%>" value="<%= data['fechas[]'][t]%>" required=""></td>
-                            <td><input class="form-control" type="number" name="cants" min="1" value="<%= data['cants[]'][t]%>" required=""></td>
-                            <td style="text-align: center;"><input type="checkbox" name="lock"></td>
-                            <td><a onclick="drop(this)" class="btn btn-danger"><i class="fa fa-remove"></i></a></td>
+                            <td style="padding: 3px"><input type="date" name="fechas" class="form-control" min="<%new Date()%>" value="<%= data['fechas[]'][t]%>" required=""></td>
+                            <td style="padding: 3px"><input class="form-control" type="number" name="cants" min="1" value="<%= data['cants[]'][t]%>" required=""></td>
+                            <td style="text-align: center;"><input class="form-control" style="margin-left: 40%; width: 20px; height: 20px;" type="checkbox" name="lock"></td>
+                            <td><a onclick="drop(this)" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a></td>
                         </tr>
                         <%}%>
                     </tbody>
                 </table>
             </div>
             <div class="panel-footer">
-                <div class="form-inline">
-                    <input type="hidden" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Fabricación" class="form-control" value='1' required>
-                    <button class="btn btn-success" style="width:10%" id="of_submit" >+ Crear</button>
-                    <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                <div class="row">
+                    <div class="col-md-1 col-md-offset-11" style="padding: 0; padding-right: 8px">
+                        <input type="hidden" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Fabricación" class="form-control" value='1' required>
+                        <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
+                        <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                    </div>
                 </div>
 
             </div>

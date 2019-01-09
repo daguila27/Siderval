@@ -128,7 +128,7 @@ router.get("/busq_oda",function(req,res,next){
                connection.query('SELECT abastecimiento.*, material.detalle, material.stock FROM abastecimiento '+
                    'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE cantidad != recibidos',
                    function(err, abast) {
-                   console.log(abast);
+                   //console.log(abast);
                    res.render("matprimas/search_oda", {abast: abast});
                });
            }
