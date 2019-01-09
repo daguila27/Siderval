@@ -590,7 +590,7 @@ router.post('/buscar_matp', function(req, res, next){
             }
 		}
         if(input.prod == 'false'){
-        	input.det += " AND material.tipo != 'P'";
+        	input.det += " AND material.tipo != 'P' AND material.tipo != 'S'";
         }
         req.getConnection(function(err,connection){
             connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
@@ -1768,6 +1768,17 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Rechazado', key: 'final', width: 15},
             { header: 'Ingresado a BPT', key: 'final', width: 15}
         ];
+        var sheet3 = workbook.addWorksheet('Salidas');
+        sheet3.columns = [
+            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Detalle', key: 'name', width: 50 },
+            { header: 'Unidad Med.', key: 'unit', width: 10},
+            { header: 'Retiro Bodega', key: 'virtual', width: 10},
+            { header: 'GDD Venta', key: 'income', width: 10},
+            { header: 'GDD Traslado', key: 'income', width: 10},
+            { header: 'GDD Devolucion', key: 'departures', width: 10},
+            { header: 'GDD Anulada', key: 'income', width: 15},
+        ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
             sheet.getRow(1).fill = {
@@ -1841,14 +1852,22 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 			}
 			adminModel.produccion(req.params.token.split("@"),function(err,prods){
 				if(err) throw err;
-				for(var i=0;i<prods.length;i++){
+				for(let i=0;i<prods.length;i++){
 					sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
 						,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
 				}
-                workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
-                    console.log('new xlsx');
-                    res.send(nombre);
-                });
+				adminModel.salidas(req.params.token.split("@"),function(err,salidas){
+					if(err) throw err;
+                    for(let i=0;i<salidas.length;i++){
+                    	console.log(salidas[i].codigo);
+                        sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion
+                            ,salidas[i].anulado]);
+                    }
+                    workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                        console.log('new xlsx');
+                        res.send(nombre);
+                    });
+				});
 			});
 
 
