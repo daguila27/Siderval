@@ -52,7 +52,7 @@
             </td>
             <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>"><%= data[i].receptor%></td>
             <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
-                <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_gen).toLocaleDateString())%></span>
+                <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_gen).getTime()%>" name="amount_total"><%= fechaLatino(new Date(data[i].f_gen).toLocaleDateString())%></span>
             </td>
         </tr>
     <%}%>

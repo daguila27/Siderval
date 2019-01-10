@@ -1385,4 +1385,137 @@ router.get('/convert_despachos', function(req, res, next){
 });
 
 
+
+
+router.get('/convert_despachos', function(req, res, next){
+    req.getConnection(function(err, connection){
+        if(err) throw err;
+        connection.query("SELECT * FROM despacho", function(err, desp){
+            if(err) throw err;
+
+            /*
+            *
+            * SQL's para crear tablas.
+            *
+            * create table gd(
+                 idgd int not null auto_increment,
+                 estado varchar(11) not null default 'Venta',
+                 fecha datetime default current_timestamp,
+                 last_mod datetime default current_timestamp,
+                 obs varchar(100) default null,
+                 primary key(idgd)
+             );
+
+             create table despachos(
+                 iddespacho int(10) not null auto_increment,
+                 idgd int(10) not null,
+                 idpedido int(10) default 0,
+                 idmaterial int(10) not null,
+                 cantidad int default 0,
+                 primary key(iddespacho),
+                 foreign key (idgd) references gd (idgd) on delete cascade,
+                 FOREIGN KEY (`idpedido`)  REFERENCES `siderval`.`pedido` (`idpedido`)  ON DELETE cascade,
+                 FOREIGN KEY (`idmaterial`)  REFERENCES `siderval`.`material` (`idmaterial`)  ON DELETE cascade
+             );
+            * */
+
+            //BD actual (concatenada):
+            //   iddespacho, idorden_f, mat_token, cant_token, id_token, idf_token, fecha, estado, obs, last_mod
+            //Nueva BD:
+            //   idgd (auto_increment), estado, fecha despacho, fecha ultima modificaci�n, observaci�n
+            var gds = [];
+            //   idgd, idmaterial, idfabricacion, cantidad
+            var despachos = [];
+            for(var a=0; a < desp.length; a++){
+                desp[a].id_token = desp[a].id_token.split('@');
+                desp[a].cant_token = desp[a].cant_token.split(',');
+                desp[a].idf_token = desp[a].idf_token.split('@');
+                gds.push([desp[a].iddespacho, desp[a].estado, desp[a].fecha, desp[a].last_mod, desp[a].obs]);
+                //Si esta anulada, solo agregar gd pero no despachos.
+                if(desp[a].estado != 'Anulado' && desp[a].estado != 'Blanco'){
+                    for(var b=0; b < desp[a].cant_token.length; b++){
+                        if(isNaN(parseInt(desp[a].id_token[b])) || isNaN(parseInt(desp[a].cant_token[b]))){
+                            continue;
+                        }
+                        if(isNaN(parseInt(desp[a].idf_token[b])) || desp[a].idf_token[b] == '' || desp[a].idf_token[b] == '0'){
+                            desp[a].idf_token[b] = null;
+                        }
+                        if(isNaN(parseInt(desp[a].cant_token[b]))){
+                            desp[a].cant_token[b] = '0';
+                        }
+                        if(desp[a].id_token[b] == '0' || desp[a].id_token[b] == ''){
+                            gds[a][4] += " " + desp[a].cant_token[b] + " - " + desp[a].mat_token[b] + " \n";
+                        } else despachos.push([desp[a].iddespacho, parseInt(desp[a].id_token[b]), parseInt(desp[a].cant_token[b]),null]);
+                    }
+                }
+            }
+            connection.query("INSERT INTO gd (idgd, estado, fecha, last_mod, obs) VALUES ?", [gds],function(err, inGD){
+                if(err) throw err;
+                console.log(inGD);
+                console.log(despachos);
+                connection.query("INSERT INTO despachos (idgd, idmaterial, cantidad, idpedido) VALUES ?", [despachos],function(err, inDesp){
+                    if(err) throw err;
+                    console.log(inDesp);
+                    res.redirect('/');
+                });
+            });
+        });
+    })
+});
+
+
+
+
+
+
+
+router.get('/fixfechas_despachos', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
+
+    var parser = parse(
+        function(err,gd){
+            var gds = [];
+            if(err) throw err;
+            var query = "UPDATE gd SET fecha = CASE";
+            var query2 = "UPDATE gd SET last_mod = CASE";
+
+            /*
+            * UPDATE `table` SET `uid` = CASE
+                WHEN id = 1 THEN 2952
+                WHEN id = 2 THEN 4925
+                WHEN id = 3 THEN 1592
+                ELSE `uid`
+                END
+            WHERE id  in (1,2,3)
+            * */
+            for(var e=1; e < gd.length; e++) {
+                if (gds.indexOf(gd[e][0]) == -1) {
+                    query += " WHEN idgd = " + gd[e][0] + " THEN '" + gd[e][1] +"'";
+                    query2 += " WHEN idgd = " + gd[e][0] + " THEN '" + gd[e][1]+ "'";
+                    gds.push(gd[e][0]);
+                }
+            }
+            query += " ELSE fecha END WHERE idgd IN ("+gds.join(',')+")";
+            query2 += " ELSE last_mod END WHERE idgd IN ("+gds.join(',')+")";
+            console.log(query);
+            req.getConnection(function(err, connection){
+               if(err) throw err;
+               connection.query(query, function(err, inGD){
+                   if(err) throw err;
+                   console.log(inGD);
+                   connection.query(query2, function(err, inGD2){
+                       if(err) throw err;
+                       console.log(inGD2);
+                       res.redirect('/');
+                   });
+               });
+            });
+        });
+    var input = fs.createReadStream('csvs/fechasdespacho.csv');
+    input.pipe(parser);
+
+});
+
+
 module.exports = router;

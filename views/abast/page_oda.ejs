@@ -26,10 +26,10 @@ function fechaLatino(string){
                         </button>
                     </div>
                     <div class="row" style="width: 100%;">
-                        <div class="col-md-8">
+                        <div class="col-md-7">
                             <h1 style="width: 100%; margin-top: 0"><span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span></h1>
                         </div>
-                        <div class="col-md-2" style="margin-left: 12.7%">
+                        <div class="col-md-3" style="margin-left: 12.7%">
                             <h1 style="width: 100%; margin-top: 0">
                                 <a class="pull-right" style="z-index: 10; margin-left: 10px;" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" onclick="verPdf(this)">
                                     <i data-toggle="tooltip" title="Ver PDF" class="fa fa-file-pdf-o"></i>
@@ -40,6 +40,11 @@ function fechaLatino(string){
                                 <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
                                     <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
                                 </a>
+                                <% if (isRecep){ %>
+                                <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="receiveAll(this)">
+                                    <i data-toggle="tooltip" title="Recepcionar Todos" class="fa fa-cubes"></i>
+                                </a>
+                                <%}%>
                             </h1>
                         </div>
                         <div class="col-md-1" style="padding: 0; width: 32px">
@@ -381,5 +386,17 @@ function fechaLatino(string){
 
     function verPdf(yo){
        window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
+    }
+
+    function receiveAll(self) {
+        if (confirm("¿Esta seguro que desea recepcionar todo lo que falte por recepcionar?")){
+            $.ajax({
+                type: 'GET',
+                url: '/abastecimiento/receiveAll/' + $(self).data('idoda'),
+                success: function (data) {
+                    $(".main-page").html(data);
+                }
+            })
+        }
     }
 </script>

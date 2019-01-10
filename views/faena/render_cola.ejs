@@ -34,11 +34,11 @@
     </div>
   <%}else{
   for(var i=0; i< data.length; i++){%>
-    	<div class="col-sm-12 col-md-12 fabricacionItem">
+    	<div class="col-md-12 fabricacionItem">
     		<div id="<%= data[i].idproduccion%>" data-toggle="tooltip" title="Enviar a siguiente etapa" data-placement="bottom">
     			<div style="width: 83%">
     				<div style="display: flex;">
-    					<h3 style="width: 75%"><b> </b><%= letraMayus(data[i].detalle)%></h3>
+    					<h3 style="width: 75%"><b> </b><%= data[i].detalle%></h3>
     					<p style="width: 25%"><b>Por producir: </b><%= data[i][etapaactual]%> unidades</p>
     				</div>
     				<div style="display: flex">
@@ -57,12 +57,34 @@
 						data-toggle="modal"
 						data-target="#send_step">
                   Enviar Producto</button>
+				<button class="btn btn-danger btn-sm rechazarProduccion"
+						data-toggle="modal"
+						data-target="#rechazoQueue"
+						data-idp="<%= data[i].idproduccion%>"
+						data-det="<%= data[i].detalle%>"
+						data-cant="<%= data[i][etapaactual]%>"
+						data-etapa="<%= etapaactual%>"
+						style="margin-top: 10px; margin-left: 25px">
+					<i class="fa fa-trash"></i>
+				</button>
 	        </div>
     	</div>
 	<%}}%>
 </div>
 <script type="text/javascript">
 	
+	$(".rechazarProduccion").on('click', function(e){
+	    e.preventDefault();
+	    //alert("ESTAMOS AQUI JEFE GORGORI");
+		$("#productoRechazado").html("<small><b>Producto: </b>"+$(this).data('det')+"</small>")
+		$("#idproduccionRechazo").val($(this).data('idp'));
+		$("#cantidadSolicitada").val($(this).data('cant'));
+        $("#cantidadRechazo").attr({
+            "max" : parseInt($(this).data('cant')),        // substitute your own
+            "min" : 1          // values (or variables) here
+        });
+        $("#thisetapa").val( $(this).data('etapa') );
+	});
 
 
 	function setmodal(yo){

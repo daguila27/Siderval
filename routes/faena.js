@@ -129,7 +129,7 @@ router.post("/next_step",function(req,res,next){
         for(var w=0; w < input.idprod.length; w++){
             cant_aux -= parseInt(input.cantprod[w]);
         	if(cant_aux > 0){
-        		/* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION */
+        		/* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION  */
                 query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
                 query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
 				//history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
@@ -314,11 +314,14 @@ router.post('/report_error', function(req, res, next){
 	if(verificar(req.session.userData)){
 		var input = JSON.parse(JSON.stringify(req.body));
 		console.log(input);
+		if(!input.comentario){
+			input.comentario = null;
+		}
 		req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection : %s", err);}
 			//UPDATE `siderval`.`produccion` SET `5`='4', `standby`='1' WHERE `idproduccion`='14';
-			connection.query("SELECT produccion.idproduccion, produccion.`"+input.thisetapa+"` AS cantidad  FROM produccion WHERE idproduccion IN ("+input.idproduccion.replace('-',',')+")", function(err, idprods){
+            connection.query("SELECT produccion.idproduccion, produccion.`"+input.thisetapa+"` AS cantidad  FROM produccion WHERE produccion.idproduccion IN ("+input.idproduccion.split('-').join(',')+") ORDER BY produccion.idproduccion ASC", function(err, idprods){
                 if(err){console.log("Error Selecting : %s", err);}
-                console.log(idprods);
                 /*
 				* UPDATE `table` SET `uid` = CASE
 					WHEN id = 1 THEN 2952
@@ -332,18 +335,24 @@ router.post('/report_error', function(req, res, next){
                 var upcase = "UPDATE produccion SET produccion.`"+input.thisetapa+"` = CASE";
                 var upcaseStand = "UPDATE produccion SET produccion.standby = CASE";
                 var idsp = [];
+                //idproduccion, enviados, fecha, to, from, comentario
+                var hist = [];
+                var ini_standby = 0;
                 for(var e=0; e < idprods.length; e++){
-                    input.standby = input.standby - parseInt(idprods[e].cantidad);
+                    ini_standby = input.standby;
+                	input.standby = input.standby - parseInt(idprods[e].cantidad);
                     if(input.standby < 0){
                         upcase += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN "+(input.standby*-1);
-                        upcaseStand += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN "+(input.standby + parseInt(idprods[e].cantidad));
+                        upcaseStand += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN produccion.standby+"+(input.standby + parseInt(idprods[e].cantidad));
                     	idsp.push(idprods[e].idproduccion);
-                        break;
+                        hist.push([idprods[e].idproduccion, /*parseInt(idprods[e].cantidad)-ini_standby*/ input.standby + parseInt(idprods[e].cantidad), 's', input.thisetapa, input.comentario]);
+                    	break;
                     }
                     else{
                         idsp.push(idprods[e].idproduccion);
                         upcase += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN 0";
-                        upcaseStand += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN produccion.`"+input.thisetapa+"`";
+                        upcaseStand += " WHEN produccion.idproduccion='"+idprods[e].idproduccion+"' THEN produccion.standby+produccion.`"+input.thisetapa+"`";
+                        hist.push([idprods[e].idproduccion, parseInt(idprods[e].cantidad), 's', input.thisetapa, input.comentario]);
                     }
                 }
                 upcase += " ELSE produccion.`"+input.thisetapa+"` END WHERE produccion.idproduccion IN ("+idsp.join(',')+")";
@@ -352,15 +361,23 @@ router.post('/report_error', function(req, res, next){
                 console.log(upcaseStand);
                 connection.query(upcaseStand, function(err, upStand){
                     if(err){console.log("Error Selecting : %s", err);}
-                    console.log(upStand);
+                    //console.log(upStand);
                     connection.query(upcase, function(err, upProds){
                         if(err){console.log("Error Selecting : %s", err);}
-                        console.log(upProds);
-                        res.redirect('/faena/confirm_notificacion/'+input.idnotificacion);
-						/*connection.query("UPDATE produccion SET produccion."+input.thisetapa+"= produccion."+input.thisetapa+" - "+input.standby+" , standby= standby +"+input.standby+" WHERE idproduccion = ?",
-						 [input.idproduccion], function(err, rows){
-							if(err){console.log("Error Selecting : %s", err);}
-						});*/
+                        //console.log(upProds);
+                        //INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history];
+                        connection.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `to`, `from`, `comentario`) VALUES ?", [hist], function(err, inHist){
+                        	if(err) throw err;
+							console.log(inHist);
+                        	if(input.idnotificacion){
+                                res.redirect('/faena/confirm_notificacion/'+input.idnotificacion);
+                                console.log("DESDE NOTIFICACION");
+                            }
+                            else{
+                                console.log("DESDE COLA DE PRODUCCION");
+                                res.send("hello");
+                            }
+						});
                     });
                 });
 
@@ -369,6 +386,9 @@ router.post('/report_error', function(req, res, next){
 	}
 	else{res.redirect('bad_login');}
 });
+
+
+
 
 
 module.exports = router;

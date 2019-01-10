@@ -64,7 +64,7 @@ router.get('/crear_gdd', function(req, res, next){
 router.get('/buscar_insumos/:detalle', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("select * from material where (material.tipo='M' OR material.tipo='I' OR material.tipo='O' OR material.tipo='X') AND detalle like ? ORDER BY idmaterial",
+            connection.query("select * from material where (material.tipo='M' OR material.tipo='I' OR material.tipo='O' OR material.tipo='X' OR material.tipo='P' OR material.tipo='C') AND detalle like ? ORDER BY idmaterial",
                 ["%"+req.params.detalle+"%"],
                 function(err, insum){
                     if(err)
@@ -302,7 +302,7 @@ router.post('/crear_gdd_fill', function(req, res, next){
         });
     }
     else{res.redirect('bad_login');}
-});
+
 
 router.post('/save_gdd', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
@@ -438,6 +438,7 @@ router.post('/act_gdd', function(req, res, next){
             console.log("idfab: " + input['list[' + i + '][]'][0]);
             query2 += "WHEN material.idmaterial = "+ input['list[' + i + '][]'][1]
                 + " THEN material.stock " + ope+ " " + input['list[' + i + '][]'][2]+ " ";
+
             if(input.estado == 'Venta'){
                 query += "WHEN idpedido = " + input['list[' + i + '][]'][0]
                     + " THEN despachados " + ope2+ " " + input['list[' + i + '][]'][2]+ " ";
@@ -492,36 +493,44 @@ router.post('/anular_gdd', function(req, res, next){
     req.getConnection(function(err, connection){
         connection.query("SELECT * FROM despachos WHERE idgd = ?", idgd, function(err, desp){
         if(err) console.log("Error Selecting : %s", err);
-            var ped_query = "UPDATE pedido SET pedido.despachados = CASE";
-            var ped_where = "WHERE pedido.idpedido in (";
-            for(var i=0; i < desp.length; i++){
-                ped_query += " WHEN pedido.idpedido=" + desp[i].idpedido + " THEN pedido.despachados-" + desp[i].cantidad;
-                ped_where += "" + desp[i].idpedido;
-                if(i+1 != desp.length){
-                    ped_where += ",";
-                }
+            if(desp.length == 0){
+                connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
+                    if(err) console.log("Error Selecting : %s", err);
+                    res.send('/Guia anulada');
+                });
             }
-            ped_query += " END " + ped_where + ")";
-            connection.query(ped_query, function(err, ped){
-                if(err) console.log("Error Selecting : %s", err);
-                var mat_query = "UPDATE material SET material.stock = CASE";
-                var mat_where = "WHERE material.idmaterial in (";
+            else{
+                var ped_query = "UPDATE pedido SET pedido.despachados = CASE";
+                var ped_where = "WHERE pedido.idpedido in (";
                 for(var i=0; i < desp.length; i++){
-                    mat_query += " WHEN material.idmaterial=" + desp[i].idmaterial + " THEN material.stock+" + desp[i].cantidad;
-                    mat_where += "" + desp[i].idmaterial;
+                    ped_query += " WHEN pedido.idpedido=" + desp[i].idpedido + " THEN pedido.despachados-" + desp[i].cantidad;
+                    ped_where += "" + desp[i].idpedido;
                     if(i+1 != desp.length){
-                        mat_where += ",";
+                        ped_where += ",";
                     }
                 }
-                mat_query += " END " + mat_where + ")";
-                connection.query(mat_query, function(err, ped){
+                ped_query += " END " + ped_where + ")";
+                connection.query(ped_query, function(err, ped){
                     if(err) console.log("Error Selecting : %s", err);
-                    connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
+                    var mat_query = "UPDATE material SET material.stock = CASE";
+                    var mat_where = "WHERE material.idmaterial in (";
+                    for(var i=0; i < desp.length; i++){
+                        mat_query += " WHEN material.idmaterial=" + desp[i].idmaterial + " THEN material.stock+" + desp[i].cantidad;
+                        mat_where += "" + desp[i].idmaterial;
+                        if(i+1 != desp.length){
+                            mat_where += ",";
+                        }
+                    }
+                    mat_query += " END " + mat_where + ")";
+                    connection.query(mat_query, function(err, ped){
                         if(err) console.log("Error Selecting : %s", err);
-                        res.send('/Guia anulada');
+                        connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
+                            if(err) console.log("Error Selecting : %s", err);
+                            res.send('/Guia anulada');
+                        });
                     });
                 });
-            });
+            }
         });
 
     });
