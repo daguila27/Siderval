@@ -1689,19 +1689,13 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
                 // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
                 " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
                 " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
-                " WHERE oda.creacion" +
+				" WHERE oda.creacion" +
                 " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
                 " WHERE NOT (solicitados.necesarios = 0 AND virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial", function(err, ops){
+				if(err) throw err;
 
 				//Inicio de la funcion post query.
-
-                sheet.getCell('A1').fill = {
-                    type: 'pattern',
-                    pattern:'solid',
-                    bgColor:{argb:'blue'}
-                };
-
 				for(var i = 2; i < ops.length+2; i++){
 					sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 					sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
@@ -1749,6 +1743,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Recepcion GDD', key: 'income', width: 15},
             { header: 'Retiros en BMI', key: 'departures', width: 15},
             { header: 'Salidas en GDD', key: 'departures', width: 15},
+            { header: 'Facturados', key: 'departures', width: 15},
+            { header: 'Por Facturar', key: 'departures', width: 15},
             { header: 'Stock actual', key: 'final', width: 15}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
@@ -1805,8 +1801,10 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				};
 	            sheet.getCell('N'+i.toString()).value = ops[i-2].sum_sal;
                 sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
-                sheet.getCell('P'+i.toString()).value = ops[i-2].stock;
-				sheet.getCell('P'+i.toString()).border = {
+                sheet.getCell('P'+i.toString()).value = ops[i-2].sum_fact;
+                sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
+                sheet.getCell('R'+i.toString()).value = ops[i-2].stock;
+				sheet.getCell('R'+i.toString()).border = {
 					left: {style:'double', color: {argb:'00000000'}},
 				};
 			}
@@ -1816,11 +1814,18 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 fgColor:{argb:'F4D03F'}
             };
             sheet.getRow(1).font = {
-                name: 'Comic Sans MS',
+                name: 'Arial',
                 family: 4,
                 size: 11,
-                underline: false,
-                bold: true
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
             };
 
 			workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {

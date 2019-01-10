@@ -31,7 +31,7 @@ informe.getdatos = function(fecha,callback){
             virtuales_oda: Cantidad no reccepcionada de ODA, AS virts_oda.sum_virtual
         },(...)];
         */
-        connection.query("select material.codigo,material.stock,material.s_inicial,material.detalle, material.precio,material.u_medida," +
+        connection.query("select material.codigo,material.stock,material.s_inicial,material.detalle, material.precio,material.u_medida, coalesce(facturados.facturados, 0) as sum_fact," +
             "COALESCE(fabrs.fabricados,0) as fabricados,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
             ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales,COALESCE(virts_oda.sum_virtual,0) as virtuales_oda" +
             ",COALESCE(necesario.neto,0) AS necesario_neto,COALESCE(necesario.necesarios,0) AS necesarios,COALESCE(salidas_mp.sum_sal,0) as sum_sal" +
@@ -54,6 +54,7 @@ informe.getdatos = function(fecha,callback){
             " WHERE material.e_abast != 4" +
             " GROUP BY bom.idmaterial_slave) AS necesario ON necesario.idmaterial_slave = material.idmaterial" +
             // Salidas de materias primas - as salidas_mp.sum_sal
+            " LEFT JOIN (SELECT despachos.idmaterial, SUM(despachos.cantidad) AS facturados FROM despachos LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE gd.numfac IS NOT null AND despachos.idmaterial != 0 AND (gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59') GROUP BY despachos.idmaterial) AS facturados ON facturados.idmaterial=material.idmaterial" +
             " LEFT JOIN (select movimiento_detalle.idmaterial, sum(movimiento_detalle.cantidad) as sum_sal FROM movimiento" +
             " LEFT JOIN movimiento_detalle on movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
             " WHERE movimiento.tipo = 0 AND movimiento.f_gen" +
