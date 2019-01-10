@@ -1517,5 +1517,46 @@ router.get('/fixfechas_despachos', function(req, res, next){
 
 });
 
+router.get('/putnumfac_despachos', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
 
+    var parser = parse(
+        function(err,gd){
+            var gds = [];
+            if(err) throw err;
+            var query = "UPDATE gd SET numfac = CASE";
+
+            /*
+            * UPDATE `table` SET `uid` = CASE
+                WHEN id = 1 THEN 2952
+                WHEN id = 2 THEN 4925
+                WHEN id = 3 THEN 1592
+                ELSE `uid`
+                END
+            WHERE id  in (1,2,3)
+            * */
+            for(var e=1; e < gd.length; e++) {
+                if (gds.indexOf(gd[e][0]) == -1) {
+                    if(gd[e][1] != 'Nula'){
+                        query += " WHEN idgd = " + gd[e][0] + " THEN '" + gd[e][1] +"'";
+                        gds.push(gd[e][0]);
+                    }
+                }
+            }
+            query += " ELSE numfac END WHERE idgd IN ("+gds.join(',')+")";
+            console.log(query);
+            req.getConnection(function(err, connection){
+                if(err) throw err;
+                connection.query(query, function(err, inGD){
+                    if(err) throw err;
+                    console.log(inGD);
+                        res.redirect('/');
+                });
+            });
+        });
+    var input = fs.createReadStream('csvs/despachosFacturados.csv');
+    input.pipe(parser);
+
+});
 module.exports = router;
