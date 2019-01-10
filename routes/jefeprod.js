@@ -1318,7 +1318,7 @@ router.get("/phistory_data",function(req,res){
    if(verificar(req.session.userData)){
        req.getConnection(function(err,connection){
           if(err) console.log(err);
-          connection.query("SELECT produccion_history.enviados,DATE_FORMAT(produccion_history.fecha,'%d/%m/%Y %r') AS fecha,etapafaena.nombre_etapa AS desde,ef2.nombre_etapa AS hacia,material.detalle FROM siderval.produccion_history " +
+          connection.query("SELECT produccion_history.enviados,DATE_FORMAT(produccion_history.fecha,'%Y-%m-%d %r') AS fecha,etapafaena.nombre_etapa AS desde,ef2.nombre_etapa AS hacia,material.detalle FROM siderval.produccion_history " +
               " LEFT JOIN etapafaena ON etapafaena.value = produccion_history.from" +
               " LEFT JOIN etapafaena AS ef2 ON ef2.value = produccion_history.to" +
               " LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion" +
