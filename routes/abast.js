@@ -1689,19 +1689,13 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
                 // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
                 " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
                 " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
-                " WHERE oda.creacion" +
+				" WHERE oda.creacion" +
                 " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
                 " WHERE NOT (solicitados.necesarios = 0 AND virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial", function(err, ops){
+				if(err) throw err;
 
 				//Inicio de la funcion post query.
-
-                sheet.getCell('A1').fill = {
-                    type: 'pattern',
-                    pattern:'solid',
-                    bgColor:{argb:'blue'}
-                };
-
 				for(var i = 2; i < ops.length+2; i++){
 					sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 					sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
@@ -1736,7 +1730,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
-
             { header: 'Stock Inicio Mes', key: 'initial', width: 15},
             { header: 'Solicitado en OC', key: 'asked', width: 15},
             { header: 'Solicitado en OC atrasado', key: 'asked', width: 20},
@@ -1749,14 +1742,15 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Recepcion GDD', key: 'income', width: 15},
             { header: 'Retiros en BMI', key: 'departures', width: 15},
             { header: 'Salidas en GDD', key: 'departures', width: 15},
-            { header: 'Stock Final', key: 'final', width: 15}
+            { header: 'Facturados', key: 'departures', width: 15},
+            { header: 'Por Facturar', key: 'departures', width: 15},
+            { header: 'Stock actual', key: 'final', width: 15}
         ];
         var sheet2 = workbook.addWorksheet('Produccion');
         sheet2.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
-
             { header: 'Solicitado en OP', key: 'asked', width: 15},
             { header: 'Moldeo', key: 'virtual', width: 10},
             { header: 'Fusion', key: 'income', width: 10},
@@ -1777,7 +1771,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'GDD Venta', key: 'income', width: 10},
             { header: 'GDD Traslado', key: 'income', width: 10},
             { header: 'GDD Devolucion', key: 'departures', width: 10},
-            { header: 'GDD Anulada', key: 'income', width: 15},
+            { header: 'GDD Anulada', key: 'income', width: 15}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
@@ -1845,11 +1839,34 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				};
 	            sheet.getCell('N'+i.toString()).value = ops[i-2].sum_sal;
                 sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
-                sheet.getCell('P'+i.toString()).value = ops[i-2].s_inicial + ops[i-2].fabricados + ops[i-2].sum_dev + ops[i-2].ing_oda - ops[i-2].despachados - ops[i-2].sum_sal;
-				sheet.getCell('P'+i.toString()).border = {
-					left: {style:'double', color: {argb:'00000000'}},
-				};
-			}
+                sheet.getCell('P'+i.toString()).value = ops[i-2].sum_fact;
+                sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
+                //sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
+                sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
+                sheet.getCell('R'+i.toString()).border = {
+                    left: {style:'double', color: {argb:'00000000'}},
+                };
+            }
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
 			adminModel.produccion(req.params.token.split("@"),function(err,prods){
 				if(err) throw err;
 				for(let i=0;i<prods.length;i++){
@@ -1859,17 +1876,13 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				adminModel.salidas(req.params.token.split("@"),function(err,salidas){
 					if(err) throw err;
                     for(let i=0;i<salidas.length;i++){
-                    	console.log(salidas[i].codigo);
-                        sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion
-                            ,salidas[i].anulado]);
+                        sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion, salidas[i].anulado]);
                     }
                     workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
-                        console.log('new xlsx');
                         res.send(nombre);
                     });
 				});
-			});
-
+            });
 
         });
     }
