@@ -1803,7 +1803,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
                 sheet.getCell('P'+i.toString()).value = ops[i-2].sum_fact;
                 sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
-                sheet.getCell('R'+i.toString()).value = ops[i-2].stock;
+                sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
 				sheet.getCell('R'+i.toString()).border = {
 					left: {style:'double', color: {argb:'00000000'}},
 				};
