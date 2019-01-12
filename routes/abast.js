@@ -338,10 +338,14 @@ router.post('/data_bom', function(req, res, next) {
 				connection.query("select material.codigo,material.idmaterial,material.detalle, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token, group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave where material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
+
+								if(semi.length == 0){
+									console.log("SIN BOM");
+								}
 								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
 				});
 			}
@@ -349,10 +353,14 @@ router.post('/data_bom', function(req, res, next) {
 				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave where material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
+
+								if(semi.length == 0){
+									console.log("SIN BOM");
+								}
 								res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
 				});
 			}
@@ -582,7 +590,7 @@ router.post('/buscar_matp', function(req, res, next){
             }
 		}
         if(input.prod == 'false'){
-        	input.det += " AND material.tipo != 'P'";
+        	input.det += " AND material.tipo != 'P' AND material.tipo != 'S'";
         }
         req.getConnection(function(err,connection){
             connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
@@ -1560,7 +1568,6 @@ router.get("/fabrs_list/:token",function(req,res){
         console.log(req.params.token);
 		adminModel.getdatos(req.params.token.split("@"),function(err,data){
 			if(err) console.log(err);
-			console.log(data);
             res.render("plan/insumos_table",{prods:data});
 		});
     } else res.redirect("/bad_login");
@@ -1682,19 +1689,13 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
                 // FROM (sum_virtual) as virtuales -- salidas desde movimientos tipo 0
                 " LEFT JOIN (select abastecimiento.idmaterial, sum(abastecimiento.cantidad - abastecimiento.recibidos) as sum_virtual FROM oda" +
                 " LEFT JOIN abastecimiento ON abastecimiento.idoda = oda.idoda" +
-                " WHERE oda.creacion" +
+				" WHERE oda.creacion" +
                 " BETWEEN '"+req.params.token.split('@')[0]+" 00:00:00' AND '"+req.params.token.split('@')[1]+" 23:59:59'" +
                 " GROUP BY abastecimiento.idmaterial) AS virtuales ON virtuales.idmaterial = material.idmaterial" +
                 " WHERE NOT (solicitados.necesarios = 0 AND virtuales.sum_virtual = 0 AND salidas.sum_sal = 0 AND ingresos.sum_ing = 0 AND devs.sum_devs = 0) GROUP BY material.idmaterial", function(err, ops){
+				if(err) throw err;
 
 				//Inicio de la funcion post query.
-
-                sheet.getCell('A1').fill = {
-                    type: 'pattern',
-                    pattern:'solid',
-                    bgColor:{argb:'blue'}
-                };
-
 				for(var i = 2; i < ops.length+2; i++){
 					sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 					sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
@@ -1724,29 +1725,69 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         var nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
-        var sheet = workbook.addWorksheet('stockmaster');
+        var sheet = workbook.addWorksheet('InformeTotal');
         sheet.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
-
             { header: 'Stock Inicio Mes', key: 'initial', width: 15},
             { header: 'Solicitado en OC', key: 'asked', width: 15},
             { header: 'Solicitado en OC atrasado', key: 'asked', width: 20},
             { header: 'Solicitada según OP', key: 'asked', width: 20},
-			{ header: 'Solicitada según entradas a BPT', key: 'asked', width: 25},
+			{ header: 'Solicitada según entradas a BPT', key: 'asked', width: 28},
             { header: 'Stock en producción', key: 'virtual', width: 15},
-            { header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 20},
+            { header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 25},
             { header: 'Aceptados por CC', key: 'income', width: 15},
             { header: 'Devolución a BMI', key: 'income', width: 15},
             { header: 'Recepcion GDD', key: 'income', width: 15},
             { header: 'Retiros en BMI', key: 'departures', width: 15},
             { header: 'Salidas en GDD', key: 'departures', width: 15},
+            { header: 'Facturados', key: 'departures', width: 15},
+            { header: 'Por Facturar', key: 'departures', width: 15},
             { header: 'Stock actual', key: 'final', width: 15}
+        ];
+        var sheet2 = workbook.addWorksheet('Produccion');
+        sheet2.columns = [
+            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Detalle', key: 'name', width: 50 },
+            { header: 'Unidad Med.', key: 'unit', width: 10},
+            { header: 'Solicitado en OP', key: 'asked', width: 15},
+            { header: 'Moldeo', key: 'virtual', width: 10},
+            { header: 'Fusion', key: 'income', width: 10},
+            { header: 'Quiebre', key: 'income', width: 10},
+            { header: 'Terminación', key: 'departures', width: 10},
+            { header: 'Tratamiento Térmico', key: 'income', width: 15},
+            { header: 'Maestranza', key: 'departures', width: 10},
+            { header: 'Control de Calidad', key: 'final', width: 15},
+            { header: 'Rechazado', key: 'final', width: 15},
+            { header: 'Ingresado a BPT', key: 'final', width: 15}
+        ];
+        var sheet3 = workbook.addWorksheet('Salidas');
+        sheet3.columns = [
+            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Detalle', key: 'name', width: 50 },
+            { header: 'Unidad Med.', key: 'unit', width: 10},
+            { header: 'Retiro Bodega', key: 'virtual', width: 10},
+            { header: 'GDD Venta', key: 'income', width: 10},
+            { header: 'GDD Traslado', key: 'income', width: 10},
+            { header: 'GDD Devolucion', key: 'departures', width: 10},
+            { header: 'GDD Anulada', key: 'income', width: 15}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
-			for(var i = 2; i < ops.length+2; i++){
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
+            for(var i = 2; i < ops.length+2; i++){
 				sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 				sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
 				sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
@@ -1798,16 +1839,51 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				};
 	            sheet.getCell('N'+i.toString()).value = ops[i-2].sum_sal;
                 sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
-                sheet.getCell('P'+i.toString()).value = ops[i-2].stock;
-				sheet.getCell('P'+i.toString()).border = {
-					left: {style:'double', color: {argb:'00000000'}},
-				};
-			}
+                sheet.getCell('P'+i.toString()).value = ops[i-2].sum_fact;
+                sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
+                //sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
+                sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
+                sheet.getCell('R'+i.toString()).border = {
+                    left: {style:'double', color: {argb:'00000000'}},
+                };
+            }
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
 
-			workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
-				console.log('new xlsx');
-				res.send(nombre);
-			});
+			adminModel.produccion(req.params.token.split("@"),function(err,prods){
+				if(err) throw err;
+				for(let i=0;i<prods.length;i++){
+					sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
+						,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
+				}
+				adminModel.salidas(req.params.token.split("@"),function(err,salidas){
+					if(err) throw err;
+                    for(let i=0;i<salidas.length;i++){
+                        sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion, salidas[i].anulado]);
+                    }
+                    workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                        res.send(nombre);
+                    });
+				});
+            });
+
         });
     }
 });

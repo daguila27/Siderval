@@ -1517,5 +1517,139 @@ router.get('/fixfechas_despachos', function(req, res, next){
 
 });
 
+router.get('/putnumfac_despachos', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
 
+    var parser = parse(
+        function(err,gd){
+            var gds = [];
+            if(err) throw err;
+            req.getConnection(function(err, connection){
+                if(err) throw err;
+                connection.query("SELECT despachos.*, material.codigo FROM despachos LEFT JOIN material ON material.idmaterial=despachos.idmaterial", function(err, mats){
+                    if(err) throw err;
+
+                    var aux = [];
+                    var confl = [];
+                    for(var e=1; e < gd.length; e++) {
+                        for(var w=0; w < mats.length; w++){
+                          if(gd[e][3] != 'Nula'){
+                              if(mats[w].codigo == gd[e][1] && parseInt(mats[w].cantidad) == parseInt(gd[e][2]) && mats[w].idgd == gd[e][0]){
+                                  console.log("¡DESPACHO ENCONTRADO!");
+                                  //gd[e][1] = mats[w].iddespacho;
+                                  aux.push([mats[w].iddespacho,gd[e][3]]);
+                                  break;
+                              }
+                              if(w == mats.length-1){
+                                  confl.push([gd[e][0], gd[e][1],gd[e][3], gd[e][2]]);
+                              }
+                          }
+                          else{
+                              break;
+                          }
+                        }
+                    }
+                    var query = "UPDATE despachos SET numfac = CASE";
+                    var query_cant = "UPDATE despachos SET cantidad = CASE";
+
+                    /*
+                    * UPDATE `table` SET `uid` = CASE
+                        WHEN id = 1 THEN 2952
+                        WHEN id = 2 THEN 4925
+                        WHEN id = 3 THEN 1592
+                        ELSE `uid`
+                        END
+                    WHERE id  in (1,2,3)
+                    * */
+                    console.log(confl);
+                    var iddesp = [];
+                    var aux2 =
+                        [ [ '21341', '2406', '6667/NC/6735', '90' ],
+                        [ '21341', '2407', '6668/NC/6736', '72' ],
+                        [ '21341', '2408', '6669/NC/6737', '16' ],
+                        [ '21341', '2409', '6670/NC/6738/NC/6752', '5' ],
+/*
+                        [ '21345', 'X1376', '6641', '45000' ],
+*/
+                        [ '21348', '2208', '6643', '16' ],
+                        [ '21348', '2209', '6643', '10' ],
+                        [ '21349', '2217', '6647', '10' ],
+                        [ '21350', '2410', '6648', '20' ],
+                        [ '21350', '2411', '6648', '5' ],
+                        [ '21350', '2412', '6750', '3' ],
+                        [ '21350', '2413', '6649', '13' ],
+                        [ '21350', '2414', '6649', '60' ],
+                        [ '21355', '2220', '6650', '81' ],
+                        [ '21358', '2415', '6661', '130' ],
+                        [ '21369', '2241', '6747/NC/6760', '66' ],
+/*
+                        [ '21376', 'P01020760074', '6682', '324' ],
+                        [ '21376', 'P01020760076', '6682', '4780' ],
+                        [ '21376', 'P01020760075', '6682', '500' ],
+                        [ '21377', 'P01020760074', '6681', '3748' ],
+                        [ '21377', 'P01020760076', '6681', '4681' ],
+                        [ '21377', 'P01020760075', '6681', '393' ],
+*/
+                        [ '21378', '2272', '6687/NC/6765', '30' ],
+                        [ '21378', '2273', '6687/NC/6765', '7' ],
+                        [ '21378', '2274', '6687/NC/6765', '62' ],
+                        [ '21378', '2275', '6687/NC/6765', '33' ],
+                        [ '21382', '2398', '6689', '11' ],
+                        [ '21382', '2399', '6691', '29' ],
+                        [ '21382', '2401', '6694/NC/6763', '9' ],
+                        [ '21382', '2402', '6694/NC/6763', '8' ],
+                        [ '21395', '2345', '6726', '55' ],
+                        [ '21395', '2346', '6726', '130' ],
+                        [ '21400', '2353', '6717/NC/6731', '71' ],
+                        [ '21406', '2358', '6778', '70' ],
+                        [ '21406', '2359', '6780', '144' ],
+                        [ '21406', '2360', '6781', '1' ],
+                        [ '21406', '2361', '666', '5' ],
+                        [ '21406', '2362', '666', '3' ],
+/*
+                        [ '21418', 'P01020760074', '6721', '2176' ],
+                        [ '21418', 'P01020760076', '6721', '193' ],
+*/
+                        [ '21420', '2380', '6771', '26' ],
+                        [ '21420', '2381', '6770', '61' ],
+                        [ '21420', '2382', '666', '5' ],
+                        [ '21420', '2383', '666', '1' ],
+                        [ '21420', '2385', '6773', '101' ],
+                        [ '21420', '2386', '6776', '111' ],
+                        [ '21424', '2391', '6767', '139' ] ];
+                    for(var e=0; e < aux.length; e++) {
+                            if(aux[e][1] != 'Nula'){
+                                query += " WHEN iddespacho = " + aux[e][0] + " THEN '" + aux[e][1] +"'";
+                                iddesp.push(aux[e][0]);
+                            }
+                    }
+                    for(var e=0; e < aux2.length; e++) {
+                        if(aux2[e][2] != 'Nula'){
+                            query += " WHEN iddespacho = " + aux2[e][1] + " THEN '" + aux2[e][2] +"'";
+
+                            query_cant += " WHEN iddespacho = " + aux2[e][1] + " THEN '" + aux2[e][3] +"'";
+                            iddesp.push(aux2[e][1]);
+                        }
+                    }
+                    query += " ELSE numfac END WHERE iddespacho IN ("+iddesp.join(',')+")";
+                    query_cant += " ELSE cantidad END WHERE iddespacho IN ("+iddesp.join(',')+")";
+                    //console.log(query);
+                    connection.query(query, function(err, inGD){
+                        if(err) throw err;
+                        connection.query(query_cant, function(err, inCant){
+                            if(err) throw err;
+
+                            console.log(inGD);
+                            console.log(inCant);
+                            res.redirect('/');
+                        });
+                    });
+                });
+            });
+        });
+    var input = fs.createReadStream('csvs/despachosFacturados2.csv');
+    input.pipe(parser);
+
+});
 module.exports = router;
