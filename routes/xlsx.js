@@ -2,14 +2,12 @@
 var mysql = require('mysql');
 //creamos la conexion a nuestra base de datos con los datos de acceso de cada uno
 var connection = mysql.createConnection({
-
-    host: '192.168.1.25',
+    host: 'localhost',
     user: 'admin',
     password : 'tempo123',
     port : 3306,
     database:'siderval',
     insecureAuth : true
-
 });
 
 var informe = {};
@@ -40,7 +38,7 @@ informe.getdatos = function(fecha,callback){
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
             " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-            " WHERE produccion_history.to='8' AND (produccion_history.fecha between '" + fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " WHERE produccion_history.to='8' AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
             // Solicitado Teorico desde Bom -  as necesario.necesarios
             " LEFT JOIN (SELECT bom.idmaterial_slave,SUM(enprod.enprod*bom.cantidad) as necesarios,SUM(enprod.enbpt*bom.cantidad) as neto FROM" +
@@ -64,14 +62,14 @@ informe.getdatos = function(fecha,callback){
             " LEFT JOIN (SELECT material.idmaterial, SUM(coalesce(movimiento_detalle.cantidad,0)) as sum_devs FROM material" +
             " LEFT JOIN movimiento_detalle ON material.idmaterial = movimiento_detalle.idmaterial" +
             " LEFT JOIN movimiento ON movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
-            " WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '" + fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
+            " WHERE movimiento.tipo = 1 AND movimiento.f_gen BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
             " GROUP BY material.idmaterial) AS devs ON devs.idmaterial = material.idmaterial" +
             // LEFT JOIN (sum_ing) AS ingresos -- entradas desde recepción de OCA
             " LEFT JOIN (select material.idmaterial, sum(recepcion_detalle.cantidad) as sum_ing FROM recepcion" +
             " LEFT JOIN recepcion_detalle on recepcion_detalle.idrecepcion = recepcion.idrecepcion" +
             " LEFT JOIN abastecimiento ON abastecimiento.idabast = recepcion_detalle.idabast" +
             " LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial" +
-            " WHERE recepcion.fecha BETWEEN '" + fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
+            " WHERE recepcion.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
             " GROUP BY material.idmaterial) as ing_oda ON ing_oda.idmaterial = material.idmaterial" +
             //LEFT JOIN pedidos AKA cantidad pedida según OC entrantes
             " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad) as solicitados" +
@@ -84,7 +82,7 @@ informe.getdatos = function(fecha,callback){
             // LEFT JOIN despachos AKA cantidad en GDD
             " LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados" +
             " FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
-            " LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '" + fecha[1]+" 23:59:59'" +
+            " LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
             " GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
             // LEFT JOIN produccion AKA cantidad en produccion
             " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby) as virtuales" +
@@ -137,6 +135,7 @@ informe.produccion = function(fecha,callback){
         });
     } else callback("Error",{});
 };
+
 informe.salidas = function(fecha,callback){
     if(connection){
         connection.query("SELECT material.*,desps.*,COALESCE(salidas_mp.sum_sal,0) AS salidas FROM material" +
