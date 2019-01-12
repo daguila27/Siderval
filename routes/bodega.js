@@ -60,6 +60,7 @@ router.get('/crear_gdd', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
+
 //Buscador de materiales para traslado en vista Crear GDD (pestaña insumos)
 router.get('/buscar_insumos/:detalle', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -275,24 +276,24 @@ router.get('/loadStateGDBD', function(req, res, next){
 });
 
 // Retorna lista de despachos segun filtro, NO SE USA, SE CAMBIO A DATATABLE
-router.post('/crear_gdd_fill', function(req, res, next){
-    if(verificar(req.session.userData)){
+router.post('/crear_gdd_fill', function(req, res, next) {
+    if (verificar(req.session.userData)) {
         var input = JSON.parse(JSON.stringify(req.body));
-        var where = "WHERE internalquery.detalle LIKE '%"+input.detalle+"%' OR concat(repeat('0', abs(6 - length(internalquery.numordenfabricacion))),internalquery.numordenfabricacion ) LIKE '%"+input.detalle+"%' OR internalquery.anom LIKE '%"+input.detalle+"%' OR internalquery.f_entrega LIKE '%"+input.detalle+"%' OR internalquery.cantidad-internalquery.despachados LIKE '%"+input.detalle+"%' OR concat(repeat('0', abs(6 - length(internalquery.numof))),internalquery.numof ) LIKE '%"+input.detalle+"%'";
-        if(input.detalle != ''){
-            where += " OR internalquery.detalle = '"+input.detalle+"' OR concat(repeat('0', abs(6 - length(internalquery.numordenfabricacion))),internalquery.numordenfabricacion ) = '"+input.detalle+"' OR internalquery.anom = '"+input.detalle+"' OR internalquery.f_entrega = '"+input.detalle+"' OR internalquery.cantidad-internalquery.despachados = '"+input.detalle+"' OR concat(repeat('0', abs(6 - length(internalquery.numof))),internalquery.numof ) = '"+input.detalle+"'";
+        var where = "WHERE internalquery.detalle LIKE '%" + input.detalle + "%' OR concat(repeat('0', abs(6 - length(internalquery.numordenfabricacion))),internalquery.numordenfabricacion ) LIKE '%" + input.detalle + "%' OR internalquery.anom LIKE '%" + input.detalle + "%' OR internalquery.f_entrega LIKE '%" + input.detalle + "%' OR internalquery.cantidad-internalquery.despachados LIKE '%" + input.detalle + "%' OR concat(repeat('0', abs(6 - length(internalquery.numof))),internalquery.numof ) LIKE '%" + input.detalle + "%'";
+        if (input.detalle != '') {
+            where += " OR internalquery.detalle = '" + input.detalle + "' OR concat(repeat('0', abs(6 - length(internalquery.numordenfabricacion))),internalquery.numordenfabricacion ) = '" + input.detalle + "' OR internalquery.anom = '" + input.detalle + "' OR internalquery.f_entrega = '" + input.detalle + "' OR internalquery.cantidad-internalquery.despachados = '" + input.detalle + "' OR concat(repeat('0', abs(6 - length(internalquery.numof))),internalquery.numof ) = '" + input.detalle + "'";
         }
-        req.getConnection(function(err, connection){
-            connection.query("SELECT MAX(iddespacho) as id FROM despacho", function(err, num){
-                if(err)
+        req.getConnection(function (err, connection) {
+            connection.query("SELECT MAX(iddespacho) as id FROM despacho", function (err, num) {
+                if (err)
                     console.log("Error Selecting : %s", err);
-                num = num[0].id+1;
+                num = num[0].id + 1;
                 connection.query("SELECT * FROM (select cliente.idcliente,fabricaciones.idorden_f as numof,pedido.idpedido as idfabricaciones,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
-                    +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                    +" left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
-                    +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join cliente on cliente.idcliente=odc.idcliente where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by "+input.fill+" "+input.orden+") as internalquery "+where,
-                    function(err, rows){
-                        if(err)
+                    + "odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
+                    + " left join odc on odc.idodc=pedido.idodc left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
+                    + " left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join cliente on cliente.idcliente=odc.idcliente where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by " + input.fill + " " + input.orden + ") as internalquery " + where,
+                    function (err, rows) {
+                        if (err)
                             console.log("Error Selecting :%s", err);
 
                         res.render('bodega/g_despacho_table', {data: rows});
@@ -301,8 +302,10 @@ router.post('/crear_gdd_fill', function(req, res, next){
             });
         });
     }
-    else{res.redirect('bad_login');}
-
+    else {
+        res.redirect('bad_login');
+    }
+});
 
 router.post('/save_gdd', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
@@ -827,12 +830,11 @@ router.get("/search_gdd/:numgdd", function(req, res, next){
             connection.query("SELECT * FROM despacho WHERE iddespacho LIKE '%"+id+"%'", function(err, desp){
                 if(err)
                     console.log("Error Selecting : %s", err);
-
                 res.render('bodega/despachos', {data: desp, tipo: 'Todas'});
             });
         });
-        
     }
-    else res.redirect('/bad_login'); 
+    else {res.redirect('/bad_login');}
 });
+
 module.exports = router;
