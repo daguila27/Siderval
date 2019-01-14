@@ -145,9 +145,8 @@ router.post("/search_oca",function(req,res,next){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
             connection.query("select oda.numoda,abastecimiento.idabast,material.idmaterial,material.detalle,coalesce(material.u_medida,'und') AS umed,abastecimiento.cantidad,abastecimiento.recibidos"
-                + " from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
-                + "abastecimiento.idmaterial = material.idmaterial WHERE oda.idoda = ? and abastecimiento.recibidos < abastecimiento.cantidad group by abastecimiento.idabast"
-                ,[req.body.numoda],function(err,rows){
+                    + " from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
+                    + "abastecimiento.idmaterial = material.idmaterial WHERE oda.idoda = ? and abastecimiento.recibidos < abastecimiento.cantidad group by abastecimiento.idabast",[req.body.numoda],function(err,rows){
                 if(err) console.log(err);
 
                 console.log(rows);
