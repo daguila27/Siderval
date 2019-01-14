@@ -38,25 +38,31 @@
 </style>
 <div class="row" style="margin: 0; padding: 0;">
 	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%;">
-		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
-			<li class="active">Orden de Compra</li>
+		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+			<li class="active">Orden de Compra </li>
 			<!-- Mostrar cantidad de datos -->
 			<div id="pedidos" style="margin-top: 8px"></div>
 
 
 		</ol>
-		<div style="width: 50%;">
+		<div style="width: 50%; margin-right: 4%">
 			<div class="form-group o_searchview" style="margin: 0;padding: 0;">
-				<div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
+				<div class="form-control etiqueta-input" style="display:flex; vertical-align: center;">
 					<div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
 					</div>
-					<input id="buscar_pedido" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
+					<input id="buscar_pedido" style="border: none" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
 					<input id="buscar_pedido-value" style="display: none" type="text">
 				</div>
 				<ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
 					<li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OC</em> para: <strong></strong></a></li>
 					<li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripción</em> para: <strong></strong></a></li>
 					<li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Cliente</em> para: <strong></strong></a></li>
+				</ul>
+			</div>
+			<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+				<button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+				<ul class="dropdown-menu">
+					<li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
 				</ul>
 			</div>
 			<!--<input type="text" id="buscar_pedido" class="form-control pull-right" placeholder="Buscar...">-->
@@ -367,6 +373,19 @@
         else{
             $(".indicator-oc-check").css('display', 'block');
         }
+    });
+
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
+
     });
 
 </script>
