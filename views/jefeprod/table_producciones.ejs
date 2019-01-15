@@ -26,6 +26,7 @@ function fechaLatino(string){
         <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
         <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
         <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">Rch</th>
         <th data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" style="text-align: center">BPT</th>
         <th class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center">TRA</th>
     </tr>
@@ -48,6 +49,7 @@ function fechaLatino(string){
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
+        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" id="prod<%=datalen[i].idproduccion%>-8" style="text-align: center"><%= datalen[i]['8'] %></td>
         <td class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
     </tr>
