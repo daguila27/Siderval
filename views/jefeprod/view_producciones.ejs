@@ -69,6 +69,13 @@
                     <li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OF</em> para: <strong></strong></a></li>
                 </ul>
             </div>
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="getcsvof" data-tipo="opdetalle"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel Detalle</a></li>
+                    <li><a href="#" class="getcsvof" data-tipo="op"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
             <!--<input type="text" id="buscar_produccion" class="form-control pull-right" placeholder="Buscar...">-->
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
                 <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
@@ -246,5 +253,18 @@
         }
     });
 
+
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/jefeprod/xlsx_' + $(yo).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
+
+    });
 
 </script>

@@ -527,6 +527,7 @@ router.get('/list_ops', function(req, res, next){
                         console.log("Select Error: %s",err);
                     }
                     var aux = [];
+                    console.log(ofs);
                     /*El error del etapatoken nulo se debe por lo general a que hay fabricaciones sin fecha de entrega*/
                     for(var i = 0;i< ofs.length;i++){
                     	if(typeof ofs[i].oftoken != 'null'){
@@ -578,7 +579,7 @@ router.get('/list_ops', function(req, res, next){
                                     console.log("Select Error: %s",err);
                                 }
                                 //console.log(progress);
-                                res.render('jefeprod/ope_list',{data: ofs , data2: anul,datalen: prods, prog: progress},function (err,html){if(err)throw err;res.send(html);});
+                                res.render('jefeprod/ope_list',{data: ofs , data2: anul,datalen: prods, prog:/* progress*/ []},function (err,html){if(err)throw err;res.send(html);});
                             });
                         });
                     });
