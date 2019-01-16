@@ -294,7 +294,7 @@ router.get('/bom_mat_uni_page/:page', function(req, res, next) {
 					if(err)
 						console.log("Error Selecting : %s", err);
     				
-    				res.render('abast/bom_all_list', {data: ped});
+    				res.render('abast/bom_all_list', {data: ped, page: pagina});
 
 				});
 		});

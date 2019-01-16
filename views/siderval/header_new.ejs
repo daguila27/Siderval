@@ -135,7 +135,7 @@
 
                     <div class="oe_secondary_menu_section">Planificación</div>
                     <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                        <li onclick="ajax(this)" data-link="/plan/view_pedidos">
+                        <li id="pedd" onclick="ajax(this)" data-link="/plan/view_pedidos">
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Pedidos
@@ -167,13 +167,6 @@
                                 </span>
                             </a>
                         </li>
-                        <li onclick="ajax(this)" data-link="/jefeprod/phistory_view">
-                            <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Historial de producción
-                                </span>
-                            </a>
-                        </li>
                     </ul>
 
                     <div class="oe_secondary_menu_section">Materias Primas</div>
@@ -181,14 +174,28 @@
                         <li onclick="ajax(this)" data-link="/faena/procesos">
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Ver Procesos
+                                    Ver Materias Primas
                                 </span>
                             </a>
                         </li>
-                        <li onclick="ajax(this)" data-link="/jefeprod/phistory_view">
+                        <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Ver Historial de producción
+                                    Ver Movimientos
+                                </span>
+                            </a>
+                        </li>
+                        <li  onclick="ajax(this)" data-link="/matprimas/view_recep" id="view_movimientos">
+                            <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Ver Recepciones
+                                </span>
+                            </a>
+                        </li>
+                        <li onclick="ajax(this)" data-link="/abastecimiento/bom_mat_uni">
+                            <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Ver BOM productos
                                 </span>
                             </a>
                         </li>
@@ -196,6 +203,13 @@
 
                     <div class="oe_secondary_menu_section">Jefe Producción</div>
                     <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                        <li onclick="ajax(this)" data-link="/jefeprod/view_producciones">
+                            <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Ver Producciones
+                                </span>
+                            </a>
+                        </li>
                         <li onclick="ajax(this)" data-link="/faena/procesos">
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
@@ -214,20 +228,7 @@
 
                     <div class="oe_secondary_menu_section">Bodega</div>
                     <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                        <li onclick="ajax(this)" data-link="/faena/procesos">
-                            <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Procesos
-                                </span>
-                            </a>
-                        </li>
-                        <li onclick="ajax(this)" data-link="/jefeprod/phistory_view">
-                            <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Historial de producción
-                                </span>
-                            </a>
-                        </li>
+                        
                     </ul>
 
                     <div class="oe_secondary_menu_section">Clientes y Proveedores</div>

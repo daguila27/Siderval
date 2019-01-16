@@ -35,6 +35,18 @@
 
     <script type="text/javascript">
 
+        $(document).ready(function(){
+            $.ajax({
+                type: 'GET',
+                url: '/plan/view_pedidos',
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                    $("#pedd").addClass('active');
+                    $("#page-wrapper").fadeIn();
+                }
+            });
+        });
+
         function ajax(yo){
         $(".active").removeClass('active');
         $(yo).addClass('active');
