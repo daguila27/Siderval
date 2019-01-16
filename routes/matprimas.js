@@ -36,7 +36,7 @@ router.get("/crear_movimiento",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE ((codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND notbom = true AND material.detalle != '') OR codigo in ('P02000063001','P02000063002','P01020704006' ,'P01043604003' ,'P01054104002' ,'P01043004004' ,'P01043004001' ,'P01054104007' ) GROUP BY material.detalle",function (err,materiales) {
                 if(err) console.log(err);
                 res.render("matprimas/create_retiro",{mat: materiales});
             });
@@ -48,7 +48,7 @@ router.get("/crear_movimiento_dev",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE (codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND notbom = true AND material.detalle != '' GROUP BY material.detalle",function (err,materiales) {
+            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE ((codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND notbom = true AND material.detalle != '') OR codigo in ('P02000063001','P02000063002','P01020704006' ,'P01043604003' ,'P01054104002' ,'P01043004004' ,'P01043004001' ,'P01054104007' ) GROUP BY material.detalle",function (err,materiales) {
                 if(err) console.log(err);
 
                 console.log(materiales.length);
@@ -145,9 +145,8 @@ router.post("/search_oca",function(req,res,next){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
             connection.query("select oda.numoda,abastecimiento.idabast,material.idmaterial,material.detalle,coalesce(material.u_medida,'und') AS umed,abastecimiento.cantidad,abastecimiento.recibidos"
-                + " from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
-                + "abastecimiento.idmaterial = material.idmaterial WHERE oda.idoda = ? and abastecimiento.recibidos < abastecimiento.cantidad group by abastecimiento.idabast"
-                ,[req.body.numoda],function(err,rows){
+                    + " from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
+                    + "abastecimiento.idmaterial = material.idmaterial WHERE oda.idoda = ? and abastecimiento.recibidos < abastecimiento.cantidad group by abastecimiento.idabast",[req.body.numoda],function(err,rows){
                 if(err) console.log(err);
 
                 console.log(rows);

@@ -157,7 +157,7 @@ function letraMayus(string) {
                             if(data[i].stock <= 0){
                                 stateButton = 'false';
                             }%>
-                            <tr id="<%=data[i].idpedido%>">
+                            <tr class="mat_desp" id="<%=data[i].idpedido%>">
                                 <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
                                 <td id="nof<%=data[i].idpedido%>"><%= largeID(data[i].numof, 6)%></td>
                                 <td><%= data[i].numitem%></td>
@@ -166,14 +166,14 @@ function letraMayus(string) {
                                 
                                 <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
                                 
-                                <td style="text-align: center;" class="parsear_nro"><%= data[i].stock %></td>
+                                <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock %></td>
                                 
                                 <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" class="form-control" value="1" style="width: 80px;margin: 0"></td>
                                 
                                 <td id="date<%= data[i].idpedido%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
 
-                                <td id="add<%= data[i].idpedido%>">
-                                    <a onclick="add_row(this)" data-idpedido="<%= data[i].idpedido%>" class="btn btn-success btn-xs"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
+                                <td class="mat_butt" id="add<%= data[i].idpedido%>">
+                                    <a data-idpedido="<%= data[i].idpedido%>" aria-disabled="false" class="btn btn-success btn-xs addrow"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
                                 </td>
                                 
                                 <td class="hidden" id="rmv<%= data[i].idpedido%>">
@@ -224,6 +224,21 @@ function letraMayus(string) {
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
+    $(".mat_desp").each(function(){
+        var stock = parseInt($(this).children('.mat_stock').html());
+        if(stock == 0){
+            $(this).children('.mat_butt').children('a').removeClass('btn-success');
+            $(this).children('.mat_butt').children('a').addClass('btn-danger');
+            $(this).children('.mat_butt').children('a').removeClass('addrow');
+            $(this).children('.mat_butt').children('a').html("<span class='fa fa-ban' style='padding-left: 2px'></span>");
+        }
+    });
+
+
+    $(".addrow").on('click', function(e){
+        e.preventDefault();
+        add_row(this);
+    });
 
     // Oculta la seccion de insumos
     $(document).ready(function(){

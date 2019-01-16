@@ -1057,6 +1057,7 @@ router.get('/csv_of', function(req,res){
 
 router.get('/xlsx_of', function(req,res){
     if(verificar(req.session.userData)){
+        console.log("¡Profesor Jirafales!, ¿no gusta pasar a tomar una tasita de cafe?");
         var fs = require('fs');
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
@@ -1087,21 +1088,24 @@ router.get('/xlsx_of', function(req,res){
         req.getConnection(function(err, connection) {
             if(err)
                 console.log("Error connection : %s", err);
+
+            console.log("¿No será mucha molestia?");
             connection.query("select material.codigo,fabricaciones.idorden_f,fabricaciones.restantes,coalesce(prod_query.pt,0) as pt,coalesce(odc.numoc, 'SIDERVAL') as numoc,"
-                +" material.detalle,subaleacion.subnom as aleacion, coalesce(pedido.despachados,"
-                +" concat(fabricaciones.cantidad-fabricaciones.restantes, ' sin producción')) as despachados,"
-                +" coalesce(pedido.cantidad, fabricaciones.cantidad) as solicitados, coalesce(material.peso,0) as peso_u,"
-                +" coalesce(material.peso*pedido.cantidad,0) as peso_t, coalesce(material.peso*(pedido.cantidad - pedido.despachados),0)"
-                +" as peso_d, coalesce(pedido.f_entrega, fabricaciones.f_entrega) as f_entrega,coalesce(group_concat(despacho.iddespacho),"
-                +" 'Sin GD') as gd from fabricaciones left join material on material.idmaterial=fabricaciones.idmaterial left join pedido on"
-                +" pedido.idpedido=fabricaciones.idpedido left join producido on producido.idmaterial=material.idmaterial left join subaleacion"
-                +" on subaleacion.idsubaleacion=producido.idsubaleacion left join odc on odc.idodc=pedido.idodc left join despacho on Pedin_despacho(despacho.idf_token,pedido.idpedido)"
-                +" left join (select produccion.idfabricaciones ,sum(produccion.`8`) as pt  from produccion group by produccion.idfabricaciones) as prod_query on prod_query.idfabricaciones=fabricaciones.idfabricaciones group by pedido.idpedido order by fabricaciones.idfabricaciones",
+                    +"material.detalle,subaleacion.subnom as aleacion, coalesce(pedido.despachados,"
+                    +"concat(fabricaciones.cantidad-fabricaciones.restantes, ' sin producción')) as despachados,"
+                    +"coalesce(pedido.cantidad, fabricaciones.cantidad) as solicitados, coalesce(material.peso,0) as peso_u,"
+                    +"coalesce(material.peso*pedido.cantidad,0) as peso_t, coalesce(material.peso*(pedido.cantidad - pedido.despachados),0)"
+                    +"as peso_d, coalesce(pedido.f_entrega, fabricaciones.f_entrega) as f_entrega,coalesce(group_concat(despachos.idgd),"
+                    +"'Sin GD') as gd from fabricaciones left join material on material.idmaterial=fabricaciones.idmaterial left join pedido on"
+                    +" pedido.idpedido=fabricaciones.idpedido left join producido on producido.idmaterial=material.idmaterial left join subaleacion"
+                    +" on subaleacion.idsubaleacion=producido.idsubaleacion left join odc on odc.idodc=pedido.idodc left join despachos on despachos.idpedido=pedido.idpedido"
+                    +" left join (select produccion.idfabricaciones ,sum(produccion.`8`) as pt  from produccion group by produccion.idfabricaciones) as prod_query on prod_query.idfabricaciones=fabricaciones.idfabricaciones group by pedido.idpedido order by fabricaciones.idfabricaciones",
                 function(err, rows){
                     if (err)
                         console.log("Error Select : %s ",err );
 
-                    console.log(rows);
+                    console.log("Por supuesto que no pase usted");
+                    //console.log(rows);
                     if(rows.length>0){
                         var nombre = 'csvs/master_of_' + ident + '.xlsx';
                         sheet.getCell('A1').value = 'Código';
@@ -1138,8 +1142,8 @@ router.get('/xlsx_of', function(req,res){
                                 fechaEntrega = new Date(rows[j].f_entrega).getTime();
                                 Hoy    = new Date().getTime();
                                 diff = Hoy - fechaEntrega;
-                                console.log(diff);
-                                console.log(diff/(1000*60*60*24));
+                                //console.log(diff);
+                                //console.log(diff/(1000*60*60*24));
                                 sheet.getCell('C' + auxrow.toString()).value = "Atrasado";
                             }
                             else{
@@ -1166,8 +1170,11 @@ router.get('/xlsx_of', function(req,res){
                                 }
                             }
                         }
+
+                        console.log("Despues de usted");
                         workbook.xlsx.writeFile('public/' + nombre)
                             .then(function() {
+                                console.log("Aaww");
                                 res.send('/csvs/master_of_'+ ident + '.xlsx');
 
                             });
@@ -4581,6 +4588,7 @@ router.get('/get_client_pred/:text', function(req,res,next){
             function(err, datos){
                 if(err)
                     console.log("Error Selecting : %s", err);
+
                 res.render('plan/predict_stream', {info : datos});
 
             });

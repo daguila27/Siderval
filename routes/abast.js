@@ -1986,7 +1986,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(facturacion.cantidad),0) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,coalesce(sum(facturacion.cantidad),0) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
                     + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
 	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
 	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
@@ -3259,12 +3259,13 @@ router.get('/get_guiaAbast/:idgd', function(req, res, next) {
 
 router.post('/new_cliente/', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input);
 	req.getConnection(function (err, connection) {
-		connection.query("INSERT INTO cliente SET ?", input, function (err, cliente) {
-			if (err) console.log("Error en la query cliente");
-            res.send("Se inserto nuevo cliente");
-        })
-
+		connection.query("INSERT INTO cliente SET ?", [input], function (err, cliente) {
+			if (err) {console.log("Error en la query cliente");}
+            console.log(cliente);
+			res.send("Se inserto nuevo cliente");
+        });
     });
 });
 

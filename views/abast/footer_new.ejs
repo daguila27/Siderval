@@ -267,7 +267,8 @@ However, delay the fade out process for 2.5 seconds */
                     telefono: $("#telefonoForm").val(),
                     contacto: $("#contactoForm").val(),
                 },
-                success: function () {
+                success: function (data) {
+                    alert(data);
                     $('#crearProv').modal('hide');
                 }
             });
