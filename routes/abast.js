@@ -23,7 +23,7 @@ router.use(
 
 
 function verificar(usr){
-	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan'){
+	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
 		return true;
 	}else{
 		return false;
@@ -168,7 +168,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
 							}
 
 						}
-                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable, isRecep: isRecepcionable});
+                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable, isRecep: isRecepcionable, user: req.session.userData});
                     });
                 });
             });
