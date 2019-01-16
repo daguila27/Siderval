@@ -14,6 +14,7 @@ var Service = require('node-windows').Service;
 var index = require('./routes/index');
 var users = require('./routes/users');
 var admin = require('./routes/admin');
+var siderval = require('./routes/siderval');
 var faena = require('./routes/faena');
 var plan = require('./routes/plan');
 var dt = require('./routes/dt');
@@ -48,6 +49,7 @@ app.use(cookieSession({
 app.use('/', index);
 app.use('/user', users);
 
+app.use('/siderval', siderval);
 app.use('/plan', plan);
 app.use('/gerencia', admin);
 app.use('/faena', faena);

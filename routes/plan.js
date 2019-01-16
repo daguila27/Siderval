@@ -15,7 +15,7 @@ router.use(
     },'pool')
 );
 function verificar(usr){
-  if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento'){
+  if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento' || usr.nombre == 'siderval'){
     return true;
   }else{
     return false;
@@ -197,7 +197,7 @@ router.post('/buscar_fabricaciones_list', function(req, res, next){
                 function(err, odc){
                     if(err) throw err;
 
-                    res.render('plan/table_fabricaciones', {data: odc, key: orden.replace(' ', '-')});
+                    res.render('plan/table_fabricaciones', {data: odc, key: orden.replace(' ', '-'), user: req.session.userData});
                 
             });
         });
@@ -281,7 +281,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
                 function(err, of){
                     if(err) throw err;
 
-                    res.render('plan/table_fabricaciones', {data: of, key: orden.replace(' ', '-')});
+                    res.render('plan/table_fabricaciones', {data: of, key: orden.replace(' ', '-'), user: req.session.userData});
                 
             });
         });

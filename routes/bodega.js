@@ -19,7 +19,7 @@ router.use(
 );
 
 function verificar(usr){
-	if(usr.nombre == 'bodega' || usr.nombre == 'plan'){
+	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
 		return true;
 	}else{
 		return false;
@@ -100,7 +100,7 @@ router.post('/buscar_despacho_list', function(req, res, next){
             connection.query("SELECT * FROM despacho WHERE despacho.iddespacho LIKE '%"+clave+"%' AND despacho.estado LIKE '%"+tipo+"%'",
                 function(err, desp){
                     if(err) throw err;
-                    res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
+                    res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-'), user: req.session.userData});
             });
         });
     }
@@ -128,7 +128,7 @@ router.post('/table_despachos', function(req, res, next){
                     console.log("Error Selecting :%s", err);
                 console.log(desp);
                 //console.log(desp);
-                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-')});
+                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-'), user: req.session.userData});
             });         
         });
     }
@@ -497,7 +497,7 @@ router.post('/anular_gdd', function(req, res, next){
         connection.query("SELECT * FROM despachos WHERE idgd = ?", idgd, function(err, desp){
         if(err) console.log("Error Selecting : %s", err);
             if(desp.length == 0){
-                connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
+                connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado", idgd],function(err, up){
                     if(err) console.log("Error Selecting : %s", err);
                     res.send('/Guia anulada');
                 });
