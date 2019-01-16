@@ -23,7 +23,7 @@
 			<tr class="o_data_row" onclick="" data-idodc="">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" ><%=desp[i].idgd%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
-				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
+				<td id="item<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].estado%></td>
@@ -82,7 +82,7 @@
 		});
     }
     function anulate(file){
-        var resp = confirm("Anular la Guia de despacho retorna el stock a los materiales involucrados y ademas es irreversible. \n\n                         ¿Esta seguro que desea continuar?");
+        var resp = confirm("Anular la Guia de despacho retorna el stock a los materiales involucrados y además es irreversible. \n\n                         ¿Esta seguro que desea continuar?");
         if(resp){
             $.ajax({
                 type: 'POST',
@@ -90,12 +90,7 @@
                 url: 'bodega/anular_gdd',
                 success: function(){
 					$("#btns"+$(file).data('id')).html('');
-					//Por cada material, de la GD de despacho.
-					console.log($('#est'+$(file).data('id')).data('id'));
-					for(var i = 0; i < $('#est'+$(file).data('id')).data('id'); i++){
-					    console.log('#est'+$(file).data('id')+"-"+String(i))
-                        $('#est'+$(file).data('id')+"-"+String(i)).html("Anulado");
-					}
+					$("#est"+$(file).data('id')).html('Anulado');
                 }
             });
         }

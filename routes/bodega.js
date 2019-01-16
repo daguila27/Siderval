@@ -497,7 +497,7 @@ router.post('/anular_gdd', function(req, res, next){
         connection.query("SELECT * FROM despachos WHERE idgd = ?", idgd, function(err, desp){
         if(err) console.log("Error Selecting : %s", err);
             if(desp.length == 0){
-                connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
+                connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado", idgd],function(err, up){
                     if(err) console.log("Error Selecting : %s", err);
                     res.send('/Guia anulada');
                 });
