@@ -5,7 +5,7 @@
 	}
 %>
 
-<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: 7px">
 		<thead>
 			<tr>
 				<th class="o_column_sortable">Número de GD</th>
@@ -14,7 +14,9 @@
 				<th class="o_column_sortable">Observación</th>
 				<th class="o_column_sortable" style="text-align: center;" data-order="gd.fecha-DESC">Fecha de Despacho</th>
 				<th class="o_column_sortable">Tipo</th>
-				<th class="o_column_sortable" style="width:80px" >Accion</th>
+				<%if(user.nombre != 'siderval'){%>
+					<th class="o_column_sortable" style="width:80px" >Acción</th>
+				<%}%>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
@@ -23,24 +25,26 @@
 			<tr class="o_data_row" onclick="" data-idodc="">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" ><%=desp[i].idgd%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
-				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
+				<td id="item<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].estado%></td>
+				<%if(user.nombre != 'siderval'){%>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 					<%if(desp[i].estado != 'Anulado'){%>
-						<div id="btns<%=desp[i].idgd%>">
-							<%if(desp[i].estado == 'Blanco'){%>
-								<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].idgd%>">AC</a>
-							<%}else{%>
-								<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].idgd%>">GD</a>
-							<%}%>
-							<a class="btn btn-xs btn-danger anular" onclick="anulate(this)" data-id="<%=desp[i].idgd%>"><i class="fa fa-ban"></i></a>
-						</div>
-					<%} %>
+					<div id="btns<%=desp[i].idgd%>">
+						<%if(desp[i].estado == 'Blanco'){%>
+							<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].idgd%>">AC</a>
+						<%}else{%>
+							<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].idgd%>">GD</a>
+						<%}%>
+						<a class="btn btn-xs btn-danger anular" onclick="anulate(this)" data-id="<%=desp[i].idgd%>"><i class="fa fa-ban"></i></a>
+					</div>
+					<%}%>
 				</td>
+				<%}%>
 			</tr>
-		<% } %>
+		<%}%>
 	</tbody>
 	<tfoot>
 		<tr>
@@ -50,6 +54,9 @@
 			<td></td>
 			<td></td>
 			<td></td>
+			<%if(user.nombre != 'siderval'){%>
+				<td></td>
+			<%}%>
 		</tr>
 	</tfoot>
 </table>
@@ -82,7 +89,7 @@
 		});
     }
     function anulate(file){
-        var resp = confirm("Anular la Guia de despacho retorna el stock a los materiales involucrados y ademas es irreversible. \n\n                         ¿Esta seguro que desea continuar?");
+        var resp = confirm("Anular la Guia de despacho retorna el stock a los materiales involucrados y además es irreversible. \n\n                         ¿Esta seguro que desea continuar?");
         if(resp){
             $.ajax({
                 type: 'POST',
@@ -90,17 +97,14 @@
                 url: 'bodega/anular_gdd',
                 success: function(){
 					$("#btns"+$(file).data('id')).html('');
-					//Por cada material, de la GD de despacho.
-					console.log($('#est'+$(file).data('id')).data('id'));
-					for(var i = 0; i < $('#est'+$(file).data('id')).data('id'); i++){
-					    console.log('#est'+$(file).data('id')+"-"+String(i))
-                        $('#est'+$(file).data('id')+"-"+String(i)).html("Anulado");
-					}
+					$("#est"+$(file).data('id')).html('Anulado');
                 }
             });
         }
     }
+    
     setDataTableMain("#despachosTable");
+
 	function ver_gdd(yo){
 		//$("#form"+$(yo).data('idodc')).submit();
 		$.ajax({

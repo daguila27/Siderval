@@ -18,7 +18,7 @@ router.use(
 
 );
 function verificar(usr){
-	if(usr.nombre == 'jefeprod' || usr.nombre == 'gerencia'){
+	if(usr.nombre == 'jefeprod' || usr.nombre == 'gerencia' || usr.nombre == 'siderval'){
 		return true;
 	}else{
 		return false;

@@ -37,9 +37,11 @@ function fechaLatino(string){
                                 <a class="pull-right" style="z-index: 10; margin-left: 10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
                                     <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
                                 </a>
-                                <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
-                                    <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
-                                </a>
+                                <%if(user.nombre != 'siderval'){%>
+                                    <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
+                                        <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
+                                    </a>
+                                <%}%>
                                 <% if (isRecep){ %>
                                 <!--<a class="pull-right" style="margin-left: 10px" data-idoda="%= oda.idoda%" data-numoda="%= oda.idoda%" onclick="receiveAll(this)">
                                     <i data-toggle="tooltip" title="Recepcionar Todos" class="fa fa-cubes"></i>

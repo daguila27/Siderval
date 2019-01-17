@@ -18,7 +18,7 @@ router.use(
 );
 
 function verificar(usr){
-	if(usr.nombre == 'matprimas'){
+	if(usr.nombre == 'matprimas' || usr.nombre == 'siderval'){
 		return true;
 	}else{
 		return false;

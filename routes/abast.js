@@ -23,7 +23,7 @@ router.use(
 
 
 function verificar(usr){
-	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan'){
+	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
 		return true;
 	}else{
 		return false;
@@ -168,7 +168,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
 							}
 
 						}
-                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable, isRecep: isRecepcionable});
+                        res.render('abast/page_oda', {oda:oda[0], abast: abast, isfact: isFacturable, isRecep: isRecepcionable, user: req.session.userData});
                     });
                 });
             });
@@ -294,7 +294,7 @@ router.get('/bom_mat_uni_page/:page', function(req, res, next) {
 					if(err)
 						console.log("Error Selecting : %s", err);
     				
-    				res.render('abast/bom_all_list', {data: ped});
+    				res.render('abast/bom_all_list', {data: ped, page: pagina});
 
 				});
 		});

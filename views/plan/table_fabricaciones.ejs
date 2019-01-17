@@ -11,7 +11,7 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px">
 	<style>
 		.order-column:hover{
 			cursor: pointer;
@@ -28,7 +28,9 @@
 				<th id="planta" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">Planta</th>-->
 				<th id="f_entrega" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
 				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="ordenfabricacion.creacion-ASC">Fecha de Creación</th>
-				<th id="habilitar_cand" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC">Habilitar</th>
+				<%if(user.nombre != 'siderval'){%>
+					<th id="habilitar_cand" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC">Habilitar</th>
+				<%}%>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable" style="margin-top: 10px">
@@ -46,26 +48,28 @@
 						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString())%></span>
 					</td>
 					<%
-					if(data[i].externo == '0' && data[i].restantes > 0 ){
-						if(data[i].lock == '0'){%>
-							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
-								<button class="btn btn-xs btn-primary" onclick="habFabricacion(this)" data-state="0" data-id="<%= data[i].idfabricaciones%>">
-									<i class="fa fa-unlock"></i>
-								</button>
-							</td>
-						<%}else{%>
-							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
-								<button class="btn btn-xs btn-danger"  onclick="habFabricacion(this)" data-state="1" data-id="<%= data[i].idfabricaciones%>">
-									<i class="fa fa-lock"></i>
-								</button>
-							</td>
-						<%}
-					}else{%>
-							<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
-								<button class="btn btn-xs btn-danger">
-									<i class="fa fa-ban"></i>
-								</button>
-							</td>
+					if(user.nombre != 'siderval'){
+						if(data[i].externo == '0' && data[i].restantes > 0 ){
+							if(data[i].lock == '0'){%>
+								<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+									<button class="btn btn-xs btn-primary" onclick="habFabricacion(this)" data-state="0" data-id="<%= data[i].idfabricaciones%>">
+										<i class="fa fa-unlock"></i>
+									</button>
+								</td>
+							<%}else{%>
+								<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+									<button class="btn btn-xs btn-danger"  onclick="habFabricacion(this)" data-state="1" data-id="<%= data[i].idfabricaciones%>">
+										<i class="fa fa-lock"></i>
+									</button>
+								</td>
+							<%}
+						}else{%>
+								<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+									<button class="btn btn-xs btn-danger">
+										<i class="fa fa-ban"></i>
+									</button>
+								</td>
+						<%}%>
 					<%}%>
             </tr>
 		<%}%>
@@ -80,7 +84,9 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td></td>
+			<%if(user.nombre != 'siderval'){%>
+				<td></td>
+			<%}%>
 		</tr>
 	</tfoot>
 </table>
