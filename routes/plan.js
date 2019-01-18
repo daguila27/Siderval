@@ -95,7 +95,9 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
             }
         }
 
-        if(input.pendientes){
+
+
+        if(input.pendientes == 'true'){
             condiciones_where.push(['pedido.cantidad > pedido.despachados']);
         }
 
@@ -113,7 +115,7 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
             connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
                 + " ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
-                + where + " LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden,
+                + where + ") as " + orden.split('.')[0] + " ORDER BY " + orden,
                 function(err, odc){
                     if(err) throw err;
 
@@ -259,8 +261,9 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         }
         orden = orden.replace('-', ' ');
         var where = " ";
+
+        condiciones_where.push("pedido.externo = '0'");
         if(input.pendientes == 'true'){
-            condiciones_where.push("pedido.externo = '0'");
             condiciones_where.push("fabricaciones.restantes>0");
             //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
         }
@@ -273,11 +276,14 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         console.log(where);
       req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, material.detalle, odc.numoc"
+
+            var consulta = "select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
-                +"on material.idmaterial=fabricaciones.idmaterial"+where,
+                +"on material.idmaterial=fabricaciones.idmaterial"+where;
+            console.log(consulta);
+            connection.query(consulta,
                 function(err, of){
                     if(err) throw err;
 
