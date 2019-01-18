@@ -110,6 +110,11 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         }
 
         console.log(where);
+        query_ped = "SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido"
+                + " LEFT JOIN odc ON odc.idodc=pedido.idodc LEFT JOIN cliente"
+                + " ON cliente.idcliente = odc.idcliente LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
+                + where + " LIMIT " + page_now + ",50) as " + orden.split('.')[0] + " ORDER BY " + orden;
+        console.log(query_ped);
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido"
@@ -476,7 +481,7 @@ router.get('/all_clientes', function(req, res, next){
                         function (err,client){
                             if(err) console.log("Select Error: %s",err);
                         
-                            res.render('plan/client_list',{largo: client.length});
+                            res.render('plan/client_list',{largo: client.length, user: req.session.userData});
                 });
             });
         } else res.redirect("/bad_login");
@@ -499,7 +504,7 @@ router.get('/search_client/:key', function(req, res, next){
                             if(err) console.log("Select Error: %s",err);
                         
                             //console.log(client);
-                            res.render('plan/cliente_page',{data: client});
+                            res.render('plan/cliente_page',{data: client, user: req.session.userData});
                 });
             });
         } else res.redirect("/bad_login");
@@ -524,7 +529,7 @@ router.get('/pag_clientes/:pagina', function(req, res, next){
                             if(err) console.log("Select Error: %s",err);
                         
                             console.log(client);
-                            res.render('plan/cliente_page',{data: client});
+                            res.render('plan/cliente_page',{data: client, user: req.session.userData});
                 });
             });
         } else res.redirect("/bad_login");

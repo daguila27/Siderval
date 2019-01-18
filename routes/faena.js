@@ -221,7 +221,7 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 							rows[i].nextstep = "bodega";
 						} else rows[i].nextstep = rows[i].ruta[nextstep];
 					}
-					res.render('faena/render_cola', {data: rows,etapaactual:input.proceso, nombreetapa: etapa[0].nombre_etapa});
+					res.render('faena/render_cola', {data: rows,etapaactual:input.proceso, nombreetapa: etapa[0].nombre_etapa, user: req.session.userData});
 				});
 			});
 			
