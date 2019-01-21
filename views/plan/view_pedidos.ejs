@@ -37,7 +37,7 @@
 	}
 </style>
 <div class="row" style="margin: 0; padding: 0;">
-	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%;">
+	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%;">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra </li>
 			<!-- Mostrar cantidad de datos -->
@@ -45,7 +45,7 @@
 
 
 		</ol>
-		<div style="width: 50%; margin-right: 4%">
+		<div style="width: 50%;">
 			<div class="form-group o_searchview" style="margin: 0;padding: 0;">
 				<div class="form-control etiqueta-input" style="display:flex; vertical-align: center;">
 					<div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
@@ -57,6 +57,7 @@
 					<li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OC</em> para: <strong></strong></a></li>
 					<li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripción</em> para: <strong></strong></a></li>
 					<li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Cliente</em> para: <strong></strong></a></li>
+					<li data-searchcol="3" class="item3 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Estado</em> para: <strong></strong></a></li>
 				</ul>
 			</div>
 			<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
@@ -73,8 +74,8 @@
 	    
 	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 				<div style="display: flex">
-					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Pendientes Solamente</label>
-					<input type="checkbox" id="pend_oc" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_oc()" checked>
+					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
+					<input type="checkbox" id="pend_oc" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_oc()">
 					<h5 style="margin-left: 10px" class="indicator-oc-check"><small>Mostrando solo pedido(s) sin despachar</small></h5>
 				</div>
 	       		<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
@@ -105,7 +106,8 @@
     var array_fill = [
         "OC@primary",
         "Detalle@success",
-        "Cliente@info"
+        "Cliente@info",
+        "Estado@warning"
     ];
     var filtros_seleccionados = [];
 	// Carga la tabla de pedidos
@@ -172,16 +174,16 @@
 
 
         //SI SOBREPASA EL LIMITE INFERIOR
-        if(parseInt(item) >= 5){
+        if(parseInt(item) >= 4){
             $(".o_searchview_autocomplete").data('item', "0");
             $(".fill-item-abast").removeClass("o-selection-focus");
             $(".item0").addClass("o-selection-focus");
         }
         //SI SOBREPASA EL LIMITE SUPERIOR
         else if(parseInt(item) < 0){
-            $(".o_searchview_autocomplete").data('item', "4");
+            $(".o_searchview_autocomplete").data('item', "3");
             $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item4").addClass("o-selection-focus");
+            $(".item3").addClass("o-selection-focus");
         }
         else{
             $(".o_searchview_autocomplete").data('item', item);

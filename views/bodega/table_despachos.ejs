@@ -34,11 +34,11 @@
 					<%if(desp[i].estado != 'Anulado'){%>
 					<div id="btns<%=desp[i].idgd%>">
 						<%if(desp[i].estado == 'Blanco'){%>
-							<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].idgd%>">AC</a>
+							<a class="btn btn-xs btn-info" onclick="activarGD(this)" data-id="<%=desp[i].idgd%>" data-toggle="tooltip" data-placement="bottom" title="Activar GD">AC</a>
 						<%}else{%>
-							<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].idgd%>">GD</a>
+							<a class="btn btn-xs btn-success genguia" onclick="getxlsx(this)" data-id="<%=desp[i].idgd%>" data-toggle="tooltip" data-placement="bottom" title="Descargar Excel">GD</a>
 						<%}%>
-						<a class="btn btn-xs btn-danger anular" onclick="anulate(this)" data-id="<%=desp[i].idgd%>"><i class="fa fa-ban"></i></a>
+						<a class="btn btn-xs btn-danger anular" onclick="anulate(this)" data-id="<%=desp[i].idgd%>" data-toggle="tooltip" data-placement="bottom" title="Anular GD"><i class="fa fa-ban"></i></a>
 					</div>
 					<%}%>
 				</td>
@@ -72,7 +72,7 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-
+    setDataTableMain("#despachosTable");
 	function getxlsx(file){
 		$.ajax({
 			type: 'GET',
@@ -102,8 +102,7 @@
             });
         }
     }
-    
-    setDataTableMain("#despachosTable");
+
 
 	function ver_gdd(yo){
 		//$("#form"+$(yo).data('idodc')).submit();
