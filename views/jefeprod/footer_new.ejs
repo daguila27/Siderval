@@ -170,7 +170,7 @@
                         <input class="form-control" type="number" name="cantidadRechazo" id="cantidadRechazo" placeholder="Cantidad Rechazada">
                         <textarea class="form-control" name="comentarioRechazo" id="comentarioRechazo" rows="5" placeholder="Detalle ..." style="margin-top: 10px"></textarea>
                     </div>
-                    <input type="hidden" name="thisetapa" id="thisetapa">
+                    <input type="hidden" name="thisetapa" id="thisetapa_rechazo">
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Enviar</button>
@@ -222,6 +222,7 @@
             comentario: form[2].value,
             thisetapa: form[3].value
         };
+        alert(datos.thisetapa);
         $.ajax({
             type: 'POST',
             data: datos,
