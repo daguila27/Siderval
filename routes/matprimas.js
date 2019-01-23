@@ -374,7 +374,7 @@ router.post("/table_recepcion",function(req,res,next){
             clave = input.clave.split(',');
         }
         var where = "";
-        var condiciones_where = [];
+        var condiciones_where = ["recepcion.visible"];
         if(clave.length>0){
             for(var e=0; e < clave.length; e++){
                 condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
