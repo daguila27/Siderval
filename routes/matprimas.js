@@ -398,4 +398,15 @@ router.post("/table_recepcion",function(req,res,next){
         } );
     } else res.redirect("/bad_login");
 });
+
+
+
+/*
+* CONTROLADOR QUE RENDERIZA LA VISTA de inventarios rotativos
+* */
+router.get("/inventarios",function(req,res,next){
+    if(req.session.userData){
+        res.render("matprimas/inventario");
+    } else {res.redirect("/bad_login");}
+});
 module.exports = router;
