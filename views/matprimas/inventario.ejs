@@ -1,0 +1,169 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+%>
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="receps_table" style="width: 100%; top: -7px">
+    <thead>
+        <tr>
+            <th id="numof" class="cabecera o_column_sortable order-column" style="text-align: center;">Semana</th>
+            <th id="descrip" class="cabecera o_column_sortable order-column" style="text-align: center;">Detalle</th>
+            <th id="solicitados" class="cabecera o_column_sortable order-column">Stock Actual</th>
+            <th id="sin_produccion" class="cabecera o_column_sortable order-column">Stock Inventario</th>
+        </tr>
+    </thead>
+    <tbody class="ui-sortable">
+        <tr>
+            <th rowspan="6" style="text-align: center;">Semana 1</th>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+
+        <tr>
+            <th rowspan="6" style="text-align: center;">Semana 1</th>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+
+        <tr>
+            <th rowspan="6" style="text-align: center;">Semana 1</th>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+
+        <tr>
+            <th rowspan="6" style="text-align: center;">Semana 1</th>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+
+        <tr>
+            <th rowspan="6" style="text-align: center;">Semana 1</th>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+        <tr>
+            <td rowspan="1" style="align-content: start;">Rotor 1145</td>
+            <td rowspan="1" style="text-align: center;">10</td>
+            <td rowspan="1"><input type="number" class="form-control" placeholder="Stock Inventariado"></td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>

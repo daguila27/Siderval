@@ -26,17 +26,27 @@
 				<th class="o_column_sortable order-column" style="text-align: center;" data-order="pedido.f_entrega-DESC">Fecha de Entrega</th>
 				<th class="o_column_sortable order-column" style="text-align: center;" data-order="odc.creacion-ASC">Fecha de Creación</th>
 				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
+				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Estado</th>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
-		<%for(var i=0; i < data.length; i++){
-			if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 10 && diff_indays(data[i].f_entrega)>=0 ){%>
-				<tr class="o_data_row warning" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
-			<%}else if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 0 ){%>
-				<tr class="o_data_row danger" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
-			<%}else{%>
-				<tr class="o_data_row success" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
-			<%}%>
+		<%var clase;
+		var estado;
+		for(var i=0; i < data.length; i++){
+			if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 10 && diff_indays(data[i].f_entrega)>=0 ){
+				clase = 'warning';
+				estado = 'Pronta Entrega';
+			}else if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 0 ){
+				clase = 'danger';
+				estado = 'Atrasado';
+			}else if(parseInt(data[i].despachados) == parseInt(data[i].cantidad)){
+				clase = 'success';
+				estado = 'Finalizado';
+			}else{
+				clase = 'success';
+				estado = 'Más de 10 días';
+			}%>
+		<tr class="o_data_row <%=clase%>" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
 					<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].cantidad %></td>
@@ -48,6 +58,7 @@
 						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
 					</td>
 					<td class="o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
+					<td><%= estado%></td>
 				</tr>
 		<%}%>
 	</tbody>
@@ -57,6 +68,7 @@
 			<td></td>
 			<td></td>
 			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>

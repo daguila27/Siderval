@@ -223,7 +223,11 @@ function fechaLatino(string){
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].recibidos%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].facturados%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].costo%></td>
-                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
+                                                <%if(abast[e].u_medida == '' || abast[e].u_medida == null){%>
+                                                    <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;">und</td>
+                                                <%}else{%>
+                                                    <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
+                                                <%}%>
                                                 <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date().toLocaleDateString())%></td>
                                                 <!--<td class="o_data_cell o_many2many_tags_cell">
                                                     <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>

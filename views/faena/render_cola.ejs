@@ -75,11 +75,9 @@
 	<%}}%>
 </div>
 <script type="text/javascript">
-	
-	var io = io();
+	//var io = io();
 	$(".rechazarProduccion").on('click', function(e){
 	    e.preventDefault();
-	    //alert("ESTAMOS AQUI JEFE GORGORI");
 		$("#productoRechazado").html("<small><b>Producto: </b>"+$(this).data('det')+"</small>")
 		$("#idproduccionRechazo").val($(this).data('idp'));
 		$("#cantidadSolicitada").val($(this).data('cant'));
@@ -87,7 +85,7 @@
             "max" : parseInt($(this).data('cant')),        // substitute your own
             "min" : 1          // values (or variables) here
         });
-        $("#thisetapa").val( $(this).data('etapa') );
+        $("#thisetapa_rechazo").val( $(this).data('etapa') );
         // Enviar notificacion a abastecimiento
         // var input = {
         //     idproduccion: $(this).data('idp'),

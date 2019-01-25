@@ -75,8 +75,8 @@
 
 				<button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 				<div style="display: flex">
-					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Pendientes Solamente</label>
-					<input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_of()" checked>
+					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
+					<input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_of()">
 					<select class="form-control" style="width: 85px; margin-left: 40px; margin-right: 10px;">
                         <option value="todos">Todos</option>
                         <option value="conoc">Con OC</option>
@@ -114,6 +114,7 @@
             },
 			success: function(data){
 				$(".main-page").html(data);
+
 				//Muestra la cantidad de pedidos
 				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 			}

@@ -320,7 +320,9 @@ router.post('/report_error', function(req, res, next){
 		req.getConnection(function(err, connection){
             if(err){console.log("Error Connection : %s", err);}
 			//UPDATE `siderval`.`produccion` SET `5`='4', `standby`='1' WHERE `idproduccion`='14';
-            connection.query("SELECT produccion.idproduccion, produccion.`"+input.thisetapa+"` AS cantidad  FROM produccion WHERE produccion.idproduccion IN ("+input.idproduccion.split('-').join(',')+") ORDER BY produccion.idproduccion ASC", function(err, idprods){
+            var aaa = "SELECT produccion.idproduccion, produccion.`"+input.thisetapa+"` AS cantidad  FROM produccion WHERE produccion.idproduccion IN ("+input.idproduccion.split('-').join(',')+") ORDER BY produccion.idproduccion ASC";
+            console.log(aaa);
+			connection.query(aaa, function(err, idprods){
                 if(err){console.log("Error Selecting : %s", err);}
                 /*
 				* UPDATE `table` SET `uid` = CASE
