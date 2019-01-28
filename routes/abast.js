@@ -7,7 +7,7 @@ var adminModel = require('./xlsx');
 router.use(
     connection(mysql,{
 
-        host: '127.0.0.1',
+        host: 'localhost',
         user: 'admin',
         password : 'tempo123',
         port : 3306,
@@ -1565,7 +1565,6 @@ router.get('/ops_close', function(req, res, next){
 //Cargar Datos de INFORME DE STOCK para FABRICACIONES
 router.get("/fabrs_list/:token",function(req,res){
     if(verificar(req.session.userData)){
-        console.log(req.params.token);
 		adminModel.getdatos(req.params.token.split("@"),function(err,data){
 			if(err) console.log(err);
             res.render("plan/insumos_table",{prods:data});
@@ -1744,6 +1743,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Salidas en GDD', key: 'departures', width: 15},
             { header: 'Facturados', key: 'departures', width: 15},
             { header: 'Por Facturar', key: 'departures', width: 15},
+            { header: 'Stock Calculado', key: 'final', width: 15},
             { header: 'Stock actual', key: 'final', width: 15}
         ];
         var sheet2 = workbook.addWorksheet('Produccion');
@@ -1843,7 +1843,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
                 //sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
                 sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
-                sheet.getCell('R'+i.toString()).border = {
+                sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].stock);
+                sheet.getCell('S'+i.toString()).border = {
                     left: {style:'double', color: {argb:'00000000'}},
                 };
             }
