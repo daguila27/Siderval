@@ -1652,4 +1652,54 @@ router.get('/putnumfac_despachos', function(req, res, next){
     input.pipe(parser);
 
 });
+
+
+
+
+router.get('/comparar_stockfinales', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
+
+    var parser = parse(
+        function(err,gd){
+            if(err) throw err;
+            req.getConnection(function(err, connection){
+                if(err) throw err;
+                connection.query("SELECT codigo,detalle, stock FROM material", function(err, mats){
+                    if(err) throw err;
+                    var si=[];
+                    var no=[];
+                    for(var e=0; e < mats.length; e++){
+                        for(var a = 0; a < gd.length; a++) {
+                            if (mats[e].codigo == gd[a][0]){
+                                if (parseInt(mats[e].stock) == parseInt(gd[a][1])) {
+                                    si.push(mats[e]);
+                                }
+                                else{
+                                    no.push(mats[e]);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    console.log("CANTIDAD COINCIDENTE");
+                    console.log(si.length);
+                    console.log((si.length/(si.length+no.length))*100);
+
+                    console.log("NO COINCIDENTE");
+                    console.log(no.length);
+                    console.log((no.length/(si.length+no.length))*100);
+
+                    console.log(no);
+
+                });
+            });
+        });
+    var input = fs.createReadStream('csvs/stockfinales.csv');
+    input.pipe(parser);
+
+});
+
+
+
 module.exports = router;
