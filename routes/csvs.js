@@ -1669,10 +1669,11 @@ router.get('/comparar_stockfinales', function(req, res, next){
                     if(err) throw err;
                     var si=[];
                     var no=[];
+                    console.log(gd[0].length);
                     for(var e=0; e < mats.length; e++){
                         for(var a = 0; a < gd.length; a++) {
                             if (mats[e].codigo == gd[a][0]){
-                                if (parseInt(mats[e].stock) == parseInt(gd[a][1])) {
+                                if (parseInt(mats[e].stock) == parseInt(gd[a][17])) {
                                     si.push(mats[e]);
                                 }
                                 else{
@@ -1695,7 +1696,7 @@ router.get('/comparar_stockfinales', function(req, res, next){
                 });
             });
         });
-    var input = fs.createReadStream('csvs/stockfinales.csv');
+    var input = fs.createReadStream('csvs/IDS.csv');
     input.pipe(parser);
 
 });
