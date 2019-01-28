@@ -784,7 +784,7 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                     if (err) console.log("Error Select : %s ",err );
                     if(rows.length>0){
                         var nombre = 'csvs/gdd' + rows[0].idgd + '.xlsx';
-                        sheet.getCell('B9').value = rows[0].sigla+"-"+rows[0].razon;
+                        sheet.getCell('B9').value = rows[0].razon;
                         sheet.getCell('G9').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
                         sheet.getCell('B11').value = rows[0].direccion;
                         sheet.getCell('H11').value = rows[0].ciudad;

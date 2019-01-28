@@ -3,7 +3,6 @@ var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
 
-
 router.use(
     connection(mysql,{
         host: '127.0.0.1',
@@ -20,6 +19,14 @@ function verificar(usr){
   }else{
     return false;
   }
+}
+
+function parsear_crl(nro){
+    x = nro.toString();
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    var num =  parts.join(",");
+    return num;
 }
 
 
@@ -798,8 +805,11 @@ router.post('/addsession_prefabr', function(req,res,next){
             connection.query("SELECT material.detalle,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica WHERE material.idmaterial = ?",
                 [req.body.idm],function(err, details){
                     if(err){console.log("Error Selecting : %s", err);}
-                    res.send("<tr><td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'></td><td><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" +
-                        "<td><input class='form-control' type='number' name='cants' min='1' required></td><td style='text-align: center;'><input class='form-control' style='margin-left: 40%; width: 20px; height: 20px;' type='checkbox' name='lock'></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>");
+                    res.send("<tr><td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'></td>"
+                        +"<td style='padding: 3px'><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" 
+                        +"<td style='padding: 3px'><input class='form-control' type='number' name='cants' min='1' required></td>"
+                        +"<td class='parsear_nro' style='text-align: center; padding: 5px'><input class='form-control' style='margin-left: 40%; width: 20px; height: 20px;' type='checkbox' name='lock'></td>"
+                        +"<td><a onclick='drop(this)' class='btn btn-danger btn-xs'><i class='fa fa-remove'></i></a></td></tr>");
                 });
         });
     } else res.redirect("/bad_login");
@@ -4162,8 +4172,12 @@ router.post('/addsession_prepeds', function(req,res,next){
                         console.log(auxs);
                         if(inputprov){fila = fila + "<td>" + auxs[0].aux1 +"<input type='text' value='1' name='prov' style='display:none;'></input></td>"/*<div class='predic_text' onkeyup='getPredictions(this)'><input type='text' name='prov' autocomplete='off'></input><div></div></div>*/;}
                         else{ fila = fila + "<td><input type='text' value='-1' name='prov' style='display:none;'></input>" + auxs[0].aux2 +"</td>";}
-                        fila = fila + "<td><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" +
-                            "<td><input class='form-control' type='number' name='cants' min='1' required></td><td>"+details[0].stock+"</td><td><input type='number' class='form-control' placeholder='Precio' name='precio'></td><td style='text-align:center;'><input type='checkbox' name='lock'></td><td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td></tr>";
+                        fila = fila + "<td style='padding: 3px'><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" 
+                        +"<td style='padding: 3px'><input class='form-control' type='number' name='cants' min='1' required></td>"
+                        +"<td>"+ parsear_crl(details[0].stock) +"</td>"
+                        +"<td style='padding: 3px'><input type='number' class='form-control' placeholder='Precio' name='precio'></td>"
+                        +"<td style='text-align: center; padding: 5px'><input class='form-control' style='margin-left: 30%; width: 20px; height: 20px;' type='checkbox' name='lock'></td>"
+                        +"<td><a onclick='drop(this)' class='btn btn-danger btn-xs'><i class='fa fa-remove'></i></a></td></tr>";
                         res.send(fila);
 
                     });
