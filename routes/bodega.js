@@ -751,6 +751,8 @@ router.post('/activar_gdd', function(req,res,next){
         });
 });
 
+
+
 router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
     if(verificar(req.session.userData)){
         var id = parseInt(req.params.iddespacho);
@@ -766,12 +768,18 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
         sheet.mergeCells('B13:G14');
         sheet.mergeCells('H13:I13');
         sheet.mergeCells('A15:I18');
+        sheet.getColumn('B').width = 15.43;
+        sheet.getColumn('H').width = 11.71;
+        sheet.getColumn('I').width = 11.57;
+        console.log(sheet.getColumn('B'));
         req.getConnection(function(err, connection) {
             if(err) console.log("Error connection : %s", err);
-            connection.query("SELECT despachos.*, gd.estado, gd.fecha, gd.last_mod, gd.obs, material.detalle, material.codigo, cliente.* FROM despachos"
+            connection.query("SELECT despachos.*, gd.estado, gd.fecha, gd.last_mod, gd.obs, pedido.precio as precioPedido,fabricaciones.idorden_f,pedido.idodc,material.detalle, material.codigo, cliente.* FROM despachos"
                 + " LEFT JOIN gd ON despachos.idgd=gd.idgd"
                 + " LEFT JOIN cliente ON cliente.idcliente=gd.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial"
+                + " LEFT JOIN pedido ON pedido.idpedido = despachos.idpedido"
+                + " LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido"
                 + " WHERE despachos.idgd ="+ id,function(err, rows) {
                     if (err) console.log("Error Select : %s ",err );
                     if(rows.length>0){
@@ -783,11 +791,15 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                         sheet.getCell('B13').value = rows[0].giro;
                         sheet.getCell('H13').value = rows[0].rut;
                         var count = 0;
+                        var neto = 0;
                         for(var j=0; j<rows.length; j++){
                             sheet.mergeCells('C' + (20 + count).toString() + ':F' + (20 + count).toString());
                             sheet.getCell('B' + (20 + count).toString()).value = rows[j].codigo;
                             sheet.getCell('C' + (20 + count).toString()).value = rows[j].detalle;
                             sheet.getCell('G' + (20 + count).toString()).value = rows[j].cantidad;
+                            sheet.getCell('H' + (20 + count).toString()).value = rows[j].precioPedido;
+                            sheet.getCell('I' + (20 + count).toString()).value = rows[j].precioPedido*rows[j].cantidad;
+                            neto += rows[j].precioPedido*rows[j].cantidad;
                             count++;
                         }
                         sheet.mergeCells('B36:H36');
@@ -800,14 +812,18 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                         sheet.mergeCells('F38:G38');
                         sheet.mergeCells('C39:D39')
                         sheet.getCell('B38').value = "OF:";
-                        sheet.getCell('C38').value = "No se puede vincular a OF";
+                        sheet.getCell('C38').value = rows[0].idorden_f;
                         sheet.getCell('E38').value = "OC: ";
-                        sheet.getCell('F38').value = "No se puede vincular a OC";
+                        sheet.getCell('F38').value = rows[0].idodc;
                         sheet.getCell('B39').value = "CHOFER";
                         sheet.getCell('B40').value = "PATENTE";
                         sheet.getCell('H40').value = "NETO";
                         sheet.getCell('H41').value = "IVA";
                         sheet.getCell('H44').value = "TOTAL";
+
+                        sheet.getCell('I40').value = neto;
+                        sheet.getCell('I41').value = neto*0.19;
+                        sheet.getCell('I44').value = neto*1.19;
 
                         workbook.xlsx.writeFile('public/' + nombre)
                             .then(function() {
