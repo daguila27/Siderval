@@ -287,11 +287,13 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
       req.getConnection(function(err, connection){
             if(err) throw err;
 
-            var consulta = "select fabricaciones.*, ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, material.detalle, odc.numoc"
+            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
-                +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
-                +"on material.idmaterial=fabricaciones.idmaterial"+where;
+                +"odc on odc.idodc=ordenfabricacion.idodc "
+                +"left join pedido on pedido.idpedido=fabricaciones.idpedido "
+                +"left join (select fabricaciones.idfabricaciones, produccion_history.enviados as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
+                +"left join material on material.idmaterial=fabricaciones.idmaterial"+where;
             console.log(consulta);
             connection.query(consulta,
                 function(err, of){
