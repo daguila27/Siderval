@@ -1743,8 +1743,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Salidas en GDD', key: 'departures', width: 15},
             { header: 'Facturados', key: 'departures', width: 15},
             { header: 'Por Facturar', key: 'departures', width: 15},
-            { header: 'Stock Calculado', key: 'final', width: 15},
-            { header: 'Stock actual', key: 'final', width: 15}
+            { header: 'Stock Final', key: 'final', width: 15}
         ];
         var sheet2 = workbook.addWorksheet('Produccion');
         sheet2.columns = [
@@ -1843,10 +1842,10 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
                 //sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
                 sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
-                sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].stock);
+                /*sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].stock);
                 sheet.getCell('S'+i.toString()).border = {
                     left: {style:'double', color: {argb:'00000000'}},
-                };
+                };*/
             }
             sheet.getRow(1).fill = {
                 type: 'pattern',
