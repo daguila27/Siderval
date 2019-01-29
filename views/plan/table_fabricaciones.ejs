@@ -25,6 +25,7 @@
 				<th id="solicitados" class="cabecera o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
 				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Por Producir</th>
 				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">En Producción</th>
+				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Finalizados</th>
 				<!--<th id="p_terminado" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">PT</th>
 				<th id="planta" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">Planta</th>-->
 				<th id="f_entrega" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
@@ -43,7 +44,8 @@
 					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].cantidad %></td>
 					<td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].restantes %></td>
 					<td class="en_produccion o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].cantidad - data[i].restantes - data[i].finalizados%></td>
-				<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
+					<td class="finalizado o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].finalizados%></td>
+					<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
 						<span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
 					</td>
 					<td class="f_creacion o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].creacion).getTime()%>" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
