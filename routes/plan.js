@@ -287,7 +287,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
       req.getConnection(function(err, connection){
             if(err) throw err;
 
-            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, material.detalle, odc.numoc"
+            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle, odc.numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc "
