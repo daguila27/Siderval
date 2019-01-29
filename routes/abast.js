@@ -1735,6 +1735,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Solicitada según OP', key: 'asked', width: 20},
 			{ header: 'Solicitada según entradas a BPT', key: 'asked', width: 28},
             { header: 'Stock en producción', key: 'virtual', width: 15},
+            { header: 'Rechazados', key: 'virtual', width: 15},
             { header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 25},
             { header: 'Aceptados por CC', key: 'income', width: 15},
             { header: 'Devolución a BMI', key: 'income', width: 15},
@@ -1824,24 +1825,27 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				};
 
 				sheet.getCell('I'+i.toString()).value = ops[i-2].virtuales;
-                sheet.getCell('J'+i.toString()).value = ops[i-2].virtuales_oda;
 
-				sheet.getCell('J'+i.toString()).border = {
+                sheet.getCell('J'+i.toString()).value = ops[i-2].rechazados;
+
+                sheet.getCell('K'+i.toString()).value = ops[i-2].virtuales_oda;
+
+				sheet.getCell('K'+i.toString()).border = {
                     right: {style:'double', color: {argb:'00000000'}}
 				};
 
-                sheet.getCell('K'+i.toString()).value = ops[i-2].fabricados;
-                sheet.getCell('L'+i.toString()).value = ops[i-2].sum_dev;
-                sheet.getCell('M'+i.toString()).value = ops[i-2].ing_oda;
-				sheet.getCell('M'+i.toString()).border = {
+                sheet.getCell('L'+i.toString()).value = ops[i-2].fabricados;
+                sheet.getCell('M'+i.toString()).value = ops[i-2].sum_dev;
+                sheet.getCell('N'+i.toString()).value = ops[i-2].ing_oda;
+				sheet.getCell('N'+i.toString()).border = {
                     right: {style:'double', color: {argb:'00000000'}}
 				};
-	            sheet.getCell('N'+i.toString()).value = ops[i-2].sum_sal;
-                sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
-                sheet.getCell('P'+i.toString()).value = ops[i-2].sum_fact;
-                sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
+	            sheet.getCell('O'+i.toString()).value = ops[i-2].sum_sal;
+                sheet.getCell('P'+i.toString()).value = ops[i-2].despachados;
+                sheet.getCell('Q'+i.toString()).value = ops[i-2].sum_fact;
+                sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
                 //sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
-                sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
+                sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
                 /*sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].stock);
                 sheet.getCell('S'+i.toString()).border = {
                     left: {style:'double', color: {argb:'00000000'}},
