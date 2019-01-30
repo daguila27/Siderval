@@ -21,6 +21,7 @@
 			<tr>
                 <th id="numof" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
 				<th id="numoc" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OC</th>
+				<th id="numitem" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
 				<th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
 				<th id="solicitados" class="cabecera o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
 				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Por Producir</th>
@@ -40,6 +41,7 @@
 			<tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
 					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].idordenfabricacion%></td>
 					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numoc%></td>
+					<td class="numitem o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numitem%></td>
 					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].detalle%></td>
 					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].cantidad %></td>
 					<td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].restantes %></td>
@@ -82,6 +84,7 @@
 			<td></td>
 			<td></td>
 			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
+			<td></td>
 			<td></td>
 			<td></td>
 			<td></td>
