@@ -32,7 +32,7 @@ function parsear_crl(nro){
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-    if(verificar(req.session.userData)){
+    if(req.session.userData.nombre == 'plan'){
         res.render('plan/indx_new',{page_title:"Planificación",username: req.session.userData.nombre});}
     else{res.redirect('bad_login');}
 });
@@ -272,7 +272,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         orden = orden.replace('-', ' ');
         var where = " ";
 
-        condiciones_where.push("pedido.externo = '0'");
+        condiciones_where.push("coalesce(pedido.externo, '0') = '0'");
         if(input.pendientes == 'false'){
             condiciones_where.push("fabricaciones.restantes>0");
             //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
@@ -287,7 +287,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
       req.getConnection(function(err, connection){
             if(err) throw err;
 
-            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle, odc.numoc"
+            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle, coalesce(odc.numoc, 'Sin OC') as numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc "

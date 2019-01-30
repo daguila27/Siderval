@@ -27,7 +27,7 @@ function verificar(usr){
 }
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-	if(verificar(req.session.userData)){
+	if(req.session.userData.nombre == 'bodega'){
     	res.render('bodega/indx', {page_title: "Bodega", username: req.session.userData.nombre});
 	}
 	else{res.redirect('bad_login');}	
