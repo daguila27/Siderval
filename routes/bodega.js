@@ -774,11 +774,12 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
         console.log(sheet.getColumn('B'));
         req.getConnection(function(err, connection) {
             if(err) console.log("Error connection : %s", err);
-            connection.query("SELECT despachos.*, gd.estado, gd.fecha, gd.last_mod, gd.obs, pedido.precio as precioPedido,fabricaciones.idorden_f,pedido.idodc,material.detalle, material.codigo, cliente.* FROM despachos"
+            connection.query("SELECT despachos.*,odc.numoc, gd.estado, gd.fecha, gd.last_mod, gd.obs, pedido.precio as precioPedido,fabricaciones.idorden_f,pedido.idodc,material.detalle, material.codigo, cliente.* FROM despachos"
                 + " LEFT JOIN gd ON despachos.idgd=gd.idgd"
                 + " LEFT JOIN cliente ON cliente.idcliente=gd.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial"
                 + " LEFT JOIN pedido ON pedido.idpedido = despachos.idpedido"
+                + " LEFT JOIN odc ON odc.idodc = pedido.idodc"
                 + " LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido"
                 + " WHERE despachos.idgd ="+ id,function(err, rows) {
                     if (err) console.log("Error Select : %s ",err );
@@ -814,7 +815,7 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                         sheet.getCell('B38').value = "OF:";
                         sheet.getCell('C38').value = rows[0].idorden_f;
                         sheet.getCell('E38').value = "OC: ";
-                        sheet.getCell('F38').value = rows[0].idodc;
+                        sheet.getCell('F38').value = rows[0].numoc;
                         sheet.getCell('B39').value = "CHOFER";
                         sheet.getCell('B40').value = "PATENTE";
                         sheet.getCell('H40').value = "NETO";
