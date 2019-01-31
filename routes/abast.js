@@ -1774,6 +1774,19 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'GDD Devolucion', key: 'departures', width: 10},
             { header: 'GDD Anulada', key: 'income', width: 15}
         ];
+
+        var sheet4 = workbook.addWorksheet('Informe de Stock Resumen');
+        sheet4.columns = [
+            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Detalle', key: 'name', width: 50 },
+            { header: 'Unidad Med.', key: 'unit', width: 10},
+            { header: 'BPT Inicial', key: 'virtual', width: 10},
+            { header: 'Inicial en Producción', key: 'income', width: 10},
+            { header: 'Acumulado Fusión Mes', key: 'income', width: 10},
+            { header: 'Despachados en GD', key: 'departures', width: 10},
+            { header: 'Rechazados Mes', key: 'income', width: 15},
+            { header: 'Stock en Planta', key: 'income', width: 15}
+        ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
             sheet.getRow(1).fill = {
@@ -1782,6 +1795,19 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 fgColor:{argb:'F4D03F'}
             };
             sheet.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
+
+            sheet4.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet4.getRow(1).font = {
                 name: 'Comic Sans MS',
                 family: 4,
                 size: 11,
@@ -1863,6 +1889,25 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet.getCell('S'+i.toString()).border = {
                     left: {style:'double', color: {argb:'00000000'}},
                 };*/
+
+
+
+
+
+                sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
+                sheet4.getCell('B'+i.toString()).value = ops[i-2].detalle;
+                sheet4.getCell('C'+i.toString()).value = ops[i-2].u_medida;
+                sheet4.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
+                sheet4.getCell('E'+i.toString()).value = ops[i-2].p_inicial;
+                sheet4.getCell('F'+i.toString()).value = ops[i-2].fundidos;
+                sheet4.getCell('G'+i.toString()).value = ops[i-2].despachados;
+                sheet4.getCell('H'+i.toString()).value = ops[i-2].rechazados;
+                sheet4.getCell('I'+i.toString()).value =
+                    ops[i-2].s_inicial +
+                    ops[i-2].p_inicial +
+                    ops[i-2].fundidos -
+                    ops[i-2].despachados -
+                    ops[i-2].rechazados;
             }
             sheet.getRow(1).fill = {
                 type: 'pattern',
@@ -1878,6 +1923,51 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 bold: false //negrita
             };
             sheet.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            sheet4.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet4.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet4.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+
+
+
+
+
+            sheet4.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet4.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet4.getRow(1).border = {
                 right: {style:'thin', color: {argb:'00000000'}},
                 left: {style:'thin', color: {argb:'00000000'}},
                 top: {style:'thin', color: {argb:'00000000'}},
