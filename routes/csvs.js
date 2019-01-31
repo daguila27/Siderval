@@ -1704,5 +1704,48 @@ router.get('/comparar_stockfinales', function(req, res, next){
 });
 
 
+router.get('/setproduccionini_material', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
+
+    var parser = parse(
+        function(err,prod){
+            if(err) throw err;
+            var codigos = []
+            console.log(prod);
+            var query = "UPDATE material SET p_inicial = CASE ";
+            /*
+            * UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+            * */
+
+            for(var i=0; i < prod.length; i++){
+                query += " WHEN codigo = '"+prod[i][0]+"' THEN "+prod[i][1];
+                codigos.push("'"+prod[i][0]+"'");
+            }
+            query += " ELSE p_inicial END WHERE codigo IN ("+codigos.join(',')+")";
+
+            req.getConnection(function(err, connection){
+                if(err) throw err;
+
+                connection.query(query, function(err, result){
+                    if(err) throw err;
+                    console.log(result);
+                    res.redirect('/');
+                });
+
+            });
+        });
+    var input = fs.createReadStream('csvs/enProduccionInicialEnero.csv');
+    input.pipe(parser);
+
+});
+
+
 
 module.exports = router;
