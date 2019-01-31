@@ -1783,8 +1783,9 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'BPT Inicial', key: 'virtual', width: 10},
             { header: 'Inicial en Producción', key: 'income', width: 10},
             { header: 'Acumulado Fusión Mes', key: 'income', width: 10},
-            { header: 'Despachados en GD', key: 'departures', width: 10},
+            { header: 'Despachados en GDD', key: 'departures', width: 10},
             { header: 'Rechazados Mes', key: 'income', width: 15},
+            { header: 'Entradas por GDD', key: 'income', width: 15},
             { header: 'Stock en Planta', key: 'income', width: 15}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
@@ -1902,9 +1903,11 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet4.getCell('F'+i.toString()).value = ops[i-2].fundidos;
                 sheet4.getCell('G'+i.toString()).value = ops[i-2].despachados;
                 sheet4.getCell('H'+i.toString()).value = ops[i-2].rechazados;
-                sheet4.getCell('I'+i.toString()).value =
+                sheet4.getCell('I'+i.toString()).value = ops[i-2].ing_oda;
+                sheet4.getCell('J'+i.toString()).value =
                     ops[i-2].s_inicial +
                     ops[i-2].p_inicial +
+                    ops[i-2].ing_oda +
                     ops[i-2].fundidos -
                     ops[i-2].despachados -
                     ops[i-2].rechazados;
