@@ -393,8 +393,11 @@ router.get('/page_gdd/:idgd', function(req, res, next){
                     " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" +
                     " WHERE gd.idgd = ? GROUP BY gd.idgd",[idgd], function(err, gd){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT despachos.*,material.detalle,material.u_medida" +
-                        " FROM despachos LEFT JOIN material ON material.idmaterial = despachos.idmaterial" +
+                    connection.query("SELECT despachos.*,odc.numoc, fabricaciones.idorden_f,material.detalle,material.u_medida FROM despachos" +
+                        " LEFT JOIN material ON material.idmaterial = despachos.idmaterial" +
+                        " LEFT JOIN pedido ON pedido.idpedido = despachos.idpedido" +
+                        " LEFT JOIN odc ON odc.idodc = pedido.idodc" +
+                        " LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido" +
                         " WHERE despachos.idgd = ?" +
                         " GROUP BY despachos.iddespacho",[idgd], function(err ,despachos){
                         if(err) console.log("Select Error: %s",err);

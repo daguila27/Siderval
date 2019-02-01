@@ -115,6 +115,8 @@ function fechaLatino(string){
                                                 <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                 <th class="o_column_sortable">Cantidad</th>
+                                                <th class="o_column_sortable">N° OF</th>
+                                                <th class="o_column_sortable">N° OC</th>
                                                 <!--<th class="o_column_sortable">Impuestos</th>
                                                 <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
                                             </tr>
@@ -125,6 +127,8 @@ function fechaLatino(string){
                                                 <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
                                                 <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
                                                 <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
+                                                <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].idorden_f%></td>
+                                                <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].numoc%></td>
                                                 <!--<td class="o_data_cell o_many2many_tags_cell">
                                                     <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
                                                 </td>
