@@ -1794,6 +1794,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
+            { header: 'Peso (kg)', key: 'virtual', width: 10},
             { header: 'BPT Inicial', key: 'virtual', width: 10},
             { header: 'Inicial en Producción', key: 'income', width: 10},
             { header: 'Acumulado Fusión Mes', key: 'income', width: 10},
@@ -1913,12 +1914,13 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet4.getCell('B'+i.toString()).value = ops[i-2].detalle;
                 sheet4.getCell('C'+i.toString()).value = ops[i-2].u_medida;
                 sheet4.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
-                sheet4.getCell('E'+i.toString()).value = ops[i-2].p_inicial;
-                sheet4.getCell('F'+i.toString()).value = ops[i-2].fundidos;
-                sheet4.getCell('G'+i.toString()).value = ops[i-2].despachados;
-                sheet4.getCell('H'+i.toString()).value = ops[i-2].rechazados;
-                sheet4.getCell('I'+i.toString()).value = ops[i-2].ing_oda;
-                sheet4.getCell('J'+i.toString()).value =
+                sheet4.getCell('E'+i.toString()).value = ops[i-2].s_inicial;
+                sheet4.getCell('F'+i.toString()).value = ops[i-2].p_inicial;
+                sheet4.getCell('G'+i.toString()).value = ops[i-2].fundidos;
+                sheet4.getCell('H'+i.toString()).value = ops[i-2].despachados;
+                sheet4.getCell('I'+i.toString()).value = ops[i-2].rechazados;
+                sheet4.getCell('J'+i.toString()).value = ops[i-2].ing_oda;
+                sheet4.getCell('K'+i.toString()).value =
                     ops[i-2].s_inicial +
                     ops[i-2].p_inicial +
                     ops[i-2].ing_oda +
