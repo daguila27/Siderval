@@ -1793,14 +1793,14 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         sheet4.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
-            { header: 'Unidad Med.', key: 'unit', width: 10},
-            { header: 'Peso (kg)', key: 'virtual', width: 10},
-            { header: 'BPT Inicial', key: 'virtual', width: 10},
-            { header: 'Inicial en Producción', key: 'income', width: 10},
-            { header: 'Acumulado Fusión Mes', key: 'income', width: 10},
-            { header: 'Despachados en GDD', key: 'departures', width: 10},
-            { header: 'Rechazados Mes', key: 'income', width: 15},
-            { header: 'Entradas por GDD', key: 'income', width: 15},
+            { header: 'Unidad', key: 'unit', width: 10},
+            { header: 'Peso Unitario (KG)', key: 'virtual', width: 10},
+            { header: 'Inicial BPT', key: 'virtual', width: 10},
+            { header: 'Inicial Planta', key: 'income', width: 10},
+            { header: 'Total Fusión Mes', key: 'income', width: 10},
+            { header: 'Total Despachado GDD', key: 'departures', width: 10},
+            { header: 'Total Rechazos Mes', key: 'income', width: 15},
+            { header: 'Total Externalizado Mes', key: 'income', width: 15},
             { header: 'Stock en Planta', key: 'income', width: 15}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
