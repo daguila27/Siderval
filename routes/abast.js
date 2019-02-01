@@ -1550,11 +1550,14 @@ router.get('/abast_ops_page/:page', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 //Renderizar vista de INFORME DE STOCK para FABRICACIONES.
-router.get('/fabrs_ids', function(req, res, next){
+router.get('/fabrs_ids/:idview', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('plan/fabrs_ids');
+        res.render('plan/fabrs_ids', {idview: req.params.idview});
     } else res.redirect("/bad_login");
 });
+
+
+
 //Renderizar vista de INFORME DE STOCK para INSUMOS.
 router.get('/ops_close', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1565,7 +1568,7 @@ router.get('/ops_close', function(req, res, next){
 //Cargar Datos de INFORME DE STOCK para FABRICACIONES
 router.get("/fabrs_list/:token",function(req,res){
     if(verificar(req.session.userData)){
-		adminModel.getdatos(req.params.token.split("@"),function(err,data){
+		adminModel.getdatos(req.params.token.split('@'),function(err,data){
 			if(err) console.log(err);
             res.render("plan/insumos_table",{prods:data});
 		});
@@ -1721,10 +1724,24 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
     	let fecha = new Date();
-        var nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+    	var nombre;
+    	console.log(req.params.token.split('@')[2]);
+    	if(parseInt(req.params.token.split('@')[2]) == 1){
+            nombre = "IDS-producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+        else if(parseInt(req.params.token.split('@')[2]) == 2){
+            nombre = "IDS-matp&insumos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+        else{
+            nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
+        var sheet4 = workbook.addWorksheet('Informe de Stock Resumen');
         var sheet = workbook.addWorksheet('InformeTotal');
+        var sheet2 = workbook.addWorksheet('Produccion');
+        var sheet3 = workbook.addWorksheet('Salidas');
         sheet.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1747,7 +1764,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Por Facturar', key: 'departures', width: 15},
             { header: 'Stock Final', key: 'final', width: 15}
         ];
-        var sheet2 = workbook.addWorksheet('Produccion');
         sheet2.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1763,7 +1779,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Rechazado', key: 'final', width: 15},
             { header: 'Ingresado a BPT', key: 'final', width: 15}
         ];
-        var sheet3 = workbook.addWorksheet('Salidas');
         sheet3.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1775,7 +1790,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'GDD Anulada', key: 'income', width: 15}
         ];
 
-        var sheet4 = workbook.addWorksheet('Informe de Stock Resumen');
         sheet4.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1989,6 +2003,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                         sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion, salidas[i].anulado]);
                     }
                     workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                    	console.log(nombre);
                         res.send(nombre);
                     });
 				});

@@ -29,6 +29,20 @@ informe.getdatos = function(fecha,callback){
             virtuales_oda: Cantidad no reccepcionada de ODA, AS virts_oda.sum_virtual
         },(...)];
         */
+        var where = [];
+        var idview = fecha[2];
+        if(parseInt(idview) == 1){
+            where.push("material.codigo like 'P%'");
+        }
+        else if(parseInt(idview) == 2){
+            where.push("material.codigo like 'M%'");
+            where.push("material.codigo like 'I%'");
+            where.push("material.codigo like 'S%'");
+        }
+        else{
+            where.push("material.codigo NOT LIKE 'X%'");
+        }
+        where = where.join(' OR ');
         connection.query("select material.codigo,material.stock,material.s_inicial,material.p_inicial,material.detalle, material.precio,material.u_medida, coalesce(facturados.facturados, 0) as sum_fact," +
             "COALESCE(fabrs.fabricados,0) as fabricados, coalesce(peds_totales.totales, 0) as pendientes,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
             ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales,COALESCE(virts_oda.sum_virtual,0) as virtuales_oda" +
@@ -110,9 +124,9 @@ informe.getdatos = function(fecha,callback){
             " WHERE oda.creacion" +
             " BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
             " GROUP BY abastecimiento.idmaterial) AS virts_oda ON virts_oda.idmaterial = material.idmaterial" +
-            " WHERE NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND salidas_mp.sum_sal = 0" +
+            " WHERE ("+where+") AND (NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND salidas_mp.sum_sal = 0" +
             " AND necesario.necesarios = 0 AND virts.virtuales = 0 AND peds_atrasados.solicitados = 0 AND virts_oda.sum_virtual = 0 AND devs.sum_devs = 0" +
-            " AND ing_oda.sum_ing = 0) OR material.s_inicial != 0 OR material.stock != 0 GROUP BY material.idmaterial",function(err, prods){
+            " AND ing_oda.sum_ing = 0) OR material.s_inicial != 0 OR material.stock != 0) GROUP BY material.idmaterial",function(err, prods){
             if(err){
                 throw err;
             } else {
