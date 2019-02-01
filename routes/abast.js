@@ -1913,7 +1913,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
                 sheet4.getCell('B'+i.toString()).value = ops[i-2].detalle;
                 sheet4.getCell('C'+i.toString()).value = ops[i-2].u_medida;
-                sheet4.getCell('D'+i.toString()).value = ops[i-2].s_inicial;
+                sheet4.getCell('D'+i.toString()).value = ops[i-2].peso;
                 sheet4.getCell('E'+i.toString()).value = ops[i-2].s_inicial;
                 sheet4.getCell('F'+i.toString()).value = ops[i-2].p_inicial;
                 sheet4.getCell('G'+i.toString()).value = ops[i-2].fundidos;
