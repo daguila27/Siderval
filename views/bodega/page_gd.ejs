@@ -119,6 +119,8 @@ function fechaLatino(string){
                                                 <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                 <th class="o_column_sortable">Cantidad</th>
+                                                <th class="o_column_sortable">N° OF</th>
+                                                <th class="o_column_sortable">N° OC</th>
                                                 <th class="o_column_sortable">Factura</th>
                                                 <th class="o_column_sortable">Conector (MIGO)</th>
                                             </tr>
@@ -129,6 +131,8 @@ function fechaLatino(string){
                                                     <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
                                                     <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
                                                     <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
+                                                    <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].idorden_f%></td>
+                                                    <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].numoc%></td>
                                                     <td style="padding: 2px; width: 100px"><input data-gdd="<%=abast[e].iddespacho%>" data-tipo="numfac" style="width: 100px" type="text" class="form-control" value="<%= abast[e].numfac%>"></td>
                                                     <td style="padding: 2px; width: 100px"><input data-gdd="<%=abast[e].iddespacho%>" data-tipo="conector" style="width: 100px" type="text" class="form-control"></td>
                                                 </tr>

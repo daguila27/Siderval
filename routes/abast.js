@@ -31,7 +31,7 @@ function verificar(usr){
 }
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-	if(verificar(req.session.userData)){
+	if(req.session.userData.nombre == 'abastecimiento'){
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s",err);
@@ -1550,11 +1550,14 @@ router.get('/abast_ops_page/:page', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 //Renderizar vista de INFORME DE STOCK para FABRICACIONES.
-router.get('/fabrs_ids', function(req, res, next){
+router.get('/fabrs_ids/:idview', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('plan/fabrs_ids');
+        res.render('plan/fabrs_ids', {idview: req.params.idview});
     } else res.redirect("/bad_login");
 });
+
+
+
 //Renderizar vista de INFORME DE STOCK para INSUMOS.
 router.get('/ops_close', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1565,7 +1568,7 @@ router.get('/ops_close', function(req, res, next){
 //Cargar Datos de INFORME DE STOCK para FABRICACIONES
 router.get("/fabrs_list/:token",function(req,res){
     if(verificar(req.session.userData)){
-		adminModel.getdatos(req.params.token.split("@"),function(err,data){
+		adminModel.getdatos(req.params.token.split('@'),function(err,data){
 			if(err) console.log(err);
             res.render("plan/insumos_table",{prods:data});
 		});
@@ -1721,10 +1724,24 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
     	let fecha = new Date();
-        var nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+    	var nombre;
+    	console.log(req.params.token.split('@')[2]);
+    	if(parseInt(req.params.token.split('@')[2]) == 1){
+            nombre = "IDS-producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+        else if(parseInt(req.params.token.split('@')[2]) == 2){
+            nombre = "IDS-matp&insumos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+        else{
+            nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
+        var sheet4 = workbook.addWorksheet('Informe de Stock Resumen');
         var sheet = workbook.addWorksheet('InformeTotal');
+        var sheet2 = workbook.addWorksheet('Produccion');
+        var sheet3 = workbook.addWorksheet('Salidas');
         sheet.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1747,7 +1764,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Por Facturar', key: 'departures', width: 15},
             { header: 'Stock Final', key: 'final', width: 15}
         ];
-        var sheet2 = workbook.addWorksheet('Produccion');
         sheet2.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1763,7 +1779,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Rechazado', key: 'final', width: 15},
             { header: 'Ingresado a BPT', key: 'final', width: 15}
         ];
-        var sheet3 = workbook.addWorksheet('Salidas');
         sheet3.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1774,6 +1789,20 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'GDD Devolucion', key: 'departures', width: 10},
             { header: 'GDD Anulada', key: 'income', width: 15}
         ];
+
+        sheet4.columns = [
+            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Detalle', key: 'name', width: 50 },
+            { header: 'Unidad', key: 'unit', width: 10},
+            { header: 'Peso Unitario (KG)', key: 'virtual', width: 10},
+            { header: 'Inicial BPT', key: 'virtual', width: 10},
+            { header: 'Inicial Planta', key: 'income', width: 10},
+            { header: 'Total Fusión Mes', key: 'income', width: 10},
+            { header: 'Total Despachado GDD', key: 'departures', width: 10},
+            { header: 'Total Rechazos Mes', key: 'income', width: 15},
+            { header: 'Total Externalizado Mes', key: 'income', width: 15},
+            { header: 'Stock en Planta', key: 'income', width: 15}
+        ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
             sheet.getRow(1).fill = {
@@ -1782,6 +1811,19 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 fgColor:{argb:'F4D03F'}
             };
             sheet.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
+
+            sheet4.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet4.getRow(1).font = {
                 name: 'Comic Sans MS',
                 family: 4,
                 size: 11,
@@ -1852,11 +1894,39 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet.getCell('R'+i.toString()).value = ops[i-2].sum_fact;
                 sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
                 //sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
-                sheet.getCell('T'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
+                sheet.getCell('T'+i.toString()).value =
+					parseInt(ops[i-2].s_inicial) +
+					parseInt(ops[i-2].fabricados) +
+					parseInt(ops[i-2].sum_dev) +
+					parseInt(ops[i-2].ing_oda) -
+					parseInt(ops[i-2].despachados) -
+					parseInt(ops[i-2].sum_sal);
                 /*sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].stock);
                 sheet.getCell('S'+i.toString()).border = {
                     left: {style:'double', color: {argb:'00000000'}},
                 };*/
+
+
+
+
+
+                sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
+                sheet4.getCell('B'+i.toString()).value = ops[i-2].detalle;
+                sheet4.getCell('C'+i.toString()).value = ops[i-2].u_medida;
+                sheet4.getCell('D'+i.toString()).value = ops[i-2].peso;
+                sheet4.getCell('E'+i.toString()).value = ops[i-2].s_inicial;
+                sheet4.getCell('F'+i.toString()).value = ops[i-2].p_inicial;
+                sheet4.getCell('G'+i.toString()).value = ops[i-2].fundidos;
+                sheet4.getCell('H'+i.toString()).value = ops[i-2].despachados;
+                sheet4.getCell('I'+i.toString()).value = ops[i-2].rechazados;
+                sheet4.getCell('J'+i.toString()).value = ops[i-2].ing_oda;
+                sheet4.getCell('K'+i.toString()).value =
+                    ops[i-2].s_inicial +
+                    ops[i-2].p_inicial +
+                    ops[i-2].ing_oda +
+                    ops[i-2].fundidos -
+                    ops[i-2].despachados -
+                    ops[i-2].rechazados;
             }
             sheet.getRow(1).fill = {
                 type: 'pattern',
@@ -1878,6 +1948,51 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 bottom: {style:'thin', color: {argb:'00000000'}}
             };
 
+            sheet4.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet4.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet4.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+
+
+
+
+
+            sheet4.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet4.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet4.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
 			adminModel.produccion(req.params.token.split("@"),function(err,prods){
 				if(err) throw err;
 				for(let i=0;i<prods.length;i++){
@@ -1890,6 +2005,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                         sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion, salidas[i].anulado]);
                     }
                     workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                    	console.log(nombre);
                         res.send(nombre);
                     });
 				});

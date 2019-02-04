@@ -96,7 +96,7 @@
     function cierreMensual(){
         $.ajax({
             type: 'get',
-            url: '/abastecimiento/xlsx_ids_fabrs/' + $("#dateSelect").val(),
+            url: '/abastecimiento/xlsx_ids_fabrs/' + $("#dateSelect").val()+"@"+idvista,
             success: function(data){
                 window.open("/csvs/" + data,'_blank');
                 chargeList("#dateSelect");
@@ -104,11 +104,11 @@
         });
 
     }
-
+    var idvista = "<%= idview%>";
     function chargeList(yo){
         $.ajax({
                 type: 'GET',
-                url: '/abastecimiento/fabrs_list/'+$(yo).val(),
+                url: '/abastecimiento/fabrs_list/'+$(yo).val()+"@"+idvista,
                 success: function(data){ 
                     $(".renderDiv").html(data); 
                 }

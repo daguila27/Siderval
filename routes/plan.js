@@ -32,7 +32,7 @@ function parsear_crl(nro){
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-    if(verificar(req.session.userData)){
+    if(req.session.userData.nombre == 'plan'){
         res.render('plan/indx_new',{page_title:"Planificación",username: req.session.userData.nombre});}
     else{res.redirect('bad_login');}
 });
@@ -272,7 +272,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         orden = orden.replace('-', ' ');
         var where = " ";
 
-        condiciones_where.push("pedido.externo = '0'");
+        condiciones_where.push("coalesce(pedido.externo, '0') = '0'");
         if(input.pendientes == 'false'){
             condiciones_where.push("fabricaciones.restantes>0");
             //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
@@ -287,7 +287,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
       req.getConnection(function(err, connection){
             if(err) throw err;
 
-            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle, odc.numoc"
+            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle, coalesce(odc.numoc, 'Sin OC') as numoc"
                 +" from fabricaciones left join ordenfabricacion on"
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
                 +"odc on odc.idodc=ordenfabricacion.idodc "
@@ -1229,7 +1229,7 @@ router.get('/xlsx_desp', function(req,res){
         req.getConnection(function(err, connection) {
             if(err)
                 console.log("Error connection : %s", err);
-                connection.query("SELECT despacho.*,ordenfabricacion.numordenfabricacion FROM despacho LEFT JOIN ordenfabricacion ON despacho.idorden_f = ordenfabricacion.idordenfabricacion GROUP BY despacho.iddespacho ORDER BY despacho.fecha DESC",
+                connection.query("select gd.idgd, fabricaciones.idorden_f, odc.numoc, material.detalle, despachos.cantidad, gd.fecha, gd.estado, cliente.sigla from despachos left join gd on gd.idgd = despachos.idgd left join material on material.idmaterial = despachos.idmaterial left join pedido on pedido.idpedido = despachos.idpedido left join odc on odc.idodc = pedido.idodc left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join cliente on gd.idcliente = cliente.idcliente",
                 function(err, rows){
                     if (err)
                         console.log("Error Select : %s ",err );
@@ -1245,23 +1245,21 @@ router.get('/xlsx_desp', function(req,res){
                         var nombre = 'csvs/z_despachos_hasta_' + f_gen + '.xlsx';
                         sheet.getCell('A1').value = 'N° GD';
                         sheet.getCell('B1').value = 'N° OC';
-                        sheet.getCell('C1').value = 'Nombre';
-                        sheet.getCell('D1').value = 'Cantidad';
-                        sheet.getCell('E1').value = 'Fecha de Despacho';
-                         for (var i = 0; i < rows.length; i++) {
-                            tokenizer2 = rows[i].mat_token.split('@@');
-                            tokenizer = rows[i].cant_token.split(',');
-                            console.log('i: '+ i);
-                            console.log("tokenizer length: "+tokenizer.length);
-                            for(var j = 0; j<tokenizer.length; j++){
-                                console.log(aux);
-                                sheet.getCell('A' + aux.toString()).value = rows[i].iddespacho;
-                                sheet.getCell('B' + aux.toString()).value = rows[i].numordenfabricacion;
-                                sheet.getCell('C' + aux.toString()).value = tokenizer2[j]; 
-                                sheet.getCell('D' + aux.toString()).value = tokenizer[j];
-                                sheet.getCell('E' + aux.toString()).value = new Date(rows[i].fecha).toLocaleDateString();
-                                aux++;
-                            }
+                        sheet.getCell('C1').value = 'N° OF';
+                        sheet.getCell('D1').value = 'Nombre';
+                        sheet.getCell('E1').value = 'Cantidad';
+                        sheet.getCell('F1').value = 'Fecha de Despacho';
+                        sheet.getCell('G1').value = 'Estado';
+                        sheet.getCell('H1').value = 'Cliente';
+                        for (var i = 0; i < rows.length; i++) {
+                            sheet.getCell('A' + (i+2).toString()).value = rows[i].idgd;
+                            sheet.getCell('B' + (i+2).toString()).value = rows[i].idodc;
+                            sheet.getCell('C' + (i+2).toString()).value = rows[i].idorden_f;
+                            sheet.getCell('D' + (i+2).toString()).value = rows[i].detalle;
+                            sheet.getCell('E' + (i+2).toString()).value = rows[i].cantidad;
+                            sheet.getCell('F' + (i+2).toString()).value = new Date(rows[i].fecha).toLocaleDateString();
+                            sheet.getCell('G' + (i+2).toString()).value = rows[i].estado;
+                            sheet.getCell('H' + (i+2).toString()).value = rows[i].sigla;
                         }
                         workbook.xlsx.writeFile('public/' + nombre)
                             .then(function() {
