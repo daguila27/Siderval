@@ -164,7 +164,6 @@ router.post("/search_oca",function(req,res,next){
     } else res.redirect("/bad_login");
 });
 
-
 Object.size = function(obj) {
     var size = 0, key;
     for (key in obj) {
@@ -409,4 +408,20 @@ router.get("/inventarios",function(req,res,next){
         res.render("matprimas/inventario");
     } else {res.redirect("/bad_login");}
 });
+
+// Retorna tabla inventarios, recibe datos del filtro
+router.post("/table_inventario",function(req,res,next){
+    if(req.session.userData){
+        var input = JSON.parse(JSON.stringify(req.body));
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+            connection.query("SELECT idmaterial, tipo, detalle, stock,(select max(semana) from inventario) as semana FROM material"
+                + " WHERE (tipo='M' OR tipo='S' OR tipo='I') AND detalle LIKE '%" + input.filtro + "%'", function(err,rows){
+                if(err) console.log(err);
+                 res.render("matprimas/table_inventario",{data: rows, semana: input.semana});
+            });
+        });
+    } else res.redirect("/bad_login");
+});
+
 module.exports = router;

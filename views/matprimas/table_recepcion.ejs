@@ -25,11 +25,11 @@
 <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="receps_table" style="width: 100%; top: -7px">
     <thead>
     <tr>
-        <th id="numof" class="cabecera o_column_sortable order-column" data-order="recepcion_detalle.idrecepcion-ASC">N° GDD</th>
-        <th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
-        <th id="solicitados" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="recepcion_detalle.cantidad*1-ASC">Cantidad</th>
-        <th id="sin_produccion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
-        <th id="f_entrega" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="recepcion.fecha-DESC">Fecha de Registro</th>
+        <th id="numof" class="cabecera o_column_sortable" data-order="recepcion_detalle.idrecepcion-ASC">N° GDD</th>
+        <th id="descrip" class="cabecera o_column_sortable" data-order="material.detalle-ASC">Descripción</th>
+        <th id="solicitados" class="cabecera o_column_sortable" style="text-align: center;" data-order="recepcion_detalle.cantidad*1-ASC">Cantidad</th>
+        <th id="sin_produccion" class="cabecera o_column_sortable" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
+        <th id="f_entrega" class="cabecera o_column_sortable" style="text-align: center;" data-order="recepcion.fecha-DESC">Fecha de Registro</th>
     </tr>
     </thead>
     <tbody class="ui-sortable">
@@ -60,5 +60,9 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#receps_table");
+    $('#receps_table').DataTable( {
+        "scrollCollapse": true,
+        'searching': false,
+        "paging": false
+    } );
 </script>

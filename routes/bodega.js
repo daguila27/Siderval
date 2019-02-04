@@ -853,4 +853,61 @@ router.get("/search_gdd/:numgdd", function(req, res, next){
     else {res.redirect('/bad_login');}
 });
 
+//Inserta el numero de factura y el conector en GDD
+router.post('/page_gdd_update', function(req, res, next){
+    if(verificar(req.session.userData)){
+        if(req.session.isUserLogged){
+            var input = JSON.parse(JSON.stringify(req.body));
+            req.getConnection(function(err,connection){
+                if(err) console.log("Connection Error: %s",err);
+                // Para prevenir errores
+                var query = "";
+                var query2 = "";
+                // Query de numfac
+                if(input.numfac.length > 0) {
+                    var query = "UPDATE despachos SET numfac = CASE ";
+                    var where = "WHERE iddespacho IN (";
+                    for(var t=0; t < input.numfac.length; t++){
+                        query += "WHEN iddespacho = "+ input.numfac[t][0] + " THEN " + input.numfac[t][1] + " ";
+                        where += input.numfac[t][0] + ",";
+                    }
+                    query += "ELSE numfac END ";
+                    query += where + ")";
+                }
+                // Query de conector
+                if(input.conector.length > 0){
+                    var query2 = "UPDATE despachos SET conector = CASE ";
+                    var where2 = "WHERE iddespacho IN (";
+                    for(var t=0; t < input.conector.length; t++){
+                        query2 += "WHEN iddespacho = "+ input.conector[t][0] + " THEN " + input.conector[t][1] + " ";
+                        where2 += input.conector[t][0] + ",";
+                    }
+                    query2 += "ELSE stock END ";
+                    query2 += where2 + ")";
+                }
+                console.log(query);
+                connection.query(query, function(err, notif){
+                    if(err){console.log("Error Update : %s", err);}
+                    console.log(query2);
+                    connection.query(query2, function(err, notif2){
+                        if(err){console.log("Error Update : %s", err);}
+                        
+                    });
+                });
+            });
+        } else res.redirect("/bad_login");
+    }
+    else{res.redirect('bad_login');}
+});
+
+/*
+Ejemplo:
+UPDATE mat_prima SET stock = CASE
+    WHEN idmatpri = 5 THEN stock - 10
+    WHEN idmatpri = 6 THEN stock - 20
+    WHEN idmatpri = 7 THEN stock - 30
+    ELSE stock
+    END
+WHERE idmatpri  in (5,6,7);*/
+
 module.exports = router;
