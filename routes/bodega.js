@@ -126,7 +126,7 @@ router.post('/table_despachos', function(req, res, next){
                 + " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" + where,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
-                console.log(desp);
+                // console.log(desp);
                 //console.log(desp);
                 res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-'), user: req.session.userData});
             });         
@@ -862,31 +862,41 @@ router.post('/page_gdd_update', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
             var input = JSON.parse(JSON.stringify(req.body));
+            var numfac = JSON.parse(input.numfac);
+            var conector = JSON.parse(input.conector);
+            console.log(input);
+            console.log(numfac);
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
                 // Para prevenir errores
                 var query = "";
                 var query2 = "";
                 // Query de numfac
-                if(input.numfac.length > 0) {
+                if(numfac.length > 0) {
                     var query = "UPDATE despachos SET numfac = CASE ";
                     var where = "WHERE iddespacho IN (";
-                    for(var t=0; t < input.numfac.length; t++){
-                        query += "WHEN iddespacho = "+ input.numfac[t][0] + " THEN " + input.numfac[t][1] + " ";
-                        where += input.numfac[t][0] + ",";
+                    for(var t=0; t < numfac.length; t++){
+                        query += "WHEN iddespacho = "+ numfac[t][0] + " THEN " + numfac[t][1] + " ";
+                        if(t != 0){
+                            where += ",";
+                        }
+                        where += numfac[t][0];
                     }
                     query += "ELSE numfac END ";
                     query += where + ")";
                 }
                 // Query de conector
-                if(input.conector.length > 0){
+                if(conector.length > 0){
                     var query2 = "UPDATE despachos SET conector = CASE ";
                     var where2 = "WHERE iddespacho IN (";
-                    for(var t=0; t < input.conector.length; t++){
-                        query2 += "WHEN iddespacho = "+ input.conector[t][0] + " THEN " + input.conector[t][1] + " ";
-                        where2 += input.conector[t][0] + ",";
+                    for(var t=0; t < conector.length; t++){
+                        query2 += "WHEN iddespacho = "+ conector[t][0] + " THEN " + conector[t][1] + " ";
+                        if(t != 0){
+                            where2 += ",";
+                        }
+                        where2 += conector[t][0];
                     }
-                    query2 += "ELSE stock END ";
+                    query2 += "ELSE conector END ";
                     query2 += where2 + ")";
                 }
                 console.log(query);
@@ -895,7 +905,7 @@ router.post('/page_gdd_update', function(req, res, next){
                     console.log(query2);
                     connection.query(query2, function(err, notif2){
                         if(err){console.log("Error Update : %s", err);}
-                        
+                        res.send("ok");
                     });
                 });
             });
@@ -913,5 +923,21 @@ UPDATE mat_prima SET stock = CASE
     ELSE stock
     END
 WHERE idmatpri  in (5,6,7);*/
+
+router.get("/view_factura", function(req, res, next){
+   if(verificar(req.session.userData)){
+        var id = parseInt(req.params.numgdd);
+        req.getConnection(function(err, connection){
+            if(err) console.log("Error connection : %s", err);
+            connection.query("SELECT despachos.*, material.detalle FROM despachos"
+                + " LEFT JOIN material ON material.idmaterial = despachos.idmaterial", function(err, data){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                res.render('bodega/table_factura', {data: data});
+            });
+        });
+    }
+    else {res.redirect('/bad_login');}
+});
 
 module.exports = router;

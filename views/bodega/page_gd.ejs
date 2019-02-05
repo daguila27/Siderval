@@ -145,6 +145,8 @@ function fechaLatino(string){
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
+                                                    <td></td>
+                                                    <td></td>
                                                 </tr>
                                             </tfoot>
                                         </table>
@@ -172,6 +174,7 @@ function fechaLatino(string){
         setDataTable('#tablaODA');
     });
 
+    // Actualiza los campos ingresados en la tabla despachos
     $("#actualizar").on('click', function(e){
         e.preventDefault();
         var numfac = [];
@@ -187,8 +190,8 @@ function fechaLatino(string){
         });
         $.ajax({
             type: 'POST',
-            data: {numfac: numfac, conector: conector},
-            url: '/matprimas/page_gdd_update',
+            data: {numfac: JSON.stringify(numfac), conector: JSON.stringify(conector)},
+            url: '/bodega/page_gdd_update',
             success: function(data){
                 if(data == "ok"){
                     alert("Los datos se han actualizado con exito.");
