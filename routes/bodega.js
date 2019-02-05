@@ -899,10 +899,8 @@ router.post('/page_gdd_update', function(req, res, next){
                     query2 += "ELSE conector END ";
                     query2 += where2 + ")";
                 }
-                console.log(query);
                 connection.query(query, function(err, notif){
                     if(err){console.log("Error Update : %s", err);}
-                    console.log(query2);
                     connection.query(query2, function(err, notif2){
                         if(err){console.log("Error Update : %s", err);}
                         res.send("ok");
@@ -926,11 +924,20 @@ WHERE idmatpri  in (5,6,7);*/
 
 router.get("/view_factura", function(req, res, next){
    if(verificar(req.session.userData)){
-        var id = parseInt(req.params.numgdd);
+        res.render('bodega/view_factura');
+    }
+    else {res.redirect('/bad_login');}
+});
+
+router.post("/table_factura", function(req, res, next){
+   if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
         req.getConnection(function(err, connection){
             if(err) console.log("Error connection : %s", err);
-            connection.query("SELECT despachos.*, material.detalle FROM despachos"
-                + " LEFT JOIN material ON material.idmaterial = despachos.idmaterial", function(err, data){
+            connection.query("SELECT despachos.*, material.detalle, cliente.sigla FROM despachos"
+                + " LEFT JOIN material ON material.idmaterial = despachos.idmaterial"
+                + " LEFT JOIN gd ON gd.idgd=despachos.idgd"
+                + " LEFT JOIN cliente ON cliente.idcliente=gd.idgd where despachos.numfac > 0 AND despachos.numfac LIKE '%" + input.clave + "%'", function(err, data){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 res.render('bodega/table_factura', {data: data});

@@ -5,7 +5,7 @@
 	}
 %>
 
-<table id="facturaTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: 7px">
+<table id="facturaTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
 		<thead>
 			<tr>
 				<th class="o_column_sortable">N° de Factura</th>
@@ -14,20 +14,20 @@
 				<th class="o_column_sortable">Detalle</th>
 				<th class="o_column_sortable">N° Items</th>
 				<th class="o_column_sortable">Cliente</th>
-				<th class="o_column_sortable" style="text-align: center;" data-order="gd.fecha-DESC">Fecha de Factura</th>
+				<th class="o_column_sortable" style="text-align: center;">Fecha de Factura</th>
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
 		<%
-		for(var i=0; i < desp.length; i++){ %>
+		for(var i=0; i < data.length; i++){ %>
 			<tr class="o_data_row" data-idodc="">
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].numfac%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].conector%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].idgd%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].detalle%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].sigla%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].f_fact%></td>
 			</tr>
 		<%}%>
 	</tbody>
