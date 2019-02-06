@@ -2112,19 +2112,18 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         console.log(where);
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
-        	if(err) { console.log("Error Connection : %s", err);
-        	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,coalesce(sum(facturacion.cantidad),0) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
-                    + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
-	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
-	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
-	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
-                    + " LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast"
-                    + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
-                    + " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast"
-                    + " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion"
-	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"
-	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC) AS abastecimiento "+where, function(err, abs){
+        	if(err) { console.log("Error Connection : %s", err);}
+        	else {
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,facturacion.cantidad as facturados, facturacion.factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token," +
+                    " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento" +
+                    " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda" +
+                    " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial" +
+                    " LEFT JOIN (select facturacion.idabast, sum(cantidad) as cantidad, GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion ON abastecimiento.idabast = facturacion.idabast" +
+                    " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
+                    " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast" +
+                    " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion" +
+                    " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)" +
+                    " GROUP BY abastecimiento.idabast ORDER BY abastecimiento.idoda DESC) AS abastecimiento "+where, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1},function(err,html){
