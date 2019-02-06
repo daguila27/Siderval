@@ -1570,7 +1570,8 @@ router.get("/fabrs_list/:token",function(req,res){
     if(verificar(req.session.userData)){
 		adminModel.getdatos(req.params.token.split('@'),function(err,data){
 			if(err) console.log(err);
-            res.render("plan/insumos_table",{prods:data});
+			console.log(req.params.token);
+            res.render("plan/insumos_table",{prods:data, token: req.params.token});
 		});
     } else res.redirect("/bad_login");
 });
