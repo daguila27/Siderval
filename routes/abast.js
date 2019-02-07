@@ -1631,6 +1631,99 @@ router.get('/insumos_list/:token', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
+
+
+
+
+
+router.get('/xlsx_oca', function(req,res){
+    if(verificar(req.session.userData)){
+        let fecha = new Date();
+        var nombre = "master-oda-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        var Excel = require('exceljs');
+        var workbook = new Excel.Workbook();
+        var sheet1 = workbook.addWorksheet('Pedidos');
+        var sheet2 = workbook.addWorksheet('Facturas');
+        sheet1.columns = [
+            { header: 'N° OCA', key: 'id', width: 15 },
+            { header: 'Código', key: 'name', width: 50 },
+            { header: 'Detalle', key: 'unit', width: 10},
+            { header: 'Cantidad', key: 'asked', width: 15},
+            { header: 'Costo Unitario', key: 'virtual', width: 10},
+            { header: 'Centro de Costo', key: 'virtual', width: 10},
+            { header: 'Fecha Creación', key: 'income', width: 10},
+            { header: 'Proveedor', key: 'income', width: 10}
+		];
+        sheet2.columns = [
+            { header: 'Factura', key: 'id', width: 15 },
+            { header: 'Código', key: 'name', width: 50 },
+            { header: 'Detalle', key: 'unit', width: 10},
+            { header: 'Facturado', key: 'virtual', width: 10},
+            { header: 'N° OCA', key: 'income', width: 10},
+            { header: 'Fecha de Facturación', key: 'income', width: 10}
+        ];
+
+
+        adminModel.getdatosODA(function(err,oda){
+            if(err) console.log(err);
+            sheet1.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet1.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
+
+            for(var i = 2; i < ops.length+2; i++){
+                sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
+                sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
+                sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
+
+            }
+            sheet1.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet1.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet1.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            adminModel.getDatosFacturas(function(err,facts){
+                if(err) throw err;
+                for(let i=0;i<prods.length;i++){
+                    sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
+                        ,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
+                }
+                workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                    console.log(nombre);
+                    res.send(nombre);
+                });
+            });
+
+        });
+    }
+    else res.redirect('/bad_login');
+});
+
+
+
 // Descargar xlsx de insumos
 router.get('/xlsx_ids_ins/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
@@ -2112,13 +2205,13 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         console.log(where);
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
-        	if(err) { console.log("Error Connection : %s", err);}
-        	else {
+        	if(err) { console.log("Error Connection : %s", err);
+        	} else {
 	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,facturacion.cantidad as facturados, facturacion.factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token," +
                     " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento" +
                     " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda" +
                     " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial" +
-                    " LEFT JOIN (select facturacion.idabast, sum(cantidad) as cantidad, GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion ON abastecimiento.idabast = facturacion.idabast" +
+                    " LEFT JOIN (select facturacion.idabast, coalesce(sum(cantidad), 0) as cantidad, GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion ON abastecimiento.idabast = facturacion.idabast" +
                     " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
                     " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast" +
                     " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion" +

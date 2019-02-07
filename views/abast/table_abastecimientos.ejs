@@ -77,11 +77,15 @@
 		    if(data[i].factura_token != null){
 				lista = data[i].factura_token.split(",");
 				if(lista.length > 1){
-					lista.map(function(e){
+					for(var e=0; e < lista.length; e++){
+					    lista[e] = lista[e].split('@');
+					}
+				    /*lista.map(function(e){
 					    lista2.push(e.split("@"));
-						return e;
-					});
-					lista = lista2;
+					    return e;
+					});*/
+					//lista = lista2;
+					console.log(lista);
 				} else lista[0] = lista[0].split("@");
 			} else {
 		        lista = [];
@@ -89,11 +93,9 @@
 			if(data[i].gd_token != null){
 				gd_lista = data[i].gd_token.split(",");
 				if(gd_lista.length > 1){
-					gd_lista.map(function(e){
-						lista3.push(e.split("@"));
-						return e;
-					});
-					gd_lista = lista3;
+					for(var e=0; e < gd_lista.length; e++){
+						gd_lista[e] = gd_lista[e].split('@');
+					}
 				} else gd_lista[0] = gd_lista[0].split("@");
 			} else {
 				gd_lista = [];
@@ -105,14 +107,15 @@
 				</td>
 				<td class="o_data_cell" style="text-align: center; width: 13%">
 					<%if(lista.length>2){
-						for(var j=0;j<2;j++){%>
-							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
+						for(var j=0; j<2; j++){%>
+							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%=lista[j][1]%>" ><%= lista[j][0]%></a>
 						<%}%>
 					    <a class="label label-primary pull-right" type="button"  onclick="changeIcon(this)" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>" data-state="close">
 							<i class="fa fa-arrow-down"></i>
 						</a>
 					    <div class="collapse collapseLabel" id="collapseFactura<%=i%>">
-							<%for(var j=3; j<lista.length; j++){%>
+							<%
+							for(var j=3; j<lista.length; j++){%>
 								<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
 							<%}%>
 						</div>

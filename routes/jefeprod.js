@@ -1333,4 +1333,139 @@ router.get("/phistory_data",function(req,res){
    } else res.redirect('/bad_login');
 });
 
+
+//Cierre de mes producciones.
+router.get("/cierre_producciones",function(req,res){
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+            //Se actualiza la fecha a las produccion con piezas en curso y nada en BPT
+            //(esas no son necesario duplicarlas porque generaría producciones solo con ceros)
+            connection.query("UPDATE siderval.produccion SET f_program = '2019-02-01 00:00:00' WHERE (" +
+                "produccion.1 != 0 OR " +
+                "produccion.2 != 0 OR " +
+                "produccion.3 != 0 OR " +
+                "produccion.4 != 0 OR " +
+                "produccion.5 != 0 OR " +
+                "produccion.6 != 0 OR " +
+                "produccion.7 != 0) and (produccion.8 = 0)",function(err,result){
+                    if(err) console.log(err);
+                    console.log(result);
+                    connection.query("SELECT max(produccion.idproduccion) + 1 as lastid FROM produccion",function(err, lastid){
+                        if(err) console.log(err);
+                        //SE OBTIENEN LAS PRODUCCION QUE SE DEBEN CERRAR, CON SALDO EN PRODUCCION Y AL MENOS 1 UND EN BPT
+                        connection.query("alter table produccion auto_increment = "+ lastid[0].lastid, function(err, result){
+                            if(err) console.log(err);
+                            console.log(result);
+                            connection.query("SELECT * FROM siderval.produccion where (" +
+                                "produccion.1 != 0 OR " +
+                                "produccion.2 != 0 OR " +
+                                "produccion.3 != 0 OR " +
+                                "produccion.4 != 0 OR " +
+                                "produccion.5 != 0 OR " +
+                                "produccion.6 != 0 OR " +
+                                "produccion.7 != 0) and (produccion.8 > 0)",function(err, encurso){
+                                if(err) console.log(err);
+
+                                //IDS de las produccion a las que luego debemos actualizar la linea de produccion a 0
+                                var ids = [];
+                                var inBD = [];
+                                for(var e=0; e < encurso.length; e++){
+                                    ids.push(encurso[e].idproduccion);
+                                    //encurso[e].idproduccion = lastid[0].lastid + e;
+                                    encurso[e]['8'] = 0;
+                                    encurso[e].standby = 0;
+                                    encurso[e].cantidad = encurso[e]['1']+encurso[e]['2']+encurso[e]['3']+encurso[e]['4']+encurso[e]['5']+encurso[e]['6']+encurso[e]['7'];
+                                    encurso[e].f_gen = new Date().toLocaleDateString();
+                                    encurso[e].f_program = new Date().toLocaleDateString();
+                                    delete encurso[e].idproduccion;
+                                    inBD.push([
+                                        encurso[e]['1'],
+                                        encurso[e]['2'],
+                                        encurso[e]['3'],
+                                        encurso[e]['4'],
+                                        encurso[e]['5'],
+                                        encurso[e]['6'],
+                                        encurso[e]['7'],
+                                        encurso[e]['8'],
+                                        encurso[e].cantidad,
+                                        encurso[e].standby,
+                                        encurso[e].f_program,
+                                        encurso[e].idfabricaciones,
+                                        encurso[e].idordenproduccion,
+                                        0,
+                                        encurso[e].el
+                                    ]);
+                                }
+                                console.log(encurso.length);
+                                connection.query("INSERT INTO produccion " +
+                                    "(produccion.1, produccion.2, produccion.3, produccion.4," +
+                                    " produccion.5, produccion.6, produccion.7, produccion.8," +
+                                    " produccion.cantidad, produccion.standby, produccion.f_program," +
+                                    " produccion.idfabricaciones, produccion.idordenproduccion, produccion.abastecidos," +
+                                    " produccion.el) " +
+                                    "VALUES ?", [inBD], function(err, result){
+                                    if(err) console.log(err);
+                                    console.log(result);
+                                    connection.query("UPDATE produccion SET produccion.1 = 0 WHERE produccion.idproduccion in (" + ids.join(',')+")", function(err, result){
+                                        if(err) console.log(err);
+                                        console.log(result);
+                                        connection.query("UPDATE produccion SET produccion.2 = 0 WHERE produccion.idproduccion in (" + ids.join(',')+")", function(err, result){
+                                            if(err) console.log(err);
+                                            console.log(result);
+                                            connection.query("UPDATE produccion SET produccion.3 = 0 WHERE produccion.idproduccion in (" + ids.join(',')+")", function(err, result){
+                                                if(err) console.log(err);
+                                                console.log(result);
+                                                connection.query("UPDATE produccion SET produccion.4 = 0 WHERE produccion.idproduccion in (" + ids.join(',')+")", function(err, result){
+                                                    if(err) console.log(err);
+                                                    console.log(result);
+                                                    connection.query("UPDATE produccion SET produccion.5 = 0 WHERE produccion.idproduccion in (" + ids.join(',')+")", function(err, result){
+                                                        if(err) console.log(err);
+                                                        console.log(result);
+                                                        connection.query("UPDATE produccion SET produccion.6 = 0 WHERE produccion.idproduccion in (" +ids.join(',')+")", function(err, result){
+                                                            if(err) console.log(err);
+                                                            console.log(result);
+                                                            connection.query("UPDATE produccion SET produccion.7 = 0 WHERE produccion.idproduccion in (" + ids.join(',')+")", function(err, result){
+                                                                if(err) console.log(err);
+                                                                console.log(result);
+                                                                connection.query("update produccion set cantidad = " +
+                                                                    "produccion.1 +" +
+                                                                    "produccion.2 +" +
+                                                                    "produccion.3 +" +
+                                                                    "produccion.4 +" +
+                                                                    "produccion.5 +" +
+                                                                    "produccion.6 +" +
+                                                                    "produccion.7 +" +
+                                                                    "produccion.8 +" +
+                                                                    "produccion.standby" +
+                                                                    " where cantidad != produccion.1 +" +
+                                                                    "produccion.2 +" +
+                                                                    "produccion.3 +" +
+                                                                    "produccion.4 +" +
+                                                                    "produccion.5 +" +
+                                                                    "produccion.6 +" +
+                                                                    "produccion.7 +" +
+                                                                    "produccion.8 +" +
+                                                                    "produccion.standby and idproduccion > 0", function(err, result){
+                                                                    if(err){console.log(err);}
+
+                                                                    console.log(result);
+                                                                    res.redirect('/');
+                                                                });
+                                                            });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+            });
+        });
+    } else res.redirect('/bad_login');
+});
+
 module.exports = router;
