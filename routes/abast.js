@@ -1636,7 +1636,7 @@ router.get('/insumos_list/:token', function(req, res, next){
 
 
 
-router.get('/xlsx_oca', function(req,res){
+router.get('/xlsx_oda', function(req,res){
     if(verificar(req.session.userData)){
         let fecha = new Date();
         var nombre = "master-oda-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
@@ -1659,12 +1659,13 @@ router.get('/xlsx_oca', function(req,res){
             { header: 'Código', key: 'name', width: 50 },
             { header: 'Detalle', key: 'unit', width: 10},
             { header: 'Facturado', key: 'virtual', width: 10},
+            { header: 'Costo', key: 'virtual', width: 10},
             { header: 'N° OCA', key: 'income', width: 10},
             { header: 'Fecha de Facturación', key: 'income', width: 10}
         ];
 
 
-        adminModel.getdatosODA(function(err,oda){
+        adminModel.getdatosODA(null,function(err,ops){
             if(err) console.log(err);
             sheet1.getRow(1).fill = {
                 type: 'pattern',
@@ -1678,12 +1679,27 @@ router.get('/xlsx_oca', function(req,res){
                 underline: false,
                 bold: true
             };
-
+            /*
+            sheet1.columns = [
+                { header: 'N° OCA', key: 'id', width: 15 },
+                { header: 'Código', key: 'name', width: 50 },
+                { header: 'Detalle', key: 'unit', width: 10},
+                { header: 'Cantidad', key: 'asked', width: 15},
+                { header: 'Costo Unitario', key: 'virtual', width: 10},
+                { header: 'Centro de Costo', key: 'virtual', width: 10},
+                { header: 'Fecha Creación', key: 'income', width: 10},
+                { header: 'Proveedor', key: 'income', width: 10}
+            ];
+            * */
             for(var i = 2; i < ops.length+2; i++){
-                sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
-                sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
-                sheet.getCell('C'+i.toString()).value = ops[i-2].u_medida;
-
+                sheet1.getCell('A'+i.toString()).value = ops[i-2].idoda;
+                sheet1.getCell('B'+i.toString()).value = ops[i-2].codigo;
+                sheet1.getCell('C'+i.toString()).value = ops[i-2].detalle;
+                sheet1.getCell('D'+i.toString()).value = ops[i-2].cantidad;
+                sheet1.getCell('E'+i.toString()).value = ops[i-2].costo;
+                sheet1.getCell('F'+i.toString()).value = ops[i-2].cc;
+                sheet1.getCell('G'+i.toString()).value = ops[i-2].fecha;
+                sheet1.getCell('H'+i.toString()).value = ops[i-2].sigla;
             }
             sheet1.getRow(1).fill = {
                 type: 'pattern',
@@ -1705,15 +1721,25 @@ router.get('/xlsx_oca', function(req,res){
                 bottom: {style:'thin', color: {argb:'00000000'}}
             };
 
-            adminModel.getDatosFacturas(function(err,facts){
+            adminModel.getDatosFacturas(null,function(err,prods){
                 if(err) throw err;
+                /*
+                sheet2.columns = [
+                    { header: 'Factura', key: 'id', width: 15 },
+                    { header: 'Código', key: 'name', width: 50 },
+                    { header: 'Detalle', key: 'unit', width: 10},
+                    { header: 'Facturado', key: 'virtual', width: 10},
+                    { header: 'Costo', key: 'virtual', width: 10},
+                    { header: 'N° OCA', key: 'income', width: 10},
+                    { header: 'Fecha de Facturación', key: 'income', width: 10}
+                ];
+                * */
                 for(let i=0;i<prods.length;i++){
-                    sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
-                        ,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
+                    sheet2.addRow([prods[i].numfac,prods[i].codigo,prods[i].detalle,prods[i].cantidad,prods[i].costo,prods[i].idoda,prods[i].fecha]);
                 }
                 workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
                     console.log(nombre);
-                    res.send(nombre);
+                    res.send('/csvs/'+nombre);
                 });
             });
 
