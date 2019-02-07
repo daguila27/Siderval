@@ -899,11 +899,23 @@ router.post('/page_gdd_update', function(req, res, next){
                     query2 += "ELSE conector END ";
                     query2 += where2 + ")";
                 }
+                var date = date = new Date();
+                date = date.getUTCFullYear() + '-' +
+                    ('00' + (date.getUTCMonth()+1)).slice(-2) + '-' +
+                    ('00' + date.getUTCDate()).slice(-2) + ' ' + 
+                    ('00' + date.getUTCHours()).slice(-2) + ':' + 
+                    ('00' + date.getUTCMinutes()).slice(-2) + ':' + 
+                    ('00' + date.getUTCSeconds()).slice(-2);
+                console.log(date);
                 connection.query(query, function(err, notif){
-                    if(err){console.log("Error Update : %s", err);}
-                    connection.query(query2, function(err, notif2){
-                        if(err){console.log("Error Update : %s", err);}
-                        res.send("ok");
+                    if(err){console.log("Error Update numfac: %s", err);}
+                    console.log("UPDATE despachos SET f_fact = '" + date + "' " + where + ")");
+                    connection.query("UPDATE despachos SET f_fact = '" + date + "' " + where + ")", function(err, f_fact){
+                        if(err){console.log("Error Update f_fact : %s", err);}
+                        connection.query(query2, function(err, notif2){
+                            if(err){console.log("Error Update conector: %s", err);}
+                            res.send("ok");
+                        });
                     });
                 });
             });
@@ -937,7 +949,7 @@ router.post("/table_factura", function(req, res, next){
             connection.query("SELECT despachos.*, material.detalle, cliente.sigla FROM despachos"
                 + " LEFT JOIN material ON material.idmaterial = despachos.idmaterial"
                 + " LEFT JOIN gd ON gd.idgd=despachos.idgd"
-                + " LEFT JOIN cliente ON cliente.idcliente=gd.idgd where despachos.numfac > 0 AND despachos.numfac LIKE '%" + input.clave + "%'", function(err, data){
+                + " LEFT JOIN cliente ON cliente.idcliente=gd.idgd where despachos.numfac > 0 AND (despachos.numfac LIKE '%" + input.clave + "%' OR despachos.idgd LIKE '%" + input.clave + "%')", function(err, data){
                 if(err)
                     console.log("Error Selecting : %s", err);
                 res.render('bodega/table_factura', {data: data});

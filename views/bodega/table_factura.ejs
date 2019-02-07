@@ -1,7 +1,13 @@
 <%
 	var count = 0;
 	function fechaLatino(string){
-		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
+		date = string.getUTCFullYear() + '-' +
+                    ('00' + (string.getUTCMonth()+1)).slice(-2) + '-' +
+                    ('00' + string.getUTCDate()).slice(-2) + ' ' + 
+                    ('00' + string.getUTCHours()).slice(-2) + ':' + 
+                    ('00' + string.getUTCMinutes()).slice(-2) + ':' + 
+                    ('00' + string.getUTCSeconds()).slice(-2);
+		return date;
 	}
 %>
 
@@ -27,7 +33,7 @@
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].detalle%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].sigla%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].f_fact%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%= new Date(data[i].f_fact).toLocaleDateString() %></td>
 			</tr>
 		<%}%>
 	</tbody>
