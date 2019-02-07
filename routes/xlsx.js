@@ -137,6 +137,33 @@ informe.getdatos = function(fecha,callback){
 
 };
 
+
+
+informe.getdatosODA = function(fecha,callback){
+    if (connection){
+        connection.query("SELECT oda.idoda, oda.creacion,material.codigo, material.detalle,abastecimiento.cantidad, abastecimiento.costo, abastecimiento.cc, coalesce(facturacion.cantidad, 0) as facturados, facturacion.facturas,coalesce(cliente.sigla, 'Sin definir') as sigla FROM abastecimiento left join oda on oda.idoda = abastecimiento.idoda inner join material on material.idmaterial = abastecimiento.idmaterial left join cliente on cliente.idcliente = oda.idproveedor left join (SELECT facturacion.idabast, coalesce(sum(facturacion.cantidad)) as cantidad, group_concat(factura.numfac separator '/') as facturas FROM facturacion left join abastecimiento on abastecimiento.idabast=facturacion.idabast left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast",function(err, odas){
+            if(err){
+                throw err;
+            } else {
+                callback(null,odas);
+            }
+        });
+    }
+
+};
+informe.getDatosFacturas = function(fecha,callback){
+    if (connection){
+        connection.query("SELECT factura.idoda,factura.numfac,material.detalle, facturacion.costo, facturacion.cantidad, factura.fecha FROM facturacion left join factura on factura.idfactura = facturacion.idfactura left join abastecimiento on abastecimiento.idabast = facturacion.idabast left join material on material.idmaterial = abastecimiento.idmaterial",function(err, facts){
+            if(err){
+                throw err;
+            } else {
+                callback(null,facts);
+            }
+        });
+    }
+
+};
+
 informe.produccion = function(fecha,callback){
     if(connection){
         connection.query("SELECT material.*,prods.*,COALESCE(rech.rechazados,0) AS rechazados,COALESCE(fabrs.fabricados,0) AS fabricados FROM material" +

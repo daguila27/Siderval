@@ -68,6 +68,12 @@
 					<li data-searchcol="5" class="item5 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Centro de Costo (CC)</em> para: <strong></strong></a></li>
 				</ul>
 			</div>
+			<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+				<button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+				<ul class="dropdown-menu">
+					<li><a href="#" class="getcsvoda" data-tipo="oda"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+				</ul>
+			</div>
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-DESC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
@@ -106,7 +112,6 @@
 	// Pagina actual
 	var global_page = '1';
 	$(document).ready(function(){
-
 		$.ajax({
 			type: 'POST',
             data: {
@@ -430,5 +435,18 @@
 		}
 	});
 
+
+    $(".getcsvoda").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/abastecimiento/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
+
+    });
 
 </script>
