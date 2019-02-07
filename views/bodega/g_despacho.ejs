@@ -46,6 +46,7 @@ function letraMayus(string) {
                     <label style="width: 30%">
                         Cliente: 
                         <select name="cliente_gd" class="form-control" id="cliente_gd">
+                            <option value="0" id="cli0" selected disabled>Sin Cliente</option>
                             <%for(var w=0; w < cli.length; w++){%>
                                 <option value="<%= cli[w].idcliente%>" id="cli<%= cli[w].idcliente%>"><%= cli[w].sigla%> - <%= cli[w].razon%></option>
                             <%}%>
