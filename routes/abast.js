@@ -2207,7 +2207,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,facturacion.cantidad as facturados, facturacion.factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token," +
+	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token," +
                     " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento" +
                     " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda" +
                     " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial" +
