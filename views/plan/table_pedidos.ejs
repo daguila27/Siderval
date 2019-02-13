@@ -21,12 +21,12 @@
 			<tr>
 				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">N° de OC</th>
 				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">N° Item</th>
+				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
 				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
 				<th class="o_column_sortable order-column" data-order="pedido.cantidad-ASC">Solicitados</th>
 				<th class="o_column_sortable order-column" data-order="pedido.despachados-ASC">Despachados</th>
 				<th class="o_column_sortable order-column" style="text-align: center;" data-order="pedido.f_entrega-DESC">Fecha de Entrega</th>
 				<th class="o_column_sortable order-column" style="text-align: center;" data-order="odc.creacion-ASC">Fecha de Creación</th>
-				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
 				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Estado</th>
 			</tr>
 		</thead>
@@ -48,20 +48,20 @@
 				estado = 'Más de 10 días';
 			}%>
 		<tr class="o_data_row <%=clase%>" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
-					<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].cantidad %></td>
-					<td class="o_data_cell parsear_nro" style="text-align: center;"><%= data[i].despachados %></td>
-					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" style="text-align: center;">
-						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
-					</td>
-					<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].creacion).getTime()%>" style="text-align: center;">
-						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
-					</td>
-					<td class="o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
-					<td><%= estado%></td>
-				</tr>
+			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
+			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
+			<td class="o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
+			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
+			<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].cantidad %></td>
+			<td class="o_data_cell parsear_nro" style="text-align: center;"><%= data[i].despachados %></td>
+			<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" style="text-align: center;">
+				<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
+			</td>
+			<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].creacion).getTime()%>" style="text-align: center;">
+				<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
+			</td>
+			<td><%= estado%></td>
+		</tr>
 		<%}%>
 	</tbody>
 	<tfoot>

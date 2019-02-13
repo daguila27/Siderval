@@ -41,18 +41,18 @@
 	<tbody class="ui-sortable" style="margin-top: 10px">
 		<%for(var i=0; i < data.length; i++){%>
 			<tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
-					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].idordenfabricacion%></td>
-				<td class="numitem o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numitem%></td>
-					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numoc%></td>
-				    <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].cliente%></td>
-					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].detalle%></td>
-					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].cantidad %></td>
-					<td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].restantes %></td>
-					<td class="en_produccion o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].cantidad - data[i].restantes - data[i].finalizados%></td>
-					<td class="finalizado o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].finalizados%></td>
-					<td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].peso%></td>
-					<td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].peso * data[i].restantes%></td>
-					<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
+					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>"><a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary"><%=data[i].idordenfabricacion%></a></td>
+					<td class="numitem o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numitem%></td>
+					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numoc%></td>
+				    <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].cliente%></td>
+					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
+					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad %></td>
+					<td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].restantes %></td>
+					<td class="en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].cantidad - data[i].restantes - data[i].finalizados%></td>
+					<td class="finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].finalizados%></td>
+					<td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
+					<td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].restantes%></td>
+					<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" >
 						<span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
 					</td>
 					<%
@@ -108,7 +108,9 @@
 <script type="text/javascript">
     setDataTableMain("#DataTableFabs");
     $(document).ready(function(){
-        /*$(".order-column").removeClass('o-sort-up');
+        $('#DataTableFabs tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('success');
+        } );        /*$(".order-column").removeClass('o-sort-up');
         $(".order-column").removeClass('o-sort-down');
         $(".order-column").each(function(){
             //$(this).css("width", $("."+$(this).attr('id')).css('width'));
