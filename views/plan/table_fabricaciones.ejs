@@ -20,9 +20,9 @@
 	<thead style="/*position: fixed; width: 100%*/">
 			<tr>
                 <th id="numof" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
+				<th id="numitem" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
 				<th id="numoc" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OC</th>
 				<th id="cliente" class="cabecera o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
-				<th id="numitem" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
 				<th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
 				<th id="solicitados" class="cabecera o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
 				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Por Moldear</th>
@@ -31,7 +31,7 @@
 				<!--<th id="p_terminado" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">PT</th>
 				<th id="planta" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">Planta</th>-->
 				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;">Peso unitario</th>
-				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;">Peso Total(sin producir)</th>
+				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;">Peso Total (sin producir)</th>
 				<th id="f_entrega" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
 				<%if(user.nombre != 'siderval'){%>
 					<th id="habilitar_cand" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC">Habilitar</th>
@@ -42,9 +42,9 @@
 		<%for(var i=0; i < data.length; i++){%>
 			<tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
 					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].idordenfabricacion%></td>
+				<td class="numitem o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numitem%></td>
 					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numoc%></td>
 				    <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].cliente%></td>
-					<td class="numitem o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numitem%></td>
 					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].detalle%></td>
 					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].cantidad %></td>
 					<td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].restantes %></td>

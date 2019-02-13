@@ -80,7 +80,6 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         var orden = req.params.orden;
         orden = orden.replace('-', ' ');
         var page = req.params.page - 1;
-        var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
         var array_fill = [
@@ -103,9 +102,6 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
                 condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
             }
         }
-
-
-
         if(input.pendientes == 'false'){
             condiciones_where.push(['pedido.cantidad > pedido.despachados']);
         }
@@ -120,7 +116,7 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion, cliente.*, material.* FROM pedido"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
@@ -295,7 +291,6 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
                 +"left join cliente on cliente.idcliente = odc.idcliente "
                 +"left join (select fabricaciones.idfabricaciones, produccion_history.enviados as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
                 +"left join material on material.idmaterial=fabricaciones.idmaterial"+where;
-            console.log(consulta);
             connection.query(consulta,
                 function(err, of){
                     if(err) throw err;
@@ -1112,7 +1107,7 @@ router.get('/xlsx_of', function(req,res){
                 console.log("Error connection : %s", err);
 
             console.log("¿No será mucha molestia?");
-            connection.query("select material.codigo,fabricaciones.idorden_f,fabricaciones.restantes,coalesce(prod_query.pt,0) as pt,coalesce(odc.numoc, 'SIDERVAL') as numoc,"
+            connection.query("select material.codigo,COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,fabricaciones.idorden_f,fabricaciones.restantes,coalesce(prod_query.pt,0) as pt,coalesce(odc.numoc, 'SIDERVAL') as numoc,"
                     +"material.detalle,subaleacion.subnom as aleacion, coalesce(pedido.despachados,"
                     +"concat(fabricaciones.cantidad-fabricaciones.restantes, ' sin producción')) as despachados,"
                     +"coalesce(pedido.cantidad, fabricaciones.cantidad) as solicitados, coalesce(material.peso,0) as peso_u,"
@@ -1120,7 +1115,7 @@ router.get('/xlsx_of', function(req,res){
                     +"as peso_d, coalesce(pedido.f_entrega, fabricaciones.f_entrega) as f_entrega,coalesce(group_concat(despachos.idgd),"
                     +"'Sin GD') as gd from fabricaciones left join material on material.idmaterial=fabricaciones.idmaterial left join pedido on"
                     +" pedido.idpedido=fabricaciones.idpedido left join producido on producido.idmaterial=material.idmaterial left join subaleacion"
-                    +" on subaleacion.idsubaleacion=producido.idsubaleacion left join odc on odc.idodc=pedido.idodc left join despachos on despachos.idpedido=pedido.idpedido"
+                    +" on subaleacion.idsubaleacion=producido.idsubaleacion left join odc on odc.idodc=pedido.idodc LEFT JOIN cliente ON cliente.idcliente = odc.idcliente left join despachos on despachos.idpedido=pedido.idpedido"
                     +" left join (select produccion.idfabricaciones ,sum(produccion.`8`) as pt  from produccion group by produccion.idfabricaciones) as prod_query on prod_query.idfabricaciones=fabricaciones.idfabricaciones group by pedido.idpedido order by fabricaciones.idfabricaciones",
                 function(err, rows){
                     if (err)
