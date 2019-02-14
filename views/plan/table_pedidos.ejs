@@ -20,6 +20,7 @@
 		<thead>
 			<tr>
 				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">N° de OC</th>
+				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">N° OFS</th>
 				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">N° Item</th>
 				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
 				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
@@ -47,8 +48,9 @@
 				clase = 'success';
 				estado = 'Más de 10 días';
 			}%>
-		<tr class="o_data_row <%=clase%>" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
+		<tr class="o_data_row <%=clase%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
 			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
+			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].oefes%></td>
 			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
 			<td class="o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
 			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
@@ -85,35 +87,6 @@
 
 <script type="text/javascript">
     setDataTableMain("#DataTablePeds");
-    $(document).ready(function(){
-		/*$(".order-column").removeClass('o-sort-up');
-		$(".order-column").removeClass('o-sort-down');
-		$(".order-column").each(function(){
-			if($(this).data('order').split('-')[0] == "< key.split('-')[0]>" ){
-				if("< key.split('-')[1]>" == "ASC"){
-					$(this).addClass('o-sort-up');
-					$(this).data('order', '< key.split("-")[0]>-DESC');
-				}
-				else{
-					$(this).addClass('o-sort-down');
-					$(this).data('order', '< key.split("-")[0]>-ASC');
-					
-				}
-			}
-		});*/
-	});
-	/*$(".order-column").on('click', function(e){
-		e.preventDefault();
-		var item = this;
-		var orden = $(this).data('order');
-		$.ajax({
-			type: 'GET',
-			url: '/plan/table_pedidos/' + orden + '/',
-			success: function(data){
-				$(".main-page").html(data);
-			}
-		});
-	});*/
 
 	function submit_form(yo){
 		//$("#form"+$(yo).data('idodc')).submit();

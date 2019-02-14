@@ -110,38 +110,8 @@
     $(document).ready(function(){
         $('#DataTableFabs tbody').on( 'click', 'tr', function () {
             $(this).toggleClass('success');
-        } );        /*$(".order-column").removeClass('o-sort-up');
-        $(".order-column").removeClass('o-sort-down');
-        $(".order-column").each(function(){
-            //$(this).css("width", $("."+$(this).attr('id')).css('width'));
-
-            if($(this).data('order').split('-')[0] == "< key.split('-')[0]>" ){
-                if("< key.split('-')[1]>" == "ASC"){
-                    $(this).addClass('o-sort-up');
-                    $(this).data('order', '< key.split("-")[0]>-DESC');
-                }
-				else{
-                    $(this).addClass('o-sort-down');
-
-                    $(this).data('order', '< key.split("-")[0]>-ASC');
-                }
-            }
-        });*/
+        });
     });
-	/*$(".order-column").on('click', function(e){
-		e.preventDefault();
-		var item = this;
-		var orden = $(this).data('order');
-		var showPend = $("#pend").is(':checked'); 
-		$.ajax({
-			type: 'GET',
-			url: '/plan/table_fabricaciones/'+orden+'/'+showPend,
-			success: function(data){
-				$(".main-page").html(data);
-			}
-		});
-	});*/
-
 
 	function submit_form(yo){
 		//$("#form"+$(yo).data('idodc')).submit();

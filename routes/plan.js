@@ -116,8 +116,9 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(ordenfabricacion.idordenfabricacion,'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
+                + " LEFT JOIN ordenfabricacion ON pedido.idodc = ordenfabricacion.idodc"
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " LEFT JOIN (SELECT pedido.idpedido, EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado FROM pedido) AS estado ON estado.idpedido=pedido.idpedido"
@@ -827,7 +828,7 @@ router.get('/lanzar_of/:tipo', function(req,res,next){
                         if(err)
                             console.log("Error Selecting : %s ",err );
 
-                    res.render("plan/lanzar_" + req.params.tipo,{caracts: rows, cli: cli});
+                    res.render("plan/lanzar_" + req.params.tipo.toString(),{caracts: rows, cli: cli});
                 });
             });    
         })
@@ -1000,8 +1001,6 @@ router.post('/crear_of', function(req, res, next){
                         if(err) console.log(err);
                         connection.query("INSERT INTO save (llave,token) VALUES ?",[[['of', '1']]],function(err,inSave){
                             if(err) console.log(err);
-                            
-
                             res.send(rows.insertId.toString());
                             //res.redirect('/plan/lanzar_of/of');
                         });
