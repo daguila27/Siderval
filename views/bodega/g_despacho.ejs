@@ -138,10 +138,10 @@ function letraMayus(string) {
                         <thead>
                             <tr>
                                 <th>N°OC</th>
+                                <th>Cliente</th>
                                 <th>N°OF</th>
                                 <th>Item</th>
                                 <th>Detalle</th>
-                                <th>Aleación</th>
                                 <th>Sin Despachar</th>
                                 <th>En Stock</th>
                                 <th class="hidden">A Enviar</th>
@@ -160,11 +160,11 @@ function letraMayus(string) {
                             }%>
                             <tr class="mat_desp" id="<%=data[i].idpedido%>">
                                 <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
+                                <td><%= data[i].cliente%></td>
                                 <td id="nof<%=data[i].idpedido%>"><%= largeID(data[i].numof, 6)%></td>
                                 <td><%= data[i].numitem%></td>
                                 <td><%= letraMayus(data[i].detalle)%></td>
-                                <td id="anom<%=data[i].idpedido%>" style="text-align: center;"><%=data[i].anom%></td>
-                                
+
                                 <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
                                 
                                 <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock %></td>
