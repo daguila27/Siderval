@@ -147,7 +147,7 @@ router.post("/next_step",function(req,res,next){
             }
         }
         var notif =  {cant: input.sendnum, idproduccion: input.idprod};
-		query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
+        query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
         query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
 
         //SE EMITE UNA NOTIFICACION AL USUARIO FAENA
@@ -166,20 +166,10 @@ router.post("/next_step",function(req,res,next){
 					connection.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
 						if(err) throw err;
 						res.send("si");
-						/*res.on('finish', function(){
-							req.app.locals.io.emit('refreshfaena'+input.newetapa, notif);
-							if(input.newetapa == '8'){
-								res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/idm');
-								req.app.locals.io.emit('notif', notif);
-							}
-						});
-						res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/fa'+input.newetapa);*/
-
 					});
 				});
 	        });
-
-    })
+    });
 	} else res.send("no");
 });
 

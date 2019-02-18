@@ -18,7 +18,7 @@
                         <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
                         <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
                       </ul>
-                    </div>
+                </div>
                 <div class="row">
                     <div class="col-md-6">
                         <h3>Crear Orden de Fabricación: </h3>
@@ -57,11 +57,10 @@
                 <div class="row">
                     <div class="col-md-1 col-md-offset-11" style="padding: 0; padding-right: 8px">
                         <input type="hidden" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Fabricación" class="form-control" value='1' required>
-                        <button class="btn btn-success" style="width:80px" id="of_submit">Crear</button>
+                        <button class="btn btn-success" style="width:80px" type="submit" id="of_submit">Crear</button>
                         <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
                     </div>
                 </div>
-
             </div>
             </form>
         </div>
@@ -106,8 +105,62 @@
 </div>
 
 
-<script>
+<script type="text/javascript">
     $(document).ready(function(){
+        $("#send_of").submit(function (e) {
+            e.preventDefault();
+            if(confirm("?")){
+                alert("si");
+            } else{
+                alert("no");
+            }
+        });
+        $("#naniiiiii").submit(function(e){
+            e.preventDefault();
+            console.log("listo");
+            lista = $(this).serializeArray();
+            var data = {
+                idm: [],
+                idp: [],
+                fechas: [],
+                cants: [],
+                lock: [],
+                cliente: $("#cliente").val()
+            }
+            for(var i =0;i<$(this).serializeArray().length;i++){
+                if(lista[i].name != 'nroordenfabricacion'){
+                    data[lista[i].name].push(lista[i].value);
+                } else{
+                    data[lista[i].name] = lista[i].value;
+                }
+            }
+            data.lock = [];
+            $("#send_of :checkbox").each(function(){
+                if($(this).is(':checked')){
+                    data.lock.push('1');
+                }
+                else{
+                    data.lock.push('0');
+                }
+                //console.log($(this).val());
+            });
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/plan/crear_of',
+                success: function(data){
+                    console.log("no listo");
+                    if(data == 'error'){
+                        alert("El pedido es inválido");
+                    } else {
+                        alert("La OF fue creada exitosamente");
+                        emitToast([data,0]);
+                        loadStateOF();
+                        //$("#page-wrapper").html(data);
+                    }
+                }
+            });
+        });
         loadStateOF();
     });
     function refresh(){
@@ -191,51 +244,6 @@
                 $("#of_submit").prop('disabled', false);
             }
     });
-    $("#send_of").submit(function(e){
-        e.preventDefault();
-        lista = $(this).serializeArray();
-        var data = {
-            idm: [],
-            idp: [],
-            fechas: [],
-            cants: [],
-            lock: [],
-            cliente: $("#cliente").val()
-        }
-        for(var i =0;i<$(this).serializeArray().length;i++){
-            if(lista[i].name != 'nroordenfabricacion'){
-                data[lista[i].name].push(lista[i].value);
-            } else{
-                data[lista[i].name] = lista[i].value;
-            }
-        }
-        data.lock = [];
-        $("#send_of :checkbox").each(function(){
-           if($(this).is(':checked')){
-             data.lock.push('1');
-           }
-           else{
-             data.lock.push('0');  
-           }
-           //console.log($(this).val());
-        });
-        $.ajax({
-            type: 'POST',
-            data: data,
-            url: '/plan/crear_of',
-            success: function(data){
-                if(data == 'error'){
-                    alert("El pedido es inválido");
-                } else {
-                    alert("La OF fue creada exitosamente");
-                    emitToast([data,0]);
-                    loadStateOF();
-                    //$("#page-wrapper").html(data);
-                }
-            }
-        });
-    });
-
 
     $(".modalOption").on('click', function(e){
         e.preventDefault();
@@ -245,7 +253,6 @@
 
     function saveStateOF(){
         var lista = $("#send_of").serializeArray();
-        console.log(lista);
         var data = {
             idm: [],
             idp: [],
@@ -253,7 +260,7 @@
             cants: [],
             lock: [],
             nroordenfabricacion: ''
-        }
+            }
         for(var i =0;i<$("#send_of").serializeArray().length;i++){
             if(lista[i].name != 'nroordenfabricacion'){
                 data[lista[i].name].push(lista[i].value);
@@ -267,11 +274,10 @@
              data.lock.push('1');
            }
            else{
-             data.lock.push('0');  
+             data.lock.push('0');
            }
            //console.log($(this).val());
         });
-        console.log(data);
         var html = $(".sectionSave").html();
         $.ajax({
             type: 'POST',
