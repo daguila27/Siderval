@@ -46,7 +46,7 @@ function letraMayus(string) {
                     <label style="width: 30%">
                         Cliente: 
                         <select name="cliente_gd" class="form-control" id="cliente_gd">
-                            <option value="0" id="cli0" selected disabled>Sin Cliente</option>
+                            <option value="0" id="cli0" selected>Sin Cliente</option>
                             <%for(var w=0; w < cli.length; w++){%>
                                 <option value="<%= cli[w].idcliente%>" id="cli<%= cli[w].idcliente%>"><%= cli[w].sigla%> - <%= cli[w].razon%></option>
                             <%}%>
@@ -220,7 +220,7 @@ function letraMayus(string) {
         </div>
     </div>
 </div>
-
+<button onclick="comprobarCliente()">checknode</button>
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 
@@ -360,19 +360,32 @@ function letraMayus(string) {
             }
         });
     });
-
+    function comprobarCliente(){
+        if($("#cliente_gd").val() == 0){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
     $("form#send_gdd").on('submit',function(e){
         e.preventDefault();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
+
             aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value]);
         });
         var est = $("#estadoselect").val();
-        if(aux.length == 0){
-            conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
-            est = "Blanco";
-        } else {
-            conf = confirm("¿Esta seguro que desea crear esta GDD?")
+        if(comprobarCliente()){
+            if(aux.length == 0){
+                conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
+                est = "Blanco";
+            } else {
+                conf = confirm("¿Esta seguro que desea crear esta GDD?");
+            }
+        }
+        else{
+            alert("Seleccione Cliente.");
         }
         if(conf){
             $.ajax({

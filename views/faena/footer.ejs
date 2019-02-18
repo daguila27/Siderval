@@ -434,6 +434,7 @@
                         razon: razon,
                         etapa: datos.thisetapa
                     };
+                    //emit que crea la notificación de jefe de producción
                     io.emit('addError', input);
                     $(".notificaciones").html(data);
                     $(".collapse").collapse('hide');

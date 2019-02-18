@@ -117,7 +117,6 @@
                             100% {background-image: url('../assets/img/clickup.png');}
                         }
                     </style>
-
                     <li class="list-group-item" style="">
                         <h4 style="margin: 0; padding: 5% 5%; width: 100%" data-toggle="collapse" data-target="#opcion4">Material dañado</h4>
                         <div id="opcion4" class="collapse">
@@ -231,6 +230,16 @@
                 $("#rechazoQueue").modal('hide');
                 $("#comentarioRechazo").val(null);
                 $("#cantidadRechazo").val(null);
+
+                //ENVIAR NOTIFICACIÓN
+                var input = {
+                    idproduccion: form[0].value,
+                    cantidad: form[1].value,
+                    razon: form[2].value,
+                    etapa: form[3].value
+                };
+                //emit que crea la notificación de jefe de producción
+                io.emit('addError', input);
             }
         });
     });

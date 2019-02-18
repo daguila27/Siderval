@@ -289,7 +289,7 @@ router.get('/render_notificaciones/:uservalue', function(req, res, next){
 			+ "LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial "
 			+ "WHERE SUBSTRING(notificacion.descripcion,1,3) = ? AND notificacion.active = true", key, function(err, notif){
 			if(err){console.log("Error Selecting : %s", err);}
-			res.render('faena/notificaciones', {notif: notif})
+			res.render('faena/notificaciones', {notif: notif});
 		});
 	});
 });
