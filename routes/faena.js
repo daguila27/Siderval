@@ -56,7 +56,21 @@ router.get('/', function(req, res, next) {
 	else{res.redirect('bad_login');}
 });
 
-
+router.get('/drop_notif/:idnotif', function(req, res, next){
+    req.getConnection(function(err,connection){
+        if(err){
+            console.log("Error Connection : %s", err);
+        }
+        connection.query("UPDATE notificacion SET active = false WHERE idnotificacion = ?",[req.params.idnotif],
+            function(err, notif){
+                if(err){
+                    console.log("Error Selecting : %s", err);
+                }
+                //res.render('abast/notificaciones', {notif: notif});
+				res.redirect('/jefeprod/render_notificaciones');
+            });
+    });
+});
 
 router.get('/procesos', function(req, res, next){
 	if(verificar(req.session.userData)){
@@ -176,11 +190,17 @@ router.post("/next_step",function(req,res,next){
 router.get('/render_proceso/:proceso', function(req, res, next){
 	if(verificar(req.session.userData)){
 		var input = req.params;
-		input.proceso = input.proceso.toString();
+        input.proceso = input.proceso.toString();
+        input.etapa_val = input.proceso;
+        input.etapa_act = input.proceso;
+		if(input.proceso === 's') {
+			input.proceso = 'standby';
+            input.etapa_act = '8';
+        }
 		req.session.myValue = input.proceso;
 		req.getConnection(function(err, connection){
 			//select * from ordenproduccion left join material on (ordenproduccion.idproducido=material.idmaterial) left join producto ON (ordenproduccion.idproducido=producto.idmaterial)
-			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.proceso, function(err, etapa){
+			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.etapa_val, function(err, etapa){
 				if(err){console.log("Error Selecting : %s", err);}
 				/*connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "+
 					"(select produccion.*,coalesce(producido.ruta,'1,2,3,4,5,6,7,8') as ruta,material.detalle, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.proceso+"') as nextStep from produccion"+
@@ -194,7 +214,7 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 						+"group_concat(produccion.1 separator '-') as prod_1,group_concat(produccion.2 separator '-') as prod_2,group_concat(produccion.3 separator '-') as prod_3,group_concat(produccion.4 separator '-') as prod_4,"
 						+"group_concat(produccion.5 separator '-') as prod_5,group_concat(produccion.6 separator '-') as prod_6,group_concat(produccion.7 separator '-') as prod_7,group_concat(produccion.8 separator '-') as prod_8,"
 						+"sum(produccion.`1`) as `1`,sum(produccion.`2`) as `2`,sum(produccion.`3`) as `3`,sum(produccion.`4`) as `4`,sum(produccion.`5`) as `5`,sum(produccion.`6`) as `6`,sum(produccion.`7`) as `7`,sum(produccion.`8`) as `8`,"
-						+"coalesce(producido.ruta, '1,2,3,4,5,6,7,8') as ruta,material.detalle,material.idmaterial, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.proceso+"') as nextStep from produccion"
+						+"coalesce(producido.ruta, '1,2,3,4,5,6,7,8') as ruta,material.detalle,material.idmaterial, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.etapa_act+"') as nextStep from produccion"
 						+" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (material.idmaterial=producido.idmaterial)"
 						+"WHERE produccion."+input.proceso+" > 0 group by material.idmaterial ORDER BY produccion.idproduccion DESC )"
 						+"as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`) group by querytable.idmaterial",
