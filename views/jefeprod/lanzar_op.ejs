@@ -230,8 +230,14 @@ However, delay the fade out process for 2.5 seconds */
     $(document).ready(function(){
             $("#page-wrapper").css('height', $("#page-wrapper").children('div').height()+"px");
             refreshProdList();
-            
-            //setDataTable("#tabla_producciones");
+            $.ajax({
+                type: 'GET',
+                url: 'jefeprod/render_notificaciones',
+                success: function(data){
+                    $(".notificaciones").html(data);
+                }
+            });
+        //setDataTable("#tabla_producciones");
     });
     function clickSnackbar(yo){
         var x = document.getElementById("snackbar");

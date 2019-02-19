@@ -61,14 +61,33 @@ router.get('/drop_notif/:idnotif', function(req, res, next){
         if(err){
             console.log("Error Connection : %s", err);
         }
-        connection.query("UPDATE notificacion SET active = false WHERE idnotificacion = ?",[req.params.idnotif],
-            function(err, notif){
+        connection.query("SELECT descripcion FROM notificacion WHERE idnotificacion = ?",[req.params.idnotif],function (err,rows){
+            if(err){
+                console.log("Error Selecting : %s", err);
+            }
+            var notif = rows[0].descripcion.split("@");
+			connection.query("SELECT fabricaciones.idfabricaciones,fabricaciones.idorden_f,fabricaciones.cantidad,fabricaciones.restantes,SUM(produccion.cantidad) AS cants,SUM(produccion.`8`) AS finish,SUM(produccion.standby) AS rechas" +
+				" FROM fabricaciones LEFT JOIN produccion ON produccion.idfabricaciones = fabricaciones.idfabricaciones" +
+				" WHERE fabricaciones.idfabricaciones IN (SELECT idfabricaciones FROM produccion WHERE idproduccion = ?) GROUP BY fabricaciones.idfabricaciones",[notif[4]],function(err,rows){
                 if(err){
                     console.log("Error Selecting : %s", err);
                 }
-                //res.render('abast/notificaciones', {notif: notif});
-				res.redirect('/jefeprod/render_notificaciones');
-            });
+                console.log(rows[0]);
+                connection.query("UPDATE fabricaciones SET restantes = restantes + ? WHERE idfabricaciones = ?",[Math.min(parseInt(notif[2]),parseInt(rows[0].cantidad) - parseInt(rows[0].restantes) - (parseInt(rows[0].cants) - parseInt(rows[0].finish) - parseInt(rows[0].rechas))),rows[0].idfabricaciones],function (err,rows){
+                    if(err){
+                        console.log("Error Selecting : %s", err);
+                    }
+                    connection.query("UPDATE notificacion SET active = false WHERE idnotificacion = ?",[req.params.idnotif],
+                        function(err, notif){
+                            if(err){
+                                console.log("Error Selecting : %s", err);
+                            }
+                            //res.render('abast/notificaciones', {notif: notif});
+                            res.redirect('/jefeprod/render_notificaciones');
+					});
+				});
+			});
+		});
     });
 });
 

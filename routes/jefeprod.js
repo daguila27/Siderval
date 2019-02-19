@@ -1219,9 +1219,6 @@ router.get('/render_notificaciones', function(req, res, next){
     req.getConnection(function(err,connection){
         connection.query("select notificacion.*,material.detalle,etapafaena.nombre_etapa from notificacion LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value WHERE SUBSTRING(notificacion.descripcion,1,3) = 'jfp' AND notificacion.active = true", function(err, notif){
             if(err){console.log("Error Selecting : %s", err);}
-
-
-            console.log(notif);
             res.render('jefeprod/notificaciones', {notif: notif})
         });
     });
