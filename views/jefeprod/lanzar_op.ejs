@@ -443,49 +443,49 @@ However, delay the fade out process for 2.5 seconds */
 
     function comprobarItems(){
         var aux = [];
-                var idf = [];
-                var cants = [];
-                var aux2 = [];
-                var c = 0;
-                $("#send_op :input.form-control").each(function(e){
-                    if(c > 0){
-                        if(c%2!=0){     
-                            aux.push(this.value);
-                            idf.push($(this).attr('id').substring(4, $(this).attr('id').length));
-                            cants.push($(this).data('cant'));
-                        }
-                        else{
-                            if(this.value == ""){
-                                aux2.push(null);
-                            }
-                            else{                    
-                                aux2.push(this.value);
-                            }
-                        }
-                    }
-                    c++;
-                });
-                var inf = [];
-                var max = [];
-                var sum = [];
-                for(var i=0; i < idf.length; i++){
-                    if(inf.indexOf(idf[i]) == '-1'){
-                        inf.push(idf[i]);
-                        max.push(cants[i]);
-                        sum.push(parseInt(aux[i]));
+        var idf = [];
+        var cants = [];
+        var aux2 = [];
+        var c = 0;
+        $("#send_op :input.form-control").each(function(e){
+            if(c > 0){
+                if(c%2!=0){
+                    aux.push(this.value);
+                    idf.push($(this).attr('id').substring(4, $(this).attr('id').length));
+                    cants.push($(this).data('cant'));
+                }
+                else{
+                    if(this.value == ""){
+                        aux2.push(null);
                     }
                     else{
-                        sum[inf.indexOf(idf[i])] += parseInt(aux[i]); 
+                        aux2.push(this.value);
                     }
                 }
-                for(var i=0; i < idf.length; i++){
-                    if(max[i] < sum[i]){
-                        return false;
-                    }
-                    else{ 
-                        return true;
-                    }
-                }
+            }
+            c++;
+        });
+        var inf = [];
+        var max = [];
+        var sum = [];
+        for(var i=0; i < idf.length; i++){
+            if(inf.indexOf(idf[i]) == '-1'){
+                inf.push(idf[i]);
+                max.push(cants[i]);
+                sum.push(parseInt(aux[i]));
+            }
+            else{
+                sum[inf.indexOf(idf[i])] += parseInt(aux[i]);
+            }
+        }
+        for(var i=0; i < idf.length; i++){
+            if(max[i] < sum[i]){
+                return false;
+            }
+            else{
+                return true;
+            }
+        }
     }
 
 

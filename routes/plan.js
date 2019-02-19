@@ -116,16 +116,18 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(ordenfabricacion.idordenfabricacion,'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(ordenfabricacion.idordenfabricacion,'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
+                + " LEFT JOIN fabricaciones ON fabricaciones.idpedido= pedido.idpedido"
+                + " LEFT JOIN (SELECT idfabricaciones,SUM(cantidad) AS sol_op,SUM(standby) AS rech_op,SUM(`8`) AS bpt_op "
+                + "FROM produccion GROUP BY idfabricaciones) AS prods ON prods.idfabricaciones = fabricaciones.idfabricaciones"
                 + " LEFT JOIN ordenfabricacion ON pedido.idodc = ordenfabricacion.idodc"
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " LEFT JOIN (SELECT pedido.idpedido, EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado FROM pedido) AS estado ON estado.idpedido=pedido.idpedido"
-                + where + ") as " + orden.split('.')[0] + " ORDER BY " + orden,
+                + where + " GROUP BY pedido.idpedido) as " + orden.split('.')[0] + " ORDER BY " + orden,
                 function(err, odc){
                     if(err) throw err;
-
                     res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-'), page: page+1});
 
             });
@@ -796,7 +798,6 @@ router.get('/show_ofs', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
 
 router.post('/addsession_prefabr', function(req,res,next){
     if(verificar(req.session.userData)){
