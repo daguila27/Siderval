@@ -28,6 +28,7 @@
 				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Por Moldear</th>
 				<th id="sin_produccion" class="cabecera o_column_sortable order-column" >En Producción</th>
 				<th id="sin_produccion" class="cabecera o_column_sortable order-column" >Finalizados</th>
+				<th id="sin_produccion" class="cabecera o_column_sortable order-column" >Despachados</th>
 				<!--<th id="p_terminado" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">PT</th>
 				<th id="planta" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">Planta</th>-->
 				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;">Peso unitario</th>
@@ -47,9 +48,10 @@
 				    <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].cliente%></td>
 					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
 					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad %></td>
-					<td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].restantes %></td>
-					<td class="en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].cantidad - data[i].restantes - data[i].finalizados%></td>
+					<td class="sin_produccion o_data_cell" style="text-align: center;" ><%= data[i].restantes %></td>
+					<td class="en_produccion o_data_cell" style="text-align: center;" ><%= data[i].enprod -  data[i].finalizados - data[i].enrech%></td>
 					<td class="finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].finalizados%></td>
+				<td class="finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].despachados%></td>
 					<td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
 					<td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].restantes%></td>
 					<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" >
