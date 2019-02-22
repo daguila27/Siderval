@@ -288,7 +288,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
             if(err) throw err;
 
             var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados," +
-                "COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,ordenfabricacion.*,pedido.despachados," +
+                "COALESCE(cliente.sigla,'SIDERVAL S.A') AS cliente,COALESCE(cliente.razon,'SIDERVAL S.A') AS razon,ordenfabricacion.*,pedido.despachados," +
                 "coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
                 " coalesce(odc.numoc, 'Sin OC') as numoc,COALESCE(pedido.despachados) AS despachados,COALESCE(pedido.cantidad) AS solicitados," +
                 "COALESCE(enprod.enprod,0) AS enprod,COALESCE(enprod.enrech,0) AS enrech"
