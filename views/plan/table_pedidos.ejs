@@ -56,7 +56,14 @@
 				estado = 'Más de 10 días';
 			}%>
 		<tr class="o_data_row <%=clase%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
-			<td class="col-numof o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].oefes%></td>
+
+			<td class="col-numof o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center">
+                <%if(data[i].oefes.split(',').length > 2){%>
+                    <%=data[i].oefes.substring(0,8)%>...
+                <%}else{%>
+                    <%=data[i].oefes%>
+                <%}%>
+            </td>
 			<td class="col-item o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
 			<td class="col-numoc o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
 			<td class="col-cliente o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
@@ -81,9 +88,6 @@
 		<%}%>
 	</tbody>
     <style>
-        #encabezadotabla {
-            /*position:fixed;*/
-        }
         #pietabla {
             position:fixed;
             left:0px;
@@ -92,7 +96,6 @@
             width:100%;
             /*background:#999;*/
         }
-
     </style>
     <tfoot id="pietabla" class="fixed_table">
 		<tr>

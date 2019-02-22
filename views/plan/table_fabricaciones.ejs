@@ -48,7 +48,13 @@
 		var peso_t = 0;
 		for(var i=0; i < data.length; i++){%>
 			<tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
-					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>"><a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary"><%=data[i].idordenfabricacion%></a></td>
+
+					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>">
+						<a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
+								<%=data[i].idordenfabricacion%>
+						</a>
+					</td>
+
 					<td class="numitem o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numitem%></td>
 					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numoc%></td>
 				    <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" title="<%= data[i].razon%>"><%=data[i].cliente%></td>

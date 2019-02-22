@@ -116,7 +116,7 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido,GROUP_CONCAT(COALESCE(ordenfabricacion.idordenfabricacion,'-')) AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(GROUP_CONCAT(ordenfabricacion.idordenfabricacion),'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
                 + " LEFT JOIN fabricaciones ON fabricaciones.idpedido= pedido.idpedido"
                 + " LEFT JOIN (SELECT idfabricaciones,SUM(cantidad) AS sol_op,SUM(standby) AS rech_op,SUM(`8`) AS bpt_op "
