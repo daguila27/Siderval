@@ -5,7 +5,7 @@ var mysql = require('mysql');
 
 router.use(
     connection(mysql,{
-        host: '127.0.0.1',
+        host: 'localhost',
         user: 'user',
         password : '1234',
         port : 3306,
@@ -116,16 +116,18 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(ordenfabricacion.idordenfabricacion,'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido,GROUP_CONCAT(COALESCE(ordenfabricacion.idordenfabricacion,'-')) AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
+                + " LEFT JOIN fabricaciones ON fabricaciones.idpedido= pedido.idpedido"
+                + " LEFT JOIN (SELECT idfabricaciones,SUM(cantidad) AS sol_op,SUM(standby) AS rech_op,SUM(`8`) AS bpt_op "
+                + "FROM produccion GROUP BY idfabricaciones) AS prods ON prods.idfabricaciones = fabricaciones.idfabricaciones"
                 + " LEFT JOIN ordenfabricacion ON pedido.idodc = ordenfabricacion.idodc"
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " LEFT JOIN (SELECT pedido.idpedido, EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado FROM pedido) AS estado ON estado.idpedido=pedido.idpedido"
-                + where + ") as " + orden.split('.')[0] + " ORDER BY " + orden,
+                + where + " GROUP BY pedido.idpedido) as " + orden.split('.')[0] + " ORDER BY " + orden,
                 function(err, odc){
                     if(err) throw err;
-
                     res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-'), page: page+1});
 
             });
@@ -197,11 +199,12 @@ router.post('/buscar_fabricaciones_list', function(req, res, next){
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select fabricaciones.*, ordenfabricacion.*, pedido.externo,material.detalle, odc.numoc"
-                +" from fabricaciones left join ordenfabricacion on"
-                +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
-                +"odc on odc.idodc=ordenfabricacion.idodc left join pedido on pedido.idpedido=fabricaciones.idpedido left join material "
-                +"on material.idmaterial=fabricaciones.idmaterial WHERE"+where
-                +" (material.detalle like '%"+clave+"%' or ordenfabricacion.idordenfabricacion like '%"+clave+"%' or fabricaciones.cantidad"
+                +" from fabricaciones" +
+                " left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f" +
+                " left join odc on odc.idodc=ordenfabricacion.idodc" +
+                " left join pedido on pedido.idpedido=fabricaciones.idpedido" +
+                " left join material on material.idmaterial=fabricaciones.idmaterial" +
+                " WHERE" + where +" (material.detalle like '%"+clave+"%' or ordenfabricacion.idordenfabricacion like '%"+clave+"%' or fabricaciones.cantidad"
                 +" like '%"+clave+"%' OR odc.numoc like '%"+clave+"%')",
                 function(err, odc){
                     if(err) throw err;
@@ -284,14 +287,19 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
       req.getConnection(function(err, connection){
             if(err) throw err;
 
-            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados,COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,  ordenfabricacion.*,pedido.despachados ,coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle, coalesce(odc.numoc, 'Sin OC') as numoc"
-                +" from fabricaciones left join ordenfabricacion on"
-                +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join "
-                +"odc on odc.idodc=ordenfabricacion.idodc "
+            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados," +
+                "COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,ordenfabricacion.*,pedido.despachados," +
+                "coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
+                " coalesce(odc.numoc, 'Sin OC') as numoc,COALESCE(pedido.despachados) AS despachados,COALESCE(pedido.cantidad) AS solicitados," +
+                "COALESCE(enprod.enprod,0) AS enprod,COALESCE(enprod.enrech,0) AS enrech"
+                +" from fabricaciones "
+                +"left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f "
+                +"left join odc on odc.idodc=ordenfabricacion.idodc "
                 +"left join pedido on pedido.idpedido=fabricaciones.idpedido "
                 +"left join cliente on cliente.idcliente = odc.idcliente "
                 +"left join (select fabricaciones.idfabricaciones, produccion_history.enviados as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
-                +"left join material on material.idmaterial=fabricaciones.idmaterial"+where;
+                +"left join (select fabricaciones.idfabricaciones,SUM(produccion.cantidad) as enprod,SUM(produccion.standby) as enrech from produccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones group by fabricaciones.idfabricaciones) as enprod on enprod.idfabricaciones = fabricaciones.idfabricaciones "
+                +"left join material on material.idmaterial=fabricaciones.idmaterial"+where +" GROUP BY fabricaciones.idfabricaciones ORDER BY " + orden;
             connection.query(consulta,
                 function(err, of){
                     if(err) throw err;
@@ -796,7 +804,6 @@ router.get('/show_ofs', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
 
 router.post('/addsession_prefabr', function(req,res,next){
     if(verificar(req.session.userData)){

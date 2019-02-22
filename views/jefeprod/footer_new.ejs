@@ -371,14 +371,6 @@
         });
     });
 
-    $.ajax({
-        type: 'GET',
-        url: 'jefeprod/render_notificaciones',
-        success: function(data){
-            $(".notificaciones").html(data);
-        }
-    });
-
     var io = io();
     io.on('notif', function(){
         $.ajax({
