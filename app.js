@@ -20,6 +20,7 @@ var plan = require('./routes/plan');
 var dt = require('./routes/dt');
 var dm = require('./routes/dm');
 var jefeprod = require('./routes/jefeprod');
+var jefeplanta = require('./routes/jefeplanta');
 var bodega = require('./routes/bodega');
 var abast = require('./routes/abast');
 var matprimas = require('./routes/matprimas');
@@ -57,6 +58,7 @@ app.use('/dt', dt);
 app.use('/plan', plan);
 app.use('/dm', dm);
 app.use('/jefeprod', jefeprod);
+app.use('/jefeplanta', jefeplanta);
 app.use('/bodega', bodega);
 app.use('/abastecimiento', abast);
 app.use('/matprimas', matprimas);
@@ -163,6 +165,16 @@ io.on('connection', function (socket) {
                   });
 
 
+                }
+                else if(userf == "9"){
+                    dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+                    console.log(dataInsert);
+                    connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                        if(err){console.log("Error Selecting : %s", err);}
+                        io.sockets.emit("refreshfaena"+userf);
+
+                        //connection.end();
+                    });
                 }
                 else{
                   dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;

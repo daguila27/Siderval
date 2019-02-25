@@ -4,9 +4,7 @@ var connection  = require('express-myconnection');
 var mysql = require('mysql');
 
 router.use(
-
     connection(mysql,{
-
         host: '127.0.0.1',
         user: 'admin',
         password : 'tempo123',
@@ -15,10 +13,9 @@ router.use(
   insecureAuth : true
 
     },'pool')
-
 );
 function verificar(usr){
-	if(usr.nombre == 'jefeprod' || usr.nombre == 'gerencia' || usr.nombre == 'siderval'){
+	if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta'){
 		return true;
 	}else{
 		return false;
@@ -40,6 +37,21 @@ router.get('/', function(req, res, next){
         });
     }
 	else{res.redirect('bad_login');}	
+});
+router.get('/stats', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            if(err)
+                console.log("Error Connection : %s", err);
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+
+                res.render('jefeprod/indx_new', {page_title: "Jefe de Produccion", username: req.session.userData.nombre, etapas: etp});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
 });
 
 router.get('/view_producciones', function(req, res, next){
@@ -449,14 +461,6 @@ router.post('/lanzar_op_fill', function(req, res, next){
         if(input.detalle != ''){
             where += " OR internalquery.detalle = '"+input.detalle+"' OR concat(repeat('0', abs(6 - length(internalquery.idordenfabricacion)) ),internalquery.idordenfabricacion ) = '"+input.detalle+"' OR internalquery.subnom = '"+input.detalle+"' OR internalquery.f_entrega = '"+input.detalle+"' OR internalquery.cantidad = '"+input.detalle+"'";
         }
-        var query = "select * from (select fabricaciones.*,ordenfabricacion.idordenfabricacion, ordenfabricacion.numordenfabricacion,aleacion.nom as anom,coalesce(subaleacion.subnom,'Sin') as subnom , material.detalle from fabricaciones "
-            + "left join ordenfabricacion on (ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f)"
-            + " left join material on (material.idmaterial=fabricaciones.idmaterial)"
-            + " left join producido on (fabricaciones.idproducto=producido.idproducto)"+
-            " left join subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
-            " left join aleacion ON aleacion.idaleacion = subaleacion.idsubaleacion left join pedido on pedido.idpedido = fabricaciones.idpedido WHERE fabricaciones.restantes > 0 and coalesce(pedido.externo, false) = false AND fabricaciones.lock = false"
-            + " GROUP BY fabricaciones.idfabricaciones ORDER BY "+input.fill+" "+input.orden+") as internalquery "+where;
-        console.log(query);
         req.getConnection(function(err, connection){
             connection.query("select * from (select fabricaciones.*,ordenfabricacion.idordenfabricacion, ordenfabricacion.numordenfabricacion,aleacion.nom as anom,coalesce(subaleacion.subnom,'Sin') as subnom , material.detalle from fabricaciones "
                 + "left join ordenfabricacion on (ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f)"

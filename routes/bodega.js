@@ -19,7 +19,7 @@ router.use(
 );
 
 function verificar(usr){
-	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
+	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'|| usr.nombre == 'jefeplanta'){
 		return true;
 	}else{
 		return false;
@@ -58,7 +58,6 @@ router.get('/crear_gdd', function(req, res, next){
         });
     }
     else{res.redirect('bad_login');}
-
 });
 
 //Buscador de materiales para traslado en vista Crear GDD (pestaña insumos)

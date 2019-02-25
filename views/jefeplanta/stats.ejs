@@ -1,0 +1,64 @@
+
+<div style="margin: 10px">
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Despachos</div>
+                <div class="panel-body" id="despachos_chart" style="height: 400px">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Liberaciones Control de calidad</div>
+                <div class="panel-body" id="produccion_chart" style="height: 400px">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    new Morris.Area({
+        // ID of the element in which to draw the chart.
+        element: 'despachos_chart',
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data: [
+            <% if(data.length){
+                for(var i = 0;i<data.length;i++){%>
+            {
+                fecha:'<%=data[i].fecha%>',
+                peso: <%=data[i].peso%>,
+                estado: '<%=data[i].estado%>',
+                numgdd: '<%=data[i].numgd%>',
+                cliente: '<%=data[i].sigla%>'
+            }
+            <% if(i != data.length -1){%>
+            ,
+            <%}%>
+            <%  }
+               }%>
+        ],
+        // The name of the data record attribute that contains x-values.
+        xkey: 'fecha',
+        // A list of names of data record attributes that contain y-values.
+        ykeys: ['peso'],
+        // Labels for the ykeys -- will be displayed when you hover over the
+        // chart.
+        labels: ['Peso Total'],
+        hoverCallback:function(index,option,content,row){
+            var html ="<ul><li><b>N°GD:</b> " +
+                    row.numgdd +
+                "</li><li><b>Cliente:</b> " +
+                row.cliente +
+                "</li><li><b>Tipo:</b> " +
+                row.estado +
+                "</li></ul>";
+            return html;
+        },
+        postUnits: 'Kg'
+    });
+</script>

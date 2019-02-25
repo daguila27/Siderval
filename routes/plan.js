@@ -14,7 +14,7 @@ router.use(
     },'pool')
 );
 function verificar(usr){
-  if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento' || usr.nombre == 'siderval'){
+  if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento' || usr.nombre == 'siderval' || usr.nombre == 'jefeplanta'){
     return true;
   }else{
     return false;
