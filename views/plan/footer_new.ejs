@@ -162,6 +162,7 @@
     <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
     <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
 
+
     <script src="/js/pdftex.js"></script>
 
     <script src="https://togetherjs.com/togetherjs-min.js"></script>
@@ -295,6 +296,10 @@
     function setDataTableFabricaciones(str){
         return $(str).DataTable({
             fixedColumns: true,
+            fixedHeader: {
+                header: true,
+                footer: true
+            },
             responsive: true,
             lengthChange: false,
             paging: false,

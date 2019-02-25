@@ -139,6 +139,8 @@
 
     setDataTableFabricaciones("#DataTableFabs");
 
+
+
     var dimensiones = {clase: [], ancho: []};
 
     function getMedidas(){
@@ -170,7 +172,7 @@
 		//aqui el codigo que se ejecutara cuando se redimencione la ventana
         //setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
         ini_table("#DataTableFabs");
-    })
+    });
     $(document).ready(function(){
         $('#DataTableFabs tbody').on( 'click', 'tr', function () {
             $(this).toggleClass('success');
