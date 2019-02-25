@@ -2219,7 +2219,6 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                 }
             }
         }*/
-        console.log(condiciones_where);
 
         if(condiciones_where.length==0){
         	condiciones_where.push('true');
@@ -2228,7 +2227,6 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
             condiciones_cc.push('true');
         }
         where = "WHERE "+ condiciones_where.join(" AND ")+ " AND ("+condiciones_cc.join(' OR ')+")";
-        console.log(where);
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);

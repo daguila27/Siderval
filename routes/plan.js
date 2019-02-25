@@ -66,6 +66,7 @@ router.get('/view_fabricaciones', function(req, res, next){
 });
 
 
+
 router.get('/calendar_peds', function(req, res, next){
   if(verificar(req.session.userData)){
     res.render('plan/calendar_view', {alto: '600px'});}

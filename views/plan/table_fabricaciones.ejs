@@ -16,29 +16,38 @@
 		.order-column:hover{
 			cursor: pointer;
 		}
+		#encabezadotabla{
+			z-index: 10;
+		}
+		#pietabla {
+			left:0px;
+			bottom:0px;
+			height:30px;
+			width:100%;
+			/*background:#999;*/
+		}
 	</style>
-	<thead id="encabezadotabla" class="fixed_table">
+	<thead id="encabezadotabla">
 		<tr>
-            <th id="numof" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
-			<th id="numitem" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
-			<th id="numoc" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OC</th>
-			<th id="cliente" class="cabecera o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
-			<th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
-			<th id="solicitados" class="cabecera o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
-			<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Por Moldear</th>
-			<th id="en_produccion" class="cabecera o_column_sortable order-column" >En Producción</th>
-			<th id="finalizado" class="cabecera o_column_sortable order-column" >Finalizados</th>
-			<!--<th id="p_terminado" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">PT</th>
-			<th id="planta" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">Planta</th>-->
-			<th id="pesoxproducir" class="cabecera o_column_sortable order-column" style="text-align: center;">Peso unitario</th>
-			<th id="pesototal" class="cabecera o_column_sortable order-column" style="text-align: center;">Peso Total (sin producir)</th>
-			<th id="f_entrega" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
+			<th id="cab-ini" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC"></th>
+            <th id="cab-numof" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
+			<th id="cab-numitem" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
+			<th id="cab-numoc" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OC</th>
+			<th id="cab-cliente" class="order-column" data-order="cliente.razon-ASC">Cliente</th>
+			<th id="cab-descrip" class="order-column" data-order="material.detalle-ASC">Descripción</th>
+			<th id="cab-solicitados" class="order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
+			<th id="cab-sin_produccion" class="order-column" data-order="fabricaciones.restantes-ASC">Por Moldear</th>
+			<th id="cab-en_produccion" class="order-column" >En Producción</th>
+			<th id="cab-finalizado" class="order-column" >Finalizados</th>
+			<th id="cab-pesoxproducir" class="order-column" style="text-align: center;">Peso unitario</th>
+			<th id="cab-pesototal" class="order-column" style="text-align: center;">Peso Total (sin producir)</th>
+			<th id="cab-f_entrega" class="order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
 			<%if(user.nombre != 'siderval'){%>
-				<th id="habilitar_cand" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC">Habilitar</th>
+				<th id="cab-habilitar_cand" class="order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC"></th>
 			<%}%>
 		</tr>
 	</thead>
-	<tbody class="ui-sortable" style="margin-top: 10px;">
+	<tbody class="ui-sortable" id="cuerpotabla">
 		<%
 		var cantidad_total = 0;
 		var restantes_total = 0;
@@ -48,7 +57,7 @@
 		var peso_t = 0;
 		for(var i=0; i < data.length; i++){%>
 			<tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
-
+					<td class="ini"><%= i+1%></td>
 					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>">
 						<a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
 								<%=data[i].idordenfabricacion%>
@@ -57,7 +66,7 @@
 
 					<td class="numitem o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numitem%></td>
 					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numoc%></td>
-				    <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" title="<%= data[i].razon%>"><%=data[i].cliente%></td>
+					<td class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" title="<%= data[i].razon%>"><%=data[i].cliente%></td>
 					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
 					<%cantidad_total += data[i].cantidad %>
 					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad %></td>
@@ -98,25 +107,12 @@
 								</td>
 						<%}%>
 					<%}%>
-            </tr>
+			</tr>
 		<%}%>
 	</tbody>
-	<style>
-		#encabezadotabla {
-			/*position:fixed;*/
-		}
-		#pietabla {
-			position:fixed;
-			left:0px;
-			bottom:0px;
-			height:30px;
-			width:100%;
-			/*background:#999;*/
-		}
-
-	</style>
 	<tfoot id="pietabla" class="fixed_table">
 		<tr>
+			<td id="ini"></td>
 			<td id="numof"></td>
 			<td id="numitem"></td>
 			<td id="numoc"></td>
@@ -126,10 +122,8 @@
 			<td id="sin_produccion" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%= restantes_total%></td>
 			<td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%= enproduccion_total%></td>
 			<td id="finalizado" data-toggle="tooltip" title="Total Finalizados" style="text-align: center;" class="parsear_nro"><%= finalizados_total %></td>
-
 			<td id="pesoxproducir" data-toggle="tooltip" title="Peso Unitario" style="text-align: center;" class="parsear_nro"><%= peso_u%></td>
 			<td id="pesototal" data-toggle="tooltip" title="Peso Total" style="text-align: center;" class="parsear_nro"><%= peso_t%></td>
-
 			<td id="f_entrega"></td>
 			<%if(user.nombre != 'siderval'){%>
 				<td id="habilitar_cand"></td>
@@ -143,32 +137,44 @@
 
 <script type="text/javascript">
 
+    setDataTableFabricaciones("#DataTableFabs");
 
+    var dimensiones = {clase: [], ancho: []};
 
-   setDataTableFabricaciones("#DataTableFabs");
+    function getMedidas(){
+        dimensiones.clase = [];
+        dimensiones.ancho = [];
+        $("#pietabla tr td").each(function () {
+            dimensiones.clase.push($(this).attr('id'));
+            dimensiones.ancho.push($("." + $(this).attr('id')).width());
+        });
+    }
+    function ini_table(str) {
+        $("#pietabla").css('position', 'fixed');
+        $(".fixed_table").width($(str).width());
+        $(".fixed_table").css('left', $(".o_sub_menu").width());
+        //$("#cuerpotabla").css('margin-top', $("#encabezadotabla").css('height'));
+        getMedidas();
+        //$("#encabezadotabla").css('position', 'fixed');
+        //$("#cuerpotabla").css('position', 'absolute');
 
-   $(".fixed_table").width( $("#DataTableFabs").width() );
-
-   $(".fixed_table").css( 'left' ,$(".o_sub_menu").width() );
-
-    $("#pietabla tr td").each(function(){
-        if($(this).attr('id')){
-            $(this).css('width', $("."+$(this).attr('id')).width());
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            //$("#encabezadotabla tr #cab-"+dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+            //$("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+            $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
         }
-    });
-   /*$("#encabezadotabla").css( 'position' ,'fixed' );
+    }
+    ini_table("#DataTableFabs");
 
-     $("#encabezadotabla tr th").each(function(){
-         if($(this).attr('id')){
-             $(this).css('width', $("."+$(this).attr('id')).width());
-         }
-     });*/
+    $(window).resize(function(){
+		//aqui el codigo que se ejecutara cuando se redimencione la ventana
+        //setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
+        ini_table("#DataTableFabs");
+    })
     $(document).ready(function(){
-
         $('#DataTableFabs tbody').on( 'click', 'tr', function () {
             $(this).toggleClass('success');
         });
-
     });
 
 	function submit_form(yo){
@@ -177,7 +183,7 @@
 			type: 'GET',
 			url: '/plan/page_of/'+$(yo).data('idodc'),
 			success: function(data){
-				$(".main-page").html(data);	
+				$(".main-page").html(data);
 			}
 		});
 	}

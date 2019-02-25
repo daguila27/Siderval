@@ -118,18 +118,41 @@ router.post('/table_despachos', function(req, res, next){
         //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
         // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
         //
-        var where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
+        var array_fill = [
+            "gd.idgd",
+            "cliente.sigla",
+            "material.detalle",
+            "gd.obs"
+        ];
+        var clave;
+        var where;
+        var condiciones_where = [];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+        }
+        condiciones_where.push(["gd.estado LIKE '%" + tipo + "%'"]);
+        where = " WHERE "+ condiciones_where.join(" AND ")+" GROUP BY gd.idgd ORDER BY gd.fecha DESC";
+        //where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
         //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
             connection.query("SELECT gd.*,COUNT(despachos.iddespacho) as n_items,COALESCE(cliente.razon,'Sin Cliente') AS cliente FROM gd"
                 + " LEFT JOIN despachos ON despachos.idgd=gd.idgd"
+                + " LEFT JOIN material ON material.idmaterial = despachos.idmaterial"
                 + " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" + where,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
                 // console.log(desp);
                 //console.log(desp);
                 res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-'), user: req.session.userData});
-            });         
+            });
         });
     }
     else{res.redirect('bad_login');}
