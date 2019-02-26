@@ -10,13 +10,37 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-offset-1 col-md-10">
-            <div class="panel panel-primary">
-                <div class="panel-heading">Liberaciones Control de calidad</div>
-                <div class="panel-body" id="produccion_chart" style="height: 400px">
+        <div class="col-md-offset-1 col-md-10" style="display: flex;">
+            <div class="panel panel-primary" style="width: 50%;">
+                <div class="panel-heading">Liberaciones desde Tratamiento Térmico</div>
+                <div class="panel-body" style="height: 400px;">
+                    <div id="produccion_tto">
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="panel panel-primary" style="width: 50%;">
+                <div class="panel-heading">Liberaciones desde Terminación</div>
+                <div class="panel-body" style="height: 400px;">
+                    <div id="produccion_ter">
+                    </div>
+                </div>
+            </div>
+        <!--<ul class="col-md-offset-2 col-md-10 nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#home">Tratamiento Térmico</a></li>
+            <li><a data-toggle="tab" href="#menu1">Terminacion</a></li>
+        </ul>
+        <div class="col-md-offset-1 col-md-10 tab-content">
+            <div id="home" class="tab-pane fade in active panel panel-primary">
+                    <div class="panel-heading">Liberaciones Tratamiento Térmico</div>
+                    <div class="panel-body" id="produccion_tto" style="height: 400px">
+                    </div>
+            </div>
+            <div id="menu1" class="tab-pane fade panel panel-primary">
+                    <div class="panel-heading">Liberaciones Terminación</div>
+                    <div class="panel-body" id="produccion_ter" style="height: 400px">
+                    </div>
+            </div>
+        </div>-->
     </div>
 </div>
 <script type="text/javascript">
@@ -60,5 +84,27 @@
             return html;
         },
         postUnits: 'Kg'
+    });
+    new Morris.Donut({
+        element: 'produccion_tto',
+        data: [
+            <%for(var q=0; q < tto.length; q++){%>
+                {label: '<%= tto[q].etapa%>', value: parseInt('<%= tto[q].enviados%>')}
+                <%if(tto.length > q-1){%>
+                    ,
+                <%}%>
+            <%}%>
+        ]
+    });
+    new Morris.Donut({
+        element: 'produccion_ter',
+        data: [
+            <%for(var q=0; q < ter.length; q++){%>
+                {label: '<%= ter[q].etapa%>', value: parseInt('<%= ter[q].enviados%>')}
+                <%if(ter.length > q-1){%>
+                ,
+                <%}%>
+            <%}%>
+        ]
     });
 </script>

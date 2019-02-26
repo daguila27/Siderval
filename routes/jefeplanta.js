@@ -36,16 +36,40 @@ router.get('/stats', function(req, res, next){
             if(err)
                 console.log("Error Connection : %s", err);
             var fecha = new Date().getFullYear() + "-" + (new Date().getUTCMonth() + 1) + "-";
+            fecha = '2019-1-';
             connection.query("SELECT DATE_FORMAT(gd.fecha,'%Y-%m-%d %H:%i:%s') AS fecha,gd.idgd AS numgd,cliente.sigla," +
                 "SUM(coalesce(despachos.cantidad,0)*COALESCE(material.peso,0)) AS peso,gd.estado FROM gd" +
                 " LEFT JOIN despachos ON despachos.idgd = gd.idgd" +
                 " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" +
                 " LEFT JOIN material ON material.idmaterial = despachos.idmaterial " +
                 "WHERE gd.fecha BETWEEN ? AND ? GROUP BY gd.idgd",[fecha+"01",fecha + "31"], function(err, etp){
-                if(err)
-                    console.log("Error Selecting : %s", err);
+                if(err){console.log("Error Selecting : %s", err);}
 
-                res.render('jefeplanta/stats', {data: etp});
+                connection.query("select " +
+                    "etapafaena.nombre_etapa as etapa, sum(material.peso) as enviados " +
+                    "from produccion_history " +
+                    "left join etapafaena on etapafaena.value=produccion_history.to " +
+                    "left join produccion on produccion_history.idproduccion=produccion.idproduccion " +
+                    "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
+                    "left join material on material.idmaterial=fabricaciones.idmaterial " +
+                    "where produccion_history.from = 5 AND produccion_history.fecha BETWEEN ? AND ? " +
+                    "group by produccion_history.to",[fecha+"01",fecha + "31"], function(err, tto) {
+                    if (err){console.log("Error Selecting : %s", err);}
+                    connection.query("select " +
+                        "etapafaena.nombre_etapa as etapa, sum(material.peso) as enviados " +
+                        "from produccion_history " +
+                        "left join etapafaena on etapafaena.value=produccion_history.to " +
+                        "left join produccion on produccion_history.idproduccion=produccion.idproduccion " +
+                        "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
+                        "left join material on material.idmaterial=fabricaciones.idmaterial " +
+                        "where produccion_history.from = 4 AND produccion_history.fecha BETWEEN ? AND ? " +
+                        "group by produccion_history.to",[fecha+"01",fecha + "31"], function(err, ter) {
+                        if (err){console.log("Error Selecting : %s", err);}
+
+                        console.log(ter);
+                        res.render('jefeplanta/stats', {data: etp, tto: tto, ter: ter});
+                    });
+                });
             });
         });
     }
