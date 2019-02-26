@@ -1863,7 +1863,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         var sheet2 = workbook.addWorksheet('Produccion');
         var sheet3 = workbook.addWorksheet('Salidas');
         sheet.columns = [
-            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Código', key: 'id', width: 15, style: 'text-aling: center' },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
             { header: 'Stock Inicio Mes', key: 'initial', width: 15},
@@ -1911,17 +1911,17 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         ];
 
         sheet4.columns = [
-            { header: 'Código', key: 'id', width: 15 },
-            { header: 'Detalle', key: 'name', width: 50 },
-            { header: 'Unidad', key: 'unit', width: 10},
-            { header: 'Peso Unitario (KG)', key: 'virtual', width: 10},
-            { header: 'Inicial BPT', key: 'virtual', width: 10},
-            { header: 'Inicial Planta', key: 'income', width: 10},
-            { header: 'Total Fusión Mes', key: 'income', width: 10},
-            { header: 'Total Despachado GDD', key: 'departures', width: 10},
-            { header: 'Total Rechazos Mes', key: 'income', width: 15},
-            { header: 'Total Externalizado Mes', key: 'income', width: 15},
-            { header: 'Stock en Planta', key: 'income', width: 15}
+            { header: 'Código', key: 'id', width: 13, height: 13.43},
+            { header: 'Detalle', key: 'name', width: 42.14 },
+            { header: 'Unidad', key: 'unit', width: 7.86},
+            { header: 'Peso Unitario (KG)', key: 'virtual', width: 14.71},
+            { header: 'Inicial BPT', key: 'virtual', width: 14.71},
+            { header: 'Inicial Planta', key: 'income', width: 14.71},
+            { header: 'Total Fusión Mes', key: 'income', width: 13.57},
+            { header: 'Total Despachado GDD', key: 'departures', width: 14.71},
+            { header: 'Total Rechazos Mes', key: 'income', width: 14.71},
+            { header: 'Total Externalizado Mes', key: 'income', width: 14.71},
+            { header: 'Stock en Planta', key: 'income', width: 11}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
@@ -1938,18 +1938,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 bold: true
             };
 
-            sheet4.getRow(1).fill = {
-                type: 'pattern',
-                pattern:'solid',
-                fgColor:{argb:'F4D03F'}
-            };
-            sheet4.getRow(1).font = {
-                name: 'Comic Sans MS',
-                family: 4,
-                size: 11,
-                underline: false,
-                bold: true
-            };
+
+            sheet4.getRow(1).height = 42.75;
             for(var i = 2; i < ops.length+2; i++){
 				sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 				sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
@@ -2068,25 +2058,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 bottom: {style:'thin', color: {argb:'00000000'}}
             };
 
-            sheet4.getRow(1).fill = {
-                type: 'pattern',
-                pattern:'solid',
-                fgColor:{argb:'F4D03F'}
-            };
-            sheet4.getRow(1).font = {
-                name: 'Arial',
-                family: 4,
-                size: 11,
-                color: {argb: 'FDFEFE'},
-                underline: false, //subrayado
-                bold: false //negrita
-            };
-            sheet4.getRow(1).border = {
-                right: {style:'thin', color: {argb:'00000000'}},
-                left: {style:'thin', color: {argb:'00000000'}},
-                top: {style:'thin', color: {argb:'00000000'}},
-                bottom: {style:'thin', color: {argb:'00000000'}}
-            };
 
 
 
@@ -2102,9 +2073,9 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 name: 'Arial',
                 family: 4,
                 size: 11,
-                color: {argb: 'FDFEFE'},
+                color: {argb: '00000000'},
                 underline: false, //subrayado
-                bold: false //negrita
+                bold: true //negrita
             };
             sheet4.getRow(1).border = {
                 right: {style:'thin', color: {argb:'00000000'}},
@@ -2113,7 +2084,12 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 bottom: {style:'thin', color: {argb:'00000000'}}
             };
 
-			adminModel.produccion(req.params.token.split("@"),function(err,prods){
+            sheet4.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet4.autoFilter = {
+                from: 'A1',
+                to: 'K1',
+            };
+            adminModel.produccion(req.params.token.split("@"),function(err,prods){
 				if(err) throw err;
 				for(let i=0;i<prods.length;i++){
 					sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
@@ -2219,7 +2195,6 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                 }
             }
         }*/
-        console.log(condiciones_where);
 
         if(condiciones_where.length==0){
         	condiciones_where.push('true');
@@ -2228,7 +2203,6 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
             condiciones_cc.push('true');
         }
         where = "WHERE "+ condiciones_where.join(" AND ")+ " AND ("+condiciones_cc.join(' OR ')+")";
-        console.log(where);
         orden = orden.replace('-', ' ');
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);

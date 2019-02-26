@@ -36,6 +36,11 @@
 	<tbody class="ui-sortable">
 		<%var clase;
 		var estado;
+		var t_sol = 0;
+        var t_xfabs = 0;
+        var t_enprod = 0;
+        var t_sindesp = 0;
+        var t_desp = 0;
 		for(var i=0; i < data.length; i++){
 			if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 10 && diff_indays(data[i].f_entrega)>=0 ){
 				clase = 'warning';
@@ -51,35 +56,61 @@
 				estado = 'Más de 10 días';
 			}%>
 		<tr class="o_data_row <%=clase%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].oefes%></td>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
-			<td class="o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].cantidad %></td>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].x_fabricar %></td>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].sol_op) - parseInt(data[i].rech_op) - parseInt(data[i].bpt_op) %></td>
-			<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].cantidad) - parseInt(data[i].despachados) %></td>
-			<td class="o_data_cell parsear_nro" style="text-align: center;"><%= data[i].despachados %></td>
-			<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" style="text-align: center;">
+
+			<td class="col-numof o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center">
+                <%if(data[i].oefes.split(',').length > 2){%>
+                    <%=data[i].oefes.substring(0,8)%>...
+                <%}else{%>
+                    <%=data[i].oefes%>
+                <%}%>
+            </td>
+			<td class="col-item o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
+			<td class="col-numoc o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
+			<td class="col-cliente o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
+			<td class="col-descrip o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
+            <%
+                t_sol += data[i].cantidad;
+                t_xfabs  += data[i].x_fabricar;
+                t_enprod  += (parseInt(data[i].sol_op) - parseInt(data[i].rech_op) - parseInt(data[i].bpt_op));
+                t_sindesp += ( parseInt(data[i].cantidad) - parseInt(data[i].despachados) );
+                t_desp  += data[i].despachados;
+            %>
+			<td class="col-solic o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].cantidad %></td>
+			<td class="col-xfabs o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].x_fabricar %></td>
+			<td class="col-enprod o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].sol_op) - parseInt(data[i].rech_op) - parseInt(data[i].bpt_op) %></td>
+			<td class="col-sindesp o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].cantidad) - parseInt(data[i].despachados) %></td>
+			<td class="col-desp o_data_cell parsear_nro" style="text-align: center;"><%= data[i].despachados %></td>
+			<td class="col-f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" style="text-align: center;">
 				<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
 			</td>
-			<td><%= estado%></td>
+			<td class="col-estado"><%= estado%></td>
 		</tr>
 		<%}%>
 	</tbody>
-	<tfoot>
+    <style>
+        #pietabla {
+            position:fixed;
+            left:0px;
+            bottom:0px;
+            height:30px;
+            width:100%;
+            /*background:#999;*/
+        }
+    </style>
+    <tfoot id="pietabla" class="fixed_table">
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td id="col-numof"></td>
+			<td id="col-item"></td>
+			<td id="col-numoc"></td>
+			<td id="col-cliente"></td>
+			<td id="col-descrip"></td>
+			<td data-toggle="tooltip" title="Total Solicitado" style="text-align: center;" class="parsear_nro" id="col-solic"><%=t_sol%></td>
+			<td data-toggle="tooltip" title="Total por Fabricar" style="text-align: center;" class="parsear_nro" id="col-xfabs"><%=t_xfabs%></td>
+			<td data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro" id="col-enprod"><%=t_enprod%></td>
+			<td data-toggle="tooltip" title="Total por Despachar" style="text-align: center;" class="parsear_nro" id="col-sindesp"><%=t_sindesp%></td>
+			<td data-toggle="tooltip" title="Total Despachado" style="text-align: center;" class="parsear_nro" id="col-desp"><%=t_desp%></td>
+			<td id="col-f_entrega"></td>
+			<td id="col-estado"></td>
 		</tr>
 	</tfoot>
 </table>
@@ -88,8 +119,16 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#DataTablePeds");
+    setDataTableFabricaciones("#DataTablePeds");
+    $(".fixed_table").width( $("#DataTablePeds").width() );
 
+    $(".fixed_table").css( 'left' ,$(".o_sub_menu").width() );
+
+    $("#pietabla tr td").each(function(){
+        if($(this).attr('id')){
+            $(this).css('width', $("."+$(this).attr('id')).width());
+        }
+    });
 	function submit_form(yo){
 		//$("#form"+$(yo).data('idodc')).submit();
 		$.ajax({

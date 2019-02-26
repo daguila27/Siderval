@@ -25,6 +25,7 @@ var bodega = require('./routes/bodega');
 var abast = require('./routes/abast');
 var matprimas = require('./routes/matprimas');
 var csvs = require('./routes/csvs');
+var test = require('./routes/test');
 
 //const ejslint = require('ejs-lint');
 
@@ -63,6 +64,8 @@ app.use('/bodega', bodega);
 app.use('/abastecimiento', abast);
 app.use('/matprimas', matprimas);
 app.use('/csvs', csvs);
+
+app.use('/test', test);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

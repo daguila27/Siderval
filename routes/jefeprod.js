@@ -466,7 +466,7 @@ router.post('/lanzar_op_fill', function(req, res, next){
                 + "left join ordenfabricacion on (ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f)"
                 + " left join material on (material.idmaterial=fabricaciones.idmaterial)" 
                 + " left join producido on (fabricaciones.idproducto=producido.idproducto)"+
-                " left join subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
+                " left join subaleacion ON CAST( SUBSTRING(material.codigo, 6, 2) AS SIGNED) = subaleacion.idsubaleacion" +
                 " left join aleacion ON aleacion.idaleacion = subaleacion.idsubaleacion left join pedido on pedido.idpedido = fabricaciones.idpedido WHERE fabricaciones.restantes > 0 and coalesce(pedido.externo, false) = false AND fabricaciones.lock = false"
                 + " GROUP BY fabricaciones.idfabricaciones ORDER BY "+input.fill+" "+input.orden+") as internalquery "+where,
                 function(err, rows){

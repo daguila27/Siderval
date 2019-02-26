@@ -66,6 +66,7 @@ router.get('/view_fabricaciones', function(req, res, next){
 });
 
 
+
 router.get('/calendar_peds', function(req, res, next){
   if(verificar(req.session.userData)){
     res.render('plan/calendar_view', {alto: '600px'});}
@@ -116,7 +117,7 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido,GROUP_CONCAT(COALESCE(ordenfabricacion.idordenfabricacion,'-')) AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(GROUP_CONCAT(ordenfabricacion.idordenfabricacion),'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
                 + " LEFT JOIN fabricaciones ON fabricaciones.idpedido= pedido.idpedido"
                 + " LEFT JOIN (SELECT idfabricaciones,SUM(cantidad) AS sol_op,SUM(standby) AS rech_op,SUM(`8`) AS bpt_op "
@@ -288,7 +289,7 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
             if(err) throw err;
 
             var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados," +
-                "COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,ordenfabricacion.*,pedido.despachados," +
+                "COALESCE(cliente.sigla,'SIDERVAL S.A') AS cliente,COALESCE(cliente.razon,'SIDERVAL S.A') AS razon,ordenfabricacion.*,pedido.despachados," +
                 "coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
                 " coalesce(odc.numoc, 'Sin OC') as numoc,COALESCE(pedido.despachados) AS despachados,COALESCE(pedido.cantidad) AS solicitados," +
                 "COALESCE(enprod.enprod,0) AS enprod,COALESCE(enprod.enrech,0) AS enrech"
