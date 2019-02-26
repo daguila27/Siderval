@@ -37,7 +37,7 @@ router.get('/stats', function(req, res, next){
                 console.log("Error Connection : %s", err);
             var fecha = new Date().getFullYear() + "-" + (new Date().getUTCMonth() + 1) + "-";
             //fecha = '2019-1-';
-            connection.query("SELECT DATE_FORMAT(gd.fecha,'%Y-%m-%d %H:%i:%s') AS fecha,COUNT(*) AS cantidad,EXTRACT( YEAR FROM gd.fecha ) as ano,MONTHNAME(gd.fecha) as mes,gd.idgd AS numgd," +
+            connection.query("SELECT DATE_FORMAT(gd.fecha,'%Y-%m-01 00:00:00') AS fecha,COUNT(*) AS cantidad,EXTRACT( YEAR FROM gd.fecha ) as ano,MONTHNAME(gd.fecha) as mes,gd.idgd AS numgd," +
                 "SUM(coalesce(despachos.cantidad,0)*COALESCE(material.peso,0)) AS peso,gd.estado FROM gd" +
                 " LEFT JOIN despachos ON despachos.idgd = gd.idgd" +
                 " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" +
@@ -45,7 +45,6 @@ router.get('/stats', function(req, res, next){
                 "GROUP BY SUBSTRING(gd.fecha, 1, 7)", function(err, etp){
                 if(err){console.log("Error Selecting : %s", err);}
 
-                console.log(etp);
                 connection.query("select " +
                     "etapafaena.nombre_etapa as etapa, sum(material.peso*produccion_history.enviados) as enviados " +
                     "from produccion_history " +

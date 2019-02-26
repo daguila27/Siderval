@@ -54,7 +54,7 @@
             <% if(data.length){
                 for(var i = 0;i<data.length;i++){%>
             {
-                fecha:'<%=data[i].ano%>-<%= data[i].mes%>',
+                fecha:'<%=data[i].fecha%>',
                 peso: <%=data[i].peso%>,
                 cantidad: <%= data[i].cantidad%>
             }
@@ -72,12 +72,13 @@
         // chart.
         labels: ['Peso Total'],
         hoverCallback:function(index,option,content,row){
+            console.log(row);
             var html ="<ul><li><b>Guía Emitidas:</b> " +
                     row.cantidad +
                 "</li><li><b>Mes:</b> " +
-                row.mes +"/"+row.ano +
+                    row.fecha +
                 "</li><li><b>Peso:</b> " +
-                row.peso +
+                    row.peso + " kg" +
                 "</li></ul>";
             return html;
         },
