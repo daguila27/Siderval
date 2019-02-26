@@ -46,8 +46,13 @@
 
 <script type="text/javascript">
     $('#phtable').DataTable( {
+        fixedColumns: true,
         responsive: true,
         lengthChange: false,
+        paging: true,
+        bFilter: true,
+        bInfo: true,
+        pageLength: 30,
         language: {
             "sProcessing":     "Procesando...",
             "sZeroRecords":    "No se encontraron resultados",
