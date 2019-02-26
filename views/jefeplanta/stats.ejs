@@ -54,11 +54,9 @@
             <% if(data.length){
                 for(var i = 0;i<data.length;i++){%>
             {
-                fecha:'<%=data[i].fecha%>',
+                fecha:'<%=data[i].ano%>-<%= data[i].mes%>',
                 peso: <%=data[i].peso%>,
-                estado: '<%=data[i].estado%>',
-                numgdd: '<%=data[i].numgd%>',
-                cliente: '<%=data[i].sigla%>'
+                cantidad: <%= data[i].cantidad%>
             }
             <% if(i != data.length -1){%>
             ,
@@ -74,12 +72,12 @@
         // chart.
         labels: ['Peso Total'],
         hoverCallback:function(index,option,content,row){
-            var html ="<ul><li><b>N°GD:</b> " +
-                    row.numgdd +
-                "</li><li><b>Cliente:</b> " +
-                row.cliente +
-                "</li><li><b>Tipo:</b> " +
-                row.estado +
+            var html ="<ul><li><b>Guía Emitidas:</b> " +
+                    row.cantidad +
+                "</li><li><b>Mes:</b> " +
+                row.mes +"/"+row.ano +
+                "</li><li><b>Peso:</b> " +
+                row.peso +
                 "</li></ul>";
             return html;
         },
