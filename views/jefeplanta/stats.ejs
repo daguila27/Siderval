@@ -1,4 +1,6 @@
 
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
 <div style="margin: 10px">
     <div class="row">
         <div class="col-md-offset-1 col-md-10">
@@ -44,7 +46,17 @@
     </div>
 </div>
 <script type="text/javascript">
-
+    function parseNumero(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        if(parts.length > 1){
+            if(parts[1].length > 2){
+                parts[1] = parts[1].substring(0,2);
+            }
+        }
+        var num =  parts.join(",");
+        return num;
+    }
     new Morris.Line({
         // ID of the element in which to draw the chart.
         element: 'despachos_chart',
@@ -74,12 +86,12 @@
         smooth: false,
         hoverCallback:function(index,option,content,row){
             console.log(row);
-            var html ="<ul><li><b>Guía Emitidas:</b> " +
-                    row.cantidad +
+            var html ="<ul><li><b>Guía Emitidas:</b>" +
+                    parseNumero(row.cantidad) +
                 "</li><li><b>Mes:</b> " +
                     [row.fecha.split("-")[1],row.fecha.split("-")[0]].join('-') +
-                "</li><li><b>Peso:</b> " +
-                    row.peso + " kg" +
+                "</li><li><b>Peso:</b>" +
+                    parseNumero(row.peso) + " kg" +
                 "</li></ul>";
             return html;
         },
