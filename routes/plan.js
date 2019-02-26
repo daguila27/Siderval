@@ -5452,6 +5452,26 @@ router.get('/loadStateOF', function(req,res,next){
 
 
 
+router.get('/ini_stock_mes', function(req,res,next){
+    req.getConnection(function(err, connection){
+        if(err) console.log("Error Selecting : %s",err);
+        connection.query("SELECT idmaterial FROM material", function(err, mats){
+            if(err) console.log("Error Selecting : %s",err);
+            var dataIn = [];
+            for(var e=0; e < mats.length; e++){
+                dataIn.push([mats[e].idmaterial]);
+            }
+            connection.query("INSERT INTO stock_mes (`idmaterial_stock`) VALUES ?",[dataIn],
+                function(err, inProds){
+                    if(err) console.log("Error Insert : %s",err);
+
+                    console.log(inProds);
+                    res.redirect('/');
+                });
+        });
+    });
+});
+
 
 module.exports = router;
 
