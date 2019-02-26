@@ -36,7 +36,7 @@ router.get('/stats', function(req, res, next){
             if(err)
                 console.log("Error Connection : %s", err);
             var fecha = new Date().getFullYear() + "-" + (new Date().getUTCMonth() + 1) + "-";
-            fecha = '2019-1-';
+            //fecha = '2019-1-';
             connection.query("SELECT DATE_FORMAT(gd.fecha,'%Y-%m-%d %H:%i:%s') AS fecha,gd.idgd AS numgd,cliente.sigla," +
                 "SUM(coalesce(despachos.cantidad,0)*COALESCE(material.peso,0)) AS peso,gd.estado FROM gd" +
                 " LEFT JOIN despachos ON despachos.idgd = gd.idgd" +
