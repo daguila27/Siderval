@@ -76,7 +76,7 @@
             var html ="<ul><li><b>Guía Emitidas:</b> " +
                     row.cantidad +
                 "</li><li><b>Mes:</b> " +
-                    row.fecha +
+                    [row.fecha.split("-")[1],row.fecha.split("-")[0]].join('-') +
                 "</li><li><b>Peso:</b> " +
                     row.peso + " kg" +
                 "</li></ul>";
