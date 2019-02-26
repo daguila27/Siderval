@@ -29,7 +29,6 @@
 	</style>
 	<thead id="encabezadotabla">
 		<tr>
-			<th id="cab-ini" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC"></th>
             <th id="cab-numof" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
 			<th id="cab-numitem" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
 			<th id="cab-numoc" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OC</th>
@@ -57,7 +56,6 @@
 		var peso_t = 0;
 		for(var i=0; i < data.length; i++){%>
 			<tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
-					<td class="ini"><%= i+1%></td>
 					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>">
 						<a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
 								<%=data[i].idordenfabricacion%>
@@ -112,7 +110,6 @@
 	</tbody>
 	<tfoot id="pietabla" class="fixed_table">
 		<tr>
-			<td id="ini"></td>
 			<td id="numof"></td>
 			<td id="numitem"></td>
 			<td id="numoc"></td>
