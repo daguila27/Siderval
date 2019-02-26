@@ -42,7 +42,7 @@ router.get('/stats', function(req, res, next){
                 " LEFT JOIN despachos ON despachos.idgd = gd.idgd" +
                 " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" +
                 " LEFT JOIN material ON material.idmaterial = despachos.idmaterial"+
-                " WHERE material.detalle LIKE '%inserto%' AND gd.estado != 'Traslado' GROUP BY SUBSTRING(gd.fecha, 1, 7)", function(err, etp){
+                " WHERE material.detalle LIKE '%inserto%' GROUP BY SUBSTRING(gd.fecha, 1, 7)", function(err, etp){
                 if(err){console.log("Error Selecting : %s", err);}
 
                 connection.query("select " +
