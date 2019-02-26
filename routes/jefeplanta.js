@@ -45,7 +45,7 @@ router.get('/stats', function(req, res, next){
                 "WHERE gd.fecha BETWEEN ? AND ? GROUP BY gd.idgd",[fecha+"01",fecha + "31"], function(err, etp){
                 if(err){console.log("Error Selecting : %s", err);}
                 connection.query("select " +
-                    "etapafaena.nombre_etapa as etapa, sum(material.peso) as enviados " +
+                    "etapafaena.nombre_etapa as etapa, sum(material.peso*produccion_history.enviados) as enviados " +
                     "from produccion_history " +
                     "left join etapafaena on etapafaena.value=produccion_history.to " +
                     "left join produccion on produccion_history.idproduccion=produccion.idproduccion " +
