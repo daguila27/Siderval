@@ -66,7 +66,6 @@ router.get('/stats', function(req, res, next){
                         "group by produccion_history.to",[fecha+"01",fecha + "31"], function(err, ter) {
                         if (err){console.log("Error Selecting : %s", err);}
 
-                        console.log(ter);
                         res.render('jefeplanta/stats', {data: etp, tto: tto, ter: ter});
                     });
                 });
