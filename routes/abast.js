@@ -136,7 +136,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura,'@',factura.fecha,'@',factura.coment)) AS facturas_token, GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion,'@', recepcion.fecha )) as gd_token FROM oda" +
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura,'@',factura.fecha,'@',coalesce(factura.coment, 'Sin Comentarios.'))) AS facturas_token, GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion,'@', recepcion.fecha )) as gd_token FROM oda" +
                     " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
                     " LEFT JOIN factura ON oda.idoda = factura.idoda "+
                     " LEFT JOIN abastecimiento ON abastecimiento.idoda=oda.idoda "+
