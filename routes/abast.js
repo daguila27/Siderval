@@ -1918,10 +1918,12 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Inicial BPT', key: 'virtual', width: 14.71},
             { header: 'Inicial Planta', key: 'income', width: 14.71},
             { header: 'Total Fusión Mes', key: 'income', width: 13.57},
+            { header: 'Entradas a Producción', key: 'income', width: 13.57},
+            { header: 'Actual en Planta', key: 'income', width: 13.57},
             { header: 'Total Despachado GDD', key: 'departures', width: 14.71},
             { header: 'Total Rechazos Mes', key: 'income', width: 14.71},
             { header: 'Total Externalizado Mes', key: 'income', width: 14.71},
-            { header: 'Stock en Planta', key: 'income', width: 11}
+            { header: 'Stock en Siderval', key: 'income', width: 11}
         ];
         adminModel.getdatos(req.params.token.split("@"),function(err,ops){
             if(err) console.log(err);
@@ -2027,10 +2029,15 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 sheet4.getCell('E'+i.toString()).value = ops[i-2].s_inicial;
                 sheet4.getCell('F'+i.toString()).value = ops[i-2].p_inicial;
                 sheet4.getCell('G'+i.toString()).value = ops[i-2].fundidos;
-                sheet4.getCell('H'+i.toString()).value = ops[i-2].despachados;
-                sheet4.getCell('I'+i.toString()).value = ops[i-2].rechazados;
-                sheet4.getCell('J'+i.toString()).value = ops[i-2].ing_oda;
-                sheet4.getCell('K'+i.toString()).value =
+
+                sheet4.getCell('H'+i.toString()).value = ops[i-2].virtuales + (ops[i-2].fabricados+ops[i-2].rechazados)-ops[i-2].p_inicial;
+                sheet4.getCell('I'+i.toString()).value = ops[i-2].virtuales;
+
+
+                sheet4.getCell('J'+i.toString()).value = ops[i-2].despachados;
+                sheet4.getCell('K'+i.toString()).value = ops[i-2].rechazados;
+                sheet4.getCell('L'+i.toString()).value = ops[i-2].ing_oda;
+                sheet4.getCell('M'+i.toString()).value =
                     ops[i-2].s_inicial +
                     ops[i-2].p_inicial +
                     ops[i-2].ing_oda +
