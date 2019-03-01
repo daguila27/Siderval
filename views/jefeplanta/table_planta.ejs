@@ -29,13 +29,13 @@ function fechaLatino(string){
     </style>
     <thead id="encabezadotabla">
     <tr>
-        <th id="cab-numof" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
-        <th id="cab-numitem" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
+        <th id="cab-numof" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">OF</th>
+        <th id="cab-numitem" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">Item</th>
+        <th id="cab-cliente" class="order-column" data-order="cliente.sigla-ASC">Cliente</th>
         <th id="cab-descrip" class="order-column" data-order="material.detalle-ASC">Descripción</th>
         <th id="cab-solicitados" class="order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
         <th id="cab-sin_produccion" class="order-column" data-order="fabricaciones.restantes-ASC">Por Despachar</th>
         <th id="cab-en_produccion" class="order-column" >En Producción</th>
-        <th id="cab-finalizado" class="order-column" >Finalizados</th>
         <th id="cab-pesoxproducir" class="order-column" style="text-align: center;">Peso unitario</th>
         <th id="cab-pesototal" class="order-column" style="text-align: center;">Peso x Despachar</th>
         <th id="cab-pesototal" class="order-column" style="text-align: center;">Peso Despachado</th>
@@ -70,12 +70,12 @@ function fechaLatino(string){
             pesot_total += (data[i].peso*data[i].xdespachar);
             pesod_total += (data[i].peso*data[i].despachados);
         %>
-        <td class="numitem o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numitem%></td>
+        <td class="numitem o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].numitem%></td>
+        <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
         <td class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
         <td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].solicitados%></td>
         <td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].xdespachar %></td>
         <td class="en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].enproduccion%></td>
-        <td class="finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].finalizados%></td>
         <td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
         <td class="pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].xdespachar%></td>
         <td class="pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].despachados%></td>
@@ -94,7 +94,6 @@ function fechaLatino(string){
         <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%=solic_total%></td>
         <td id="sin_produccion" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%=xdesp_total%></td>
         <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%=enpro_total%> </td>
-        <td id="finalizado" data-toggle="tooltip" title="Total Finalizados" style="text-align: center;" class="parsear_nro"><%=final_total%></td>
         <td id="pesoxproducir"></td>
         <td id="pesototal" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro"><%=pesot_total%> Kg</td>
         <td id="pesototal" data-toggle="tooltip" title="Peso Total despachado" style="text-align: center;" class="parsear_nro"><%=pesod_total%></td>
@@ -161,6 +160,13 @@ function fechaLatino(string){
             }
         });
     }
-
+    $("#encabezadotabla").affix({
+        offset: {
+            bottom: function () {
+                console.log($('#view_header').outerHeight(true));
+                return (this.top = $('#view_header').outerHeight(true))
+            }
+        }
+    });
 
 </script>

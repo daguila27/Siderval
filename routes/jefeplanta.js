@@ -127,12 +127,13 @@ router.post('/table_planta', function(req, res, next){
             if(err) throw err;
 
             var consulta = "select " +
-                "odc.numoc, pedido.numitem,pedido.despachados, fabricaciones.idorden_f as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
+                "odc.numoc,cliente.razon,cliente.sigla,pedido.numitem,pedido.despachados, fabricaciones.idorden_f as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
                 "coalesce(pedido.cantidad - pedido.despachados,0) as xdespachar, pedido.f_entrega, " +
                 "pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
                 "material.stock, material.peso, coalesce(material.peso*(pedido.cantidad - pedido.despachados), 0) as pesoxdespachar " +
                 "from pedido " +
                 "left join odc on odc.idodc = pedido.idodc " +
+                "left join cliente on odc.idcliente = cliente.idcliente " +
                 "left join fabricaciones on (fabricaciones.idpedido = pedido.idpedido AND !pedido.externo) " +
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 "left join " +
