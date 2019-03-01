@@ -1,0 +1,166 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+%>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"><%= data.length %></div>
+
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px; width: 100%;">
+    <style>
+        .order-column:hover{
+            cursor: pointer;
+        }
+        #encabezadotabla{
+            z-index: 10;
+        }
+        #pietabla {
+            left:0px;
+            bottom:0px;
+            height:30px;
+            width:100%;
+            /*background:#999;*/
+        }
+    </style>
+    <thead id="encabezadotabla">
+    <tr>
+        <th id="cab-numof" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
+        <th id="cab-numitem" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° Item</th>
+        <th id="cab-descrip" class="order-column" data-order="material.detalle-ASC">Descripción</th>
+        <th id="cab-solicitados" class="order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
+        <th id="cab-sin_produccion" class="order-column" data-order="fabricaciones.restantes-ASC">Por Despachar</th>
+        <th id="cab-en_produccion" class="order-column" >En Producción</th>
+        <th id="cab-finalizado" class="order-column" >Finalizados</th>
+        <th id="cab-pesoxproducir" class="order-column" style="text-align: center;">Peso unitario</th>
+        <th id="cab-pesototal" class="order-column" style="text-align: center;">Peso x Despachar</th>
+        <th id="cab-pesototal" class="order-column" style="text-align: center;">Peso Despachado</th>
+        <th id="cab-stock" class="order-column" style="text-align: center;">Stock</th>
+        <th id="cab-f_entrega" class="order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
+    </tr>
+    </thead>
+    <tbody class="ui-sortable" id="cuerpotabla">
+    <%
+    var solic_total = 0;
+    var xdesp_total = 0;
+    var enpro_total = 0;
+    var final_total = 0;
+    var pesot_total = 0;
+    var pesod_total = 0;
+    for(var i=0; i < data.length; i++){%>
+    <tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
+        <td class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>">
+            <%if(!data[i].externo){%>
+                <a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
+                    <%=data[i].idordenfabricacion%>
+                </a>
+            <%}else{%>
+                Externo
+            <%}%>
+        </td>
+        <%
+            solic_total += data[i].solicitados;
+            xdesp_total += data[i].xdespachar;
+            enpro_total += data[i].enproduccion;
+            final_total += data[i].finalizados;
+            pesot_total += (data[i].peso*data[i].xdespachar);
+            pesod_total += (data[i].peso*data[i].despachados);
+        %>
+        <td class="numitem o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numitem%></td>
+        <td class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
+        <td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].solicitados%></td>
+        <td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].xdespachar %></td>
+        <td class="en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].enproduccion%></td>
+        <td class="finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].finalizados%></td>
+        <td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
+        <td class="pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].xdespachar%></td>
+        <td class="pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].despachados%></td>
+        <td class="stock o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
+        <td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" >
+            <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
+        </td>
+    </tr>
+    <%}%>
+    </tbody>
+    <tfoot id="pietabla" class="fixed_table">
+    <tr>
+        <td id="numof"></td>
+        <td id="numitem"></td>
+        <td id="descrip"></td>
+        <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%=solic_total%></td>
+        <td id="sin_produccion" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%=xdesp_total%></td>
+        <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%=enpro_total%> </td>
+        <td id="finalizado" data-toggle="tooltip" title="Total Finalizados" style="text-align: center;" class="parsear_nro"><%=final_total%></td>
+        <td id="pesoxproducir"></td>
+        <td id="pesototal" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro"><%=pesot_total%> Kg</td>
+        <td id="pesototal" data-toggle="tooltip" title="Peso Total despachado" style="text-align: center;" class="parsear_nro"><%=pesod_total%></td>
+        <td id="stock"></td>
+        <td id="f_entrega"></td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+
+    setDataTableFabricaciones("#DataTableFabs");
+
+
+
+    var dimensiones = {clase: [], ancho: []};
+
+    function getMedidas(){
+        dimensiones.clase = [];
+        dimensiones.ancho = [];
+        $("#pietabla tr td").each(function () {
+            dimensiones.clase.push($(this).attr('id'));
+            dimensiones.ancho.push($("." + $(this).attr('id')).width());
+        });
+    }
+    function ini_table(str) {
+        $("#pietabla").css('position', 'fixed');
+        $(".fixed_table").width($(str).width());
+        $(".fixed_table").css('left', $(".o_sub_menu").width());
+        //$("#cuerpotabla").css('margin-top', $("#encabezadotabla").css('height'));
+        getMedidas();
+        //$("#encabezadotabla").css('position', 'fixed');
+        //$("#cuerpotabla").css('position', 'absolute');
+
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            //$("#encabezadotabla tr #cab-"+dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+            //$("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+            $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+        }
+    }
+    ini_table("#DataTableFabs");
+
+    $(window).resize(function(){
+        //aqui el codigo que se ejecutara cuando se redimencione la ventana
+        //setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
+        ini_table("#DataTableFabs");
+    });
+    $(document).ready(function(){
+        $('#DataTableFabs tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('success');
+        });
+    });
+
+    function submit_form(yo){
+        //$("#form"+$(yo).data('idodc')).submit();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/page_of/'+$(yo).data('idodc'),
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+
+
+</script>

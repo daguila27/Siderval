@@ -66,6 +66,9 @@ router.get('/stats', function(req, res, next){
                         "group by produccion_history.to",[fecha+"01",fecha + "31"], function(err, ter) {
                         if (err){console.log("Error Selecting : %s", err);}
 
+                        console.log(ter);
+                        console.log(tto);
+
                         res.render('jefeplanta/stats', {data: etp, tto: tto, ter: ter});
                     });
                 });
@@ -74,4 +77,79 @@ router.get('/stats', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
+
+
+/* GET users listing. */
+router.get('/view_planta', function(req, res, next){
+    if(verificar(req.session.userData)){
+        res.render('jefeplanta/view_planta');
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.post('/table_planta', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var array_fill = [
+            "fabricaciones.idorden_f",
+            "pedido.numitem",
+            "material.detalle"
+        ];
+        var clave;
+        var where;
+        var condiciones_where = ['coalesce(pedido.cantidad - pedido.despachados,0) > 0'];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+        }
+        var where = " ";
+        if(input.pendientes == 'false'){
+            condiciones_where.push('(MONTH(pedido.f_entrega) <= MONTH(CURRENT_DATE()) AND YEAR(pedido.f_entrega) <= YEAR(CURRENT_DATE()))');
+            //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
+        }
+
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+        console.log(where);
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+
+            var consulta = "select " +
+                "odc.numoc, pedido.numitem,pedido.despachados, fabricaciones.idorden_f as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
+                "coalesce(pedido.cantidad - pedido.despachados,0) as xdespachar, pedido.f_entrega, " +
+                "pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
+                "material.stock, material.peso, coalesce(material.peso*(pedido.cantidad - pedido.despachados), 0) as pesoxdespachar " +
+                "from pedido " +
+                "left join odc on odc.idodc = pedido.idodc " +
+                "left join fabricaciones on (fabricaciones.idpedido = pedido.idpedido AND !pedido.externo) " +
+                "left join material on material.idmaterial = pedido.idmaterial " +
+                "left join " +
+                "(select produccion.idfabricaciones, sum(produccion.cantidad - produccion.`8` - produccion.standby) as enproduccion, produccion.`8` as finalizados from produccion group by produccion.idfabricaciones)" +
+                " as queryPlanta on queryPlanta.idfabricaciones = fabricaciones.idfabricaciones "+where;
+            connection.query(consulta,
+                function(err, of){
+                    if(err) throw err;
+
+                    res.render('jefeplanta/table_planta', {data: of});
+
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
 module.exports = router;

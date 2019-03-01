@@ -1939,8 +1939,23 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 underline: false,
                 bold: true
             };
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
 
 
+            sheet.getRow(1).height = 42.75;
+            sheet2.getRow(1).height = 42.75;
+            sheet3.getRow(1).height = 42.75;
             sheet4.getRow(1).height = 42.75;
             for(var i = 2; i < ops.length+2; i++){
 				sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
@@ -2045,7 +2060,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                     ops[i-2].despachados -
                     ops[i-2].rechazados;
             }
-            sheet.getRow(1).fill = {
+           /* sheet.getRow(1).fill = {
                 type: 'pattern',
                 pattern:'solid',
                 fgColor:{argb:'F4D03F'}
@@ -2063,12 +2078,91 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 left: {style:'thin', color: {argb:'00000000'}},
                 top: {style:'thin', color: {argb:'00000000'}},
                 bottom: {style:'thin', color: {argb:'00000000'}}
+            };*/
+
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: '00000000'},
+                underline: false, //subrayado
+                bold: true //negrita
+            };
+            sheet.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            sheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet.autoFilter = {
+                from: 'A1',
+                to: 'T1',
             };
 
 
 
 
+            sheet2.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet2.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: '00000000'},
+                underline: false, //subrayado
+                bold: true //negrita
+            };
+            sheet2.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
 
+            sheet2.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet2.autoFilter = {
+                from: 'A1',
+                to: 'M1',
+            };
+
+
+
+
+            sheet3.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet3.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: '00000000'},
+                underline: false, //subrayado
+                bold: true //negrita
+            };
+            sheet3.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            sheet3.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet3.autoFilter = {
+                from: 'A1',
+                to: 'H1',
+            };
 
 
             sheet4.getRow(1).fill = {
