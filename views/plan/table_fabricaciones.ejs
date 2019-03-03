@@ -41,7 +41,7 @@
 			<th id="cab-pesoxproducir" class="order-column" style="text-align: center;">Peso unitario</th>
 			<th id="cab-pesototal" class="order-column" style="text-align: center;">Peso Total (sin producir)</th>
 			<th id="cab-f_entrega" class="order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
-			<%if(user.nombre != 'siderval'){%>
+			<%if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){%>
 				<th id="cab-habilitar_cand" class="order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC"></th>
 			<%}%>
 		</tr>
@@ -82,7 +82,7 @@
 						<span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
 					</td>
 					<%
-					if(user.nombre != 'siderval'){
+					if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){
 						if(data[i].externo == '0' && data[i].restantes > 0 ){
 							if(data[i].lock == '0'){%>
 								<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
@@ -122,7 +122,7 @@
 			<td id="pesoxproducir" data-toggle="tooltip" title="Peso Unitario" style="text-align: center;" class="parsear_nro"><%= peso_u%></td>
 			<td id="pesototal" data-toggle="tooltip" title="Peso Total" style="text-align: center;" class="parsear_nro"><%= peso_t%></td>
 			<td id="f_entrega"></td>
-			<%if(user.nombre != 'siderval'){%>
+			<%if(user.nombre != 'siderval'&& user.nombre != 'jefeplanta'){%>
 				<td id="habilitar_cand"></td>
 			<%}%>
 		</tr>
