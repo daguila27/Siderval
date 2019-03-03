@@ -254,8 +254,20 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
             "odc.numoc",
             "material.detalle",
             "pedido.f_entrega",
-            "ordenfabricacion.creacion"
+            "cliente.sigla"
         ];
+      var object_fill = {
+          "ordenfabricacion.idordenfabricacion-off": [],
+          "odc.numoc-off": [],
+          "material.detalle-off": [],
+          "pedido.f_entrega-off": [],
+          "cliente.sigla-off": [],
+          "ordenfabricacion.idordenfabricacion-on": [],
+          "odc.numoc-on": [],
+          "material.detalle-on": [],
+          "pedido.f_entrega-on": [],
+          "cliente.sigla-on": []
+      };
         var clave;
         var where;
         var condiciones_where = [];
@@ -267,9 +279,22 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         }
         if(clave.length>0){
             for(var e=0; e < clave.length; e++){
-              condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
             }
         }
+        console.log(condiciones_where);
         orden = orden.replace('-', ' ');
         var where = " ";
 

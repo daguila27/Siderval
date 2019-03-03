@@ -92,10 +92,18 @@ router.post('/table_planta', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         var array_fill = [
-            "fabricaciones.idorden_f",
+            "coalesce(fabricaciones.idorden_f,'Sin OF')",
             "pedido.numitem",
             "material.detalle"
         ];
+        var object_fill = {
+            "coalesce(fabricaciones.idorden_f,'Sin OF')-off": [],
+            "pedido.numitem-off": [],
+            "material.detalle-off": [],
+            "coalesce(fabricaciones.idorden_f,'Sin OF')-on": [],
+            "pedido.numitem-on": [],
+            "material.detalle-on": []
+        };
         var clave;
         var where;
         var condiciones_where = ['coalesce(pedido.cantidad - pedido.despachados,0) > 0'];
@@ -107,9 +115,24 @@ router.post('/table_planta', function(req, res, next){
         }
         if(clave.length>0){
             for(var e=0; e < clave.length; e++){
-                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
             }
         }
+
+
+
         var where = " ";
         if(input.pendientes == 'false'){
             condiciones_where.push('(MONTH(pedido.f_entrega) <= MONTH(CURRENT_DATE()) AND YEAR(pedido.f_entrega) <= YEAR(CURRENT_DATE()))');
@@ -127,13 +150,13 @@ router.post('/table_planta', function(req, res, next){
             if(err) throw err;
 
             var consulta = "select " +
-                "odc.numoc, pedido.numitem,pedido.despachados, fabricaciones.idorden_f as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
+                "odc.numoc, pedido.numitem,pedido.despachados, coalesce(fabricaciones.idorden_f, 'No OF') as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
                 "coalesce(pedido.cantidad - pedido.despachados,0) as xdespachar, pedido.f_entrega, " +
                 "pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
                 "material.stock, material.peso, coalesce(material.peso*(pedido.cantidad - pedido.despachados), 0) as pesoxdespachar " +
                 "from pedido " +
                 "left join odc on odc.idodc = pedido.idodc " +
-                "left join fabricaciones on (fabricaciones.idpedido = pedido.idpedido AND !pedido.externo) " +
+                "left join fabricaciones on (fabricaciones.idpedido = pedido.idpedido) " +
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 "left join " +
                 "(select produccion.idfabricaciones, sum(produccion.cantidad - produccion.`8` - produccion.standby) as enproduccion, produccion.`8` as finalizados from produccion group by produccion.idfabricaciones)" +

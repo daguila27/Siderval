@@ -49,7 +49,7 @@
                     <div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
                     </div>
                     <input id="buscar_planta" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
-                    <input id="buscar_planta-value" style="display: none" type="text">
+                    <input id="buscar_planta-value" style="display: none" type="text" autocomplete="off">
                 </div>
                 <ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
                     <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OF</em> para: <strong></strong></a></li>
@@ -195,18 +195,18 @@
         var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
         var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
         $(".etiqueta-filtro-div").append(
-            "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_planta").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
+            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_planta").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_planta").val()+"@on' class='etiqueta-filtro label label-success'>"+clase[0]+": <strong>"
             +$("#buscar_planta").val()+
-            "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+            "</strong> <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-del'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
         );
         $(".etiqueta-filtro-div").data('cant', labels+1);
         if($("#buscar_planta-value").val() == '' || $("#buscar_planta-value").val() == null || $("#buscar_planta-value").val() == undefined){
-            $("#buscar_planta-value").val($(this).data('searchcol')+"@"+$("#buscar_planta").val());
+            $("#buscar_planta-value").val($(this).data('searchcol')+"@"+$("#buscar_planta").val()+"@off");
         }
         else{
-            $("#buscar_planta-value").val([$("#buscar_planta-value").val(),$(this).data('searchcol')+"@"+$("#buscar_planta").val()].join(','));
+            $("#buscar_planta-value").val([$("#buscar_planta-value").val(),$(this).data('searchcol')+"@"+$("#buscar_planta").val(),'off'].join(','));
         }
-        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_planta").val());
+        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_planta").val()+"@off");
         $(".o_searchview_autocomplete").css('display', 'none');
         $(".o_searchview_autocomplete strong").html('');
         $("#buscar_planta").val('');
@@ -225,6 +225,37 @@
             count++;
         });
         $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        buscar_planta();
+    }
+
+    function cambiarEtiqueta(yo){
+        if($(yo).data('state') == 'off') {
+            $(yo).parent().removeClass('label-success');
+            $(yo).parent().addClass('label-danger');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
+
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Removiendo "+'"'+$(yo).parent().children('strong').text()+'"'+" de la busqueda");
+            $(yo).removeClass('fa-toggle-off');
+            $(yo).addClass('fa-toggle-on');
+            $(yo).data('state', 'on');
+        }
+        else{
+            $(yo).parent().removeClass('label-danger');
+            $(yo).parent().addClass('label-success');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'off'].join('@'));
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Buscando "+'"'+$(yo).parent().children('strong').text()+'"');
+
+            $(yo).removeClass('fa-toggle-on');
+            $(yo).addClass('fa-toggle-off');
+
+            $(yo).data('state', 'off');
+        }
         buscar_planta();
     }
 

@@ -59,7 +59,9 @@ function fechaLatino(string){
                     <%=data[i].idordenfabricacion%>
                 </a>
             <%}else{%>
-                Externo
+                    <a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
+                        <%=data[i].idordenfabricacion%>
+                    </a> (Ext)
             <%}%>
         </td>
         <%
