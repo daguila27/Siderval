@@ -85,10 +85,24 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(input);
         var array_fill = [
             "odc.numoc",
+            "ordenfabricacion.idordenfabricacion",
             "material.detalle",
-            "cliente.sigla",
+            "coalesce(cliente.sigla,'Sin Cliente')",
             "estado.estado"
         ];
+
+        var object_fill = {
+            "odc.numoc-off": [],
+            "ordenfabricacion.idordenfabricacion-off": [],
+            "material.detalle-off": [],
+            "coalesce(cliente.sigla,'Sin Cliente')-off": [],
+            "estado.estado-off": [],
+            "odc.numoc-on": [],
+            "ordenfabricacion.idordenfabricacion-on": [],
+            "material.detalle-on": [],
+            "coalesce(cliente.sigla,'Sin Cliente')-on": [],
+            "estado.estado-on": []
+        };
         var clave;
         var where;
         var condiciones_where = [];
@@ -98,14 +112,35 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         else{
             clave = input.clave.split(',');
         }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
-        }
+
         if(input.pendientes == 'false'){
             condiciones_where.push(['pedido.cantidad > pedido.despachados']);
         }
+
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+        console.log(condiciones_where);
 
         var where = " ";
         if(condiciones_where.length==0){
@@ -117,7 +152,7 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(GROUP_CONCAT(ordenfabricacion.idordenfabricacion),'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,cliente.sigla, material.* FROM pedido"
+            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(GROUP_CONCAT(ordenfabricacion.idordenfabricacion),'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,COALESCE(cliente.sigla, 'Sin Cliente') AS sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
                 + " LEFT JOIN fabricaciones ON fabricaciones.idpedido= pedido.idpedido"
                 + " LEFT JOIN (SELECT idfabricaciones,SUM(cantidad) AS sol_op,SUM(standby) AS rech_op,SUM(`8`) AS bpt_op "
@@ -291,7 +326,13 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
         }
         for(var w=0; w < Object.keys(object_fill).length; w++){
             if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
             }
         }
         console.log(condiciones_where);
@@ -5496,6 +5537,256 @@ router.get('/ini_stock_mes', function(req,res,next){
         });
     });
 });
+
+
+router.get('/check_despachados', function(req,res,next){
+    req.getConnection(function(err, connection){
+        if(err) console.log("Error Selecting : %s",err);
+        connection.query("SELECT idpedido, despachados FROM pedido where cantidad>despachados", function(err, peds){
+            if(err) console.log("Error Selecting : %s",err);
+            console.log(peds.length);
+            var pendientes = [
+                [9084	,20],
+                [9743	,1],
+                [9744	,0],
+                [9784	,0],
+                [10121	,0],
+                [10131	,0],
+                [10182	,24],
+                [10203	,2],
+                [10209	,0],
+                [10210	,0],
+                [10213	,0],
+                [10214	,0],
+                [10246	,0],
+                [10247	,0],
+                [10248	,0],
+                [10251	,0],
+                [10252	,0],
+                [10268	,0],
+                [10271	,2],
+                [10272	,0],
+                [10278	,5],
+                [10282	,0],
+                [10292	,0],
+                [10299	,29],
+                [10300	,523],
+                [10351	,9],
+                [10352	,0],
+                [10353	,0],
+                [10354	,0],
+                [10355	,15],
+                [10356	,0],
+                [10357	,0],
+                [10358	,0],
+                [10360	,2],
+                [10361	,2],
+                [10369	,640],
+                [10383	,1],
+                [10394	,1],
+                [10395	,0],
+                [10397	,0],
+                [10398	,0],
+                [10399	,0],
+                [10400	,0],
+                [10401	,0],
+                [10402	,0],
+                [10403	,0],
+                [10404	,0],
+                [10405	,0],
+                [10406	,0],
+                [10407	,0],
+                [10408	,0],
+                [10409	,0],
+                [10410	,0],
+                [10411	,0],
+                [10412	,0],
+                [10413	,0],
+                [10414	,0],
+                [10415	,0],
+                [10416	,0],
+                [10417	,0],
+                [10418	,0],
+                [10419	,0],
+                [10420	,0],
+                [10421	,0],
+                [10422	,0],
+                [10423	,0],
+                [10424	,0],
+                [10425	,0],
+                [10426	,0],
+                [10427	,0],
+                [10428	,0],
+                [10429	,0],
+                [10430	,0],
+                [10431	,0],
+                [10439	,190],
+                [10446	,59],
+                [10449	,53],
+                [10452	,159],
+                [10454	,48],
+                [10490	,1],
+                [10503	,49],
+                [10504	,175],
+                [10505	,35],
+                [10506	,33],
+                [10507	,233],
+                [10508	,68],
+                [10525	,0],
+                [10526	,0],
+                [10539	,2],
+                [10570	,0],
+                [10575	,80],
+                [10576	,0],
+                [10577	,1],
+                [10578	,0],
+                [10579	,0],
+                [10580	,0],
+                [10581	,0],
+                [10593	,0],
+                [10594	,0],
+                [10596	,0],
+                [10602	,181],
+                [10610	,0],
+                [10612	,8],
+                [10616	,0],
+                [10617	,0],
+                [10618	,380],
+                [10622	,0],
+                [10623	,0],
+                [10624	,0],
+                [10626	,0],
+                [10627	,0],
+                [10628	,0],
+                [10629	,0],
+                [10630	,0],
+                [10631	,0],
+                [10632	,0],
+                [10643	,37],
+                [10644	,0],
+                [10645	,25],
+                [10646	,670],
+                [10648	,1],
+                [10649	,0],
+                [10650	,0],
+                [10651	,0],
+                [10652	,0],
+                [10653	,0],
+                [10654	,0],
+                [10655	,0],
+                [10656	,0],
+                [10658	,0],
+                [10659	,0],
+                [10661	,0],
+                [10662	,0],
+                [10663	,0],
+                [10664	,0],
+                [10665	,0],
+                [10668	,107],
+                [10670	,27],
+                [10672	,25],
+                [10673	,20],
+                [10679	,0],
+                [10681	,0],
+                [10685	,0],
+                [10686	,0],
+                [10687	,0],
+                [10695	,1],
+                [10700	,0],
+                [10701	,0],
+                [10702	,457],
+                [10706	,0],
+                [10707	,0],
+                [10708	,0],
+                [10717	,1],
+                [10719	,0],
+                [10720	,0],
+                [10721	,1],
+                [10723	,0],
+                [10725	,0],
+                [10727	,0],
+                [10729	,33],
+                [10730	,55],
+                [10736	,0],
+                [10737	,0],
+                [10738	,0],
+                [10740	,0],
+                [10741	,0],
+                [10742	,0],
+                [10743	,0],
+                [10744	,0],
+                [10745	,0],
+                [10748	,0],
+                [10749	,0],
+                [10750	,0],
+                [10751	,0],
+                [10752	,0],
+                [10753	,0],
+                [10758	,1],
+                [10760	,0],
+                [10762	,16],
+                [10767	,0],
+                [10768	,0],
+                [10770	,0],
+                [10771	,0],
+                [10774	,0],
+                [10776	,1],
+                [10777	,1],
+                [10780	,23],
+                [10781	,26],
+                [10782	,0],
+                [10783	,0],
+                [10786	,0],
+                [10787	,0],
+                [10788	,0],
+                [10789	,0],
+                [10790	,0],
+                [10791	,0],
+                [10792	,0],
+                [10793	,0],
+                [10794	,0],
+                [10795	,0],
+                [10796	,0],
+                [10797	,0],
+                [10798	,0],
+                [10799	,0],
+                [10800	,0],
+                [10801	,0],
+                [10802	,0],
+            ];
+            var cambios = [];
+            var desp = [];
+
+            //REVISO SI LOS PENDIENTES AUN CONTINUAN ASI (PENDIENTES)
+            //CONPARANDOLO CON LA BD Y ALMECENANDO LOS CAMBIOS EN UN ARRAY
+            for(var e=0; e < pendientes.length; e++){
+                for(var t=0; t < peds.length; t++){
+                    if(peds[t].idpedido == pendientes[e][0]){
+
+                        if(peds[t].despachados == parseInt(pendientes[e][1])){
+                            break;
+                        }
+                        else{
+                            desp.push([pendientes[e][0],pendientes[e][1], peds[t].despachados,  'Cambio despachados']);
+                            break;
+                        }
+                    }
+                    if(t == peds.length-1){
+                        cambios.push([pendientes[e][0],pendientes[e][1], 0,  'Cerrado']);
+                        break;
+                    }
+
+                }
+            }
+
+            console.log(cambios.length);
+            console.log(cambios);
+            console.log(desp);
+            res.redirect('/');
+        });
+    });
+});
+
 
 
 module.exports = router;

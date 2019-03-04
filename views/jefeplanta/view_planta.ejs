@@ -35,6 +35,9 @@
     .etiqueta-filtro-div{
         display: flex;
     }
+    .etiqueta-filtro-cha:hover{
+        cursor: pointer;
+    }
 </style>
 <div class="row" style="margin: 0; padding: 0;" id="view_header">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; position: fixed; z-index: 10; width: 86%">
@@ -122,35 +125,7 @@
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
 
-    /*
-    $("#buscar_planta").on('keyup', function(e){
-        e.preventDefault();
-        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
-            $.ajax({
-                type: 'POST',
-                data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
-                url: '/jefeplanta/buscar_planta_list',
-                success: function(data){
-                    $(".main-page").html(data);
-                    //Muestra la cantidad de pedidos
-                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                }
-            });
-        }
-        else{
-            $.ajax({
-                type: 'POST',
-                data: {clave: $(this).val(),  showPend: $("#pend").is(':checked')},
-                url: '/jefeplanta/buscar_planta_item',
-                success: function(data){
-                    $(".main-page").html(data);
-                    //Muestra la cantidad de pedidos
-                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                }
-            });
-        }
-    });
-    */
+
 
 
     function buscar_planta(){
@@ -171,13 +146,7 @@
 
 
 
-    $('.fill-item-abast').hover(function() {
-        $(this).css('cursor','pointer');
-        $('.fill-item-abast').removeClass("o-selection-focus");
-        $(this).addClass("o-selection-focus");
-        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
-    });
-
+    //FUNCIONES PARA BUSCADORES
     $("#buscar_planta").on('keyup', function(e){
         e.preventDefault();
         if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
@@ -190,14 +159,22 @@
         }
     });
 
+
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
+
     $(".fill-item-abast").on('click', function(e){
         e.preventDefault();
         var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
         var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
         $(".etiqueta-filtro-div").append(
-            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_planta").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_planta").val()+"@on' class='etiqueta-filtro label label-success'>"+clase[0]+": <strong>"
+            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_planta").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_planta").val()+"@on' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
             +$("#buscar_planta").val()+
-            "</strong> <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-del'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+            "</strong> <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
         );
         $(".etiqueta-filtro-div").data('cant', labels+1);
         if($("#buscar_planta-value").val() == '' || $("#buscar_planta-value").val() == null || $("#buscar_planta-value").val() == undefined){
@@ -213,6 +190,21 @@
         $("#buscar_planta").focus();
         buscar_planta();
     });
+
+    $("#buscar_planta").on('keyup', function(e){
+        e.preventDefault();
+        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
+            $(".o_searchview_autocomplete").css('display', 'none');
+            $(".o_searchview_autocomplete strong").html('');
+        }
+        else{
+            $(".o_searchview_autocomplete").css('display', 'block');
+            $(".o_searchview_autocomplete strong").html($(this).val());
+        }
+    });
+
+
+
 
 
     function eliminarEtiqueta(yo){
@@ -230,7 +222,7 @@
 
     function cambiarEtiqueta(yo){
         if($(yo).data('state') == 'off') {
-            $(yo).parent().removeClass('label-success');
+            $(yo).parent().removeClass('label-primary');
             $(yo).parent().addClass('label-danger');
             $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
 
@@ -244,7 +236,7 @@
         }
         else{
             $(yo).parent().removeClass('label-danger');
-            $(yo).parent().addClass('label-success');
+            $(yo).parent().addClass('label-primary');
             $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'off'].join('@'));
 
             filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
@@ -258,8 +250,6 @@
         }
         buscar_planta();
     }
-
-
     function despInput(event){
         var char = event.which || event.keyCode;
         var item = $(".o_searchview_autocomplete").data('item');

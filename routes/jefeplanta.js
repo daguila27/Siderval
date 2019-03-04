@@ -127,7 +127,13 @@ router.post('/table_planta', function(req, res, next){
         }
         for(var w=0; w < Object.keys(object_fill).length; w++){
             if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
             }
         }
 
