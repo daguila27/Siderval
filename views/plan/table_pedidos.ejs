@@ -75,11 +75,11 @@
                 t_sindesp += ( parseInt(data[i].cantidad) - parseInt(data[i].despachados) );
                 t_desp  += data[i].despachados;
             %>
-			<td class="col-solic o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].cantidad %></td>
-			<td class="col-xfabs o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].x_fabricar %></td>
-			<td class="col-enprod o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].sol_op) - parseInt(data[i].rech_op) - parseInt(data[i].bpt_op) %></td>
-			<td class="col-sindesp o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].cantidad) - parseInt(data[i].despachados) %></td>
-			<td class="col-desp o_data_cell parsear_nro" style="text-align: center;"><%= data[i].despachados %></td>
+			<td data-valor = "<%= data[i].cantidad %>" data-name="col-solic" class="checkFuntion col-solic o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].cantidad %></td>
+			<td data-valor = "<%= data[i].x_fabricar %>" data-name="col-xfabs" class="checkFuntion col-xfabs o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= data[i].x_fabricar %></td>
+			<td data-valor = "<%= parseInt(data[i].sol_op) - parseInt(data[i].rech_op) - parseInt(data[i].bpt_op) %>" data-name="col-enprod" class="checkFuntion col-enprod o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].sol_op) - parseInt(data[i].rech_op) - parseInt(data[i].bpt_op) %></td>
+			<td data-valor = "<%= parseInt(data[i].cantidad) - parseInt(data[i].despachados) %>" data-name="col-sindesp" class="checkFuntion col-sindesp o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;"><%= parseInt(data[i].cantidad) - parseInt(data[i].despachados) %></td>
+			<td data-valor = "<%= data[i].despachados %>" data-name="col-desp" class="checkFuntion col-desp o_data_cell parsear_nro" style="text-align: center;"><%= data[i].despachados %></td>
 			<td class="col-f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" style="text-align: center;">
 				<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString() )%></span>
 			</td>
@@ -104,11 +104,11 @@
 			<td id="col-numoc"></td>
 			<td id="col-cliente"></td>
 			<td id="col-descrip"></td>
-			<td data-toggle="tooltip" title="Total Solicitado" style="text-align: center;" class="parsear_nro" id="col-solic"><%=t_sol%></td>
-			<td data-toggle="tooltip" title="Total por Fabricar" style="text-align: center;" class="parsear_nro" id="col-xfabs"><%=t_xfabs%></td>
+			<td data-toggle="tooltip" title="Total Solicitado" style="text-align: center;" class="parsear_nro"    id="col-solic"><%=t_sol%></td>
+			<td data-toggle="tooltip" title="Total por Fabricar" style="text-align: center;" class="parsear_nro"  id="col-xfabs"><%=t_xfabs%></td>
 			<td data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro" id="col-enprod"><%=t_enprod%></td>
 			<td data-toggle="tooltip" title="Total por Despachar" style="text-align: center;" class="parsear_nro" id="col-sindesp"><%=t_sindesp%></td>
-			<td data-toggle="tooltip" title="Total Despachado" style="text-align: center;" class="parsear_nro" id="col-desp"><%=t_desp%></td>
+			<td data-toggle="tooltip" title="Total Despachado" style="text-align: center;" class="parsear_nro"    id="col-desp"><%=t_desp%></td>
 			<td id="col-f_entrega"></td>
 			<td id="col-estado"></td>
 		</tr>

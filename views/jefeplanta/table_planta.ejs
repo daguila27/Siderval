@@ -37,7 +37,7 @@ function fechaLatino(string){
         <th id="cab-sin_produccion" class="order-column" data-order="fabricaciones.restantes-ASC">Por Despachar</th>
         <th id="cab-en_produccion" class="order-column" >En Producción</th>
         <th id="cab-pesoxproducir" class="order-column" style="text-align: center;">Peso unitario</th>
-        <th id="cab-pesototal" class="order-column" style="text-align: center;">Peso x Despachar</th>
+        <th id="cab-peso" class="order-column" style="text-align: center;">Peso x Despachar</th>
         <th id="cab-pesototal" class="order-column" style="text-align: center;">Peso Despachado</th>
         <th id="cab-stock" class="order-column" style="text-align: center;">Stock</th>
         <th id="cab-f_entrega" class="order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
@@ -75,12 +75,12 @@ function fechaLatino(string){
         <td class="numitem o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].numitem%></td>
         <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
         <td class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
-        <td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].solicitados%></td>
-        <td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].xdespachar %></td>
-        <td class="en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].enproduccion%></td>
-        <td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
-        <td class="pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].xdespachar%></td>
-        <td class="pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].despachados%></td>
+        <td data-name = "solicitados" class="checkFunction solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
+        <td data-name = "sin_produccion"class="checkFunction sin_produccion o_data_cell parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
+        <td data-name = "en_produccion"class="checkFunction en_produccion o_data_cell parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
+        <td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
+        <td data-name= "peso" class="checkFunction peso o_data_cell parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
+        <td data-name= "pesototal" class="checkFunction pesototal o_data_cell parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
         <td class="stock o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
         <td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" >
             <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
@@ -92,19 +92,19 @@ function fechaLatino(string){
     <tr>
         <td id="numof"></td>
         <td id="numitem"></td>
+        <td id="cliente"></td>
         <td id="descrip"></td>
         <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%=solic_total%></td>
         <td id="sin_produccion" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%=xdesp_total%></td>
         <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%=enpro_total%> </td>
         <td id="pesoxproducir"></td>
-        <td id="pesototal" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro"><%=pesot_total%> Kg</td>
+        <td id="peso" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro"><%=pesot_total%> Kg</td>
         <td id="pesototal" data-toggle="tooltip" title="Peso Total despachado" style="text-align: center;" class="parsear_nro"><%=pesod_total%></td>
         <td id="stock"></td>
         <td id="f_entrega"></td>
     </tr>
     </tfoot>
 </table>
-
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 
@@ -113,7 +113,34 @@ function fechaLatino(string){
     setDataTableFabricaciones("#DataTableFabs");
 
 
+    function refreshSumas(){
+        var object = {
+        "solicitados" : 0,
+        "sin_produccion" : 0,
+        "en_produccion" : 0,
+        "peso": 0,
+        "pesototal": 0
+        };
+        if($('.focus-row').length == 0) {
+            $(".checkFunction").each(function(){
+                object[$(this).data('name')] += $(this).data('valor');
+            });
+        }
+        else{
+            $(".checkFunction").each(function(){
+                if($(this).parent().hasClass('focus-row')){
+                        object[$(this).data('name')] += $(this).data('valor');
+                }
+            });
+        }
 
+
+        $("#solicitados").text(object.solicitados);
+        $("#sin_produccion").text(object.sin_produccion);
+        $("#en_produccion").text(object.en_produccion);
+        $("#peso").text(object.peso);
+        $("#pesototal").text(object.pesototal);
+    }
     var dimensiones = {clase: [], ancho: []};
 
     function getMedidas(){
@@ -149,6 +176,8 @@ function fechaLatino(string){
     $(document).ready(function(){
         $('#DataTableFabs tbody').on( 'click', 'tr', function () {
             $(this).toggleClass('success');
+            $(this).toggleClass('focus-row');
+            refreshSumas();
         });
     });
 
