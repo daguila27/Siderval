@@ -2188,7 +2188,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             sheet4.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
             sheet4.autoFilter = {
                 from: 'A1',
-                to: 'K1',
+                to: 'M1',
             };
             adminModel.produccion(req.params.token.split("@"),function(err,prods){
 				if(err) throw err;
