@@ -91,7 +91,7 @@ function fechaLatino(string){
         <td data-toggle="tooltip" title="Cliente" class="cliente" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
         <td data-toggle="tooltip" title="Descripción" class="descrip" ><%=data[i].detalle%></td>
         <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
-        <td data-toggle="tooltip" title="Sin Producción" data-name = "sin_produccion"class="checkFunction sin_produccion parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
+        <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion"class="checkFunction sin_produccion parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
         <td data-toggle="tooltip" title="En Producción" data-name = "en_produccion"class="checkFunction en_produccion parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
         <td data-toggle="tooltip" title="Peso Unitario" class="pesoxproducir parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
         <td data-toggle="tooltip" title="Peso x Despachar" data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>

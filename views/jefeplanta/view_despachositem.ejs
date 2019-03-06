@@ -92,11 +92,12 @@
                             <li><input id="fecha-hasta" class="form-control" type="date"></li>
                             <li class="divider"></li>
                             <li class="pull-right" style="padding: 0px 10px">
-                                <button class="btn btn-xs btn-primary"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+                                <button class="btn btn-xs btn-primary" onclick="restartFechas()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
                                 <button class="btn btn-xs btn-success" onclick="setFechas()"><i class="fa fa-check"></i></button>
                             </li>
                         </ul>
                     </div>
+                    <h5 style="margin-left: 10px" class="indicator-of-check"><small>Mostrando solo despachos de 2019</small></h5>
                 </div>
                 <!--<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_ofs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 
@@ -136,7 +137,7 @@
     $(document).ready(function(){
         $.ajax({
             type: 'POST',
-            data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked"), rango: rango.join('@')},
+            data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked"), rango: rango.join('@'), tab: '<%= tab%>'},
             url: '/jefeplanta/table_despachositem',
             beforeSend: function(){
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
@@ -150,13 +151,10 @@
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
 
-
-
-
     function buscar_despachositem(){
         $.ajax({
             type: 'POST',
-            data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked"), rango: rango.join('@')},
+            data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked"), rango: rango.join('@'), tab: '<%= tab%>'},
             url: '/jefeplanta/table_despachositem',
             beforeSend: function(){
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
@@ -168,8 +166,6 @@
             }
         });
     }
-
-
 
     //FUNCIONES PARA BUSCADORES
     $("#buscar_despachositem").on('keyup', function(e){
@@ -183,7 +179,6 @@
             $(".o_searchview_autocomplete strong").html($(this).val());
         }
     });
-
 
     $('.fill-item-abast').hover(function() {
         $(this).css('cursor','pointer');
@@ -227,10 +222,6 @@
             $(".o_searchview_autocomplete strong").html($(this).val());
         }
     });
-
-
-
-
 
     function eliminarEtiqueta(yo){
         filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
@@ -322,9 +313,17 @@
             alert("Debe ingresar ambas fechas.");
         }
         else{
+
+            $(".indicator-of-check").css('display', 'none');
             rango = [$("#fecha-desde").val(),$("#fecha-hasta").val()];
             buscar_despachositem();
         }
+    }
+
+    function restartFechas(){
+        rango = [];
+        $(".indicator-of-check").css('display', 'block');
+        buscar_despachositem();
     }
 
 

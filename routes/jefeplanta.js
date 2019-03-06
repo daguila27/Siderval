@@ -86,9 +86,9 @@ router.get('/view_planta', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-router.get('/view_despachositem', function(req, res, next){
+router.get('/view_despachositem/:tab', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('jefeplanta/view_despachositem');
+        res.render('jefeplanta/view_despachositem', {tab: req.params.tab});
     }
     else{res.redirect('bad_login');}
 });
@@ -212,8 +212,14 @@ router.post('/table_despachositem', function(req, res, next){
         };
         var clave;
         var where;
-        var condiciones_where = [];
-        console.log(input.rango);
+        var condiciones_where = ['despachos.cantidad > 0'];
+
+        if(input.tab == 'funds'){
+            condiciones_where.push('material.codigo LIKE "P%"');
+        }
+        else{
+            condiciones_where.push('material.codigo NOT LIKE "P%"');
+        }
         if(input.rango == undefined || input.rango == null || input.rango == ''){
             condiciones_where.push("gd.fecha > '2019-01-01 00:00:00'");
         }
