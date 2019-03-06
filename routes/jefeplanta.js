@@ -216,6 +216,7 @@ router.post('/table_despachositem', function(req, res, next){
 
         if(input.tab == 'funds'){
             condiciones_where.push('material.codigo LIKE "P%"');
+            condiciones_where.push('material.detalle NOT LIKE "%ceramico%"');
         }
         else{
             condiciones_where.push('material.codigo NOT LIKE "P%"');
