@@ -36,8 +36,9 @@ function fechaLatino(string){
             height:30px;
             width:100%;
         }
+
     </style>
-    <thead class="fixed_table" id="encabezadotabla">
+    <thead>
     <tr>
         <th id="cab-gd">GD</th>
         <th id="cab-oc">OC</th>
@@ -50,8 +51,7 @@ function fechaLatino(string){
         <th id="cab-fecha">Fecha</th>
     </tr>
     </thead>
-    <tbody class="ui-sortable" id="cuerpotabla">
-
+    <tbody id="cuerpotabla">
     <%
     var total_cantidad = 0;
     var total_peso = 0;
@@ -61,15 +61,15 @@ function fechaLatino(string){
             total_cantidad += data[e].cantidad;
             total_peso += (data[e].peso*data[e].cantidad);
             %>
-            <td class="gd center-number"><a class="btn btn-xs btn-primary"><%= data[e].idgd%></a></td>
-            <td class="oc center-number"><%= data[e].numoc%></td>
-            <td class="item center-number"><%= data[e].numitem%></td>
-            <td class="cliente center-number"><%= data[e].sigla%></td>
-            <td class="descripcion"><%= data[e].detalle%></td>
-            <td data-valor="<%= data[e].cantidad%>" data-name="despachados" class="checkFunction despachados center-number parsear_nro"><%= data[e].cantidad%></td>
-            <td class="peso center-number parsear_nro"><%= data[e].peso%></td>
-            <td data-valor="<%= data[e].peso*data[e].cantidad%>" data-name="pesodespachado" class="checkFunction pesodespachado center-number parsear_nro"><%= data[e].peso*data[e].cantidad%></td>
-            <td class="fecha center-number" data-order="<%= new Date(data[e].fecha).getTime()%>"><%= new Date(data[e].fecha).toLocaleDateString()%></td>
+            <td data-toggle="tooltip" title="GD" class="gd center-number" onclick="ver_gdd(this)" data-idgd="<%= data[e].idgd%>"><a class="btn btn-xs btn-primary"><%= data[e].idgd%></a></td>
+            <td data-toggle="tooltip" title="OC" class="oc center-number"><%= data[e].numoc%></td>
+            <td data-toggle="tooltip" title="Item" class="item center-number"><%= data[e].numitem%></td>
+            <td data-toggle="tooltip" title="Cliente" class="cliente center-number"><%= data[e].sigla%></td>
+            <td data-toggle="tooltip" title="Descripción" class="descripcion"><%= data[e].detalle%></td>
+            <td data-toggle="tooltip" title="Despachados" data-valor="<%= data[e].cantidad%>" data-name="despachados" class="checkFunction despachados center-number parsear_nro"><%= data[e].cantidad%></td>
+            <td data-toggle="tooltip" title="Peso Unitario" class="peso center-number parsear_nro"><%= data[e].peso%></td>
+            <td data-toggle="tooltip" title="Peso Despachado" data-valor="<%= data[e].peso*data[e].cantidad%>" data-name="pesodespachado" class="checkFunction pesodespachado center-number parsear_nro"><%= data[e].peso*data[e].cantidad%></td>
+            <td data-toggle="tooltip" title="Fecha" class="fecha center-number" data-order="<%= new Date(data[e].fecha).getTime()%>"><%= new Date(data[e].fecha).toLocaleDateString()%></td>
         </tr>
     <%}%>
     </tbody>
@@ -136,13 +136,13 @@ function fechaLatino(string){
         for (var w = 0; w < dimensiones.clase.length; w++) {
             $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
         }
-        $("#encabezadotabla").css('position', 'fixed');
+        /*$("#encabezadotabla").css('position', 'fixed');
         for (var w = 0; w < dimensiones.clase.length; w++) {
             $("#encabezadotabla tr #cab-" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
         }
         for (var w = 0; w < dimensiones.clase.length; w++) {
             $("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
-        }
+        }*/
     }
     ini_table("#DataTableFabs");
 
@@ -164,6 +164,16 @@ function fechaLatino(string){
         $.ajax({
             type: 'GET',
             url: '/plan/page_of/'+$(yo).data('idodc'),
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+    function ver_gdd(yo){
+        //$("#form"+$(yo).data('idodc')).submit();
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/page_gdd/'+$(yo).data('idgd'),
             success: function(data){
                 $(".main-page").html(data);
             }
