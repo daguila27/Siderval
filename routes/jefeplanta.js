@@ -193,7 +193,7 @@ router.post('/table_planta', function(req, res, next){
 router.post('/table_despachositem', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-
+        console.log("estamos aqui");
         var array_fill = [
             "gd.idgd",
             "odc.numoc",
@@ -215,10 +215,10 @@ router.post('/table_despachositem', function(req, res, next){
         var condiciones_where = ['despachos.cantidad > 0'];
 
         if(input.tab == 'funds'){
-            condiciones_where.push('material.codigo LIKE "P%" AND material.detalle NOT LIKE "%ceramico%"');
+            condiciones_where.push('(material.codigo LIKE "P%" AND material.detalle NOT LIKE "%ceramico%")');
         }
         else{
-            condiciones_where.push('material.codigo NOT LIKE "P%" OR material.detalle LIKE "%ceramico%"');
+            condiciones_where.push('(material.codigo NOT LIKE "P%" OR material.detalle LIKE "%ceramico%")');
         }
         if(input.rango == undefined || input.rango == null || input.rango == ''){
             condiciones_where.push("gd.fecha > '2019-01-01 00:00:00'");
@@ -267,6 +267,10 @@ router.post('/table_despachositem', function(req, res, next){
         else{
             where = " WHERE "+ condiciones_where.join(" AND ");
         }
+
+        console.log("WHERE");
+        console.log(where);
+
         req.getConnection(function(err, connection){
             if(err) throw err;
 
