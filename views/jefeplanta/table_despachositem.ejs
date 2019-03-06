@@ -1,0 +1,181 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+%>
+<style>
+    .center-number{
+        text-align: center;
+    }
+</style>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"><%= data.length %></div>
+
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px; width: 100%;">
+    <style>
+
+
+        .order-column:hover{
+            cursor: pointer;
+        }
+        #encabezadotabla{
+            z-index: 10;
+        }
+
+        #encabezadotabla > tr > th{
+            text-align: center;
+        }
+        #pietabla {
+            left:0px;
+            bottom:0px;
+            height:30px;
+            width:100%;
+        }
+    </style>
+    <thead class="fixed_table" id="encabezadotabla">
+    <tr>
+        <th id="cab-gd">GD</th>
+        <th id="cab-oc">OC</th>
+        <th id="cab-item">Item</th>
+        <th id="cab-cliente">Cliente</th>
+        <th id="cab-descripcion">Descripción</th>
+        <th id="cab-despachados">Despachados</th>
+        <th id="cab-peso">Peso Unitario</th>
+        <th id="cab-pesodespachado">Peso Despachado</th>
+        <th id="cab-fecha">Fecha</th>
+    </tr>
+    </thead>
+    <tbody class="ui-sortable" id="cuerpotabla">
+
+    <%
+    var total_cantidad = 0;
+    var total_peso = 0;
+    for(var e=0; e < data.length; e++){%>
+        <tr>
+            <%
+            total_cantidad += data[e].cantidad;
+            total_peso += (data[e].peso*data[e].cantidad);
+            %>
+            <td class="gd center-number"><a class="btn btn-xs btn-primary"><%= data[e].idgd%></a></td>
+            <td class="oc center-number"><%= data[e].numoc%></td>
+            <td class="item center-number"><%= data[e].numitem%></td>
+            <td class="cliente center-number"><%= data[e].sigla%></td>
+            <td class="descripcion"><%= data[e].detalle%></td>
+            <td data-valor="<%= data[e].cantidad%>" data-name="despachados" class="checkFunction despachados center-number parsear_nro"><%= data[e].cantidad%></td>
+            <td class="peso center-number parsear_nro"><%= data[e].peso%></td>
+            <td data-valor="<%= data[e].peso*data[e].cantidad%>" data-name="pesodespachado" class="checkFunction pesodespachado center-number parsear_nro"><%= data[e].peso*data[e].cantidad%></td>
+            <td class="fecha center-number" data-order="<%= new Date(data[e].fecha).getTime()%>"><%= new Date(data[e].fecha).toLocaleDateString()%></td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot id="pietabla" class="fixed_table">
+        <tr>
+            <td id="gd"></td>
+            <td id="oc"></td>
+            <td id="item"></td>
+            <td id="cliente"></td>
+            <td id="descripcion"></td>
+            <td id="despachados" data-toggle="tooltip" title="Piezas Despachadas" style="text-align: center;" class="parsear_nro"><%= total_cantidad%></td>
+            <td id="peso"></td>
+            <td id="pesodespachado" data-toggle="tooltip" title="Peso Despachado" style="text-align: center;" class="parsear_nro"><%= total_peso%></td>
+            <td id="fecha"></td>
+        </tr>
+    </tfoot>
+</table>
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    setDataTableFabricaciones("#DataTableFabs");
+
+
+    function refreshSumas(){
+        var object = {
+            "despachados" : 0,
+            "pesodespachado" : 0
+        };
+        if($('.focus-row').length == 0) {
+            $(".checkFunction").each(function(){
+                object[$(this).data('name')] += $(this).data('valor');
+            });
+        }
+        else{
+            $(".checkFunction").each(function(){
+                if($(this).parent().hasClass('focus-row')){
+                    object[$(this).data('name')] += $(this).data('valor');
+                }
+            });
+        }
+        $("#despachados").text(object.despachados);
+        $("#pesodespachado").text(object.pesodespachado);
+    }
+
+
+    var dimensiones = {clase: [], ancho: []};
+
+    function getMedidas(){
+        dimensiones.clase = [];
+        dimensiones.ancho = [];
+        $("#pietabla tr td").each(function () {
+            dimensiones.clase.push($(this).attr('id'));
+            dimensiones.ancho.push($("." + $(this).attr('id')).width());
+        });
+    }
+
+    //SETEA LAS DIMENSIONES DE LOS CAMPOS AL PIE DE LA TABLA, CON LAS MEDIDAS OBTENIDAD EN GetMedidas()
+    function ini_table(str) {
+        $("#pietabla").css('position', 'fixed');
+        $(".fixed_table").width($(str).width());
+        $(".fixed_table").css('left', $(".o_sub_menu").width());
+        getMedidas();
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+        }
+        $("#encabezadotabla").css('position', 'fixed');
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            $("#encabezadotabla tr #cab-" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+        }
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            $("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+        }
+    }
+    ini_table("#DataTableFabs");
+
+    $(window).resize(function(){
+        //aqui el codigo que se ejecutara cuando se redimencione la ventana
+        //setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
+        ini_table("#DataTableFabs");
+    });
+    $(document).ready(function(){
+        $('#DataTableFabs tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('success');
+            $(this).toggleClass('focus-row');
+            refreshSumas();
+        });
+    });
+
+    function submit_form(yo){
+        //$("#form"+$(yo).data('idodc')).submit();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/page_of/'+$(yo).data('idodc'),
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+   /*$("#encabezadotabla").affix({
+        offset: {
+            bottom: function () {
+                console.log($('#view_header').outerHeight(true));
+                return (this.top = $('#view_header').outerHeight(true))
+            }
+        }
+    });*/
+
+</script>

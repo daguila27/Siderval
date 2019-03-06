@@ -86,6 +86,12 @@ router.get('/view_planta', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
+router.get('/view_despachositem', function(req, res, next){
+    if(verificar(req.session.userData)){
+        res.render('jefeplanta/view_despachositem');
+    }
+    else{res.redirect('bad_login');}
+});
 
 
 router.post('/table_planta', function(req, res, next){
@@ -156,7 +162,7 @@ router.post('/table_planta', function(req, res, next){
             if(err) throw err;
 
             var consulta = "select " +
-                "odc.numoc, pedido.numitem,pedido.despachados, coalesce(fabricaciones.idorden_f, 'No OF') as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
+                "odc.numoc, cliente.sigla, cliente.razon,  pedido.numitem,pedido.despachados, coalesce(fabricaciones.idorden_f, 'No OF') as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
 
                 "coalesce(pedido.cantidad - pedido.despachados,0) as xdespachar, pedido.f_entrega, " +
                 "pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
@@ -175,6 +181,102 @@ router.post('/table_planta', function(req, res, next){
                     if(err) throw err;
 
                     res.render('jefeplanta/table_planta', {data: of});
+
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
+router.post('/table_despachositem', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+
+        var array_fill = [
+            "gd.idgd",
+            "odc.numoc",
+            "material.detalle",
+            "cliente.sigla"
+        ];
+        var object_fill = {
+            "gd.idgd-off": [],
+            "odc.numoc-off": [],
+            "material.detalle-off": [],
+            "cliente.sigla-off": [],
+            "gd.idgd-on": [],
+            "odc.numoc-on": [],
+            "material.detalle-on": [],
+            "cliente.sigla-on": []
+        };
+        var clave;
+        var where;
+        var condiciones_where = [];
+        console.log(input.rango);
+        if(input.rango == undefined || input.rango == null || input.rango == ''){
+            condiciones_where.push("gd.fecha > '2019-01-01 00:00:00'");
+        }
+        else{
+            condiciones_where.push("gd.fecha BETWEEN '"+input.rango.split('@')[0]+"' AND '"+input.rango.split('@')[1]+"'");
+        }
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+
+
+
+        var where = " ";
+
+
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+
+            var consulta = "SELECT " +
+                "gd.idgd, coalesce(odc.numoc, ' - ') as numoc, coalesce(pedido.numitem, ' - ') as numitem, " +
+                "material.detalle, material.peso, despachos.cantidad, cliente.sigla, cliente.razon, gd.fecha " +
+                "FROM despachos " +
+                "left join gd on gd.idgd = despachos.idgd " +
+                "left join cliente on cliente.idcliente = gd.idcliente " +
+                "left join material on material.idmaterial = despachos.idmaterial " +
+                "left join pedido on pedido.idpedido = despachos.idpedido " +
+                "left join odc on odc.idodc = pedido.idodc "+where ;
+            connection.query(consulta,
+                function(err, desp){
+                    if(err) throw err;
+                    res.render('jefeplanta/table_despachositem', {data: desp});
 
                 });
         });

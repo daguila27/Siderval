@@ -13,34 +13,49 @@ function fechaLatino(string){
 
 <table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px; width: 100%;">
     <style>
+
+        /*#DataTableFabs tbody tr td  {
+            margin: 0;
+            padding: auto;
+        }
+        #DataTableFabs thead tr th  {
+            margin: 0;
+            padding: auto;
+        }
+        #DataTableFabs tfoot tr td {
+            margin: 0;
+            padding: auto;
+        }*/
         .order-column:hover{
             cursor: pointer;
         }
         #encabezadotabla{
             z-index: 10;
         }
+        #encabezadotabla > tr > th{
+            text-align: center;
+        }
         #pietabla {
             left:0px;
             bottom:0px;
             height:30px;
             width:100%;
-            /*background:#999;*/
         }
     </style>
     <thead id="encabezadotabla">
     <tr>
-        <th id="cab-numof" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">OF</th>
-        <th id="cab-numitem" class="order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">Item</th>
-        <th id="cab-cliente" class="order-column" data-order="cliente.sigla-ASC">Cliente</th>
-        <th id="cab-descrip" class="order-column" data-order="material.detalle-ASC">Descripción</th>
-        <th id="cab-solicitados" class="order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
-        <th id="cab-sin_produccion" class="order-column" data-order="fabricaciones.restantes-ASC">Por Despachar</th>
-        <th id="cab-en_produccion" class="order-column" >En Producción</th>
-        <th id="cab-pesoxproducir" class="order-column" style="text-align: center;">Peso unitario</th>
-        <th id="cab-peso" class="order-column" style="text-align: center;">Peso x Despachar</th>
-        <th id="cab-pesototal" class="order-column" style="text-align: center;">Peso Despachado</th>
-        <th id="cab-stock" class="order-column" style="text-align: center;">Stock</th>
-        <th id="cab-f_entrega" class="order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
+        <th id="cab-numof">OF</th>
+        <th id="cab-numitem">Item</th>
+        <th id="cab-cliente">Cliente</th>
+        <th id="cab-descrip">Descripción</th>
+        <th id="cab-solicitados">Solicitados</th>
+        <th id="cab-sin_produccion">Por Despachar</th>
+        <th id="cab-en_produccion">En Producción</th>
+        <th id="cab-pesoxproducir" style="text-align: center;">Peso unitario</th>
+        <th id="cab-peso" style="text-align: center;">Peso x Despachar</th>
+        <th id="cab-pesototal" style="text-align: center;">Peso Despachado</th>
+        <th id="cab-stock" style="text-align: center;">Stock</th>
+        <th id="cab-f_entrega" style="text-align: center;">Fecha de Entrega</th>
     </tr>
     </thead>
     <tbody class="ui-sortable" id="cuerpotabla">
@@ -53,7 +68,7 @@ function fechaLatino(string){
     var pesod_total = 0;
     for(var i=0; i < data.length; i++){%>
     <tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
-        <td class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>">
+        <td class="numof" data-order="<%=data[i].idordenfabricacion%>">
             <%if(!data[i].externo){%>
                 <a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
                     <%=data[i].idordenfabricacion%>
@@ -61,7 +76,7 @@ function fechaLatino(string){
             <%}else{%>
                     <a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
                         <%=data[i].idordenfabricacion%>
-                    </a> (Ext)
+                    </a>
             <%}%>
         </td>
         <%
@@ -72,17 +87,17 @@ function fechaLatino(string){
             pesot_total += (data[i].peso*data[i].xdespachar);
             pesod_total += (data[i].peso*data[i].despachados);
         %>
-        <td class="numitem o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].numitem%></td>
-        <td class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
-        <td class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
-        <td data-name = "solicitados" class="checkFunction solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
-        <td data-name = "sin_produccion"class="checkFunction sin_produccion o_data_cell parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
-        <td data-name = "en_produccion"class="checkFunction en_produccion o_data_cell parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
-        <td class="pesoxproducir o_data_cell parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
-        <td data-name= "peso" class="checkFunction peso o_data_cell parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
-        <td data-name= "pesototal" class="checkFunction pesototal o_data_cell parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
-        <td class="stock o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
-        <td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" >
+        <td class="numitem" style="text-align: center;"><%=data[i].numitem%></td>
+        <td class="cliente" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
+        <td class="descrip" ><%=data[i].detalle%></td>
+        <td data-name = "solicitados" class="checkFunction solicitados parsear_nro" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
+        <td data-name = "sin_produccion"class="checkFunction sin_produccion parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
+        <td data-name = "en_produccion"class="checkFunction en_produccion parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
+        <td class="pesoxproducir parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
+        <td data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
+        <td data-name= "pesototal" class="checkFunction pesototal parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
+        <td class="stock parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
+        <td class="f_entrega" style="text-align: center;" >
             <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
         </td>
     </tr>
@@ -155,15 +170,17 @@ function fechaLatino(string){
         $("#pietabla").css('position', 'fixed');
         $(".fixed_table").width($(str).width());
         $(".fixed_table").css('left', $(".o_sub_menu").width());
-        //$("#cuerpotabla").css('margin-top', $("#encabezadotabla").css('height'));
         getMedidas();
-        //$("#encabezadotabla").css('position', 'fixed');
-        //$("#cuerpotabla").css('position', 'absolute');
-
         for (var w = 0; w < dimensiones.clase.length; w++) {
-            //$("#encabezadotabla tr #cab-"+dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
-            //$("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
             $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+        }
+        $("#encabezadotabla").css('position', 'fixed');
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            $("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+            $("#encabezadotabla tr #cab-" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+
+        }
+        for (var w = 0; w < dimensiones.clase.length; w++) {
         }
     }
     ini_table("#DataTableFabs");
