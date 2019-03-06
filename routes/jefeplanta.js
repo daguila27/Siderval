@@ -215,11 +215,10 @@ router.post('/table_despachositem', function(req, res, next){
         var condiciones_where = ['despachos.cantidad > 0'];
 
         if(input.tab == 'funds'){
-            condiciones_where.push('material.codigo LIKE "P%"');
-            condiciones_where.push('material.detalle NOT LIKE "%ceramico%"');
+            condiciones_where.push('material.codigo LIKE "P%" AND material.detalle NOT LIKE "%ceramico%"');
         }
         else{
-            condiciones_where.push('material.codigo NOT LIKE "P%"');
+            condiciones_where.push('material.codigo NOT LIKE "P%" OR material.detalle LIKE "%ceramico%"');
         }
         if(input.rango == undefined || input.rango == null || input.rango == ''){
             condiciones_where.push("gd.fecha > '2019-01-01 00:00:00'");

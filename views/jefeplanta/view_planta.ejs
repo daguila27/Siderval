@@ -51,8 +51,8 @@
                 <div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
                     <div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
                     </div>
-                    <input id="buscar_planta" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
-                    <input id="buscar_planta-value" style="display: none" type="text" autocomplete="off">
+                    <input disabled="disabled" autocomplete="off" id="buscar_planta" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
+                    <input disabled="disabled" autocomplete="off" id="buscar_planta-value" style="display: none" type="text" autocomplete="off">
                 </div>
                 <ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
                     <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OF</em> para: <strong></strong></a></li>
@@ -398,5 +398,14 @@
         });
 
     });
+    function getRidOffAutocomplete(){
+        var timer = window.setTimeout( function(){
+            $('#buscar_planta-value, #buscar_planta').prop('disabled',false);
+            clearTimeout(timer);
+        }, 800);
+    }
+
+    // Invoke the function
+    getRidOffAutocomplete();
 
 </script>
