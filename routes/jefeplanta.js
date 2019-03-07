@@ -94,6 +94,8 @@ router.get('/view_despachositem/:tab', function(req, res, next){
 });
 
 
+
+
 router.post('/table_planta', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -224,7 +226,8 @@ router.post('/table_despachositem', function(req, res, next){
             condiciones_where.push("gd.fecha > '2019-01-01 00:00:00'");
         }
         else{
-            condiciones_where.push("gd.fecha BETWEEN '"+input.rango.split('@')[0]+"' AND '"+input.rango.split('@')[1]+"'");
+            console.log(input.rango);
+            condiciones_where.push("gd.fecha BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59'");
         }
         if(input.clave == '' || input.clave == null || input.clave == undefined){
             clave = [];

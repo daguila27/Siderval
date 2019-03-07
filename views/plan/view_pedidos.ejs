@@ -78,6 +78,9 @@
 					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
 					<input type="checkbox" id="pend_oc" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_oc()">
 					<h5 style="margin-left: 10px" class="indicator-oc-check"><small>Mostrando solo pedido(s) sin despachar</small></h5>
+					<!--<div style="display: flex; margin-left: 20px">
+						<input type="number" onchange="changeSize(this)">
+					</div>-->
 				</div>
 	       		<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
 	    	
@@ -93,7 +96,7 @@
 		</div>
 	</div>
 </div>
-<div class="row row-main" style=" margin: 0; padding: 0;">			
+<div class="row row-main" style=" margin: 0; padding: 0;">
 	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5; top:-7px;"></div>
 </div>
 
@@ -104,6 +107,10 @@
 </style>
 
 <script type="text/javascript">
+	function changeSize(yo){
+	    alert($(yo).val());
+	    $(".row_main").css('font-size', $(yo).val()+"px");
+	}
     var array_fill = [
         "OC@primary",
         "OF@primary",
