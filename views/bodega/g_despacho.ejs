@@ -136,7 +136,7 @@ function letraMayus(string) {
         <div class="tab-pane fade in active" id="prodxdeps" style="display: block;">
             <div class="panel panel-default">
                 <div class="panel-body" style="padding: 0; padding-top: 10px">
-                    <table id="DataTableGD" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+                    <table id="DataTableGD" class="table table-condensed table-striped" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th>N°OC</th>
@@ -228,7 +228,7 @@ function letraMayus(string) {
 <script type="text/javascript">
     $(".mat_desp").each(function(){
         var stock = parseInt($(this).children('.mat_stock').html());
-        if(stock == 0){
+        if(stock <= 0){
             $(this).children('.mat_butt').children('a').removeClass('btn-success');
             $(this).children('.mat_butt').children('a').addClass('btn-danger');
             $(this).children('.mat_butt').children('a').removeClass('addrow');
