@@ -4885,14 +4885,14 @@ router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
         if(err)
             console.log("Error Connection : %s", err);
 
-        connection.query('select material.detalle,abastecimiento.cc as subcuenta, abastecimiento.costo as precio, abastecimiento.cantidad,abastecimiento.exento from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on material.idmaterial=abastecimiento.idmaterial where oda.idoda=?', [req.params.idoda],
+        connection.query("select coalesce(combustible.idmaterial, 0) as idcombustible,material.detalle,abastecimiento.cc as subcuenta, abastecimiento.costo as precio, abastecimiento.cantidad,abastecimiento.exento from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on material.idmaterial=abastecimiento.idmaterial left join (SELECT idmaterial FROM material where codigo in('I030000990004')) as combustible on combustible.idmaterial = material.idmaterial where oda.idoda=?", [req.params.idoda],
          function(err, mats){
             if(err)
                 console.log("Error Selecting : %s", err);
             connection.query("SELECT * FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor WHERE oda.idoda = ?", [req.params.idoda], function(err, oda){
                 if(err)
                     console.log("Error Selecting : %s", err);
-                console.log(mats);
+                console.log(mats[0].idcombustible);
                 res.render('plan/template_oda', {oda: oda,mats: mats,tipo: 'oda'});
             });
         });        
