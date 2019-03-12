@@ -165,18 +165,19 @@ router.post('/table_planta', function(req, res, next){
 
             var consulta = "select " +
                 "odc.numoc, cliente.sigla, cliente.razon,  pedido.numitem,pedido.despachados, coalesce(fabricaciones.idorden_f, 'No OF') as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
-
                 "coalesce(pedido.cantidad - pedido.despachados,0) as xdespachar, pedido.f_entrega, " +
-                "pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
+                "coalesce(fundidos.fundidos,0) as fundidos,pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
                 "material.stock, material.peso, coalesce(material.peso*(pedido.cantidad - pedido.despachados), 0) as pesoxdespachar " +
                 "from pedido " +
                 "left join odc on odc.idodc = pedido.idodc " +
-
+                "left join " +
+                "(select pedido.idpedido, coalesce(sum(produccion_history.enviados), 0) as fundidos from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join pedido on pedido.idpedido = fabricaciones.idpedido where produccion_history.from = 2 and pedido.idpedido is not null group by pedido.idpedido) " +
+                "as fundidos on fundidos.idpedido= pedido.idpedido " +
                 "left join cliente on odc.idcliente = cliente.idcliente " +
                 "left join fabricaciones on (fabricaciones.idpedido = pedido.idpedido) " +
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 "left join " +
-                "(select produccion.idfabricaciones, sum(produccion.cantidad - produccion.`8` - produccion.standby) as enproduccion, produccion.`8` as finalizados from produccion group by produccion.idfabricaciones)" +
+                "(select produccion.idfabricaciones, sum(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1` - produccion.`2`) as enproduccion, produccion.`8` as finalizados from produccion group by produccion.idfabricaciones)" +
                 " as queryPlanta on queryPlanta.idfabricaciones = fabricaciones.idfabricaciones "+where;
             connection.query(consulta,
                 function(err, of){
