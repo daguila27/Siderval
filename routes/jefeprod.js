@@ -103,18 +103,18 @@ router.post('/table_producciones', function(req, res, next){
         //var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND (material.detalle LIKE '%"+clave+"%' OR produccion.idordenproduccion LIKE '%"+clave+"%')";
         var query;
         if(input.agrupar == 'true'){
-            query = "SELECT * FROM (SELECT material.idmaterial,SUM(produccion.standby) as standby, SUM(produccion.`1`) as `1`,SUM(produccion.`2`) as `2`,SUM(produccion.`3`) as `3`,SUM(produccion.`4`) as `4`,SUM(produccion.`5`) as `5`,"
+            query = "SELECT * FROM (SELECT ordenproduccion.f_gen as creacion ,material.idmaterial,SUM(produccion.standby) as standby, SUM(produccion.`1`) as `1`,SUM(produccion.`2`) as `2`,SUM(produccion.`3`) as `3`,SUM(produccion.`4`) as `4`,SUM(produccion.`5`) as `5`,"
                 + "SUM(produccion.`6`) as `6`,SUM(produccion.`7`) as `7`,SUM(produccion.`8`) as `8`, GROUP_CONCAT(produccion.idproduccion separator ' - ') as idproduccion, '-' as trats,"
                 + " '-' as numordenfabricacion, '-' as idfabricaciones, '-' as idordenproduccion, sum(produccion.cantidad) as cantidad, material.detalle,  opQuery.tok ,opQuery.idordenfabricacion"
-                + " FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
+                + " FROM produccion LEFT JOIN ordenproduccion ON ordenproduccion.idordenproduccion = produccion.idordenproduccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
                 +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
                 +" fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=ordenfabricacion.idordenfabricacion" +
                 " LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial WHERE produccion.`8` + produccion.standby != produccion.cantidad GROUP BY material.idmaterial) AS table_prod" +
                 where+" GROUP BY table_prod.idmaterial";
         }
         else{
-            query = "SELECT * FROM (SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
-                +" as trats FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
+            query = "SELECT * FROM (SELECT ordenproduccion.f_gen as creacion,produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,opQuery.tok,COALESCE(SUM(produccion_history.enviados),0)"
+                +" as trats FROM produccion LEFT JOIN ordenproduccion ON ordenproduccion.idordenproduccion = produccion.idordenproduccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
                 +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
                 +" fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion left join produccion on produccion.idfabricaciones=fabricaciones.idfabricaciones group by ordenfabricacion.idordenfabricacion) as opQuery on opQuery.idordenfabricacion=ordenfabricacion.idordenfabricacion" +
                 " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial WHERE produccion.`8` + produccion.standby != produccion.cantidad GROUP BY produccion.idproduccion) AS table_prod" +
