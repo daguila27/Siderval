@@ -119,7 +119,7 @@
 
     function reSearch(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
-        if($(".vista-pill.active").data('info') == 'ex'){
+        if($(".vista-pill.active").data('info') === 'ex'){
             $.ajax({
                 type: 'POST',
                 data: {clave: filtros_seleccionados.join(','), agrupar: $("#groupP").is(':checked')},
@@ -130,21 +130,11 @@
                 },
                 success: function(data){
                     $(".main-page").html(data);
-                    //Muestra la cantidad de pedidos
-                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
                     $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-8);
                 }
             });
-            /*$.ajax({
-                type: 'POST',
-                data: {clave: $("#buscar_produccion").val(), agrupar: $("#groupP").is(':checked')},
-                url: '/jefeprod/table_producciones',
-                success: function(data){
-                    $(".main-page").html(data);
-                }
-            });*/
         }
-        else if($(".vista-pill.active").data('info') == 'prog'){
+        else if($(".vista-pill.active").data('info') === 'prog'){
             $.ajax({
                 type: 'POST',
                 data: {clave: filtros_seleccionados.join(','), agrupar: $("#groupP").is(':checked')},
@@ -235,6 +225,7 @@
         $("#buscar_produccion").focus();
         reSearch();
     });
+
     function eliminarEtiqueta(yo){
         filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
         $(yo).parent().remove();
@@ -247,8 +238,9 @@
         $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
         reSearch();
     }
+
     function cambiarEtiqueta(yo){
-        if($(yo).data('state') == 'off') {
+        if($(yo).data('state') === 'off') {
             $(yo).parent().removeClass('label-primary');
             $(yo).parent().addClass('label-danger');
             $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
@@ -275,7 +267,6 @@
 
             $(yo).data('state', 'off');
         }
-        alert(filtros_seleccionados.join(','));
         reSearch();
     }
 

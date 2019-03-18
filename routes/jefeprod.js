@@ -148,6 +148,7 @@ router.post('/table_producciones', function(req, res, next){
             connection.query(query,
                 function(err, prods){
                     if(err) throw err;
+
                     res.render('jefeprod/table_producciones', {datalen: prods});
 
                 });

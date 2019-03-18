@@ -196,6 +196,29 @@
             $('table').DataTable().destroy();
         }
     }
+
+
+
+    var io = io();
+    io.on('notif', function(){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/render_notificaciones',
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+
+    });
+
+
+    $.ajax({
+        type: 'GET',
+        url: 'bodega/render_notificaciones',
+        success: function(data){
+            $(".notificaciones").html(data);
+        }
+    });
 </script>
 </body>
 </html>
