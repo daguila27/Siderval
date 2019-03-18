@@ -216,25 +216,6 @@
             }
         });
     }
-    /*$.ajax({
-        type: 'GET',
-        url: '/test/table_test',
-        beforeSend: function(){
-            if ( $.fn.DataTable.isDataTable('table') ) {
-                $('table').DataTable().destroy();
-            }
-            $("#page-wrapper").css('display', 'none');
-        },
-        success: function(data){
-
-            $("#page-wrapper").html(data);
-            $("#page-wrapper").fadeIn();
-            $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
-            $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height);
-        }
-    });*/
-
-
     $(document).ready(function(){
         $.ajax({
             type: 'GET',

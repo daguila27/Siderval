@@ -107,7 +107,7 @@
     // Carga la tabla de pedidos
     $(document).ready(function(){
         reSearch();
-        $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+        //$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
 
     $(".vista-pill").on('click', function(e){
@@ -117,28 +117,22 @@
         reSearch();
     });
 
-    /*$("#buscar_produccion").on('keyup', function(e){
-        e.preventDefault();
-        reSearch();
-    });*/
     function reSearch(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         if($(".vista-pill.active").data('info') == 'ex'){
             $.ajax({
                 type: 'POST',
-                beforeSend: function(){
-                    destroyDataTable();
-                },
-                data: {clave: filtros_seleccionados.join(','),agrupar: $("#groupP").is(':checked')},
+                data: {clave: filtros_seleccionados.join(','), agrupar: $("#groupP").is(':checked')},
                 url: '/jefeprod/table_producciones',
                 beforeSend: function(){
+                    destroyDataTable();
                     $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
                 },
                 success: function(data){
                     $(".main-page").html(data);
                     //Muestra la cantidad de pedidos
                     $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                    $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
+                    $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-8);
                 }
             });
             /*$.ajax({
@@ -153,11 +147,12 @@
         else if($(".vista-pill.active").data('info') == 'prog'){
             $.ajax({
                 type: 'POST',
+                data: {clave: filtros_seleccionados.join(','), agrupar: $("#groupP").is(':checked')},
+                url: '/jefeprod/table_producciones_progreso',
                 beforeSend: function(){
                     destroyDataTable();
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
                 },
-                data: {clave: $("#buscar_produccion").val(), agrupar: $("#groupP").is(':checked')},
-                url: '/jefeprod/table_producciones_progreso',
                 success: function(data){
                     $(".main-page").html(data);
                     $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
@@ -222,18 +217,18 @@
         var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
         var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
         $(".etiqueta-filtro-div").append(
-            "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_produccion").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
+            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_produccion").val()+'"'+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_produccion").val()+"@off' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
             +$("#buscar_produccion").val()+
-            "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+            "</strong><div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
         );
         $(".etiqueta-filtro-div").data('cant', labels+1);
         if($("#buscar_produccion-value").val() == '' || $("#buscar_produccion-value").val() == null || $("#buscar_produccion-value").val() == undefined){
-            $("#buscar_produccion-value").val($(this).data('searchcol')+"@"+$("#buscar_produccion").val());
+            $("#buscar_produccion-value").val($(this).data('searchcol')+"@"+$("#buscar_produccion").val()+ "@off");
         }
         else{
-            $("#buscar_produccion-value").val([$("#buscar_produccion-value").val(),$(this).data('searchcol')+"@"+$("#buscar_produccion").val()].join(','));
+            $("#buscar_produccion-value").val([$("#buscar_produccion-value").val(),$(this).data('searchcol')+"@"+$("#buscar_produccion").val()].join(',')+ "@off");
         }
-        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_produccion").val());
+        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_produccion").val()+ "@off");
         $(".o_searchview_autocomplete").css('display', 'none');
         $(".o_searchview_autocomplete strong").html('');
         $("#buscar_produccion").val('');
@@ -250,6 +245,37 @@
             count++;
         });
         $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        reSearch();
+    }
+    function cambiarEtiqueta(yo){
+        if($(yo).data('state') == 'off') {
+            $(yo).parent().removeClass('label-primary');
+            $(yo).parent().addClass('label-danger');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
+
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Removiendo "+'"'+$(yo).parent().children('strong').text()+'"'+" de la busqueda");
+            $(yo).removeClass('fa-toggle-off');
+            $(yo).addClass('fa-toggle-on');
+            $(yo).data('state', 'on');
+        }
+        else{
+            $(yo).parent().removeClass('label-danger');
+            $(yo).parent().addClass('label-primary');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'off'].join('@'));
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Buscando "+'"'+$(yo).parent().children('strong').text()+'"');
+
+            $(yo).removeClass('fa-toggle-on');
+            $(yo).addClass('fa-toggle-off');
+
+            $(yo).data('state', 'off');
+        }
+        alert(filtros_seleccionados.join(','));
         reSearch();
     }
 

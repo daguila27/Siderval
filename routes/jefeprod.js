@@ -66,14 +66,20 @@ router.post('/table_producciones', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
-        var clave = input.clave;
-        var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var array_fill = [
             "table_prod.detalle",
             "table_prod.idordenproduccion",
             "table_prod.numordenfabricacion"
         ];
+        var object_fill = {
+            "table_prod.detalle-off": [],
+            "table_prod.idordenproduccion-off": [],
+            "table_prod.numordenfabricacion-off": [],
+            "table_prod.detalle-on": [],
+            "table_prod.idordenproduccion-on": [],
+            "table_prod.numordenfabricacion-on": []
+        };
+        var clave;
         var where;
         var condiciones_where = [];
         if(input.clave == '' || input.clave == null || input.clave == undefined){
@@ -82,23 +88,40 @@ router.post('/table_producciones', function(req, res, next){
         else{
             clave = input.clave.split(',');
         }
+
+
         if(clave.length>0){
             for(var e=0; e < clave.length; e++){
-                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
             }
         }
+        console.log(condiciones_where);
 
-        /*if(input.agrupar != 'true'){
-            condiciones_where.push("table_prod.el = false");
-        }*/
         var where = " ";
         if(condiciones_where.length==0){
-            //where = " WHERE table_prod.el = false";
+            where = "";
         }
         else{
-            where = " WHERE ("+ condiciones_where.join(" AND ")+")";
+            where = " WHERE "+ condiciones_where.join(" AND ");
         }
-
         console.log(where);
         //var where = " WHERE produccion.8 != produccion.cantidad AND produccion.el = false AND (material.detalle LIKE '%"+clave+"%' OR produccion.idordenproduccion LIKE '%"+clave+"%')";
         var query;
@@ -163,8 +186,8 @@ router.post('/serchprods', function(req, res, next) {
                 " WHERE material.detalle like ? AND ordenfabricacion.numordenfabricacion LIKE ? AND produccion.8 != produccion.cantidad GROUP BY produccion.idordenproduccion "*/
                 "SELECT produccion.*,ordenfabricacion.idordenfabricacion as numordenfabricacion,material.detalle,COALESCE(SUM(produccion_history.enviados),0) as trats FROM produccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion" +
                         " LEFT JOIN produccion_history ON (produccion_history.idproduccion = produccion.idproduccion AND produccion_history.from = '5') LEFT JOIN producido ON fabricaciones.idproducto = producido.idproducto LEFT JOIN material ON material.idmaterial = producido.idmaterial" +
-                        "  WHERE produccion.8 != produccion.cantidad AND material.detalle like ? AND ordenfabricacion.idordenfabricacion LIKE ?  GROUP BY produccion.idproduccion"
-                ,[req.body.detalle,req.body.numordenfabricacion],function(err,prods){
+                        "  WHERE produccion.8 != produccion.cantidad AND material.detalle like ? AND ordenfabricacion.idordenfabricacion LIKE ?  GROUP BY produccion.idproduccion",
+                [req.body.detalle,req.body.numordenfabricacion],function(err,prods){
                 
                 if(err) console.log("Select Error: %s",err);
                 console.log(prods);

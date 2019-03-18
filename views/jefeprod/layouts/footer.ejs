@@ -190,11 +190,6 @@
 
 <!-- Metis Menu Plugin JavaScript -->
 <script src="/vendor/metisMenu/metisMenu.min.js"></script>
-
-
-
-
-
 <!-- Morris Charts JavaScript -->
 <script src="/vendor/raphael/raphael.min.js"></script>
 <script src="/vendor/morrisjs/morris.min.js"></script>
@@ -214,8 +209,6 @@
     function close_menu() {
         $('.o_sub_menu').css('left', '-15%');
     }
-
-
     $("#enviarRechazo").submit(function( event ) {
         event.preventDefault();
         var form = $(this).serializeArray();
@@ -247,9 +240,6 @@
             }
         });
     });
-
-
-
     function setDataTable(str){
 
         return $(str).DataTable({
@@ -280,7 +270,6 @@
             }
         });
     }
-
     function setDataTableMain(str){
         return $(str).DataTable({
             responsive: true,
@@ -312,8 +301,6 @@
             }
         });
     }
-
-
     function  setDataTableFixed(str){
         var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 8;
         return $(str).DataTable({
@@ -351,7 +338,6 @@
             }
         });
     }
-
     function ajax(yo){
         $(".active").removeClass('active');
         $(yo).addClass('active');
@@ -359,6 +345,7 @@
             type: 'GET',
             url: $(yo).data('link'),
             beforeSend: function(){
+                destroyDataTable();
                 $("#page-wrapper").css('display', 'none');
             },
             success: function(data){
@@ -383,6 +370,7 @@
         type: 'GET',
         url: 'jefeprod/crear_op',
         beforeSend: function(){
+            destroyDataTable();
             $("#page-wrapper").css('display', 'none');
         },
         success: function(data){
@@ -390,8 +378,6 @@
             $("#page-wrapper").fadeIn();
         }
     });
-
-
     $(".enviarError").on('click', function(e){
         e.preventDefault();
         var inputid = $(this).data("idinput");
@@ -413,7 +399,6 @@
             }
         });
     });
-
     var io = io();
     io.on('notif', function(){
         $.ajax({
@@ -425,24 +410,6 @@
         });
 
     });
-
-    /*        $("form#form-return").on('submit', function(e){
-                e.preventDefault();
-                var array = $("#form-return").serializeArray();
-                console.log(array);
-                $.ajax({
-                    type: 'POST',
-                    data: {idprod: array[0].value, cant: array[1].value, newe: array[2].value , idnot: array[3].value},
-                    url: '/jefeprod/modif_op',
-                    success: function(data){
-                        $(".notificaciones").html(data);
-                        $(".cerrarRechazoModal").click();
-                    }
-                });
-
-            });*/
-
-
     $("form.form-newp").on('submit', function(e){
         e.preventDefault();
 
@@ -471,9 +438,6 @@
         });
 
     });
-
-
-
     io.on('showToastnewOF', function(num){
 
         // Get the snackbar DIV
@@ -492,10 +456,6 @@
         alert("emit");
         io.emit('showToast', []);
     }
-
-
-
-
     io.on('showToastnewFab', function(){
 
 
@@ -516,6 +476,12 @@
         //setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     });
 
+
+    function destroyDataTable(){
+        if ( $.fn.DataTable.isDataTable('table') ) {
+            $('table').DataTable().destroy();
+        }
+    }
 
 
 </script>

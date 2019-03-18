@@ -11,7 +11,7 @@ function fechaLatino(string){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"></div>
 
-<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="top: -7px; padding: 0;width: 100%;">
+<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
     <thead>
     <tr>
         <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
@@ -31,17 +31,16 @@ function fechaLatino(string){
         <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center">Creación</th>
     </tr>
     </thead>
-    <tbody id="todosbody">
+    <tbody>
     <%
     if(datalen.length){
     for(var i = 0; i< datalen.length; i++){
     %>
     <tr>
         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
-        <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].idordenproduccion %></td>
-        <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].numordenfabricacion %></td>
+        <td><%= datalen[i].idordenproduccion %></td>
+        <td><%= datalen[i].numordenfabricacion %></td>
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] %></td>
-        <!--<td data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center"><%= datalen[i].abastecidos %></td>-->
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
         <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
