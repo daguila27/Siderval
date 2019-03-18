@@ -33,7 +33,13 @@ function parsear_crl(nro){
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     if(req.session.userData.nombre == 'test'){
-        res.render('test/indx',{page_title:"Planificación",username: req.session.userData.nombre});}
+        res.render('test/index',{page_title:"Prueba DataTable",username: req.session.userData.nombre});}
+    else{res.redirect('bad_login');}
+});
+
+router.get('/table_test', function(req, res, next) {
+    if(req.session.userData.nombre == 'test'){
+        res.render('test/table_test', {view_tipo: 'false'});}
     else{res.redirect('bad_login');}
 });
 

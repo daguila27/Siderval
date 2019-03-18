@@ -2058,7 +2058,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                     ops[i-2].ing_oda +
                     ops[i-2].fundidos -
                     ops[i-2].despachados -
-                    ops[i-2].rechazados;
+                    ops[i-2].rechazados - (ops[i-2].sum_sal - ops[i-2].sum_dev);
+                //STOCK SIDERVAL FINAL = SI + PI + ING_ODA + FUND - DESP - RECH - (RET_BMP - DEV_BMP)
             }
            /* sheet.getRow(1).fill = {
                 type: 'pattern',

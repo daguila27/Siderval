@@ -164,6 +164,8 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
                 + where + " GROUP BY pedido.idpedido) as " + orden.split('.')[0] + " ORDER BY " + orden,
                 function(err, odc){
                     if(err) throw err;
+
+
                     res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-'), page: page+1});
 
             });

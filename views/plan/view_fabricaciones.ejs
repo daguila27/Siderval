@@ -39,8 +39,8 @@
 		cursor: pointer;
 	}
 </style>
-<div class="row" style="margin: 0; padding: 0;" id="view_header">
-	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; position: fixed; z-index: 10; width: 82.5%">
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Fabricacion</li>
 		    <!-- Mostrar cantidad de datos -->
@@ -87,18 +87,20 @@
                     </select>
 				</div>
 
-					<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
 
-                 <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
+				<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
+
+             <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
 			</div>
 		</div>
 	</div>
 </div>
-<div class="row row-main" style=" margin: 0; padding: 0;">
-	<div class="col-sm-12 main-page" style="margin: 0; padding-left: 0; padding-right: 0; z-index: 5; top:-7px">
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+	<div id="fw-body"  style="padding:0;margin: 0;">
+		<div class="content main-page">
+		</div>
 	</div>
 </div>
-
 <script type="text/javascript">
     var array_fill = [
         "OF@default",
@@ -107,9 +109,12 @@
         "Entrega@info",
         "Cliente@warning"
     ];
+
     var filtros_seleccionados = [];
 	$(document).ready(function(){
-		$.ajax({
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+
+        $.ajax({
 			type: 'POST',
 			data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked")},
 			url: '/plan/table_fabricaciones/fabricaciones.idorden_f-DESC/true',
@@ -121,9 +126,9 @@
 
 				//Muestra la cantidad de pedidos
 				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
 			}
 		});
-		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
 	});
 
 	/*
@@ -163,6 +168,7 @@
 			data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked")},
             url: '/plan/table_fabricaciones/fabricaciones.f_entrega-ASC/true',
             beforeSend: function(){
+                destroyDataTable();
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
             },
             success: function(data){

@@ -52,37 +52,31 @@ However, delay the fade out process for 2.5 seconds */
     to {bottom: 0; opacity: 0;}
 } 
 </style>
-
-
-
-
-
-    <!-- jQuery -->
+    <!-- jQuery-->
     <script src="/vendor/jquery/jquery.min.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
+    <!-- Bootstrap Core JavaScript-->
     <script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
 
-    <!-- Metis Menu Plugin JavaScript -->
+    <!-- Metis Menu Plugin JavaScript-->
     <script src="/vendor/metisMenu/metisMenu.min.js"></script>
 
-    <!-- DataTables JavaScript -->
-    <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
-    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
-    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
 
-    <!-- Morris Charts JavaScript -->
+    <!-- Morris Charts JavaScript-->
     <script src="/vendor/raphael/raphael.min.js"></script>
     <script src="/vendor/morrisjs/morris.min.js"></script>
     <script src="/data/morris-data.js"></script>
-    <!-- DataTables JavaScript -->
+
+    <!-- DataTables JavaScript-->
     <script src="/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
     <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
+    <script type="text/javascript" language="javascript" src="/assets/js/dataTables.fixedHeader.min.js"></script>
 
-    <!-- Custom Theme JavaScript -->
+
+                        <!-- Custom Theme JavaScript -->
     <script src="/dist/js/sb-admin-2.js"></script>
-    
+
     <script src="/vendor/jquery/jquery.twbsPagination.js" type="text/javascript"></script>
 
     <div class="footer-hidden"></div>
@@ -204,7 +198,144 @@ However, delay the fade out process for 2.5 seconds */
     }
 
 
+    function setDataTableMain(str){
+        return $(str).DataTable({
+            responsive: true,
+            lengthChange: false,
+            pageLength: 20,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
 
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
+
+    function setDataTableFabricaciones(str){
+        /*return $(str).DataTable({
+            fixedColumns: true,
+            responsive: true,
+            lengthChange: false,
+            paging: false,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });*/
+        return $(str).DataTable( {
+            fixedHeader: {
+                header: true,
+                footer: true,
+                headerOffset: 100
+            },
+            paging: false,
+            fixedColumns: true,
+            responsive: true,
+            lengthChange: false,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        } );
+    }
+
+    function  setDataTableFixed(str){
+        return $(str).DataTable( {
+            fixedHeader: {
+                header: true,
+                footer: true,
+                headerOffset:
+                    $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 5
+            },
+            paging: false,
+            fixedColumns: true,
+            responsive: true,
+            lengthChange: false,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        } );
+    }
     $.ajax({
        type: 'GET',
        url: '/bodega/render_notificaciones',
@@ -228,6 +359,9 @@ However, delay the fade out process for 2.5 seconds */
             url: $(yo).data('link'), 
             beforeSend: function(){
                 $("#page-wrapper").css('display', 'none');
+                if ( $.fn.DataTable.isDataTable('table') ) {
+                    $('table').DataTable().destroy();
+                }
             },
             success: function(data){
                 $("#page-wrapper").html(data);

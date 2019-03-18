@@ -1,0 +1,170 @@
+
+<script type="text/javascript">
+    $("#paletsTable tbody").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+
+    $(".nav-pills").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+</script>
+<%
+var count = 0;
+function fechaLatino(string){
+    return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
+}
+%>
+
+<table id="paletsTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+    <thead>
+    <tr>
+        <th class="o_column_sortable">Palet</th>
+        <th class="o_column_sortable">Peso Total</th>
+        <th class="o_column_sortable">Fecha de Entrega Minima</th>
+        <th class="o_column_sortable">Creación</th>
+        <th>Ver Item's</th>
+    </tr>
+    </thead>
+    <tbody class="ui-sortable">
+    <%
+    var peso = 0;
+    for(var i=0; i < desp.length; i++){
+        peso += desp[i].peso_palet;%>
+        <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>">
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].idpalet%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs"><i class="fa fa-spinner fa-pulse"></i></button></td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th style="text-align: center;"><%= peso%></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- Oculta cantidad de datos, va al final para contar la cantidad de materiales -->
+<% if(desp.length != 0){ %>
+<div id="registros" style="display: none"> <%=desp.length%></div>
+<%} else{%>
+    <div id="registros" style="display: none">0 0</div>
+<%}%>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+
+
+    setDataTableFixed("#paletsTable");
+    function refreshCount(){
+        var c = 0;
+        $(".select-desp.danger").each(function(){
+            c++;
+        });
+        if(c == 0){
+            $("#newpl_button").css('bottom', '-50px');
+        }
+        else{
+            $("#newpl_button").css('bottom', '20px');
+        }
+        $("#pedidos").html("<h5><small>"+c+" pedidos seleccionados.</small></h5>");
+    }
+    var mouseDown = 0;
+    document.body.onmousedown = function() {
+        mouseDown = 1;
+    }
+    document.body.onmouseup = function() {
+        mouseDown = 0;
+        //check_session();
+
+    }
+    $(".select-desp").mouseenter(function(){
+        if(mouseDown == '1'){
+            $(this).toggleClass('danger');
+            if($(this).hasClass('danger')){
+                $(this).data('state', 'selec');
+                //act_session('add', this);
+
+            }
+            else{
+                $(this).data('state', 'noselec');
+                //act_session('rm', this);
+            }
+            //check_session();
+        }
+
+    });
+    $(".select-desp").mousedown(function(){
+        $(this).toggleClass('danger');
+        if($(this).hasClass('danger')){
+            $(this).data('state', 'selec');
+            //act_session('add', this);
+
+        }
+        else{
+            $(this).data('state', 'noselec');
+            //act_session('rm', this);
+
+        }
+
+    });
+
+    function act_session(type, yo){
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/'+type+'_session_peds/'+$(yo).data('idpedido'),
+            success: function(data){
+                console.log(data);
+            }
+        });
+    }
+
+    function check_session(){
+        var array = [];
+        $(".select-desp").each(function(){
+            if($(this).hasClass('danger')){
+                array.push($(this).data('idpedido'));
+            }
+        });
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/check_session_peds/'+array.join('-'),
+            success: function(data){
+                console.log(data);
+                refreshCount();
+            }
+        });
+    }
+
+    $("#pedidos").html("<h5><small>"+"<%=arraypl.length%>"+" pedidos seleccionados.</small></h5>");
+    if('<%=arraypl.length%>' == '0'){
+        $("#newpl_button").css('bottom', '-50px');
+    }
+    else{
+        $("#newpl_button").css('bottom', '20px');
+    }
+
+    $(".view_PL").on('click', function(e){
+        e.preventDefault();
+    });
+</script>

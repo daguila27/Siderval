@@ -5,7 +5,7 @@
 	}
 %>
 
-<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: 7px">
+<table id="gdTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTabla" style="width: 100%; margin-top:0;">
 		<thead>
 			<tr>
 				<th class="o_column_sortable">GDD</th>
@@ -22,7 +22,7 @@
 	<tbody class="ui-sortable">
 		<%
 		for(var i=0; i < desp.length; i++){ %>
-			<tr class="o_data_row" onclick="" data-idodc="">
+			<tr class="o_data_row">
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" ><%=desp[i].idgd%></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
 				<td id="item<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
@@ -72,8 +72,8 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#despachosTable");
-	function getxlsx(file){
+    setDataTableFixed("#gdTable");
+    function getxlsx(file){
 		$.ajax({
 			type: 'GET',
 			url: 'bodega/gen_pdfgdd/'+$(file).attr("data-id"),
@@ -109,6 +109,9 @@
 		$.ajax({
 			type: 'GET',
 			url: '/bodega/page_gdd/'+$(yo).data('idgd'),
+			beforeSend: function(){
+			  	destroyDataTable();
+			},
 			success: function(data){
 				$(".main-page").html(data);
 			}

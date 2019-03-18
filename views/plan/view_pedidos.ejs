@@ -36,8 +36,8 @@
 		display: flex;
 	}
 </style>
-<div class="row" style="margin: 0; padding: 0;">
-	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%;">
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra </li>
 			<!-- Mostrar cantidad de datos -->
@@ -96,10 +96,13 @@
 		</div>
 	</div>
 </div>
-<div class="row row-main" style=" margin: 0; padding: 0;">
-	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5; top:-7px;"></div>
-</div>
 
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+	<div id="fw-body"  style="padding:0;margin: 0;">
+		<div class="content main-page">
+		</div>
+	</div>
+</div>
 <style type="text/css">
 	.caption a:hover{
 		cursor:pointer;
@@ -121,6 +124,7 @@
     var filtros_seleccionados = [];
 	// Carga la tabla de pedidos
 	$(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
 		/*$.ajax({
             type: 'GET',
             url: '/plan/table_pedidos/pedido.f_entrega-ASC/1',
@@ -133,8 +137,23 @@
 				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
 			}
 		});*/
-		buscar_oc();
-		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+		//buscar_oc();
+        $.ajax({
+            type: 'POST',
+            data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend_oc').is(":checked")},
+            url: '/plan/table_pedidos/pedido.idodc-DESC/1',
+            beforeSend: function(){
+                destroyDataTable();
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+            success: function(data){
+                $(".main-page").html(data);
+                //Muestra la cantidad de pedidos
+                $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                //$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
+            }
+        });
 	});
 
 	function buscar_oc(){
@@ -143,6 +162,7 @@
             data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend_oc').is(":checked")},
             url: '/plan/table_pedidos/pedido.idodc-DESC/1',
             beforeSend: function(){
+                destroyDataTable();
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
             },
             success: function(data){

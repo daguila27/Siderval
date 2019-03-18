@@ -1,4 +1,4 @@
-var express = require('express');
+    var express = require('express');
 var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
@@ -19,7 +19,7 @@ router.use(
 );
 
 function verificar(usr){
-	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'|| usr.nombre == 'jefeplanta'){
+	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'|| usr.nombre == 'jefeplanta'|| usr.nombre == 'test'){
 		return true;
 	}else{
 		return false;
@@ -28,7 +28,7 @@ function verificar(usr){
 /* GET users listing. */
 router.get('/', function(req, res, next) {
 	if(req.session.userData.nombre == 'bodega'){
-    	res.render('bodega/indx', {page_title: "Bodega", username: req.session.userData.nombre});
+    	res.render('bodega/index_new', {page_title: "Bodega", username: req.session.userData.nombre});
 	}
 	else{res.redirect('bad_login');}	
 });
@@ -80,7 +80,14 @@ router.get('/buscar_insumos/:detalle', function(req, res, next){
 
 router.get('/view_despachos', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('bodega/view_despachos');
+        var tipo;
+        if(req.session.userData.nombre == 'test'){
+            tipo = 'false';
+        }
+        else{
+            tipo = 'true';
+        }
+        res.render('bodega/view_despachos', {view_tipo: tipo});
     }
     else{res.redirect('bad_login');}
 
@@ -121,11 +128,21 @@ router.post('/table_despachos', function(req, res, next){
             "gd.idgd",
             "cliente.sigla",
             "material.detalle",
-            "gd.obs"
+            "gd.obs",
         ];
+        var object_fill = {
+            "gd.idgd-off": [],
+            "cliente.sigla-off": [],
+            "material.detalle-off": [],
+            "gd.obs-off": [],
+            "gd.idgd-on": [],
+            "cliente.sigla-on": [],
+            "material.detalle-on": [],
+            "gd.obs-on": []
+        };
         var clave;
         var where;
-        var condiciones_where = [];
+        var condiciones_where = ["gd.estado LIKE '%" + tipo + "%'"];
         if(input.clave == '' || input.clave == null || input.clave == undefined){
             clave = [];
         }
@@ -134,13 +151,40 @@ router.post('/table_despachos', function(req, res, next){
         }
         if(clave.length>0){
             for(var e=0; e < clave.length; e++){
-                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
             }
         }
-        condiciones_where.push(["gd.estado LIKE '%" + tipo + "%'"]);
-        where = " WHERE "+ condiciones_where.join(" AND ")+" GROUP BY gd.idgd ORDER BY gd.fecha DESC";
-        //where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
-        //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
+
+
+
+        var where = " ";
+
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ")+" GROUP BY gd.idgd ORDER BY gd.fecha DESC";
+        }
+        console.log(where);
+
         req.getConnection(function(err, connection){
             connection.query("SELECT gd.*,COUNT(despachos.iddespacho) as n_items,COALESCE(cliente.razon,'Sin Cliente') AS cliente FROM gd"
                 + " LEFT JOIN despachos ON despachos.idgd=gd.idgd"
@@ -150,7 +194,14 @@ router.post('/table_despachos', function(req, res, next){
                     console.log("Error Selecting :%s", err);
                 // console.log(desp);
                 //console.log(desp);
-                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-'), user: req.session.userData});
+                var tipo;
+                if(req.session.userData.nombre == 'test'){
+                    tipo = 'false';
+                }
+                else{
+                    tipo = 'true';
+                }
+                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-'), user: req.session.userData, view_tipo: tipo});
             });
         });
     }
@@ -980,5 +1031,351 @@ router.post("/table_factura", function(req, res, next){
     }
     else {res.redirect('/bad_login');}
 });
+
+
+
+router.get('/view_pendientes', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var tipo;
+        if(req.session.userData.nombre == 'test'){
+            tipo = 'false';
+        }
+        else{
+            tipo = 'true';
+        }
+        res.render('bodega/view_pendientes', {view_tipo: tipo});
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
+router.post('/table_pendientes', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var orden = input.orden.replace('-', ' ');
+        var clave = input.clave;
+        var tipo = input.tipo;
+        console.log(input);
+        //clave ES EL TEXTO QUE SE ENCUENTRA EN LA BARRA BUSCAR . Por ejemplo : "Inserto"
+        //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
+        // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
+        //
+        var array_fill = [
+            "odc.numoc",
+            "material.detalle",
+            "cliente.sigla"
+        ];
+        var object_fill = {
+            "odc.numoc-off": [],
+            "material.detalle-off": [],
+            "cliente.sigla-off": [],
+            "odc.numoc-on": [],
+            "material.detalle-on": [],
+            "cliente.sigla-on": []
+        };
+        var clave;
+        var where;
+        var condiciones_where = ["pedido.cantidad > pedido.despachados"];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+
+
+
+        var where = " ";
+
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+        console.log(where);
+        //where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
+        //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
+        req.getConnection(function(err, connection){
+            connection.query("select "
+             + " odc.numoc,"
+             + " material.detalle,"
+             + " pedido.numitem,"
+             + " pedido.idpedido,"
+             + " coalesce(enpreparacion.preparando,0) as preparando,"
+             + " material.peso,"
+             + " material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar,"
+             + " pedido.cantidad - pedido.despachados as xdespachar,"
+             + " material.stock,"
+             + " pedido.f_entrega,"
+             + " cliente.sigla,"
+             + " cliente.razon,"
+             + " coalesce(queryCC.enCC, 0) as enCC"
+             + " from pedido"
+             + " left join odc on odc.idodc = pedido.idodc"
+             + " left join (select idpedido, sum(cantidad) as preparando from palet_item group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
+             + " left join material on material.idmaterial = pedido.idmaterial"
+             + " left join (select material.idmaterial, sum(produccion.`7`) as encc from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by material.idmaterial) as queryCC on queryCC.idmaterial = material.idmaterial"
+             + " left join cliente on cliente.idcliente = odc.idcliente"
+             + where,function(err, desp){
+                if(err)
+                    console.log("Error Selecting :%s", err);
+                // console.log(desp);
+                var tipo;
+                if(req.session.userData.nombre == 'test'){
+                    tipo = 'false';
+                }
+                else{
+                    tipo = 'true';
+                }
+                if(!req.session.arrayPL){
+                    req.session.arrayPL = new Array();
+                }
+                console.log(req.session.arrayPL.join('-'));
+                res.render('bodega/table_pendientes', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: req.session.arrayPL.join('-')});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+
+
+router.get('/view_palets', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var tipo;
+        if(req.session.userData.nombre == 'test'){
+            tipo = 'false';
+        }
+        else{
+            tipo = 'true';
+        }
+        res.render('bodega/view_palets', {view_tipo: tipo});
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.post('/table_palets', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var orden = input.orden.replace('-', ' ');
+        var clave = input.clave;
+        var tipo = input.tipo;
+        console.log(input);
+        //clave ES EL TEXTO QUE SE ENCUENTRA EN LA BARRA BUSCAR . Por ejemplo : "Inserto"
+        //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
+        // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
+        //
+        var array_fill = [
+            "palet.idpalet",
+            "material.detalle"
+        ];
+        var object_fill = {
+            "palet.idpalet-off": [],
+            "material.detalle-off": [],
+            "palet.idpalet-on": [],
+            "material.detalle-on": []
+        };
+        var clave;
+        var where;
+        var condiciones_where = ["palet.idpackinglist = 0"];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+        var where = " ";
+
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+        console.log(where);
+        //where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
+        //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
+        req.getConnection(function(err, connection){
+            connection.query("select " +
+                "palet.idpalet, " +
+                "palet.creacion, " +
+                "sum(coalesce(material.peso, 0.0)) as peso_palet, " +
+                "min(pedido.f_entrega) as entrega," +
+                "group_concat(coalesce(material.peso, 0.0)) as pesos, " +
+                "group_concat(material.detalle) as detalles, " +
+                "group_concat(coalesce(palet_item.cantidad, 0)) as cantidades " +
+                "from palet_item " +
+                "left join palet on palet.idpalet = palet_item.idpalet " +
+                "left join pedido on pedido.idpedido = palet_item.idpedido " +
+                "left join material on material.idmaterial = pedido.idmaterial " +
+                where + " group by palet.idpalet",function(err, desp){
+                if(err)
+                    console.log("Error Selecting :%s", err);
+                // console.log(desp);
+                var tipo;
+                if(req.session.userData.nombre == 'test'){
+                    tipo = 'false';
+                }
+                else{
+                    tipo = 'true';
+                }
+                if(!req.session.arrayPL){
+                    req.session.arrayPL = new Array();
+                }
+                console.log(req.session.arrayPL.join('-'));
+                res.render('bodega/table_palets', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: req.session.arrayPL.join('-')});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+
+
+
+router.get('/add_session_peds/:idpedido', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var idpedido = req.params.idpedido;
+        if(req.session.arrayPL){
+            console.log("array SI existe");
+            if(req.session.arrayPL.indexOf(idpedido) == -1){
+                req.session.arrayPL.push(idpedido);
+            }
+        }
+        else{
+            console.log("array NO existe");
+            req.session.arrayPL = new Array();
+            req.session.arrayPL.push(idpedido);
+        }
+
+        res.send('ok');
+    }
+    else{res.redirect('bad_login');}
+});
+router.get('/rm_session_peds/:idpedido', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.session.arrayPL.splice( req.session.arrayPL.indexOf(req.params.idpedido), 1 );
+        res.send('ok');
+    }
+    else{res.redirect('bad_login');}
+});
+router.get('/check_session_peds/:value', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.session.arrayPL = req.params.value.split('-');
+        res.send('ok');
+    }
+    else{res.redirect('bad_login');}
+});
+
+router.get('/get_session_peds', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var where = "";
+        if(req.session.arrayPL.length>0){
+            where = "where pedido.idpedido in ("+req.session.arrayPL.join(',')+")";
+        }
+        console.log(where);
+        req.getConnection(function(err, connection){
+            if(err){throw err;}
+            connection.query("select " +
+                "pedido.idpedido,pedido.cantidad-pedido.despachados as xdespachar,pedido.f_entrega," +
+                "cliente.sigla,cliente.razon," +
+                "odc.numoc,pedido.numitem," +
+                "material.detalle," +
+                "material.peso," +
+                "material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar " +
+                "from pedido " +
+                "left join material on material.idmaterial = pedido.idmaterial " +
+                "left join odc on odc.idodc=pedido.idodc " +
+                "left join cliente on cliente.idcliente = odc.idcliente " +
+                where, function(err, xdesp){
+                if(err){throw err;}
+                res.render('bodega/pre_packinglist_table', {xdesp: xdesp});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.post('/create_palet', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        input.idpedido = input.idpedido.split('-');
+        input.cantidad = input.cantidad.split('-');
+        var data = [];
+        req.getConnection(function(err, connection){
+            if(err){throw err;}
+            connection.query("INSERT INTO palet (creacion) VALUES (now())", function(err, inPL){
+                if(err){throw err;}
+
+                console.log(inPL);
+
+                for(var i=0; i < input.idpedido.length; i++){
+                    data.push([inPL.insertId ,input.idpedido[i], input.cantidad[i]]);
+                }
+                connection.query("INSERT INTO palet_item (idpalet, idpedido, cantidad) VALUES ?", [data], function(inItemPL){
+                    if(err){throw err;}
+                    req.session.arrayPL = [];
+                    res.send('ok');
+                });
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
 
 module.exports = router;

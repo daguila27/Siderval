@@ -92,38 +92,38 @@
                     </div>
             </div>
             <form id="send_of">
-            <div style="overflow-y: scroll; max-height: 300px;">
-            <table class="table table-striped sectionSave" style="margin: 0">
-                <thead>
-                <tr>
-                    <th>Descripción</th>
-                    <th>Fabricación</th>
-                    <th>Aleación</th>
-                    <th>Fecha de Entrega</th>
-                    <th>Cantidad</th>
-                    <th>Stock</th>
-                    <th>Precio Unitario</th>
-                    <th>Bloquear</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody id="session_fabrs">
+                <div style="overflow-y: scroll; max-height: 300px;">
+                <table class="table table-striped sectionSave" style="margin: 0">
+                    <thead>
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Fabricación</th>
+                        <th>Aleación</th>
+                        <th>Fecha de Entrega</th>
+                        <th>Cantidad</th>
+                        <th>Stock</th>
+                        <th>Precio Unitario</th>
+                        <th>Bloquear</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="session_fabrs">
 
-                </tbody>
-            </table>
-            </div>
-            <div class="panel-footer">
-                <div class="row">
-                    <div class="col-md-6">
-                        <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
-                    </div>
-                    <div class="col-md-1 col-md-offset-5" style="padding: 0; padding-right: 8px">
-                        <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
-                        <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
-                    </div>
+                    </tbody>
+                </table>
                 </div>
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
+                        </div>
+                        <div class="col-md-1 col-md-offset-5" style="padding: 0; padding-right: 8px">
+                            <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
+                            <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                        </div>
+                    </div>
 
-            </div>
+                </div>
             </form>
         </div>
 
@@ -336,8 +336,8 @@
                         $.ajax({
                             type: 'GET',
                             url: '/plan/lanzar_of/pedido',
-                            success: function(html){    
-                                    $("#page-wrapper").html(html);
+                            success: function(html){
+                                $("#page-wrapper").html(html);
                             }
                         });
                     }

@@ -70,7 +70,7 @@ router.post('/handler_faena', function(req,res){
     var username = input.username;
     var password = input.password;
     var etapa = input.etapa;
-    var pin = input.pin
+    var pin = input.pin;
     console.log(input);
     req.getConnection(function(err,connection){
         if(err)
@@ -86,6 +86,10 @@ router.post('/handler_faena', function(req,res){
             }
 
             if(rows.length == 1){
+                console.log("PIN");
+                console.log(pin);
+                console.log("ETAPA");
+                console.log(etapa);
                 connection.query("SELECT * FROM etapaFaena WHERE pin = ? AND value = ?", [pin, etapa], function(err, proc){
                     if(err)
                         console.log("Error Selecting : %s", err);

@@ -172,7 +172,7 @@
         var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
         var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
         $(".etiqueta-filtro-div").append(
-            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_planta").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_planta").val()+"@on' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
+            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_planta").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_planta").val()+"@off' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
             +$("#buscar_planta").val()+
             "</strong> <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
         );
@@ -191,17 +191,7 @@
         buscar_planta();
     });
 
-    $("#buscar_planta").on('keyup', function(e){
-        e.preventDefault();
-        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
-            $(".o_searchview_autocomplete").css('display', 'none');
-            $(".o_searchview_autocomplete strong").html('');
-        }
-        else{
-            $(".o_searchview_autocomplete").css('display', 'block');
-            $(".o_searchview_autocomplete strong").html($(this).val());
-        }
-    });
+
 
 
 

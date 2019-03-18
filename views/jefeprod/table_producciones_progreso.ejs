@@ -26,7 +26,7 @@ function fechaLatino(string){
         <th data-toggle="tooltip" data-placement="bottom" title="Progreso" style="text-align: center">Progreso</th>
     </tr>
     </thead>
-    <tbody id="todosbodyprogress">
+    <tbody>
     <%var progress = [];
     var prod;
     for(var e=0; e < prog.length; e++){
@@ -98,5 +98,5 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#progresoTable");
+    setDataTableFixed("#progresoTable");
 </script>

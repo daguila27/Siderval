@@ -159,6 +159,7 @@ router.post("/next_step",function(req,res,next){
         var ids = "";
         var cant_aux = parseInt(input.sendnum);
         var history = [];
+
         for(var w=0; w < input.idprod.length; w++){
             cant_aux -= parseInt(input.cantprod[w]);
         	if(cant_aux > 0){
@@ -188,7 +189,8 @@ router.post("/next_step",function(req,res,next){
 		req.getConnection(function(err,connection){
 			if(err) throw err;
 			//connection.query("UPDATE produccion SET `" + input.etapa_act + "` = `" + input.etapa_act  + "` - ?,`" + input.newetapa + "` = `" + input.newetapa + "` + ? WHERE idproduccion = ?",[parseInt(input.sendnum),parseInt(input.sendnum),input.idprod],function(err,prod){
-            connection.query(query ,function(err,upProd1){
+			console.log(query);
+			connection.query(query ,function(err,upProd1){
                 if(err) throw err;
                 console.log(upProd1);
 
@@ -217,6 +219,7 @@ router.get('/render_proceso/:proceso', function(req, res, next){
             input.etapa_act = '8';
         }
 		req.session.myValue = input.proceso;
+		console.log(input);
 		req.getConnection(function(err, connection){
 			//select * from ordenproduccion left join material on (ordenproduccion.idproducido=material.idmaterial) left join producto ON (ordenproduccion.idproducido=producto.idmaterial)
 			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.etapa_val, function(err, etapa){
@@ -230,9 +233,9 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 					" as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`)",*/
 					connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "
 						+"(select group_concat(produccion.idproduccion separator '-') as idproduccion,group_concat(produccion.idordenproduccion separator '-') as idordenproduccion,sum(produccion.cantidad) as cantidad ,"
-						+"group_concat(produccion.1 separator '-') as prod_1,group_concat(produccion.2 separator '-') as prod_2,group_concat(produccion.3 separator '-') as prod_3,group_concat(produccion.4 separator '-') as prod_4,"
+						+"group_concat(produccion.e separator '-') as prod_e,group_concat(produccion.1 separator '-') as prod_1,group_concat(produccion.2 separator '-') as prod_2,group_concat(produccion.3 separator '-') as prod_3,group_concat(produccion.4 separator '-') as prod_4,"
 						+"group_concat(produccion.5 separator '-') as prod_5,group_concat(produccion.6 separator '-') as prod_6,group_concat(produccion.7 separator '-') as prod_7,group_concat(produccion.8 separator '-') as prod_8,"
-						+"sum(produccion.`1`) as `1`,sum(produccion.`2`) as `2`,sum(produccion.`3`) as `3`,sum(produccion.`4`) as `4`,sum(produccion.`5`) as `5`,sum(produccion.`6`) as `6`,sum(produccion.`7`) as `7`,sum(produccion.`8`) as `8`,"
+						+"sum(produccion.`e`) as `e`,sum(produccion.`1`) as `1`,sum(produccion.`2`) as `2`,sum(produccion.`3`) as `3`,sum(produccion.`4`) as `4`,sum(produccion.`5`) as `5`,sum(produccion.`6`) as `6`,sum(produccion.`7`) as `7`,sum(produccion.`8`) as `8`,"
 						+"coalesce(producido.ruta, '1,2,3,4,5,6,7,8') as ruta,material.detalle,material.idmaterial, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.etapa_act+"') as nextStep from produccion"
 						+" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (material.idmaterial=producido.idmaterial)"
 						+"WHERE produccion."+input.proceso+" > 0 group by material.idmaterial ORDER BY produccion.idproduccion DESC )"
@@ -250,6 +253,7 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 							rows[i].nextstep = "bodega";
 						} else rows[i].nextstep = rows[i].ruta[nextstep];
 					}
+					console.log(rows);
 					res.render('faena/render_cola', {data: rows,etapaactual:input.proceso, nombreetapa: etapa[0].nombre_etapa, user: req.session.userData});
 				});
 			});

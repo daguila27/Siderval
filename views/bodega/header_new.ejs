@@ -13,6 +13,8 @@
 
                 <title><%=page_title%></title>
                 <link rel="shortcut icon" href="/assets/img/logomin.png">
+
+
                 <!-- Bootstrap Core CSS -->
                 <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -25,11 +27,17 @@
                 <!-- Morris Charts CSS -->
                 <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
 
-                <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-                <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+               <!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+                <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>-->
 
 
-                <!-- Advance Table CSS -->
+                <link rel="stylesheet" type="text/css" href="/assets/css/jquery.dataTables.min.css">
+                <link rel="stylesheet" type="text/css" href="/assets/css/fixedHeader-dataTables.min.css">
+                <!-- jQuery -->
+                <script src="/vendor/jquery/jquery.min.js"></script>
+
+
+            <!-- Advance Table CSS-->
                 <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">
 
                 <!-- Custom Fonts -->
@@ -38,15 +46,15 @@
                 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
                 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
                 <!--[if lt IE 9]>
-                    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-                    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+                 <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                 <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
                 <![endif]-->
 
                 <!-- jQuery Load -->
                 <script src="/js/jquery-3.1.1.min.js"></script>
                 <script src="/js/jquery-1.11.3.min.js"></script>
                 <script src="/js/socket.io.js"></script>
-                
+
                 <!-- Google Fonts -->
                 <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
                 <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
@@ -57,24 +65,24 @@
 
 
 
-              
+
                <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_common.0.css"/>
                <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.0.css"/>
                <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.1.css"/>
                <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
                <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
-               
-               
-   
-               
+
+
+
+
                    <!--[if lt IE 10]>
                        <body class="ie9">
                    <![endif]-->
-               
+
                <script type="text/javascript">
-                   
+
                </script>
-           
+
         </head>
 
 
@@ -211,13 +219,20 @@
                                         </span>
                                 </a>
                             </li>
+                           <li onclick="ajax(this)" data-link="/bodega/view_pendientes">
+                                <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Pendientes
+                                        </span>
+                                </a>
+                            </li>
                         </ul>
 
                 
                     </div>
 
                 </div>
-                    <div id="wrapper" style="overflow-y: scroll; background-color: white">
-                        <div id="page-wrapper"  style="padding:0;margin: 0;">
+                    <div id="wrapper" style="background-color: white; overflow-x: hidden">
+                        <div id="page-wrapper"  style="padding:0;margin: 0; overflow-x: hidden">
                           
 

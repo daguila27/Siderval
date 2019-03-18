@@ -11,7 +11,7 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTablePeds" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px">
+<table id="DataTablePeds" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%">
 		<style>
 			.order-column:hover{
 				cursor: pointer;
@@ -55,16 +55,18 @@
 				clase = 'success';
 				estado = 'Más de 10 días';
 			}%>
-		<tr class="o_data_row <%=clase%>" <%if(i+1 < data.length && data[i].numoc != data[i+1].numoc){%>style="border-bottom: 2px dashed grey"<%}%>>
-			<td data-toggle="tooltip" title="OF" class="col-numof o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center">
-                <%if(data[i].oefes.split(',').length > 2){%>
-                    <%=data[i].oefes.substring(0,8)%>...
-                <%}else{%>
-                    <%=data[i].oefes%>
-                <%}%>
+		<tr class="o_data_row <%=clase%>">
+			<td data-toggle="tooltip" title="OF" class="col-numof o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center" data-idof="<%=data[i].oefes%>" onclick="submit_of(this)">
+				<button class="btn btn-primary btn-xs">
+					<%if(data[i].oefes.split(',').length > 2){%>
+						<%=data[i].oefes.substring(0,8)%>...
+					<%}else{%>
+						<%=data[i].oefes%>
+					<%}%>
+				</button>
             </td>
 			<td data-toggle="tooltip" title="Item" class="col-item o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
-			<td data-toggle="tooltip" title="OC" class="col-numoc o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
+			<td data-toggle="tooltip" title="OC" class="col-numoc o_data_cell o_readonly_modifier o_required_modifier" data-idodc="<%=data[i].idodc%>" onclick="submit_oc(this)"><button class="btn btn-primary btn-xs"><%=data[i].numoc%></button></td>
 			<td data-toggle="tooltip" title="Cliente" class="col-cliente o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
 			<td data-toggle="tooltip" title="Descripción" class="col-descrip o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
             <%
@@ -97,7 +99,7 @@
             /*background:#999;*/
         }
     </style>
-    <tfoot id="pietabla" class="fixed_table">
+    <tfoot>
 		<tr>
 			<td id="col-numof"></td>
 			<td id="col-item"></td>
@@ -119,8 +121,9 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableFabricaciones("#DataTablePeds");
-    $(".fixed_table").width( $("#DataTablePeds").width() );
+    setDataTableFixed("#DataTablePeds");
+    //setDataTableFabricaciones("#DataTablePeds");
+    /*$(".fixed_table").width( $("#DataTablePeds").width() );
 
     $(".fixed_table").css( 'left' ,$(".o_sub_menu").width() );
 
@@ -128,15 +131,31 @@
         if($(this).attr('id')){
             $(this).css('width', $("."+$(this).attr('id')).width());
         }
-    });
-	function submit_form(yo){
+    });*/
+	function submit_oc(yo){
 		//$("#form"+$(yo).data('idodc')).submit();
 		$.ajax({
 			type: 'GET',
+            beforeSend: function(){
+                destroyDataTable();
+            },
 			url: '/plan/page_oc/'+$(yo).data('idodc'),
 			success: function(data){
 				$(".main-page").html(data);	
 			}
 		});
 	}
+    function submit_of(yo){
+        //$("#form"+$(yo).data('idodc')).submit();
+        $.ajax({
+            type: 'GET',
+			beforeSend: function(){
+                destroyDataTable();
+			},
+            url: '/plan/page_of/'+$(yo).data('idof'),
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
 </script>
