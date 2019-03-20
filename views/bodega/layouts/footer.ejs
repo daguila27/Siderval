@@ -56,6 +56,7 @@
             beforeSend: function(){
                 destroyDataTable();
                 $("#page-wrapper").css('display', 'none');
+                close_menu();
             },
             success: function(data){
                 $("#page-wrapper").html(data);
@@ -83,6 +84,13 @@
     });*/
 
 
+    $.ajax({
+        type: 'GET',
+        url: 'bodega/render_notificaciones',
+        success: function(data){
+            $(".notificaciones").html(data);
+        }
+    });
     $.ajax({
         type: 'GET',
         url: 'bodega/crear_gdd',
@@ -212,13 +220,6 @@
     });
 
 
-    $.ajax({
-        type: 'GET',
-        url: 'bodega/render_notificaciones',
-        success: function(data){
-            $(".notificaciones").html(data);
-        }
-    });
 </script>
 </body>
 </html>

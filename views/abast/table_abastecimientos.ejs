@@ -28,6 +28,15 @@
 		}
 
 	}
+
+	function textoCorto(str){
+	    if(str.length > 9){
+	        return str.substring(0,6)+"...";
+		}
+		else{
+		    return str;
+		}
+	}
 %>
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
@@ -49,22 +58,22 @@
 	}
 </style>
 
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;font-size: 12px" id="dataTableOdoo">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%" id="dataTableOdoo">
 	<thead>
 		<tr>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.idabast-ASC">OC</th>
-			<th class="cabecera o_column_sortable" data-order="oda.creacion-ASC">Creación</th>
-			<th class="cabecera o_column_sortable">Facturas</th>
-			<th class="cabecera o_column_sortable">Guías</th>
-			<th class="cabecera o_column_sortable" data-order="cliente.sigla-ASC" style="text-align: center ;">Proveedor</th>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.cantidad-ASC">Solicitados</th>
-			<th class="cabecera o_column_sortable" data-order="material.detalle-ASC">Detalle</th>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.recibidos-ASC">Recibidos</th>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.recibidos-ASC">Facturados</th>
-			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo-ASC">Costo</th>
-			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo*abastecimiento.cantidad-ASC">Total</th>
-			<th class="cabecera o_column_sortable" style="text-align: center ;">CC</th>
-			<th class="cabecera o_column_sortable order-column" style="text-align: right;" data-order="material.u_medida-ASC">Unidad</th>
+			<th>OC</th>
+			<th>Creación</th>
+			<th>Facturas</th>
+			<th>Guías</th>
+			<th>Proveedor</th>
+			<th>Solicitados</th>
+			<th>Detalle</th>
+			<th>Recibidos</th>
+			<th>Facturados</th>
+			<th>Costo</th>
+			<th>Total</th>
+			<th>CC</th>
+			<th>Unidad</th>
 		</tr>
 	</thead>
 	<tbody class="ui-sortable">
@@ -105,9 +114,9 @@
 					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
 				</td>
 				<td class="o_data_cell" style="text-align: center; width: 13%">
-					<%if(lista.length>2){
-						for(var j=0; j<2; j++){%>
-							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%=lista[j][1]%>" ><%= lista[j][0]%></a>
+					<%if(lista.length>3){
+						for(var j=0; j<3; j++){%>
+							<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
 						<%}%>
 					    <a class="label label-primary pull-right" type="button"  onclick="changeIcon(this)" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>" data-state="close">
 							<i class="fa fa-arrow-down"></i>
@@ -115,20 +124,20 @@
 					    <div class="collapse collapseLabel" id="collapseFactura<%=i%>">
 							<%
 							for(var j=3; j<lista.length; j++){%>
-								<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1] %>" ><%= textoCorto(lista[j][0])%></a>
 							<%}%>
 						</div>
 					<%}else{
 					    for(var j=0; j<lista.length; j++){%>
-							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1]%>" ><%= lista[j][0]%></a>
+							<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
 						<%}
 					}%>
 				</td>
 				<td class="o_data_cell" style="text-align: center; width: 13%">
-					<%if(gd_lista.length>2){
-						for(var j=0;j<2;j++){%>
-							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" >
-								<%= gd_lista[j][0]%>
+					<%if(gd_lista.length>3){
+						for(var j=0;j<3;j++){%>
+							<a data-toggle="tooltip" title="<%=gd_lista[j][0]%>" class="label label-success" onclick="modal_guia(this)"  data-idgd="<%= gd_lista[j][1] %>" >
+								<%= textoCorto(gd_lista[j][0])%>
 							</a>
 						<%}%>
 							<a class="label label-success pull-right" type="button" onclick="changeIcon(this)" data-toggle="collapse" data-target="#collapseExample<%= i%>" aria-expanded="false" aria-controls="collapseExample" data-state="close">
@@ -136,12 +145,12 @@
 							</a>
 							<div class="collapse collapseLabel" id="collapseExample<%= i%>">
 								<%for(var j=3; j<gd_lista.length; j++){%>
-									<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" ><%= gd_lista[j][0]%></a>
+									<a data-toggle="tooltip" title="<%=gd_lista[j][0]%>" class="label label-success" onclick="modal_guia(this)"  data-idgd="<%= gd_lista[j][1] %>" ><%= textoCorto(gd_lista[j][0])%></a>
 								<%}%>
 							</div>
 					<%}else{
 						for(var j=0; j<gd_lista.length; j++){%>
-							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" ><%= gd_lista[j][0]%></a>
+							<a data-toggle="tooltip" title="<%=gd_lista[j][0]%>" class="label label-success" onclick="modal_guia(this)"  data-idgd="<%= gd_lista[j][1] %>" ><%= textoCorto(gd_lista[j][0])%></a>
 					<%}
 					}%>
 				</td>
@@ -196,7 +205,7 @@
 	$(".collapseLabel").each(function(){
 		$(this).parent().css('width', $(this).css('width'));
 	});
-    setDataTableMain("#dataTableOdoo");
+    setDataTableFixed("#dataTableOdoo");
     $(document).ready(function(){
         /*$('[data-toggle="tooltip"]').tooltip({
             container: 'body'
@@ -235,6 +244,9 @@
 		$.ajax({
 			type: 'GET',
 			url: '/abastecimiento/page_oda/'+$(yo).data('idoda'),
+            beforeSend: function(){
+                destroyDataTable();
+            },
 			success: function(data){
 				$(".main-page").html(data);	
 			}
