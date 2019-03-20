@@ -1,6 +1,6 @@
 
-<div class="row" style="margin: 0; padding: 0;">
-    <div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%">
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
             <li class="active">Movimiento Bodega Materias Primas</li>
         </ol>
@@ -27,14 +27,12 @@
         </div>
     </div>
 </div>
-<div class="row row-main" style=" margin: 0; padding: 0;">
-    <div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5;">
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
     </div>
-
-
-
 </div>
-
 <script type="text/javascript">
     var filtros_seleccionados = [];
     var array_fill = [
@@ -45,7 +43,20 @@
         "Receptor@danger",
     ];
     $(document).ready(function(){
-        buscar_movimiento();
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+
+        $.ajax({
+            type: 'POST',
+            data:{ orden: 'movimiento_detalle.idmovimiento-DESC', clave: filtros_seleccionados.join(',')},
+            beforeSend: function(){
+                destroyDataTable();
+            },
+            url: '/matprimas/table_movimientos',
+            success: function(data){
+                $(".main-page").html(data);
+                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
+            }
+        });
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
     //PARA QUE EL FILTRO NO SE CIERRE AL SELECCIONAR ALGUNA OPCION
@@ -56,6 +67,9 @@
         $.ajax({
             type: 'POST',
             data:{ orden: 'movimiento_detalle.idmovimiento-DESC', clave: filtros_seleccionados.join(',')},
+            beforeSend: function(){
+                destroyDataTable();
+            },
             url: '/matprimas/table_movimientos',
             success: function(data){
                 $(".main-page").html(data);

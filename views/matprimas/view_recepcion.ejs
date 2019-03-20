@@ -1,6 +1,6 @@
 
-<div class="row" style="margin: 0; padding: 0;">
-    <div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%">
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
             <li class="active">Recepción de Materias Primas</li>
         </ol>
@@ -24,8 +24,10 @@
         </div>
     </div>
 </div>
-<div class="row row-main" style=" margin: 0; padding: 0;">
-    <div class="col-sm-12 col-md-12 main-page" style="margin: 0; padding: 0; z-index: 5; width: 100%">
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
     </div>
 </div>
 
@@ -37,12 +39,20 @@
         "Registro@default"
     ];
     $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+
         $.ajax({
             type: 'POST',
             data:{ orden: 'recepcion_detalle.idrecepcion-DESC', clave: filtros_seleccionados.join(',')},
             url: '/matprimas/table_recepcion',
+            beforeSend: function(){
+                destroyDataTable();
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
             success: function(data){
                 $(".main-page").html(data);
+                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
+
             }
         });
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
@@ -56,6 +66,10 @@
         $.ajax({
             type: 'POST',
             data:{ orden: 'recepcion_detalle.idrecepcion-DESC', clave: filtros_seleccionados.join(',')},
+            beforeSend: function(){
+                destroyDataTable();
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
             url: '/matprimas/table_recepcion',
             success: function(data){
                 $(".main-page").html(data);
