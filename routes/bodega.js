@@ -1204,7 +1204,7 @@ router.post('/table_palets', function(req, res, next){
         };
         var clave;
         var where;
-        var condiciones_where = ["palet.idpackinglist = 0"];
+        var condiciones_where = [];
         if(input.clave == '' || input.clave == null || input.clave == undefined){
             clave = [];
         }
