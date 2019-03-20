@@ -413,7 +413,9 @@
             type: 'GET',
             url: $(yo).data('link'),
             beforeSend: function(){
+                destroyDataTable();
                 $("#page-wrapper").css('display', 'none');
+                close_menu();
             },
             success: function(data){
                 $("#page-wrapper").html(data);
