@@ -913,19 +913,19 @@ router.post('/crear_oda', function(req, res, next){
         			if(Array.isArray(input['idm[]']) ){
 	        			for(var e=0; e < input['idm[]'].length; e++){
 	        				if(input['ex_iva[]'][e] == 'off'){
-	        					array.push([odc.insertId,input['idm[]'][e],input['cants[]'][e], input['costo[]'][e].replace(',','.'),false, input['centroc[]'][e]]);
+	        					array.push([odc.insertId,input['idm[]'][e],parseFloat(input['cants[]'][e]), parseFloat(input['costo[]'][e].replace(',','.')),false, input['centroc[]'][e]]);
 	        				}
 	        				else{
-	        					array.push([odc.insertId,input['idm[]'][e],input['cants[]'][e], input['costo[]'][e].replace(',','.'),true, input['centroc[]'][e]]);	
+	        					array.push([odc.insertId,input['idm[]'][e],parseFloat(input['cants[]'][e]), parseFloat(input['costo[]'][e].replace(',','.')),true, input['centroc[]'][e]]);
 	        				}
 	        			}
         			}
         			else{
         				if(input['ex_iva[]'] == 'off'){
-		        			array.push([odc.insertId,input['idm[]'],input['cants[]'],input['costo[]'].replace(',','.'), false, input['centroc[]']]);
+		        			array.push([odc.insertId,input['idm[]'],parseFloat(input['cants[]']),parseFloat(input['costo[]'].replace(',','.')), false, input['centroc[]']]);
         				}
         				else{
-	        				array.push([odc.insertId,input['idm[]'],input['cants[]'],input['costo[]'].replace(',','.'), true, input['centroc[]']]);
+	        				array.push([odc.insertId,input['idm[]'],parseFloat(input['cants[]']),parseFloat(input['costo[]'].replace(',','.')), true, input['centroc[]']]);
         				}
         			}
         			console.log(array);
