@@ -12,6 +12,12 @@
 </div>
 
 
+<!-- Modal Factura0 -->
+<div class="modal fade" id="myModalInformation" tabindex="-1" role="dialog">
+    <!-- La informacion de este modal es cargada con modal-factura.ejs. -->
+</div><!-- /.modal -->
+
+
 <!-- Modal -->
 <div id="newCliente" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -473,6 +479,30 @@
         console.log(xhr.responseText);
         console.log(xhr);
     });
+
+
+
+    function modal_fact(label) {
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_factura/'+$(label).data('idfactura'),
+            success: function(data) {
+                $('#myModalInformation').html(data);
+                $('#myModalInformation').modal('toggle');
+            }
+        });
+    }
+
+    function modal_guia(label) {
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_guiaAbast/'+$(label).data('idgd'),
+            success: function(data) {
+                $('#myModalInformation').html(data);
+                $('#myModalInformation').modal('toggle');
+            }
+        });
+    }
 </script>
 </body>
 </html>
