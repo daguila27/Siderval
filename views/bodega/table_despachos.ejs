@@ -123,6 +123,7 @@
             data: {id: $(yo).data('id')},
             url: 'bodega/activar_gdd',
             success: function(data){
+                destroyDataTable();
                 $("#page-wrapper").html(data);
             }
         });

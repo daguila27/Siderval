@@ -485,6 +485,7 @@ router.post('/lanzar_op_fill', function(req, res, next){
         if(input.detalle != ''){
             where += " OR internalquery.detalle = '"+input.detalle+"' OR concat(repeat('0', abs(6 - length(internalquery.idordenfabricacion)) ),internalquery.idordenfabricacion ) = '"+input.detalle+"' OR internalquery.subnom = '"+input.detalle+"' OR internalquery.f_entrega = '"+input.detalle+"' OR internalquery.cantidad = '"+input.detalle+"'";
         }
+        console.log(where);
         req.getConnection(function(err, connection){
             connection.query("select * from (select fabricaciones.*,ordenfabricacion.idordenfabricacion, ordenfabricacion.numordenfabricacion,aleacion.nom as anom,coalesce(subaleacion.subnom,'Sin') as subnom , material.detalle from fabricaciones "
                 + "left join ordenfabricacion on (ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f)"
