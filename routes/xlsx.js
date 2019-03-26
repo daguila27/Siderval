@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
 
 var informe = {};
 
-informe.getdatos = function(fecha,callback){
+informe.getdatos = function(fecha,callback, condiciones){
     if (connection){
         /*
         prods = [{
@@ -42,7 +42,13 @@ informe.getdatos = function(fecha,callback){
         else{
             where.push("material.codigo NOT LIKE 'X%'");
         }
-        where = where.join(' OR ');
+        if(condiciones){
+            condiciones.push(where.join(' OR '));
+            where = condiciones.join(' AND ');
+        }
+        else{
+            where = where.join(' OR ');
+        }
         var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct', 'nov', 'dic'];
         var mes = meses[parseInt(fecha[0].split('-')[1]) - 1];
         connection.query("select material.codigo,material.stock,coalesce(stock_mes."+mes+"_si, 0) as s_inicial,coalesce(stock_mes."+mes+"_sp, 0) as p_inicial,material.detalle, material.precio,material.u_medida, material.peso , coalesce(facturados.facturados, 0) as sum_fact," +

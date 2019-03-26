@@ -40,7 +40,7 @@
     </h1>
 
     <h5>
-        <div class="form-group pull-right">
+    <div class="form-group pull-right">
       <label for="dateSelect">Seleccione periodo:</label>
       <select class="form-control" id="dateSelect" onchange="chargeList(this)">
         <option value="2018-12-01@2018-12-31">Diciembre - 2018</option>
@@ -84,6 +84,7 @@
       });
     }
 
+    var idvista = "<%= idview%>";
     function cierreMensual(){
         $.ajax({
             type: 'get',
@@ -95,7 +96,6 @@
         });
 
     }
-    var idvista = "<%= idview%>";
     function chargeList(yo){
         $.ajax({
                 type: 'GET',

@@ -1,0 +1,232 @@
+<script>
+
+
+    $("#DataTableFabs tbody").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+
+    $(".nav-pills").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+</script>
+<%
+    function fechaLatino(string){
+        if(string.split('-').length == 3){
+            return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+        }
+        else{
+            return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+        }
+      }
+
+
+    function letraMayus(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+    function unidades(string){
+        if(string=='UN'){return 'unidades';}
+        else if(string=='LT'){return 'litros';}
+        else{return 'kilos'}
+    }
+
+    function numberFormat(numero){
+        var resultado = "";
+        if(numero[0]=="-")
+        {
+            nuevoNumero=numero.replace(/\./g,'').substring(1);
+        }else{
+            nuevoNumero=numero.replace(/\./g,'');
+        }
+        if(numero.indexOf(",")>=0)
+            nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+
+        for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+            resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+        if(numero.indexOf(",")>=0)
+            resultado+=numero.substring(numero.indexOf(","));
+        if(numero[0]=="-")
+        {
+            return "-"+resultado;
+        }else{
+            return resultado;
+        }
+    }
+%>
+
+<style>
+    .parsear_nro{
+        text-align: center;
+    }
+</style>
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+    <thead>
+    <tr>
+        <th>Código</th>
+        <th>Detalle</th>
+        <th>Stock inicial</th>
+        <th>Solicitados por OC</th>
+        <th>Atrasados</th>
+        <th>Necesarios según fabricados</th>
+        <th>Virtuales en produccion</th>
+        <th>Virtuales de ODA</th>
+        <th>Aceptados por CC</th>
+        <th>Recepción GDD</th>
+        <th>Salidas con GDD</th>
+        <th>Stock final</th>
+        <th>Devoluciones BMI</th>
+        <th>Retiros BMI</th>
+    </tr>
+    </thead>
+    <%if(prods.length){total_fabricados = 0;
+    %>
+    <tbody>
+    <%for(var r = 0;r < prods.length; r++){%>
+        <tr class="select-desp" data-state="nosele" data-idmat="<%= prods[r].idmaterial%>" data-detalle="<%= prods[r].detalle%>">
+            <td><%= prods[r].codigo%></td>
+            <td><%= prods[r].detalle%></td>
+            <td class="a parsear_nro"><%= prods[r].s_inicial.toString()%></td>
+            <td class="b parsear_nro"><%= prods[r].solicitados.toString()%></td>
+            <td class="c parsear_nro"><%= prods[r].sol_atr.toString()%></td>
+            <td class="d parsear_nro"><%= prods[r].necesario_neto%></td>
+            <td class="e parsear_nro"><%= prods[r].virtuales%></td>
+            <td class="f parsear_nro"><%= prods[r].virtuales_oda.toString()%></td>
+            <td class="g parsear_nro"><%= (prods[r].fabricados).toString()%></td>
+            <td class="h parsear_nro"><%= prods[r].ing_oda.toString()%></td>
+            <td class="i parsear_nro"><%= prods[r].despachados.toString()%></td>
+            <td class="j parsear_nro"><%= (prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados - prods[r].sum_sal).toString()%></td>
+            <td class="k parsear_nro"><%= prods[r].sum_dev.toString()%></td>
+            <td class="l parsear_nro"><%= prods[r].sum_sal.toString()%></td>
+            <% total_fabricados += prods[r].fabricados;%>
+        </tr>
+    <%}%>
+    </tbody>
+
+    <%}%>
+    <tfoot id="totales_f">
+
+    <tr>
+        <td></td>
+        <td></td>
+        <td style="text-align: center" class="parsear_nro" id="a"></td>
+        <td style="text-align: center" class="parsear_nro" id="b"></td>
+        <td style="text-align: center" class="parsear_nro" id="c"></td>
+        <td style="text-align: center" class="parsear_nro" id="d"></td>
+        <td style="text-align: center" class="parsear_nro" id="e"></td>
+        <td style="text-align: center" class="parsear_nro" id="f"></td>
+        <td style="text-align: center" class="parsear_nro" id="g"></td>
+        <td style="text-align: center" class="parsear_nro" id="h"></td>
+        <td style="text-align: center" class="parsear_nro" id="i"></td>
+        <td style="text-align: center" class="parsear_nro" id="j"></td>
+        <td style="text-align: center" class="parsear_nro" id="k"></td>
+        <td style="text-align: center" class="parsear_nro" id="l"></td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    var clases = [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l"
+    ];
+    function refreshSumas(){
+        var footer = [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        ];
+        for(var e = 0; e < clases.length; e++){
+            $(".select-desp.danger ."+clases[e]).each(function(){
+                footer[e] += parseFloat( $(this).text() );
+            });
+
+            $("#totales_f #"+clases[e]).html(footer[e]);
+        }
+    }
+    setDataTableFixed("#DataTableFabs");
+
+
+    var mouseDown = 0;
+    document.body.onmousedown = function() {
+        mouseDown = 1;
+    }
+    document.body.onmouseup = function() {
+        mouseDown = 0;
+
+    }
+    $(".select-desp").mouseenter(function(){
+        if(mouseDown == '1'){
+            $(this).toggleClass('danger');
+            if($(this).hasClass('danger')){
+                $(this).data('state', 'selec');
+                //act_session('add', this);
+
+            }
+            else{
+                $(this).data('state', 'noselec');
+                //act_session('rm', this);
+            }
+            //check_session();
+            refreshSumas();
+            showReg();
+        }
+
+    });
+    $(".select-desp").mousedown(function(){
+        $(this).toggleClass('danger');
+        if($(this).hasClass('danger')){
+            $(this).data('state', 'selec');
+            //act_session('add', this);
+
+        }
+        else{
+            $(this).data('state', 'noselec');
+            //act_session('rm', this);
+
+        }
+        refreshSumas();
+        showReg();
+    });
+    /*var down = false;
+    $(document).mousedown(function() {
+        down = true;
+    }).mouseup(function() {
+        down = false;
+    });*/
+
+
+
+</script>

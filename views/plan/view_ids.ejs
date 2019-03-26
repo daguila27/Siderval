@@ -1,0 +1,353 @@
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+    .etiqueta-filtro-cha:hover{
+        cursor: pointer;
+    }
+</style>
+<%
+function formatDate(date){
+    var meses = [
+        "Enero", "Febrero", "Marzo",
+        "Abril", "Mayo", "Junio", "Julio",
+        "Agosto", "Septiembre", "Octubre",
+        "Noviembre", "Diciembre"];
+    var dia = date.getDate();
+    var mes = date.getMonth();
+    var yyy = date.getFullYear();
+    return dia + ' de ' + meses[mes] + ' de ' + yyy;
+}
+console.log(formatDate(new Date()));%>
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+            <li class="active">Informe de Stock</li>
+            <!-- Mostrar cantidad de datos -->
+            <div id="pedidos" style="margin-top: 8px"></div>
+        </ol>
+        <div style="width: 50%; margin-right: 4%">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+                <div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
+                    <div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
+                    </div>
+                    <input disabled="disabled" autocomplete="off" id="buscar_ids" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)" autocomplete="off">
+                    <input disabled="disabled" autocomplete="off" id="buscar_ids-value" style="display: none" type="text">
+                </div>
+                <ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
+                    <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Codigo</em> para: <strong></strong></a></li>
+                    <li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripcion</em> para: <strong></strong></a></li>
+                </ul>
+            </div>
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a class="getcsvof" data-tipo="of" onclick="cierreMensual()"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+            <div style="display: flex">
+                <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
+                    <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_ids/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                </div>
+                <div class="form-group" style="width: 50%; margin-left: 10%; margin-top: 10px;margin-bottom: 0; margin-right: 0; display: flex">
+                    <label for="dateSelect" style="margin: 7px 10px">Mes:</label>
+                    <select class="form-control" id="dateSelect" onchange="buscar_ids()">
+                        <option value="2018-12-01@2018-12-31">Diciembre - 2018</option>
+                        <option value="2019-01-01@2019-01-31">Enero - 2019</option>
+                        <option value="2019-02-01@2019-02-28">Febrero - 2019</option>
+                        <option value="2019-03-01@2019-03-31" selected="selected">Marzo - 2019</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function showReg(){
+        var all = 0;
+        var selec = 0;
+        $("#DataTableFabs tbody tr").each(function(){
+            all++;
+        });
+        $("#DataTableFabs tbody tr.danger").each(function(){
+            selec++;
+        });
+        $("#pedidos").html('<h5><small>Mostrando ' +all+ ' producto(s) ('+selec+' Seleccionados).</small></h5>');
+    }
+    var array_fill = [
+        "Código@default",
+        "Descripción@primary"
+    ];
+    var filtros_seleccionados = [];
+
+    var idvista = "<%= idview%>";
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        $.ajax({
+            type: 'POST',
+            data: {clave: filtros_seleccionados.join(','), token: $("#dateSelect").val()+"@"+idvista},
+            url: '/abastecimiento/table_ids',
+            beforeSend: function(){
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+            success: function(data){
+                $(".main-page").html(data);
+                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
+                showReg();
+            }
+        });
+    });
+
+    function buscar_ids(){
+        $.ajax({
+            type: 'POST',
+            data: {clave: filtros_seleccionados.join(','), token: $("#dateSelect").val()+"@"+idvista},
+            url: '/abastecimiento/table_ids',
+            beforeSend: function(){
+                destroyDataTable();
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+            success: function(data){
+                $(".main-page").html(data);
+                //Muestra la cantidad de pedidos
+                $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                showReg();
+            }
+        });
+    }
+
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
+
+    $("#buscar_ids").on('keyup', function(e){
+        e.preventDefault();
+        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
+            $(".o_searchview_autocomplete").css('display', 'none');
+            $(".o_searchview_autocomplete strong").html('');
+        }
+        else{
+            $(".o_searchview_autocomplete").css('display', 'block');
+            $(".o_searchview_autocomplete strong").html($(this).val());
+        }
+    });
+
+    $(".fill-item-abast").on('click', function(e){
+        e.preventDefault();
+        var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
+        var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
+        $(".etiqueta-filtro-div").append(
+            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_ids").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_ids").val()+"@on' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
+            +$("#buscar_ids").val()+
+            "</strong> <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+        );
+        $(".etiqueta-filtro-div").data('cant', labels+1);
+        if($("#buscar_ids-value").val() == '' || $("#buscar_ids-value").val() == null || $("#buscar_ids-value").val() == undefined){
+            $("#buscar_ids-value").val($(this).data('searchcol')+"@"+$("#buscar_ids").val()+"@off");
+        }
+        else{
+            $("#buscar_ids-value").val([$("#buscar_ids-value").val(),$(this).data('searchcol')+"@"+$("#buscar_ids").val()].join(',')+"@off");
+        }
+        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_ids").val()+"@off");
+        $(".o_searchview_autocomplete").css('display', 'none');
+        $(".o_searchview_autocomplete strong").html('');
+        $("#buscar_ids").val('');
+        $("#buscar_ids").focus();
+        buscar_ids();
+    });
+
+    function eliminarEtiqueta(yo){
+        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
+        $(yo).parent().remove();
+        $(".etiqueta-filtro").removeAttr('id');
+        var count = 0;
+        $(".etiqueta-filtro").each(function(){
+            $(this).attr("id","label"+count);
+            count++;
+        });
+        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        buscar_ids();
+    }
+
+    function cambiarEtiqueta(yo){
+        if($(yo).data('state') == 'off') {
+            $(yo).parent().removeClass('label-primary');
+            $(yo).parent().addClass('label-danger');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
+
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Removiendo "+'"'+$(yo).parent().children('strong').text()+'"'+" de la busqueda");
+            $(yo).removeClass('fa-toggle-off');
+            $(yo).addClass('fa-toggle-on');
+            $(yo).data('state', 'on');
+        }
+        else{
+            $(yo).parent().removeClass('label-danger');
+            $(yo).parent().addClass('label-primary');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'off'].join('@'));
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Buscando "+'"'+$(yo).parent().children('strong').text()+'"');
+
+            $(yo).removeClass('fa-toggle-on');
+            $(yo).addClass('fa-toggle-off');
+
+            $(yo).data('state', 'off');
+        }
+        buscar_ids();
+    }
+
+    function despInput(event){
+        var char = event.which || event.keyCode;
+        var item = $(".o_searchview_autocomplete").data('item');
+        //BORRAR LABEL
+        if(char == 8 && ($("#buscar_ids").val()==null || $("#buscar_ids").val()=='' || $("#buscar_ids").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
+            eliminarEtiqueta($("#label"+labels).children('div'));
+        }
+        //ENTER
+        else if(char == 13){
+            $(".fill-item-abast.o-selection-focus").click();
+        }
+        //ARRIBA
+        else if(char == 38){
+            item = parseInt(item) - 1;
+        }
+        //ABAJO
+        else if(char == 40){
+            item = parseInt(item) + 1;
+        }
+
+
+        //SI SOBREPASA EL LIMITE INFERIOR
+        if(parseInt(item) >= 2){
+            $(".o_searchview_autocomplete").data('item', "0");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item0").addClass("o-selection-focus");
+        }
+        //SI SOBREPASA EL LIMITE SUPERIOR
+        else if(parseInt(item) < 0){
+            $(".o_searchview_autocomplete").data('item', "1");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item1").addClass("o-selection-focus");
+        }
+        else{
+            $(".o_searchview_autocomplete").data('item', item);
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item"+item).addClass("o-selection-focus");
+        }
+
+    }
+
+    $('.view-option').on('click', function(e){
+        e.preventDefault();
+        $('.view-option').removeClass('active');
+        if($(this).data('original-title') == 'Lista'){
+            $("#check_pendientes").css('display', 'inline');
+        }
+        else{
+            $("#check_pendientes").css('display', 'none');
+        }
+        $(this).addClass('active');
+        if($(this).data('view') == 'table_ids/fabricaciones.f_entrega-ASC'){
+            $.ajax({
+                type: 'POST',
+                data: {clave: filtros_seleccionados.join(',')},
+                url: "/abastecimiento/table_ids/",
+                beforeSend: function(){
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                },
+                success: function(data){
+                    $(".main-page").html(data);
+                    if($(this).data('view') == 'table_ids/fabricaciones.f_entrega-ASC' || $(this).data('view')=='item_ofs') {
+                        //Muestra la cantidad de pedidos
+                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                    }
+                }
+            });
+        }
+        else{
+            $.ajax({
+                type: 'GET',
+                url: '/abastecimiento/'+$(this).data('view'),
+                success: function(data){
+                    $(".main-page").html(data);
+                    if($(this).data('view') == 'table_ids/fabricaciones.f_entrega-ASC' || $(this).data('view')=='item_ofs') {
+                        //Muestra la cantidad de pedidos
+                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                    }
+                }
+            });
+        }
+
+
+    });
+
+    function getRidOffAutocomplete(){
+        var timer = window.setTimeout( function(){
+            $('#buscar_ids-value, #buscar_ids').prop('disabled',false);
+            clearTimeout(timer);
+        }, 800);
+    }
+
+    // Invoke the function
+    getRidOffAutocomplete();
+
+
+    function cierreMensual(){
+        $.ajax({
+            type: 'get',
+            url: '/abastecimiento/xlsx_ids_fabrs/' + $("#dateSelect").val()+"@"+idvista,
+            success: function(data){
+                window.open("/csvs/" + data,'_blank');
+                chargeList("#dateSelect");
+            }
+        });
+
+    }
+</script>

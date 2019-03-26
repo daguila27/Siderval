@@ -1552,9 +1552,74 @@ router.get('/abast_ops_page/:page', function(req, res, next){
 //Renderizar vista de INFORME DE STOCK para FABRICACIONES.
 router.get('/fabrs_ids/:idview', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('plan/fabrs_ids', {idview: req.params.idview});
+		res.render('plan/view_ids', {idview: req.params.idview});
     } else res.redirect("/bad_login");
 });
+
+
+router.post('/table_ids', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var array_fill = [
+            "material.codigo",
+            "material.detalle"
+        ];
+
+        var object_fill = {
+            "material.codigo-off": [],
+            "material.detalle-off": [],
+            "material.codigo-on": [],
+            "material.detalle-on": []
+        };
+        var clave;
+        var where;
+        var condiciones_where = [];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+
+        if(input.pendientes == 'false'){
+            condiciones_where.push(['pedido.cantidad > pedido.despachados']);
+        }
+
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+        console.log(condiciones_where);
+
+        adminModel.getdatos(input.token.split('@'),function(err,data){
+            if(err) console.log(err);
+
+            res.render("plan/table_ids",{prods:data, token: input.token});
+        }, condiciones_where);
+    } else res.redirect("/bad_login");
+});
+
+
 
 
 
