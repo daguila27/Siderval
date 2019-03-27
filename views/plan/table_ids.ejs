@@ -69,6 +69,9 @@
     .parsear_nro{
         text-align: center;
     }
+    .info_number:hover{
+        background-color: rgb(124,123,173);
+    }
 </style>
 <table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
     <thead>
@@ -84,9 +87,9 @@
         <th>Aceptados por CC</th>
         <th>Recepción GDD</th>
         <th>Salidas con GDD</th>
-        <th>Stock final</th>
         <th>Devoluciones BMI</th>
         <th>Retiros BMI</th>
+        <th>Stock final</th>
     </tr>
     </thead>
     <%if(prods.length){total_fabricados = 0;
@@ -96,18 +99,18 @@
         <tr class="select-desp" data-state="nosele" data-idmat="<%= prods[r].idmaterial%>" data-detalle="<%= prods[r].detalle%>">
             <td><%= prods[r].codigo%></td>
             <td><%= prods[r].detalle%></td>
-            <td class="a parsear_nro"><%= prods[r].s_inicial.toString()%></td>
-            <td class="b parsear_nro"><%= prods[r].solicitados.toString()%></td>
-            <td class="c parsear_nro"><%= prods[r].sol_atr.toString()%></td>
-            <td class="d parsear_nro"><%= prods[r].necesario_neto%></td>
-            <td class="e parsear_nro"><%= prods[r].virtuales%></td>
-            <td class="f parsear_nro"><%= prods[r].virtuales_oda.toString()%></td>
-            <td class="g parsear_nro"><%= (prods[r].fabricados).toString()%></td>
-            <td class="h parsear_nro"><%= prods[r].ing_oda.toString()%></td>
-            <td class="i parsear_nro"><%= prods[r].despachados.toString()%></td>
-            <td class="j parsear_nro"><%= (prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados - prods[r].sum_sal).toString()%></td>
-            <td class="k parsear_nro"><%= prods[r].sum_dev.toString()%></td>
-            <td class="l parsear_nro"><%= prods[r].sum_sal.toString()%></td>
+            <td class="a parsear_nro" data-order="<%= prods[r].s_inicial%>"><%= prods[r].s_inicial.toString()%></td>
+            <td data-tipo="sol" data-order="<%=prods[r].solicitados%>" data-info="<%=prods[r].solicitados%>" class="info_number b parsear_nro"><%= prods[r].solicitados.toString()%></td>
+            <td data-tipo="atr" data-order="<%=prods[r].sol_atr%>" data-info="<%=prods[r].sol_atr%>" class="info_number c parsear_nro"><%= prods[r].sol_atr.toString()%></td>
+            <td data-tipo="nec_fab" data-order="<%=prods[r].necesario_neto%>" data-info="<%=prods[r].necesario_neto%>" class="d parsear_nro"><%= prods[r].necesario_neto%></td>
+            <td data-tipo="vir_pro" data-order="<%=prods[r].virtuales%>" data-info="<%=prods[r].virtuales%>" class="e parsear_nro"><%= prods[r].virtuales%></td>
+            <td data-tipo="vir_oda" data-order="<%=prods[r].virtuales_oda%>" data-info="<%=prods[r].virtuales_oda%>" class="f parsear_nro"><%= prods[r].virtuales_oda.toString()%></td>
+            <td data-tipo="ace_cc" data-order="<%=prods[r].fabricados%>" data-info="<%=prods[r].fabricados%>" class="info_number g parsear_nro"><%= (prods[r].fabricados).toString()%></td>
+            <td data-tipo="rec_gd" data-order="<%=prods[r].ing_oda%>" data-info="<%=prods[r].ing_oda%>" class="info_number h parsear_nro"><%= prods[r].ing_oda.toString()%></td>
+            <td data-tipo="sal_gd" data-order="<%=prods[r].despachados%>" data-info="<%=prods[r].despachados%>" class="info_number i parsear_nro"><%= prods[r].despachados.toString()%></td>
+            <td data-tipo="dev" data-order="<%=prods[r].sum_dev%>" data-info="<%=prods[r].sum_dev%>" class="info_number k parsear_nro"><%= prods[r].sum_dev.toString()%></td>
+            <td data-tipo="ret" data-order="<%=prods[r].sum_sal%>" data-info="<%=prods[r].sum_sal%>" class="info_number l parsear_nro"><%= prods[r].sum_sal.toString()%></td>
+            <td data-order="<%=prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados - prods[r].sum_sal%>" data-info="<%=prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados - prods[r].sum_sal%>" class="j parsear_nro"><%= (prods[r].s_inicial + prods[r].ing_oda + prods[r].sum_dev + prods[r].fabricados - prods[r].despachados - prods[r].sum_sal).toString()%></td>
             <% total_fabricados += prods[r].fabricados;%>
         </tr>
     <%}%>
@@ -139,6 +142,20 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
+
+    $(".info_number").on('click', function(e){
+        e.preventDefault();
+
+        $.ajax({
+            type: 'GET',
+            url: '/plan/get_info_ids/'+$(this).data('tipo')+"/"+$(this).parent().data('idmat')+"/"+$("#dateSelect").val(),
+            success: function(data){
+                $(".infoContent").html(data);
+                $("#infoModal").modal('show');
+            }
+        });
+    });
+
     var clases = [
         "a",
         "b",

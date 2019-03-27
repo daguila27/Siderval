@@ -42,12 +42,12 @@ function fechaLatino(string){
     var peso = 0;
     for(var i=0; i < desp.length; i++){
         peso += desp[i].peso_palet;%>
-        <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>">
+        <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>">
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].idpalet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
-            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs"><i class="fa fa-spinner fa-pulse"></i></button></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs"><i class="fa fa-eye"></i></button></td>
         </tr>
     <%}%>
     </tbody>
@@ -95,7 +95,7 @@ function fechaLatino(string){
     }
     document.body.onmouseup = function() {
         mouseDown = 0;
-        //check_session();
+        check_session();
 
     }
     $(".select-desp").mouseenter(function(){
@@ -103,12 +103,14 @@ function fechaLatino(string){
             $(this).toggleClass('danger');
             if($(this).hasClass('danger')){
                 $(this).data('state', 'selec');
+                seleccionados.push($(this).data('idpalet'));
                 //act_session('add', this);
 
             }
             else{
                 $(this).data('state', 'noselec');
                 //act_session('rm', this);
+                seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
             }
             //check_session();
         }
@@ -118,12 +120,15 @@ function fechaLatino(string){
         $(this).toggleClass('danger');
         if($(this).hasClass('danger')){
             $(this).data('state', 'selec');
+            seleccionados.push($(this).data('idpalet'));
+
             //act_session('add', this);
 
         }
         else{
             $(this).data('state', 'noselec');
             //act_session('rm', this);
+            seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
 
         }
 
@@ -140,24 +145,17 @@ function fechaLatino(string){
     }
 
     function check_session(){
-        var array = [];
-        $(".select-desp").each(function(){
-            if($(this).hasClass('danger')){
-                array.push($(this).data('idpedido'));
-            }
-        });
-        $.ajax({
-            type: 'GET',
-            url: '/bodega/check_session_peds/'+array.join('-'),
-            success: function(data){
-                console.log(data);
-                refreshCount();
-            }
-        });
+        if(seleccionados.length == 0){
+            $("#newpl_button").css('bottom', '-50px');
+        }
+        else{
+            $("#newpl_button").css('bottom', '20px');
+        }
+        $("#pedidos").html("<h5><small>"+seleccionados.length+" pedidos seleccionados.</small></h5>");
     }
 
-    $("#pedidos").html("<h5><small>"+"<%=arraypl.length%>"+" pedidos seleccionados.</small></h5>");
-    if('<%=arraypl.length%>' == '0'){
+    $("#pedidos").html("<h5><small>"+seleccionados.length+" pedidos seleccionados.</small></h5>");
+    if(seleccionados.length == '0'){
         $("#newpl_button").css('bottom', '-50px');
     }
     else{

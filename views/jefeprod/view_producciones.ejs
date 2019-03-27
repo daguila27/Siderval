@@ -125,7 +125,7 @@
                 data: {clave: filtros_seleccionados.join(','), agrupar: $("#groupP").is(':checked')},
                 url: '/jefeprod/table_producciones',
                 beforeSend: function(){
-                    destroyDataTable();
+                    destroyThisDataTable("#prodTable");
                     $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
                 },
                 success: function(data){

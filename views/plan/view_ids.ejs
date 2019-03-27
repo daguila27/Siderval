@@ -75,7 +75,7 @@ console.log(formatDate(new Date()));%>
             <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
-                    <li><a class="getcsvof" data-tipo="of" onclick="cierreMensual()"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                    <li><a class="getcsvof" data-tipo="of" onclick="cierreMensual()"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar IDS</a></li>
                 </ul>
             </div>
             <div style="display: flex">
@@ -99,6 +99,17 @@ console.log(formatDate(new Date()));%>
     <div id="fw-body"  style="padding:0;margin: 0;">
         <div class="content main-page">
         </div>
+    </div>
+</div>
+
+<div id="infoModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content infoContent">
+
+        </div>
+
     </div>
 </div>
 <script type="text/javascript">

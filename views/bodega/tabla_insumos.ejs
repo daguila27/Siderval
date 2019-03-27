@@ -18,13 +18,13 @@
 
 <script type="text/javascript">
 	function send_insum(e){
-		$(".pestana_xdespachar").css('display', 'none');
+		//$(".pestana_xdespachar").css('display', 'none');
         row = $(e);
         $("#0").remove();
         $("#insum" + row.data('idpedido') + " .col-aux").removeClass("hidden");
         $("#insum" + row.data('idpedido')).addClass("hidden");          //Oculta la fila en TI
         $("#rmv" + row.data('idpedido')).removeClass("hidden");    //Muestra el boton eliminar en TS
-        $("#nof" + row.data('idpedido')).addClass("hidden");       //Oculta el N°OF en TS
+        //$("#nof" + row.data('idpedido')).addClass("hidden");       //Oculta el N°OF en TS
         $("#anom" + row.data('idpedido')).addClass("hidden");      //Oculta la Aleacion en TS
         $("#date" + row.data('idpedido')).addClass("hidden");      //Oculta la fecha en TS
         $("#add" + row.data('idpedido')).addClass("hidden");       //Oculta el boton agregar en TS

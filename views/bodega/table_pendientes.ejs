@@ -104,19 +104,6 @@ function fechaLatino(string){
 <script type="text/javascript">
     setDataTableFixed("#despachosTable");
 
-    function refreshCount(){
-        var c = 0;
-        $(".select-desp.danger").each(function(){
-            c++;
-        });
-        if(c == 0){
-            $("#newpl_button").css('bottom', '-50px');
-        }
-        else{
-            $("#newpl_button").css('bottom', '20px');
-        }
-        $("#pedidos").html("<h5><small>"+c+" pedidos seleccionados.</small></h5>");
-    }
     var mouseDown = 0;
     document.body.onmousedown = function() {
         mouseDown = 1;
@@ -131,12 +118,15 @@ function fechaLatino(string){
             $(this).toggleClass('danger');
             if($(this).hasClass('danger')){
                 $(this).data('state', 'selec');
+                //el pedido no esta en la lista
+                seleccionados.push($(this).data('idpedido'));
                 //act_session('add', this);
 
             }
             else{
                 $(this).data('state', 'noselec');
                 //act_session('rm', this);
+                seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
             }
             //check_session();
         }
@@ -146,12 +136,14 @@ function fechaLatino(string){
             $(this).toggleClass('danger');
             if($(this).hasClass('danger')){
                 $(this).data('state', 'selec');
+                seleccionados.push($(this).data('idpedido'));
                 //act_session('add', this);
 
             }
             else{
                 $(this).data('state', 'noselec');
                 //act_session('rm', this);
+                seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
 
             }
 
@@ -168,24 +160,16 @@ function fechaLatino(string){
     }
 
     function check_session(){
-        var array = [];
-        $(".select-desp").each(function(){
-            if($(this).hasClass('danger')){
-                array.push($(this).data('idpedido'));
-            }
-        });
-        $.ajax({
-            type: 'GET',
-            url: '/bodega/check_session_peds/'+array.join('-'),
-            success: function(data){
-                console.log(data);
-                refreshCount();
-            }
-        });
+        if(seleccionados.length == 0){
+            $("#newpl_button").css('bottom', '-50px');
+        }
+        else{
+            $("#newpl_button").css('bottom', '20px');
+        }
+        $("#pedidos").html("<h5><small>"+seleccionados.length+" pedidos seleccionados.</small></h5>");
     }
-
-    $("#pedidos").html("<h5><small>"+"<%=arraypl.length%>"+" pedidos seleccionados.</small></h5>");
-    if('<%=arraypl.length%>' == '0'){
+    $("#pedidos").html("<h5><small>"+seleccionados.length+" pedidos seleccionados.</small></h5>");
+    if(seleccionados.length == 0){
         $("#newpl_button").css('bottom', '-50px');
     }
     else{

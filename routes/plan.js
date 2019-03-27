@@ -43,6 +43,125 @@ router.get('/render_informes', function(req, res, next){
   else{res.redirect('bad_login');}  
 });
 
+router.get('/get_info_ids/:tipo/:idmaterial/:token', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var query;
+        var view;
+        var tipo = req.params.tipo;
+        var fecha = req.params.token.split('@');
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection: %s", err);}
+            switch (req.params.tipo) {
+                case "sol":
+                    query = "select " +
+                        " odc.numoc, " +
+                        " cliente.sigla, " +
+                        " material.detalle, " +
+                        " pedido.* " +
+                        " from pedido " +
+                        " left join material on material.idmaterial = pedido.idmaterial " +
+                        " left join odc on odc.idodc = pedido.idodc " +
+                        " left join cliente on cliente.idcliente = odc.idcliente " +
+                        " where pedido.idmaterial in (" + req.params.idmaterial + ") AND (pedido.f_entrega BETWEEN '"+fecha[0]+"' and '"+fecha[1]+"')";
+                    view = "ids_atr";
+                    break;
+                case "atr":
+                    query = "select " +
+                        " odc.numoc, " +
+                        " cliente.sigla, " +
+                        " material.detalle, " +
+                        " pedido.* " +
+                        " from pedido " +
+                        " left join material on material.idmaterial = pedido.idmaterial " +
+                        " left join odc on odc.idodc = pedido.idodc " +
+                        " left join cliente on cliente.idcliente = odc.idcliente " +
+                        " where pedido.idmaterial in (" + req.params.idmaterial + ") and pedido.f_entrega < '"+fecha[0]+"' and pedido.cantidad > pedido.despachados";
+                    view = "ids_atr";
+                    break;
+                case "ace_cc":
+                    query = "select " +
+                        " material.detalle, " +
+                        " produccion.idordenproduccion, " +
+                        " fabricaciones.idorden_f, " +
+                        " produccion_history.*, " +
+                        " desde.nombre_etapa, " +
+                        " hasta.nombre_etapa " +
+                        " from produccion_history " +
+                        " left join produccion on produccion.idproduccion = produccion_history.idproduccion " +
+                        " left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                        " left join material on material.idmaterial = fabricaciones.idmaterial" +
+                        " left join (select * from etapafaena) as desde on desde.value = produccion_history.from " +
+                        " left join (select * from etapafaena) as hasta on hasta.value = produccion_history.to" +
+                        " where (produccion_history.fecha BETWEEN '"+fecha[0]+"' and '"+fecha[1]+"') and produccion_history.from=7 and produccion_history.to=8 and fabricaciones.idmaterial in (" + req.params.idmaterial + ")";
+                    view = "ids_ace_cc";
+                    break;
+                case "rec_gd":
+                    query = "select " +
+                        " recepcion.fecha, " +
+                        " oda.idoda, " +
+                        " material.detalle, " +
+                        " recepcion_detalle.*," +
+                        " cliente.sigla " +
+                        " from recepcion_detalle " +
+                        " left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast " +
+                        " left join oda on oda.idoda = abastecimiento.idoda " +
+                        " left join material on material.idmaterial = abastecimiento.idmaterial " +
+                        " left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion " +
+                        " left join cliente on cliente.idcliente = oda.idproveedor" +
+                        " where (recepcion.fecha BETWEEN '"+fecha[0]+"' and '"+fecha[1]+"') and abastecimiento.idmaterial in (" + req.params.idmaterial + ")";
+                    view = "ids_rec_gd";
+                    break;
+                case "sal_gd":
+                    query = "select " +
+                        " odc.numoc, " +
+                        " material.detalle, " +
+                        " despachos.*, " +
+                        " gd.fecha," +
+                        " cliente.sigla " +
+                        " from despachos " +
+                        " left join gd on gd.idgd = despachos.idgd " +
+                        " left join material on material.idmaterial = despachos.idmaterial " +
+                        " left join pedido on pedido.idpedido = despachos.idpedido " +
+                        " left join odc on odc.idodc = pedido.idodc " +
+                        " left join cliente on cliente.idcliente = odc.idcliente" +
+                        " where (gd.fecha BETWEEN '"+fecha[0]+"' and '"+fecha[1]+"') and despachos.idmaterial in (" + req.params.idmaterial + ")";
+                    view = "ids_sal_gd";
+                    break;
+                case "dev":
+                    query = "select " +
+                        " material.detalle, " +
+                        " movimiento_detalle.cantidad, " +
+                        " movimiento.* " +
+                        " from movimiento_detalle " +
+                        " left join material on material.idmaterial = movimiento_detalle.idmaterial " +
+                        " left join movimiento on movimiento.idmovimiento = movimiento_detalle.idmovimiento" +
+                        " where movimiento.tipo = 1 and (movimiento.f_gen BETWEEN '"+fecha[0]+"' and '"+fecha[1]+"') and movimiento_detalle.idmaterial in (" + req.params.idmaterial + ")";
+                    view = "ids_dev";
+                    break;
+                case "ret":
+                    query = "select " +
+                        " material.detalle, " +
+                        " movimiento_detalle.cantidad, " +
+                        " movimiento.* " +
+                        " from movimiento_detalle " +
+                        " left join material on material.idmaterial = movimiento_detalle.idmaterial " +
+                        " left join movimiento on movimiento.idmovimiento = movimiento_detalle.idmovimiento" +
+                        " where movimiento.tipo = 0 and (movimiento.f_gen BETWEEN '"+fecha[0]+"' and '"+fecha[1]+"') and movimiento_detalle.idmaterial in (" + req.params.idmaterial + ")";
+                    view = "ids_dev";
+                    break;
+            }
+
+
+            connection.query(query, function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                console.log(rows);
+                res.render('plan/'+view, {data: rows, tipo: tipo});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
 router.get('/view_pedidos', function(req, res, next){
     if(verificar(req.session.userData)) {
         req.getConnection(function(err,connection){

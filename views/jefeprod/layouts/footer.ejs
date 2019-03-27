@@ -301,6 +301,9 @@
             }
         });
     }
+
+
+
     function  setDataTableFixed(str){
         var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 8;
         return $(str).DataTable({
@@ -480,8 +483,14 @@
 
     function destroyDataTable(){
         if ( $.fn.DataTable.isDataTable('table') ) {
+            alert('in');
             $('table').DataTable().destroy();
+            alert('out');
+
         }
+    }
+    function destroyThisDataTable(str){
+        $(str).DataTable().destroy();
     }
 
 

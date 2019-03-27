@@ -105,6 +105,7 @@
 
 <button id="newpl_button" style="position: fixed; bottom: -50px; right: 20px; z-index: 12; transition: 0.5s" class="btn btn-lg btn-primary btn-circle"><i class="fa fa-plus"></i></button>
 <script type="text/javascript">
+    var seleccionados = [];
     var array_fill = [
         "Palet@default",
         "Detalle@primary"
@@ -383,13 +384,11 @@
 
     });
 
-
     $("#newpl_button").on('click', function(e){
         e.preventDefault();
-
         $.ajax({
             type: 'GET',
-            url: '/bodega/get_session_peds',
+            url: '/bodega/get_session_palets/'+seleccionados.join('-'),
             success: function(data){
                 $("#newPLModal-content").html(data);
                 $("#newPLModal").modal('show');
