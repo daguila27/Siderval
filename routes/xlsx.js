@@ -88,7 +88,7 @@ informe.getdatos = function(fecha,callback, condiciones){
             " WHERE material.e_abast != 4" +
             " GROUP BY bom.idmaterial_slave) AS necesario ON necesario.idmaterial_slave = material.idmaterial" +
             // Salidas de materias primas - as salidas_mp.sum_sal
-            " LEFT JOIN (SELECT despachos.idmaterial, SUM(despachos.cantidad) AS facturados FROM despachos LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE despachos.numfac IS NOT null AND (gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59') GROUP BY despachos.idmaterial) AS facturados ON facturados.idmaterial=material.idmaterial" +
+            " LEFT JOIN (SELECT despachos.idmaterial, SUM(despachos.cantidad) AS facturados FROM despachos LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE despachos.numfac IS NOT null AND (gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59') AND (gd.estado = 'Venta' OR (gd.estado='Traslado' AND (gd.idcliente = 6341  OR gd.idcliente = 6439) )) GROUP BY despachos.idmaterial) AS facturados ON facturados.idmaterial=material.idmaterial" +
             " LEFT JOIN (select movimiento_detalle.idmaterial, sum(movimiento_detalle.cantidad) as sum_sal FROM movimiento" +
             " LEFT JOIN movimiento_detalle on movimiento_detalle.idmovimiento = movimiento.idmovimiento" +
             " WHERE movimiento.tipo = 0 AND movimiento.f_gen" +
