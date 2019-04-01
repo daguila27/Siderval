@@ -17,27 +17,6 @@ function fechaLatino(string){
 <div id="registros" style="display: none"><%= data.length %></div>
 
 <table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px; width: 100%;">
-    <style>
-
-
-        .order-column:hover{
-            cursor: pointer;
-        }
-        #encabezadotabla{
-            z-index: 10;
-        }
-
-        #encabezadotabla > tr > th{
-            text-align: center;
-        }
-        #pietabla {
-            left:0px;
-            bottom:0px;
-            height:30px;
-            width:100%;
-        }
-
-    </style>
     <thead>
     <tr>
         <th id="cab-gd">GD</th>
@@ -51,7 +30,7 @@ function fechaLatino(string){
         <th id="cab-fecha">Fecha</th>
     </tr>
     </thead>
-    <tbody id="cuerpotabla">
+    <tbody>
     <%
     var total_cantidad = 0;
     var total_peso = 0;
@@ -73,7 +52,7 @@ function fechaLatino(string){
         </tr>
     <%}%>
     </tbody>
-    <tfoot id="pietabla" class="fixed_table">
+    <tfoot>
         <tr>
             <td id="gd"></td>
             <td id="oc"></td>
@@ -91,7 +70,7 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableFabricaciones("#DataTableFabs");
+    setDataTableFixed("#DataTableFabs");
 
 
     function refreshSumas(){
@@ -116,41 +95,6 @@ function fechaLatino(string){
     }
 
 
-    var dimensiones = {clase: [], ancho: []};
-
-    function getMedidas(){
-        dimensiones.clase = [];
-        dimensiones.ancho = [];
-        $("#pietabla tr td").each(function () {
-            dimensiones.clase.push($(this).attr('id'));
-            dimensiones.ancho.push($("." + $(this).attr('id')).width());
-        });
-    }
-
-    //SETEA LAS DIMENSIONES DE LOS CAMPOS AL PIE DE LA TABLA, CON LAS MEDIDAS OBTENIDAD EN GetMedidas()
-    function ini_table(str) {
-        $("#pietabla").css('position', 'fixed');
-        $(".fixed_table").width($(str).width());
-        $(".fixed_table").css('left', $(".o_sub_menu").width());
-        getMedidas();
-        for (var w = 0; w < dimensiones.clase.length; w++) {
-            $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
-        }
-        /*$("#encabezadotabla").css('position', 'fixed');
-        for (var w = 0; w < dimensiones.clase.length; w++) {
-            $("#encabezadotabla tr #cab-" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
-        }
-        for (var w = 0; w < dimensiones.clase.length; w++) {
-            $("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
-        }*/
-    }
-    ini_table("#DataTableFabs");
-
-    $(window).resize(function(){
-        //aqui el codigo que se ejecutara cuando se redimencione la ventana
-        //setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
-        ini_table("#DataTableFabs");
-    });
     $(document).ready(function(){
         $('#DataTableFabs tbody').on( 'click', 'tr', function () {
             $(this).toggleClass('success');

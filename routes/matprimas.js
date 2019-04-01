@@ -200,7 +200,8 @@ router.post("/save_recepcion",function(req,res,next){
         query += " ELSE recibidos END WHERE idabast IN ("+ids.substring(0,ids.length-1)+")";
         query2 += " ELSE stock END WHERE idmaterial IN ("+idsm.substring(0,idsm.length-1)+")";
 
-        //console.log(query);
+        console.log(query);
+        console.log(query2);
 
         req.getConnection(function(err, connection){
             if(err){ console.log("Error Connection : %s", err);}
@@ -212,19 +213,19 @@ router.post("/save_recepcion",function(req,res,next){
                 for(var p=0; p < recep_d.length; p++){
                     recep_d[p][0] = inRecep.insertId;
                 }
-
+                console.log(recep_d);
                 connection.query("INSERT INTO recepcion_detalle (idrecepcion, idabast, cantidad) VALUES ?", [recep_d], function(err, inRecepD){
                     if(err) {console.log("Error Insert : %s", err);}
 
-                    //console.log(inRecepD);
+                    console.log(inRecepD);
                     connection.query(query, function(err, upAbast){
                         if(err) {console.log("Error Insert : %s", err);}
 
-                        //console.log(upAbast);
+                        console.log(upAbast);
                         connection.query(query2, function(err, upMat){
                             if(err) {console.log("Error Insert : %s", err);}
 
-                            //console.log(upMat);
+                            console.log(upMat);
                             res.redirect('/matprimas/busq_oda');
                         });
                     });

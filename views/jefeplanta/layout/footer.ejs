@@ -1,0 +1,333 @@
+
+</div>
+</div>
+
+<!-- Modal -->
+<div id="newPLModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" id="newPLModal-content" >
+
+
+
+    </div>
+</div>
+
+
+<script src="/js/pdftex.js"></script>
+
+<script src="https://togetherjs.com/togetherjs-min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+
+<!--<script src="/vendor/bootstrap-select/dist/js/bootstrap-select.js"></script>-->
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="/vendor/metisMenu/metisMenu.min.js"></script>
+
+
+
+
+
+<!-- Morris Charts JavaScript -->
+<script src="/vendor/raphael/raphael.min.js"></script>
+<script src="/vendor/morrisjs/morris.min.js"></script>
+<script src="/data/morris-data.js"></script>
+<!-- DataTables JavaScript-->
+<script src="/vendor/jquery/jquery.twbsPagination.js" type="text/javascript"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/dist/js/sb-admin-2.js"></script>
+<script>
+    function show_menu(){
+        $('.o_sub_menu').css('left', '0%');
+    }
+    function close_menu() {
+        $('.o_sub_menu').css('left', '-15%');
+    }
+
+
+
+
+
+
+    $(document).ready(function(){
+        $.ajax({
+            type: 'GET',
+            url: '/jefeplanta/stats',
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    });
+
+    function ajax(yo){
+        $(".active").removeClass('active');
+        $(yo).addClass('active');
+        $.ajax({
+            type: 'GET',
+            url: $(yo).data('link'),
+            beforeSend: function(){
+                destroyDataTable();
+                $("#page-wrapper").html('');
+            },
+            success: function(data){
+                close_menu();
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
+        });
+    }
+    function setDataTable(str){
+        return $(str).DataTable({
+            responsive: true,
+            language: {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    };
+    function setDataTable2(str){
+        return $(str).DataTable({
+            responsive: true,
+            scrollX: true,
+            fixedColumns: true,
+            language: {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
+    function setDataTableMain(str){
+        return $(str).DataTable({
+            responsive: true,
+            lengthChange: false,
+            pageLength: 20,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
+    function setDataTableFabricaciones(str){
+        return $(str).DataTable({
+            fixedColumns: true,
+            fixedHeader: {
+                header: true,
+                footer: true
+            },
+            responsive: true,
+            lengthChange: false,
+            paging: false,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
+
+    function  setDataTableFixed(str){
+        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 6;
+        return $(str).DataTable( {
+            fixedHeader: {
+                header: true,
+                footer: true,
+                headerOffset: tope
+            },
+            paging: false,
+            fixedColumns: true,
+            lengthChange: false,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
+    function  setDataTableStock(str){
+        return $(str).DataTable( {
+            paging: true,
+            fixedColumns: true,
+            responsive: true,
+            lengthChange: false,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        } );
+    }
+
+    function setDataTableSmall(str){
+        return $(str).DataTable({
+            responsive: true,
+            language: {
+                "sProcessing":     "Procesando...",
+                "sLengthMenu":     "Mostrar _MENU_ registros",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":    "",
+                "sSearch":         "Buscar:",
+                "sUrl":            "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
+
+    function destroyDataTable(){
+        if ( $.fn.DataTable.isDataTable('table') ) {
+            $('table').DataTable().destroy();
+        }
+    }
+
+
+
+    var io = io();
+    io.on('notif', function(){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/render_notificaciones',
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+
+    });
+
+
+</script>
+</body>
+</html>

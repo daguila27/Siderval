@@ -89,10 +89,10 @@
 
         <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
             <li>
-                <div style="font-family: 'Lobster'; font-size: 15px; color: white; margin-right: 20px">Bienvenido Siderval</div>
+                <div style="font-family: 'Lobster'; font-size: 15px; color: white;">Bienvenido Jefe de Planta</div>
             </li>
             <li>
-                <div style="margin-right: 10px"><a href="../user/log_out">Cerrar sesión</a></div>
+                <div><a href="../user/log_out">Cerrar sesión</a></div>
             </li>
         </ul>
 
@@ -135,12 +135,11 @@
                 }
 
             </style>
-
             <div class="oe_secondary_menu">
 
                 <div class="oe_secondary_menu_section">Planificación</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li id="pedd" class="active" onclick="ajax(this)" data-link="/plan/view_pedidos">
+                    <li id="pedd" onclick="ajax(this)" data-link="/plan/view_pedidos">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Pedidos
@@ -154,85 +153,38 @@
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/plan/all_prod">
+                    <li class="active" onclick="ajax(this)" data-link="/jefeplanta/stats">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Ver Stock de Productos
+                                    Ver Graficos
+                                </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-link="/jefeplanta/view_planta">
+                        <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Deberes
                                 </span>
                         </a>
                     </li>
                 </ul>
 
-                <div class="oe_secondary_menu_section">Abastecimiento</div>
+                <div class="oe_secondary_menu_section">Despachos</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/view_abastecimiento">
+                    <li onclick="ajax(this)" data-link='jefeplanta/view_despachositem/funds'>
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Ver Orden de Compra
+                                    Productos Fundidos
                                 </span>
                         </a>
                     </li>
-                </ul>
-
-                <div class="oe_secondary_menu_section">Materias Primas</div>
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
+                    <li onclick="ajax(this)" data-link='jefeplanta/view_despachositem/otros'>
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Ver Materias Primas
+                                    Otros
                                 </span>
                         </a>
                     </li>
-                    <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Movimientos
-                                </span>
-                        </a>
-                    </li>
-                    <li  onclick="ajax(this)" data-link="/matprimas/view_recep" id="view_movimientos">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Recepciones
-                                </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/bom_mat_uni">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver BOM productos
-                                </span>
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="oe_secondary_menu_section">Jefe Producción</div>
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/jefeprod/view_producciones">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Producciones
-                                </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-link="/faena/procesos">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Procesos
-                                </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-link="/jefeprod/phistory_view">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Historial de producción
-                                </span>
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="oe_secondary_menu_section">Bodega</div>
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li onclick="ajax(this)" data-link='bodega/view_despachos'>
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
@@ -242,46 +194,8 @@
                     </li>
                 </ul>
 
-                <div class="oe_secondary_menu_section">Informes</div>
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/1">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Producción
-                                        </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/2">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Materias Primas e Insumos
-                                        </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/0">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Todos
-                                        </span>
-                        </a>
-                    </li>
-
-                </ul>
-                <div class="oe_secondary_menu_section">Clientes y Proveedores</div>
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/plan/all_clientes">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Todos
-                                </span>
-                        </a>
-                    </li>
-                </ul>
-
-
 
             </div>
-
         </div>
     </div>
     <div id="page-wrapper" style="width: 100%;">
