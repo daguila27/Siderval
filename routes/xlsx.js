@@ -123,7 +123,7 @@ informe.getdatos = function(fecha,callback, condiciones){
             " LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE (gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " AND (gd.estado = 'Venta' OR (gd.estado = 'Traslado' AND (gd.idcliente = 6341  OR gd.idcliente = 6439) )) GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
             // LEFT JOIN produccion AKA cantidad en produccion
-            " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1`) as virtuales" +
+            " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1` - produccion.`2`) as virtuales" +
             " FROM produccion" +
             " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
             " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +

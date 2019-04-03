@@ -497,14 +497,8 @@ router.post('/lanzar_op_fill', function(req, res, next){
                 function(err, rows){
                     if(err)
                         console.log("Error Selecting :%s", err);
-                    connection.query("UPDATE fabricaciones SET restantes = 0 WHERE (restantes IS null || restantes < 0) AND idfabricaciones > 0", function(err, upNull){
-                        if(err)
-                            console.log("Error Selecting :%s", err);
-                        //res.render('jefeprod/lanzar_op', {data: rows,num:idord[0]},function(err,html){if(err)console.log(err); res.send(html)});
-                        //console.log(rows);
-                        res.render('jefeprod/lanzar_op_table', {data: rows},function(err,html){if(err)console.log(err); res.send(html)});
-                        //res.render('jefeprod/ordenes_produccion', {data: rows});
-                    });
+                    console.log(rows.length);
+                    res.render('jefeprod/lanzar_op_table', {data: rows},function(err,html){if(err)console.log(err); res.send(html)});
 
                 });
         });
