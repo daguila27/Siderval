@@ -35,8 +35,7 @@ router.get('/', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s",err);
-			console.log("hola" + new Date().toTimeString() + "");
-			connection.query("SELECT * FROM cuenta WHERE detalle != ''", function(err, subc){
+			connection.query("select cuenta_g.idcuenta, cuenta_g.cuenta, ccontable.idccontable, ccontable.cuenta as ccontable, sub_ccontable.idsub, sub_ccontable.nombre from sub_ccontable left join ccontable on ccontable.idccontable = sub_ccontable.idccontable left join cuenta_g on substring(ccontable.idccontable,1,2) = cuenta_g.idcuenta", function(err, subc){
 				if(err)
 					console.log("Error Selecting : %s", err);
 
@@ -799,16 +798,15 @@ router.get('/show_plantillas', function(req,res,next){
 
 router.post('/addsession_prepeds', function(req, res, next){
     if(verificar(req.session.userData)){
-    	console.log(req.body)
+    	console.log(req.body);
         req.getConnection(function(err, connection){
-            connection.query("SELECT material.detalle, material.u_medida,caracteristica.cnom,material.u_compra,material.subcuenta,cuenta.cuenta, cuenta.detalle as cuentadetalle,subcuenta.detalle as subc,coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.') as cc FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN subcuenta ON subcuenta.subcuenta = material.subcuenta LEFT JOIN cuenta ON cuenta.subcuenta = concat(substring(material.subcuenta, 1,2),'000') WHERE material.idmaterial = ?",
+            connection.query("SELECT material.detalle, material.u_medida,caracteristica.cnom,material.u_compra,sub_ccontable.idsub as idsub ,material.ccontable,sub_ccontable.idccontable, sub_ccontable.nombre as cuentadetalle,sub_ccontable.nombre as subc,coalesce(concat(sub_ccontable.idccontable,' ',sub_ccontable.nombre),'N.D.') as cc FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN sub_ccontable ON sub_ccontable.idccontable = material.ccontable WHERE material.idmaterial = ?",
                 [req.body.idm],function(err, details){
                     if(err){
                     	console.log("Error Selecting : %s", err);
                     }
-                    console.log(details);
                     if(req.body.cant){
-                    	if(details[0].subcuenta == null || details[0].subcuenta == ''){
+                    	if(details[0].idccontable == null || details[0].idccontable == ''){
                     		res.send("<tr>" +
 									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
@@ -828,13 +826,13 @@ router.post('/addsession_prepeds', function(req, res, next){
 									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
-									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
 									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     }
                     else{
-                    	if(details[0].subcuenta == null || details[0].subcuenta == ''){
+                    	if(details[0].idccontable == null || details[0].idccontable == ''){
                     		res.send("<tr>" +
 									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
@@ -854,7 +852,7 @@ router.post('/addsession_prepeds', function(req, res, next){
 									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
-									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
 									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
@@ -2123,8 +2121,12 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                     ops[i-2].ing_oda +
                     ops[i-2].fundidos -
                     ops[i-2].despachados -
-                    ops[i-2].rechazados - (ops[i-2].sum_sal - ops[i-2].sum_dev);
-                //STOCK SIDERVAL FINAL = SI + PI + ING_ODA + FUND - DESP - RECH - (RET_BMP - DEV_BMP)
+                    ops[i-2].rechazados -
+					(ops[i-2].sum_sal - ops[i-2].sum_dev);
+                //STOCK_SIDERVAL_FINAL = STOCK_I + PROD_I + RECEP_GDD + FUND - DESP_GDD - RECH - (RET_BMP - DEV_BMP)
+				//STOCK_BPT_FINAL = STOCK_I + RECEP_GDD + ACEP_CC - DESP_GDD - (RET_BMP - DEV_BMP)
+				//STOCK_PRODUCCION_FINAL = PROD_I + FUND - ACEP_CC - RECH
+				//STOCK_SIDERVAL_FINAL = STOCK_BPT_FINAL + STOCK_PRODUCCION_FINAL
             }
            /* sheet.getRow(1).fill = {
                 type: 'pattern',

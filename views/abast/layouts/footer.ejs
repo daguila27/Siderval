@@ -87,21 +87,63 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Selecionar Centro de Costo:</h4>
             </div>
+            <%
+            var cuenta = [];
+            var idcuenta = [];
+            var contable = [];
+            var idcontable = [];
+            for(var i = 0; i < subc.length; i++){
+                if(idcuenta.indexOf(subc[i].idcuenta) == -1){
+                    cuenta.push([subc[i].idcuenta,subc[i].cuenta]);
+                    idcuenta.push(subc[i].idcuenta);
+                }
+                if(idcontable.indexOf(subc[i].idccontable) == -1 ){
+                    contable.push([subc[i].idccontable, subc[i].ccontable]);
+                    idcontable.push(subc[i].idccontable);
+                }
+            }
+            %>
             <div class="modal-body">
                 <div class="form-group">
                     <label for="subcuentasModal"></label>
-                    <select class="form-control" id="subcuentasModal" onchange="foundSC(this)">
-                        <%for(var e=0; e < subc.length; e++){%>
-                            <option value="<%= subc[e].cuenta%>-<%= subc[e].detalle.substring(0,1).toUpperCase() +subc[e].detalle.substring(1, subc[e].detalle.length).toLowerCase() %>"><%= subc[e].detalle%></option>
+                    <select class="form-control" id="cuentaSelect" onchange="act_contable()">
+                        <%for(var e=0; e < cuenta.length; e++){%>
+                            <option data-cuenta="<%= cuenta[e][0]%>" value="<%= cuenta[e][0]%>-<%= cuenta[e][1]%>"><%= cuenta[e][1]%></option>
                         <%}%>
                     </select>
                 </div>
-                <div class="form-group SCModal" style="display: none;">
+                <div class="form-group">
                     <label for="SCModal">Selecccione subcuenta: </label>
-                    <select class="form-control" id="SCModal">
-
+                    <select class="form-control" id="contableSelect" onchange="act_subcontable()">
+                        <%for(var e=0; e < contable.length; e++){%>
+                            <option class="option_c option<%= contable[e][0].split('-')[0]%>" data-contable="<%= contable[e][0]%>" value="<%= contable[e][0]%>@<%= contable[e][1]%>"><%= contable[e][1]%></option>
+                        <%}%>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="SCModal">Selecccione subcuenta: </label>
+                    <select class="form-control" id="subcontableSelect">
+                        <%for(var e=0; e < subc.length; e++){%>
+                            <option class="option_subc option<%= subc[e].idccontable%>" value="<%= subc[e].idsub%>@<%= subc[e].idccontable%>@<%= subc[e].nombre%>"><%= subc[e].nombre%></option>
+                        <%}%>
+                    </select>
+                </div>
+
+                <script>
+
+                    function act_contable(){
+                        $(".option_c").addClass('hidden');
+                        $("#contableSelect .option"+$("#cuentaSelect option:selected").data('cuenta')).removeClass('hidden');
+                        $('#contableSelect option:not(.hidden):first').prop('selected', true);
+                        act_subcontable();
+                    }
+                    function act_subcontable(){
+                        $(".option_subc").addClass('hidden');
+                        $("#subcontableSelect .option"+$("#contableSelect option:selected").data('contable')).removeClass('hidden');
+                        $('#subcontableSelect option:not(.hidden):first').prop('selected', true);
+                    }
+                    act_contable();
+                </script>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="finSelectCC()">Seleccionar</button>
@@ -649,14 +691,19 @@
     }
 
     function finSelectCC(){
-        if( $(".SCModal").css('display') != 'none'  ){
+
+        /*if( $(".SCModal").css('display') != 'none'  ){
             $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
             $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
         }
         else{
             $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]);
             $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val());
-        }
+        }*/
+
+        $("#"+$("#auxCC").val()).val($("#subcontableSelect").val().split('@')[0]);
+        $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcontableSelect").val().split('@')[1]+" "+$("#subcontableSelect").val().split('@')[2]);
+
     }
     function inNumero(){
         $.ajax({
