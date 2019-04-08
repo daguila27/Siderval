@@ -79,6 +79,121 @@ router.get('/stats', function(req, res, next){
 });
 
 
+
+
+router.post('/stats_fusion/:fill', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var fill = req.params.fill;
+        var array_fill = [
+            "coalesce(fabricaciones.idorden_f,'Sin OF')",
+            "material.detalle",
+            "cliente.sigla"
+        ];
+        var object_fill = {
+            "coalesce(fabricaciones.idorden_f,'Sin OF')-off": [],
+            "material.detalle-off": [],
+            "cliente.sigla-off": [],
+            "coalesce(fabricaciones.idorden_f,'Sin OF')-on": [],
+            "material.detalle-on": [],
+            "cliente.sigla-on": []
+        };
+        var clave;
+        var where;
+        var condiciones_where = ['produccion_history.from = 2'];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+
+
+
+        var where = " ";
+
+        if(input.rango == undefined || input.rango == null || input.rango == ''){
+            var d = new Date().toLocaleDateString();
+            condiciones_where.push("produccion_history.fecha > '"+[d.split(' ')[0].split('-')[0],d.split(' ')[0].split('-')[1]].join('-')+"-01 00:00:00'");
+        }
+        else{
+            console.log(input.rango);
+            condiciones_where.push("produccion_history.fecha BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59'");
+        }
+        console.log(fill);
+        var dataget;
+        var group;
+        if(fill=='of'){
+            dataget = "fabricaciones.idorden_f as token,sum(produccion_history.enviados) as fundidos,max(produccion_history.fecha) as last_fusion";
+            group = "fabricaciones.idorden_f";
+        }
+        else if(fill== 'producto'){
+            dataget = "material.detalle as token,sum(produccion_history.enviados) as fundidos,max(produccion_history.fecha) as last_fusion";
+            group = "material.idmaterial";
+        }
+        else{
+            dataget = "cliente.sigla as token,sum(produccion_history.enviados) as fundidos,max(produccion_history.fecha) as last_fusion";
+            group = "cliente.idcliente";
+            condiciones_where.push('cliente.idcliente IS NOT NULL');
+        }
+
+
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+        console.log(where);
+
+        req.getConnection(function(err, connection){
+            if(err)
+                console.log("Error Connection : %s", err);
+            var fecha = new Date().getFullYear() + "-" + (new Date().getUTCMonth() + 1) + "-";
+            //fecha = '2019-1-';
+            connection.query("select " +
+                dataget +
+                " from produccion_history " +
+                "left join produccion on produccion.idproduccion = produccion_history.idproduccion " +
+                "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "left join material on material.idmaterial = fabricaciones.idmaterial " +
+                "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
+                "left join odc on odc.idodc = pedido.idodc " +
+                "left join cliente on cliente.idcliente = odc.idcliente " +
+                where + " group by "+group+" order by sum(produccion_history.enviados) desc limit 10", function(err, fund){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                res.render('jefeplanta/stats_fusion', {data: fund});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
 /* GET users listing. */
 router.get('/view_planta', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -93,7 +208,111 @@ router.get('/view_despachositem/:tab', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
+router.get('/view_fusion', function(req, res, next){
+    if(verificar(req.session.userData)){
+        res.render('jefeplanta/view_fusion');
+    }
+    else{res.redirect('bad_login');}
+});
 
+
+
+router.post('/table_fusion', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var array_fill = [
+            "coalesce(fabricaciones.idorden_f,'Sin OF')",
+            "material.detalle",
+            "cliente.sigla"
+        ];
+        var object_fill = {
+            "coalesce(fabricaciones.idorden_f,'Sin OF')-off": [],
+            "material.detalle-off": [],
+            "clientes.sigla-off": [],
+            "coalesce(fabricaciones.idorden_f,'Sin OF')-on": [],
+            "material.detalle-on": [],
+            "cliente.sigla-on": []
+        };
+        var clave;
+        var where;
+        var condiciones_where = ['produccion_history.from = 2'];
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
+        }
+        else{
+            clave = input.clave.split(',');
+        }
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+
+
+
+        var where = " ";
+
+        if(input.rango == undefined || input.rango == null || input.rango == ''){
+            var d = new Date().toLocaleDateString();
+            condiciones_where.push("produccion_history.fecha > '"+[d.split(' ')[0].split('-')[0],d.split(' ')[0].split('-')[1]].join('-')+"-01 00:00:00'");
+        }
+        else{
+            console.log(input.rango);
+            condiciones_where.push("produccion_history.fecha BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59'");
+        }
+
+        if(condiciones_where.length==0){
+            where = "";
+        }
+        else{
+            where = " WHERE "+ condiciones_where.join(" AND ");
+        }
+        console.log(where);
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+
+            var consulta = "select " +
+                "material.detalle, " +
+                "produccion_history.*, " +
+                "fabricaciones.idorden_f, " +
+                "produccion.f_gen,coalesce(cliente.sigla, 'No Definido') as sigla, cliente.razon " +
+                "from produccion_history " +
+                "left join produccion on produccion.idproduccion = produccion_history.idproduccion " +
+                "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "left join material on material.idmaterial = fabricaciones.idmaterial " +
+                "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
+                "left join odc on odc.idodc = pedido.idodc " +
+                "left join cliente on cliente.idcliente = odc.idcliente "+where;
+            connection.query(consulta,
+                function(err, fund){
+                    if(err) throw err;
+
+                    res.render('jefeplanta/table_fusion', {data: fund});
+
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
 
 
 router.post('/table_planta', function(req, res, next){

@@ -1,0 +1,138 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+%>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"><%= data.length %></div>
+
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+    <thead>
+    <tr>
+        <th>OF</th>
+        <th>Cliente</th>
+        <th>Detalle</th>
+        <th>Fundidos</th>
+        <th>Inicio Producción</th>
+        <th>Fecha Fusión</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(var i=0; i < data.length; i++){%>
+    <tr class="o_data_row">
+        <td><%= data[i].idorden_f%></td>
+        <td><%= data[i].sigla%></td>
+        <td><%= data[i].detalle%></td>
+        <td style="text-align: center;"><%= data[i].enviados%></td>
+        <td style="text-align: center" data-order="<%= new Date(data[i].f_gen).getTime()%>"><%= new Date(data[i].f_gen).toLocaleDateString()%></td>
+        <td style="text-align: center" data-order="<%= new Date(data[i].fecha).getTime()%>"><%= new Date(data[i].fecha).toLocaleDateString()%></td>
+    </tr>
+    <%}%>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    </tfoot>
+</table>
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+
+    setDataTableFixed("#DataTableFabs");
+
+
+    function refreshSumas(){
+        var object = {
+            "solicitados" : 0,
+            "sin_produccion" : 0,
+            "en_produccion" : 0,
+            "peso": 0,
+            "pesototal": 0
+        };
+        if($('.focus-row').length == 0) {
+            $(".checkFunction").each(function(){
+                object[$(this).data('name')] += $(this).data('valor');
+            });
+        }
+        else{
+            $(".checkFunction").each(function(){
+                if($(this).parent().hasClass('focus-row')){
+                    object[$(this).data('name')] += $(this).data('valor');
+                }
+            });
+        }
+
+
+        $("#solicitados").text(object.solicitados);
+        $("#sin_produccion").text(object.sin_produccion);
+        $("#en_produccion").text(object.en_produccion);
+        $("#peso").text(object.peso);
+        $("#pesototal").text(object.pesototal);
+    }
+    var dimensiones = {clase: [], ancho: []};
+
+    function getMedidas(){
+        dimensiones.clase = [];
+        dimensiones.ancho = [];
+        $("#pietabla tr td").each(function () {
+            dimensiones.clase.push($(this).attr('id'));
+            dimensiones.ancho.push($("." + $(this).attr('id')).width());
+        });
+    }
+    function ini_table(str) {
+        $("#pietabla").css('position', 'fixed');
+        $(".fixed_table").width($(str).width());
+        $(".fixed_table").css('left', $(".o_sub_menu").width());
+        getMedidas();
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+        }
+        /*$("#encabezadotabla").css('position', 'fixed');
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+            $("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+            $("#encabezadotabla tr #cab-" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+
+        }
+        for (var w = 0; w < dimensiones.clase.length; w++) {
+        }*/
+    }
+    //ini_table("#DataTableFabs");
+
+    /*$(window).resize(function(){
+        aqui el codigo que se ejecutara cuando se redimencione la ventana
+        setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
+        ini_table("#DataTableFabs");
+    });*/
+    $(document).ready(function(){
+        $('#DataTableFabs tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('success');
+            $(this).toggleClass('focus-row');
+            refreshSumas();
+        });
+    });
+
+    function submit_form(yo){
+        //$("#form"+$(yo).data('idodc')).submit();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/page_of/'+$(yo).data('idodc'),
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+
+
+</script>

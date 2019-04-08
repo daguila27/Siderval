@@ -1,0 +1,481 @@
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+    .etiqueta-filtro-cha:hover{
+        cursor: pointer;
+    }
+    .filters{
+        display: flex;
+    }
+</style>
+<div class="hidden tipovista listafusion"></div>
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+            <li class="active">Fusión</li>
+            <!-- Mostrar cantidad de datos -->
+            <div id="pedidos" style="margin-top: 8px"></div>
+        </ol>
+        <div style="width: 50%; margin-right: 4%">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+                <div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
+                    <div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
+                    </div>
+                    <input disabled="disabled" autocomplete="off" id="buscar_fusion" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
+                    <input disabled="disabled" autocomplete="off" id="buscar_fusion-value" style="display: none" type="text" autocomplete="off">
+                </div>
+                <ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
+                    <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OF</em> para: <strong></strong></a></li>
+                    <li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripción</em> para: <strong></strong></a></li>
+                    <li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Cliente</em> para: <strong></strong></a></li>
+                </ul>
+                <ul class="dropdown-menu o_searchview_autocomplete_graph" data-item="0" role="menu" style="display: none;">
+                    <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em># OF</em> para: <strong></strong></a></li>
+                </ul>
+            </div>
+
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+            <!--<input type="text" id="buscar_fusion" name="" class="form-control pull-right" placeholder="Buscar...">-->
+
+            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
+                <button type="button" accesskey="l" aria-label="list" data-viewtype="list" title="" data-view='table_fusion/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                <button type="button" accesskey="2" aria-label="graph" data-viewtype="graph" title="" data-view='table_fusion/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-bar-chart view-option" data-original-title="Graph"></button>
+                <div class="filters">
+                    <!--<div style="display: flex">
+                        <label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
+                        <input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_despachositem()">
+                    </div>-->
+                    <div class="dropdown" style="margin-left: 15px">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Acotar
+                            <span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="padding: 7px">
+                            <li class="dropdown-header">Desde:</li>
+                            <li><input id="fecha-desde" class="form-control" type="date"></li>
+                            <li class="divider"></li>
+                            <li class="dropdown-header">Hasta:</li>
+                            <li><input id="fecha-hasta" class="form-control" type="date"></li>
+                            <li class="divider"></li>
+                            <li class="pull-right" style="padding: 0px 10px">
+                                <button class="btn btn-xs btn-primary" onclick="restartFechas()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+                                <button class="btn btn-xs btn-success" onclick="setFechas()"><i class="fa fa-check"></i></button>
+                            </li>
+                        </ul>
+                    </div>
+                    <h5 style="margin-left: 10px" class="indicator-of-check indicador_busqueda"><small>Mostrando Fusiones de este Mes</small></h5>
+                    <div class="form-group pull-right filtro_graph hidden" style="margin-left: 15px; display: flex;">
+                        <label for="filtro_graph">Filtro por:</label>
+                        <select class="form-control" id="filtro_graph" onchange="buscar_fusion_stats()">
+                            <option value="cliente" selected>Cliente</option>
+                            <option value="producto">Producto</option>
+                            <option value="of">Orden de Fabricación (OF)</option>
+                        </select>
+                    </div>
+                </div>
+                <!--<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_ofs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
+
+                <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
+                <div style="display: flex">
+                    <label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
+                    <input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_fusion()">
+                    <select class="form-control" style="width: 85px; margin-left: 40px; margin-right: 10px;">
+                        <option value="todos">Todos</option>
+                        <option value="conoc">Con OC</option>
+                        <option value="sinoc">Sin OC</option>
+                    </select>
+                </div>-->
+
+                <!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
+
+             <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var array_fill = [
+        "OF@default",
+        "Descripción@primary",
+        "Cliente@success"
+    ];
+    var filtros_seleccionados = [];
+    var rango = [];
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        $.ajax({
+            type: 'POST',
+            data: {clave: filtros_seleccionados.join(','),  rango: rango.join('@')},
+            url: '/jefeplanta/table_fusion',
+            beforeSend: function(){
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+            success: function(data){
+                $(".main-page").html(data);
+
+                //Muestra la cantidad de pedidos
+                $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
+            }
+        });
+        $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+    });
+
+
+
+
+    function buscar_fusion(){
+        if($(".tipovista").hasClass('listafusion')) {
+            $.ajax({
+                type: 'POST',
+                data: {clave: filtros_seleccionados.join(','), rango: rango.join('@')},
+                url: '/jefeplanta/table_fusion',
+                beforeSend: function () {
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                },
+                success: function (data) {
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de pedidos
+                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                }
+            });
+        }
+        else{
+            buscar_fusion_stats();
+        }
+    }
+
+    function buscar_fusion_stats(){
+        if(!$(".tipovista").hasClass('listafusion')) {
+            $.ajax({
+                type: 'POST',
+                data: {clave: filtros_seleccionados.join(','), rango: rango.join('@')},
+                url: '/jefeplanta/stats_fusion/'+$("#filtro_graph").val(),
+                beforeSend: function () {
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                },
+                success: function (data) {
+                    $(".main-page").html(data);
+                }
+            });
+        }
+        else{
+            buscar_fusion()
+        }
+    }
+
+
+
+    //FUNCIONES PARA BUSCADORES
+    $("#buscar_fusion").on('keyup', function(e){
+        e.preventDefault();
+        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
+            $(".o_searchview_autocomplete").css('display', 'none');
+            $(".o_searchview_autocomplete strong").html('');
+        }
+        else{
+            $(".o_searchview_autocomplete").css('display', 'block');
+            $(".o_searchview_autocomplete strong").html($(this).val());
+        }
+    });
+
+
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
+
+    $(".fill-item-abast").on('click', function(e){
+        e.preventDefault();
+        var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
+        var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
+        $(".etiqueta-filtro-div").append(
+            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_fusion").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_fusion").val()+"@off' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
+            +$("#buscar_fusion").val()+
+            "</strong> <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+        );
+        $(".etiqueta-filtro-div").data('cant', labels+1);
+        if($("#buscar_fusion-value").val() == '' || $("#buscar_fusion-value").val() == null || $("#buscar_fusion-value").val() == undefined){
+            $("#buscar_fusion-value").val($(this).data('searchcol')+"@"+$("#buscar_fusion").val()+"@off");
+        }
+        else{
+            $("#buscar_fusion-value").val([$("#buscar_fusion-value").val(),$(this).data('searchcol')+"@"+$("#buscar_fusion").val(),'off'].join(','));
+        }
+        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_fusion").val()+"@off");
+        $(".o_searchview_autocomplete").css('display', 'none');
+        $(".o_searchview_autocomplete strong").html('');
+        $("#buscar_fusion").val('');
+        $("#buscar_fusion").focus();
+        buscar_fusion();
+    });
+
+
+
+
+
+
+
+    function eliminarEtiqueta(yo){
+        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
+        $(yo).parent().remove();
+        $(".etiqueta-filtro").removeAttr('id');
+        var count = 0;
+        $(".etiqueta-filtro").each(function(){
+            $(this).attr("id","label"+count);
+            count++;
+        });
+        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        buscar_fusion();
+    }
+
+    function cambiarEtiqueta(yo){
+        if($(yo).data('state') == 'off') {
+            $(yo).parent().removeClass('label-primary');
+            $(yo).parent().addClass('label-danger');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
+
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Removiendo "+'"'+$(yo).parent().children('strong').text()+'"'+" de la busqueda");
+            $(yo).removeClass('fa-toggle-off');
+            $(yo).addClass('fa-toggle-on');
+            $(yo).data('state', 'on');
+        }
+        else{
+            $(yo).parent().removeClass('label-danger');
+            $(yo).parent().addClass('label-primary');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'off'].join('@'));
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Buscando "+'"'+$(yo).parent().children('strong').text()+'"');
+
+            $(yo).removeClass('fa-toggle-on');
+            $(yo).addClass('fa-toggle-off');
+
+            $(yo).data('state', 'off');
+        }
+        buscar_fusion();
+    }
+    function despInput(event){
+        var char = event.which || event.keyCode;
+        var item = $(".o_searchview_autocomplete").data('item');
+        //BORRAR LABEL
+        if(char == 8 && ($("#buscar_fusion").val()==null || $("#buscar_fusion").val()=='' || $("#buscar_fusion").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
+            eliminarEtiqueta($("#label"+labels).children('div'));
+        }
+        //ENTER
+        else if(char == 13){
+            $(".fill-item-abast.o-selection-focus").click();
+        }
+        //ARRIBA
+        else if(char == 38){
+            item = parseInt(item) - 1;
+        }
+        //ABAJO
+        else if(char == 40){
+            item = parseInt(item) + 1;
+        }
+
+
+        //SI SOBREPASA EL LIMITE INFERIOR
+        if(parseInt(item) >= 3){
+            $(".o_searchview_autocomplete").data('item', "0");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item0").addClass("o-selection-focus");
+        }
+        //SI SOBREPASA EL LIMITE SUPERIOR
+        else if(parseInt(item) < 0){
+            $(".o_searchview_autocomplete").data('item', "2");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item2").addClass("o-selection-focus");
+        }
+        else{
+            $(".o_searchview_autocomplete").data('item', item);
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item"+item).addClass("o-selection-focus");
+        }
+
+    }
+    $('.view-option').on('click', function(e){
+        e.preventDefault();
+        $('.view-option').removeClass('active');
+        if($(this).data('original-title') == 'Lista'){
+            $("#check_pendientes").css('display', 'inline');
+        }
+        else{
+            $("#check_pendientes").css('display', 'none');
+        }
+        $(this).addClass('active');
+
+
+        if($(this).data('viewtype') == 'list'){
+            //$(".indicador_busqueda").toggleClass('hidden');
+            $(".filtro_graph").toggleClass('hidden');
+            $(".tipovista").toggleClass('listafusion');
+            buscar_fusion();
+            /*$.ajax({
+                type: 'POST',
+                data: {clave: filtros_seleccionados.join(','),  rango: rango.join('@')},
+                url: "/jefeplanta/table_fusion/",
+                beforeSend: function(){
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                },
+                success: function(data){
+                    $(".main-page").html(data);
+                    if($(this).data('viewType') == 'list') {
+                        //Muestra la cantidad de pedidos
+                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                    }
+                }
+            });*/
+        }
+        else if($(this).data('viewtype') == 'graph'){
+            //$(".indicador_busqueda").toggleClass('hidden');
+            $(".filtro_graph").toggleClass('hidden');
+            $(".tipovista").toggleClass('listafusion');
+            buscar_fusion_stats();
+        }
+
+
+    });
+
+    // Muestra la tabla antes de ver una OF
+    function mostrar_tabla(){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+            if($("#buscar_fusion").val() == "" || $("#buscar_fusion").val() == null) {
+                $.ajax({
+                    type: 'POST',
+                    data: {clave: filtros_seleccionados.join(',')},
+                    url: '/jefeplanta/table_fusion/fabricaciones.f_entrega-ASC/true',
+                    beforeSend: function(){
+                        $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                    },
+                    success: function(data){
+                        $(".main-page").html(data);
+                        //Muestra la cantidad de pedidos
+                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                    }
+                });
+                $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+            }
+            else{
+                $.ajax({
+                    type: 'POST',
+                    data: {clave: $("#buscar_fusion").val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
+                    url: '/jefeplanta/buscar_fusion_list',
+                    success: function(data){
+                        $(".main-page").html(data);
+                        //Muestra la cantidad de pedidos
+                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                    }
+                });
+            }
+        }
+        else {
+            $.ajax({
+                type: 'POST',
+                data: {clave: $("#buscar_fusion").val(),  showPend: $("#pend").is(':checked')},
+                url: '/jefeplanta/buscar_fusion_item',
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de pedidos
+                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                }
+            });
+        }
+    };
+
+
+
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/jefeplanta/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
+
+    });
+
+
+    function setFechas(){
+        if($("#fecha-desde").val() == '' || $("#fecha-hasta").val() == ''){
+            alert("Debe ingresar ambas fechas.");
+        }
+        else{
+
+            $(".indicator-of-check").css('display', 'none');
+            rango = [$("#fecha-desde").val(),$("#fecha-hasta").val()];
+            buscar_fusion();
+        }
+    }
+
+    function restartFechas(){
+        rango = [];
+        $(".indicator-of-check").css('display', 'block');
+        buscar_fusion();
+    }
+
+    function getRidOffAutocomplete(){
+        var timer = window.setTimeout( function(){
+            $('#buscar_fusion-value, #buscar_fusion').prop('disabled',false);
+            clearTimeout(timer);
+        }, 800);
+    }
+
+    // Invoke the function
+    getRidOffAutocomplete();
+
+</script>
