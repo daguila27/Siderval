@@ -14,6 +14,7 @@
                     <th class="o_column_sortable">Item</th>
                     <th class="o_column_sortable">Cliente</th>
                     <th class="o_column_sortable">Detalle</th>
+                    <th class="o_column_sortable">Stock</th>
                     <th class="o_column_sortable">Pendientes</th>
                     <th class="o_column_sortable">Preparar</th>
                     <th class="o_column_sortable"></th>
@@ -34,9 +35,10 @@
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].numitem%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].sigla%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].detalle%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=xdesp[i].stock%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=xdesp[i].xdespachar%></td>
                     <td style="width: 15%" class="o_data_cell o_readonly_modifier o_required_modifier cantidad_preparar" data-peso="<%=xdesp[i].peso%>">
-                        <input style="width: 100%" type="number" class="form-control" name="cantidad" onkeyup="recalculatePeso('<%=xdesp[i].idpedido%>', this)" onchange="recalculatePeso('<%=xdesp[i].idpedido%>', this)" min="1" max="<%=xdesp[i].xdespachar%>" required>
+                        <input style="width: 100%" type="number" class="form-control" name="cantidad" onkeyup="recalculatePeso('<%=xdesp[i].idpedido%>', this)" onchange="recalculatePeso('<%=xdesp[i].idpedido%>', this)" min="1" max="<%=Math.min(xdesp[i].stock, xdesp[i].xdespachar)%>" required>
                     </td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier number_peso">0</td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].pesoxdespachar%></td>
@@ -47,6 +49,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
+                    <th></th>
                     <th></th>
                     <th></th>
                     <th></th>

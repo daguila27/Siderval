@@ -8,6 +8,27 @@ function fechaLatino(string){
     }
 }
 %>
+<script type="text/javascript">
+    $("#DataTableFabs tbody").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+
+    $(".nav-pills").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+</script>
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
@@ -19,10 +40,12 @@ function fechaLatino(string){
         <th id="cab-cliente">Cliente</th>
         <th id="cab-descrip">Descripción</th>
         <th id="cab-solicitados">Solicitados</th>
+        <th id="cab-pesoxproducir" style="text-align: center;">Peso unitario</th>
         <th id="cab-sin_produccion">Por Despachar</th>
         <th id="cab-fundidos">Fundidos</th>
+        <th id="cab-xfusion">Por Fundir</th>
+        <th id="cab-pesoxfusion">Peso x Fundir</th>
         <th id="cab-en_produccion">En Producción</th>
-        <th id="cab-pesoxproducir" style="text-align: center;">Peso unitario</th>
         <th id="cab-peso" style="text-align: center;">Peso x Despachar</th>
         <th id="cab-pesototal" style="text-align: center;">Peso Despachado</th>
         <th id="cab-stock" style="text-align: center;">Stock</th>
@@ -37,8 +60,10 @@ function fechaLatino(string){
     var final_total = 0;
     var pesot_total = 0;
     var pesod_total = 0;
+    var xfusion_total = 0;
+    var pesoxfusion_total = 0;
     for(var i=0; i < data.length; i++){%>
-    <tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
+    <tr class="o_data_row select-desp" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
         <td data-toggle="tooltip" title="OF" class="numof" data-order="<%=data[i].idordenfabricacion%>">
             <%if(!data[i].externo){%>
                 <a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
@@ -57,20 +82,24 @@ function fechaLatino(string){
             final_total += data[i].finalizados;
             pesot_total += (data[i].peso*data[i].xdespachar);
             pesod_total += (data[i].peso*data[i].despachados);
+            xfusion_total += (data[i].solicitados - data[i].fundidos);
+            pesoxfusion_total += (data[i].solicitados - data[i].fundidos)*data[i].peso;
         %>
         <td data-toggle="tooltip" title="Item" class="numitem" style="text-align: center;"><%=data[i].numitem%></td>
         <td data-toggle="tooltip" title="Cliente" class="cliente" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
         <td data-toggle="tooltip" title="Descripción" class="descrip" ><%=data[i].detalle%></td>
-        <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
-        <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion"class="checkFunction sin_produccion parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
-        <td data-toggle="tooltip" title="Fundidos Totales" data-name = "fundidos"class="checkFunction fundidos parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].fundidos%></td>
-        <td data-toggle="tooltip" title="En Producción" data-name = "en_produccion"class="checkFunction en_produccion parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
         <td data-toggle="tooltip" title="Peso Unitario" class="pesoxproducir parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
+        <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
+        <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion" class="checkFunction sin_produccion parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
+        <td data-toggle="tooltip" title="Fundidos Totales" data-name = "fundidos" class="checkFunction fundidos parsear_nro" style="text-align: center;" data-valor="<%= data[i].fundidos%>"><%= data[i].fundidos%></td>
+        <td data-toggle="tooltip" title="Por Fundir" data-name = "xfusion" class="checkFunction xfusion parsear_nro" style="text-align: center;" data-valor="<%=data[i].solicitados - data[i].fundidos%>"><%=data[i].solicitados - data[i].fundidos%></td>
+        <td data-toggle="tooltip" title="Peso Por Fundir" data-name = "pesoxfusion" class="checkFunction pesoxfusion parsear_nro" style="text-align: center;" data-valor="<%= (data[i].solicitados - data[i].fundidos)*data[i].peso%>"><%= (data[i].solicitados - data[i].fundidos)*data[i].peso%></td>
+        <td data-toggle="tooltip" title="En Producción" data-name = "en_produccion" class="checkFunction en_produccion parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
         <td data-toggle="tooltip" title="Peso x Despachar" data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
         <td data-toggle="tooltip" title="Peso Despachado" data-name= "pesototal" class="checkFunction pesototal parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
         <td data-toggle="tooltip" title="Stock" class="stock parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
         <td data-toggle="tooltip" title="Fecha de Entrega" class="f_entrega" style="text-align: center;" >
-            <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
+            <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= data[i].esp_fecha_entrega %> </span>
         </td>
     </tr>
     <%}%>
@@ -82,10 +111,12 @@ function fechaLatino(string){
         <td id="cliente"></td>
         <td id="descrip"></td>
         <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%=solic_total%></td>
-        <td id="sin_produccion" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%=xdesp_total%></td>
-        <td id="fundidos" data-toggle="tooltip" title="Fundidos Totales" style="text-align: center;" class="parsear_nro"></td>
-        <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%=enpro_total%> </td>
         <td id="pesoxproducir"></td>
+        <td id="sin_produccion" data-toggle="tooltip" title="Totales por Despachar" style="text-align: center;" class="parsear_nro"><%=xdesp_total%></td>
+        <td id="fundidos" data-toggle="tooltip" title="Fundidos Totales" style="text-align: center;" class="parsear_nro"></td>
+        <td id="xfusion" data-toggle="tooltip" title="Totales por Fundir" style="text-align: center;" class="parsear_nro"><%=xfusion_total%></td>
+        <td id="pesoxfusion" data-toggle="tooltip" title="Peso por Fundir" style="text-align: center;" class="parsear_nro"><%=pesoxfusion_total%></td>
+        <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%=enpro_total%> </td>
         <td id="peso" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro"><%=pesot_total%> Kg</td>
         <td id="pesototal" data-toggle="tooltip" title="Peso Total despachado" style="text-align: center;" class="parsear_nro"><%=pesod_total%></td>
         <td id="stock"></td>
@@ -97,7 +128,17 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-
+    function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        if(parts.length > 1){
+            if(parts[1].length > 2){
+                parts[1] = parts[1].substring(0,1);
+            }
+        }
+        var num =  parts.join(",");
+        return num;
+    }
     setDataTableFixed("#DataTableFabs");
 
 
@@ -105,70 +146,52 @@ function fechaLatino(string){
         var object = {
         "solicitados" : 0,
         "sin_produccion" : 0,
+        "xfusion" : 0,
+        "pesoxfusion" : 0,
         "en_produccion" : 0,
         "peso": 0,
         "pesototal": 0
         };
-        if($('.focus-row').length == 0) {
+        if($('.select-desp.danger').length == 0) {
             $(".checkFunction").each(function(){
                 object[$(this).data('name')] += $(this).data('valor');
             });
         }
         else{
             $(".checkFunction").each(function(){
-                if($(this).parent().hasClass('focus-row')){
+                if($(this).parent().hasClass('danger')){
                         object[$(this).data('name')] += $(this).data('valor');
                 }
             });
         }
 
 
-        $("#solicitados").text(object.solicitados);
-        $("#sin_produccion").text(object.sin_produccion);
-        $("#en_produccion").text(object.en_produccion);
-        $("#peso").text(object.peso);
-        $("#pesototal").text(object.pesototal);
+        $("#solicitados").text(parsear_nro(object.solicitados));
+        $("#sin_produccion").text(parsear_nro(object.sin_produccion));
+        $("#en_produccion").text(parsear_nro(object.en_produccion));
+        $("#peso").text(parsear_nro(object.peso));
+        $("#pesototal").text(parsear_nro(object.pesototal));
+        $("#xfusion").text(parsear_nro(object.xfusion));
+        $("#pesoxfusion").text(parsear_nro(object.pesoxfusion));
     }
-    var dimensiones = {clase: [], ancho: []};
-
-    function getMedidas(){
-        dimensiones.clase = [];
-        dimensiones.ancho = [];
-        $("#pietabla tr td").each(function () {
-            dimensiones.clase.push($(this).attr('id'));
-            dimensiones.ancho.push($("." + $(this).attr('id')).width());
-        });
+    var mouseDown = 0;
+    document.body.onmousedown = function() {
+        mouseDown = 1;
     }
-    function ini_table(str) {
-        $("#pietabla").css('position', 'fixed');
-        $(".fixed_table").width($(str).width());
-        $(".fixed_table").css('left', $(".o_sub_menu").width());
-        getMedidas();
-        for (var w = 0; w < dimensiones.clase.length; w++) {
-            $("#pietabla tr #" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+    document.body.onmouseup = function() {
+        mouseDown = 0;
+    }
+    $(".select-desp").mouseenter(function(){
+        if(mouseDown == '1'){
+            $(this).toggleClass('danger');
         }
-        /*$("#encabezadotabla").css('position', 'fixed');
-        for (var w = 0; w < dimensiones.clase.length; w++) {
-            $("#cuerpotabla tr ." + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
-            $("#encabezadotabla tr #cab-" + dimensiones.clase[w]).css('width', dimensiones.ancho[w]);
+        refreshSumas();
 
-        }
-        for (var w = 0; w < dimensiones.clase.length; w++) {
-        }*/
-    }
-    //ini_table("#DataTableFabs");
+    });
+    $(".select-desp").mousedown(function(){
+        $(this).toggleClass('danger');
+        refreshSumas();
 
-    /*$(window).resize(function(){
-        aqui el codigo que se ejecutara cuando se redimencione la ventana
-        setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
-        ini_table("#DataTableFabs");
-    });*/
-    $(document).ready(function(){
-        $('#DataTableFabs tbody').on( 'click', 'tr', function () {
-            $(this).toggleClass('success');
-            $(this).toggleClass('focus-row');
-            refreshSumas();
-        });
     });
 
     function submit_form(yo){

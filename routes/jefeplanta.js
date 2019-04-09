@@ -25,7 +25,14 @@ function verificar(usr){
 /* GET users listing. */
 router.get('/', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('jefeplanta/indx_new', {page_title: "Jefe de Planta", username: req.session.userData.nombre});
+        req.getConnection(function(err, connection){
+            if (err) throw err;
+            connection.query("SET lc_time_names = 'es_CL'", function(err, idm) {
+                if (err) throw err;
+
+                res.render('jefeplanta/indx_new', {page_title: "Jefe de Planta", username: req.session.userData.nombre});
+            });
+        });
     }
     else{res.redirect('bad_login');}
 });
@@ -81,10 +88,12 @@ router.get('/stats', function(req, res, next){
 
 
 
-router.post('/stats_fusion/:fill', function(req, res, next){
+router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
         var fill = req.params.fill;
+        var valetapa = req.params.valetapa;
         var array_fill = [
             "coalesce(fabricaciones.idorden_f,'Sin OF')",
             "material.detalle",
@@ -100,7 +109,7 @@ router.post('/stats_fusion/:fill', function(req, res, next){
         };
         var clave;
         var where;
-        var condiciones_where = ['produccion_history.from = 2'];
+        var condiciones_where = ['produccion_history.from = '+valetapa];
         if(input.clave == '' || input.clave == null || input.clave == undefined){
             clave = [];
         }
@@ -146,18 +155,28 @@ router.post('/stats_fusion/:fill', function(req, res, next){
         console.log(fill);
         var dataget;
         var group;
+        var orderby;
         if(fill=='of'){
-            dataget = "fabricaciones.idorden_f as token,sum(produccion_history.enviados) as fundidos,max(produccion_history.fecha) as last_fusion";
+            dataget = "fabricaciones.idorden_f as token,max(produccion_history.fecha) as last_fusion";
             group = "fabricaciones.idorden_f";
         }
         else if(fill== 'producto'){
-            dataget = "material.detalle as token,sum(produccion_history.enviados) as fundidos,max(produccion_history.fecha) as last_fusion";
+            dataget = "material.detalle as token,max(produccion_history.fecha) as last_fusion";
             group = "material.idmaterial";
         }
         else{
-            dataget = "cliente.sigla as token,sum(produccion_history.enviados) as fundidos,max(produccion_history.fecha) as last_fusion";
+            dataget = "cliente.sigla as token,max(produccion_history.fecha) as last_fusion";
             group = "cliente.idcliente";
             condiciones_where.push('cliente.idcliente IS NOT NULL');
+        }
+
+        if(input.graphval === 'kg'){
+            dataget += ",sum(produccion_history.enviados*material.peso) as fundidos ";
+            orderby = "sum(produccion_history.enviados*material.peso)";
+        }
+        else{
+            dataget += ",sum(produccion_history.enviados) as fundidos ";
+            orderby = "sum(produccion_history.enviados)";
         }
 
 
@@ -183,7 +202,7 @@ router.post('/stats_fusion/:fill', function(req, res, next){
                 "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
                 "left join odc on odc.idodc = pedido.idodc " +
                 "left join cliente on cliente.idcliente = odc.idcliente " +
-                where + " group by "+group+" order by sum(produccion_history.enviados) desc limit 10", function(err, fund){
+                where + " group by "+group+" order by "+orderby+" desc limit 10", function(err, fund){
                 if(err){console.log("Error Selecting : %s", err);}
 
                 res.render('jefeplanta/stats_fusion', {data: fund});
@@ -217,10 +236,10 @@ router.get('/view_fusion', function(req, res, next){
 
 
 
-router.post('/table_fusion', function(req, res, next){
+router.post('/table_fusion/:idetapa', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
+        var idetapa = req.params.idetapa;
         var array_fill = [
             "coalesce(fabricaciones.idorden_f,'Sin OF')",
             "material.detalle",
@@ -236,7 +255,7 @@ router.post('/table_fusion', function(req, res, next){
         };
         var clave;
         var where;
-        var condiciones_where = ['produccion_history.from = 2'];
+        var condiciones_where = ['produccion_history.from = '+idetapa];
         if(input.clave == '' || input.clave == null || input.clave == undefined){
             clave = [];
         }
@@ -290,23 +309,25 @@ router.post('/table_fusion', function(req, res, next){
         req.getConnection(function(err, connection){
             if(err) throw err;
 
-            var consulta = "select " +
-                "material.detalle, " +
-                "produccion_history.*, " +
-                "fabricaciones.idorden_f, " +
-                "produccion.f_gen,coalesce(cliente.sigla, 'No Definido') as sigla, cliente.razon " +
-                "from produccion_history " +
-                "left join produccion on produccion.idproduccion = produccion_history.idproduccion " +
-                "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
-                "left join material on material.idmaterial = fabricaciones.idmaterial " +
-                "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
-                "left join odc on odc.idodc = pedido.idodc " +
-                "left join cliente on cliente.idcliente = odc.idcliente "+where;
-            connection.query(consulta,
-                function(err, fund){
-                    if(err) throw err;
+                var consulta = "select " +
+                    "material.detalle, material.peso, " +
+                    "produccion_history.*,odc.numoc, " +
+                    "concat(dayname(produccion.f_gen), ' ', day(produccion.f_gen),' de ',monthname(produccion.f_gen),' de ',year(produccion.f_gen)) as esp_fecha_gen," +
+                    "concat(dayname(produccion_history.fecha), ' ', day(produccion_history.fecha),' de ',monthname(produccion_history.fecha),' de ',year(produccion_history.fecha)) as esp_fecha_mov," +
+                    "fabricaciones.idorden_f, " +
+                    "coalesce(cliente.sigla, 'No Definido') as sigla, cliente.razon " +
+                    "from produccion_history " +
+                    "left join produccion on produccion.idproduccion = produccion_history.idproduccion " +
+                    "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                    "left join material on material.idmaterial = fabricaciones.idmaterial " +
+                    "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
+                    "left join odc on odc.idodc = pedido.idodc " +
+                    "left join cliente on cliente.idcliente = odc.idcliente "+where;
+                connection.query(consulta,
+                    function(err, fund){
+                        if(err) throw err;
 
-                    res.render('jefeplanta/table_fusion', {data: fund});
+                        res.render('jefeplanta/table_fusion', {data: fund});
 
                 });
         });
@@ -385,6 +406,7 @@ router.post('/table_planta', function(req, res, next){
             var consulta = "select " +
                 "odc.numoc, cliente.sigla, cliente.razon,  pedido.numitem,pedido.despachados, coalesce(fabricaciones.idorden_f, 'No OF') as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
                 "coalesce(pedido.cantidad - pedido.despachados,0) as xdespachar, pedido.f_entrega, " +
+                "concat(dayname(pedido.f_entrega), ' ', day(pedido.f_entrega),' de ',monthname(pedido.f_entrega),' de ',year(pedido.f_entrega)) as esp_fecha_entrega," +
                 "coalesce(fundidos.fundidos,0) as fundidos,pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
                 "material.stock, material.peso, coalesce(material.peso*(pedido.cantidad - pedido.despachados), 0) as pesoxdespachar " +
                 "from pedido " +
@@ -499,6 +521,7 @@ router.post('/table_despachositem', function(req, res, next){
 
             var consulta = "SELECT " +
                 "gd.idgd, coalesce(odc.numoc, ' - ') as numoc, coalesce(pedido.numitem, ' - ') as numitem, " +
+                "concat(dayname(gd.fecha), ' ', day(gd.fecha),' de ',monthname(gd.fecha),' de ',year(gd.fecha)) as esp_fecha_gd," +
                 "material.detalle, material.peso, despachos.cantidad, cliente.sigla, cliente.razon, gd.fecha " +
                 "FROM despachos " +
                 "left join gd on gd.idgd = despachos.idgd " +

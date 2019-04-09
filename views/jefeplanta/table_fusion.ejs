@@ -8,6 +8,27 @@ function fechaLatino(string){
     }
 }
 %>
+<script type="text/javascript">
+    $("#DataTableFabs tbody").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+
+    $(".nav-pills").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+</script>
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
@@ -15,23 +36,34 @@ function fechaLatino(string){
     <thead>
     <tr>
         <th>OF</th>
+        <th>OC</th>
         <th>Cliente</th>
         <th>Detalle</th>
         <th>Fundidos</th>
+        <th>Peso Pieza (kg)</th>
+        <th>Peso (kg)</th>
         <th>Inicio Producción</th>
         <th>Fecha Fusión</th>
     </tr>
     </thead>
     <tbody>
-    <%for(var i=0; i < data.length; i++){%>
-    <tr class="o_data_row">
-        <td><%= data[i].idorden_f%></td>
-        <td><%= data[i].sigla%></td>
-        <td><%= data[i].detalle%></td>
-        <td style="text-align: center;"><%= data[i].enviados%></td>
-        <td style="text-align: center" data-order="<%= new Date(data[i].f_gen).getTime()%>"><%= new Date(data[i].f_gen).toLocaleDateString()%></td>
-        <td style="text-align: center" data-order="<%= new Date(data[i].fecha).getTime()%>"><%= new Date(data[i].fecha).toLocaleDateString()%></td>
-    </tr>
+    <%
+    var kilos_totales = 0;
+    var piezas_totales = 0;
+    for(var i=0; i < data.length; i++){%>
+        <tr class="o_data_row select-desp" data-state="nosele">
+            <td><%= data[i].idorden_f%></td>
+            <td><%= data[i].numoc%></td>
+            <td><%= data[i].sigla%></td>
+            <td><%= data[i].detalle%></td>
+            <td class="parsear_nro body_p" data-val="<%= data[i].enviados%>" style="text-align: center;"><%= data[i].enviados%></td>
+            <td class="parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
+            <% kilos_totales += data[i].peso*data[i].enviados;
+               piezas_totales += data[i].enviados;%>
+            <td class="parsear_nro body_k" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
+            <td style="text-align: center" data-order="<%= new Date(data[i].f_gen).getTime()%>"><%= data[i].esp_fecha_gen%></td>
+            <td style="text-align: center" data-order="<%= new Date(data[i].fecha).getTime()%>"><%= data[i].esp_fecha_mov%></td>
+        </tr>
     <%}%>
     </tbody>
     <tfoot>
@@ -40,6 +72,9 @@ function fechaLatino(string){
         <td></td>
         <td></td>
         <td></td>
+        <td id="footer_pt" class="parsear_nro" style="text-align: center"><%= piezas_totales%></td>
+        <td></td>
+        <td id="footer_kt" class="parsear_nro" style="text-align: center"><%= kilos_totales%></td>
         <td></td>
         <td></td>
     </tr>
@@ -49,37 +84,56 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-
+    var total_piezas = parseFloat('<%=piezas_totales%>');
+    var total_peso = parseFloat('<%=kilos_totales%>');
     setDataTableFixed("#DataTableFabs");
 
+    var mouseDown = 0;
+    document.body.onmousedown = function() {
+        mouseDown = 1;
+    }
+    document.body.onmouseup = function() {
+        mouseDown = 0;
+    }
+    $(".select-desp").mouseenter(function(){
+        if(mouseDown == '1'){
+            $(this).toggleClass('danger');
+        }
+        refreshSumas();
 
+    });
+    $(".select-desp").mousedown(function(){
+        $(this).toggleClass('danger');
+        refreshSumas();
+
+    });
     function refreshSumas(){
-        var object = {
-            "solicitados" : 0,
-            "sin_produccion" : 0,
-            "en_produccion" : 0,
-            "peso": 0,
-            "pesototal": 0
-        };
-        if($('.focus-row').length == 0) {
-            $(".checkFunction").each(function(){
-                object[$(this).data('name')] += $(this).data('valor');
-            });
+        var body_p = 0;
+        var body_k = 0;
+        var no_p = true;
+        var no_k = true;
+        $(".body_p").each(function(){
+            if($(this).parent().hasClass('danger')){
+                body_p += $(this).data('val');
+                no_p = false;
+            }
+        });
+        $(".body_k").each(function(){
+            if($(this).parent().hasClass('danger')) {
+                body_k += $(this).data('val');
+                no_k = false;
+            }
+        });
+
+        if( no_p || no_k ){
+            $("#footer_pt").html(parsear_nro(total_peso));
+            $("#footer_kt").html(parsear_nro(total_piezas));
         }
         else{
-            $(".checkFunction").each(function(){
-                if($(this).parent().hasClass('focus-row')){
-                    object[$(this).data('name')] += $(this).data('valor');
-                }
-            });
+            $("#footer_pt").html(parsear_nro(body_p));
+            $("#footer_kt").html(parsear_nro(body_k));
         }
 
-
-        $("#solicitados").text(object.solicitados);
-        $("#sin_produccion").text(object.sin_produccion);
-        $("#en_produccion").text(object.en_produccion);
-        $("#peso").text(object.peso);
-        $("#pesototal").text(object.pesototal);
     }
     var dimensiones = {clase: [], ancho: []};
 
@@ -115,13 +169,6 @@ function fechaLatino(string){
         setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
         ini_table("#DataTableFabs");
     });*/
-    $(document).ready(function(){
-        $('#DataTableFabs tbody').on( 'click', 'tr', function () {
-            $(this).toggleClass('success');
-            $(this).toggleClass('focus-row');
-            refreshSumas();
-        });
-    });
 
     function submit_form(yo){
         //$("#form"+$(yo).data('idodc')).submit();
@@ -132,6 +179,17 @@ function fechaLatino(string){
                 $(".main-page").html(data);
             }
         });
+    }
+    function parsear_nro(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        if(parts.length > 1){
+            if(parts[1].length > 2){
+                parts[1] = parts[1].substring(0,1);
+            }
+        }
+        var num =  parts.join(",");
+        return num;
     }
 
 

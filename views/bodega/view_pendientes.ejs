@@ -36,13 +36,10 @@
         display: flex;
     }
 </style>
-
 <div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
-            <li class="active">Pedidos sin Despachar
-            </li>
-
+            <li class="active">Pedidos sin Despachar</li>
             <!-- Mostrar cantidad de datos -->
             <div id="pedidos"><h5><small>0 pedidos seleccionados.</small></h5></div>
         </ol>
@@ -61,33 +58,20 @@
                 </ul>
 
             </div>
-
             <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
                     <li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
                 </ul>
             </div>
-            <!--<input type="text" id="buscar_pendientes" name="" class="form-control pull-right" placeholder="Buscar...">-->
             <div style="display: flex">
                 <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
-
                     <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista" style="display: flex"></button>
-
-                    <!--<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_ofs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-
-                    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>-->
-
-
-                    <!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
-
-                 <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
                 </div>
                 <div style="padding: 5px; margin-left: 15px">
                     <ul class="nav nav-pills"  style="display: flex;">
                         <li class="pill-vista active" data-name="pedido-view"><a href="#">Pedidos</a></li>
                         <li class="pill-vista" data-name="palets-view"><a href="#">Palets</a></li>
-                        <li class="pill-vista" data-name="packing-view"><a href="#">Packing List</a></li>
                     </ul>
                 </div>
             </div>
@@ -95,8 +79,6 @@
     </div>
 
 </div>
-
-
 <div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
     <div id="fw-body"  style="padding:0;margin: 0;">
         <div class="content main-page">

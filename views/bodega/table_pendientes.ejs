@@ -1,4 +1,3 @@
-
 <script type="text/javascript">
     $("#despachosTable tbody").attr('unselectable','on')
         .css({'-moz-user-select':'-moz-none',
@@ -23,23 +22,24 @@
 <%
 var count = 0;
 function fechaLatino(string){
-    return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
+    return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
 }
 %>
-
 <table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
     <thead>
-    <tr>
-        <th class="o_column_sortable">OC</th>
-        <th class="o_column_sortable">Item</th>
-        <th class="o_column_sortable">Cliente</th>
-        <th class="o_column_sortable">Detalle</th>
-        <th class="o_column_sortable">Pendientes</th>
-        <th class="o_column_sortable">Peso</th>
-        <th class="o_column_sortable">En CC</th>
-        <th class="o_column_sortable" style="text-align: center;" data-order="gd.fecha-DESC">Fecha de Entrega</th>
-        <th class="o_column_sortable">Estado</th>
-    </tr>
+        <tr>
+            <th class="o_column_sortable">OC</th>
+            <th class="o_column_sortable">Item</th>
+            <th class="o_column_sortable">Cliente</th>
+            <th class="o_column_sortable">Detalle</th>
+            <th class="o_column_sortable">Pendientes</th>
+            <th class="o_column_sortable">Paletizado</th>
+            <th class="o_column_sortable">Stock</th>
+            <th class="o_column_sortable">En CC</th>
+            <th class="o_column_sortable">Peso</th>
+            <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
+            <th class="o_column_sortable">Estado</th>
+        </tr>
     </thead>
     <tbody class="ui-sortable">
         <%
@@ -62,17 +62,19 @@ function fechaLatino(string){
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].numitem%></td>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].sigla%></td>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].detalle%></td>
-                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].xdespachar%></td>
-                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].pesoxdespachar%></td>
+                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].xdespachar-desp[i].preparando%></td>
+                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].preparando%></td>
+                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].stock%></td>
                 <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].enCC%></td>
-                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].f_entrega).toLocaleDateString()%></td>
-                <%if(desp[i].preparando > 0){%>
-                    <td class="o_data_cell o_readonly_modifier o_required_modifier">
-                        <button class="btn btn-xs btn-danger view_PL" style="z-index: 10;"><i>P</i></button>
-                    </td>
-                 <%}else{%>
-                    <td class="o_data_cell o_readonly_modifier o_required_modifier"></td>
-                <%}%>
+                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].pesoxdespachar%></td>
+            <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].f_entrega).toLocaleDateString()%></td>
+            <%if(desp[i].preparando > 0){%>
+                <td class="o_data_cell o_readonly_modifier o_required_modifier">
+                    <button class="btn btn-xs btn-danger view_PL" style="z-index: 10;"><i>P</i></button>
+                </td>
+             <%}else{%>
+                <td class="o_data_cell o_readonly_modifier o_required_modifier"></td>
+            <%}%>
             </tr>
         <%}%>
     </tbody>
@@ -83,8 +85,10 @@ function fechaLatino(string){
             <th></th>
             <th></th>
             <th style="text-align: center"><%=xdespachartotal%></th>
-            <th style="text-align: center"><%=pesototal%></th>
+            <th></th>
+            <th></th>
             <th style="text-align: center"><%=cctotal%></th>
+            <th style="text-align: center"><%=pesototal%></th>
             <th></th>
             <th></th>
         </tr>
@@ -92,9 +96,9 @@ function fechaLatino(string){
 </table>
 
 <!-- Oculta cantidad de datos, va al final para contar la cantidad de materiales -->
-<% if(desp.length != 0){ %>
-<div id="registros" style="display: none"> <%=desp.length%></div>
-<%} else{%>
+<% if(desp.length != 0){%>
+    <div id="registros" style="display: none"> <%=desp.length%></div>
+<%}else{%>
     <div id="registros" style="display: none">0 0</div>
 <%}%>
 
@@ -102,6 +106,7 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
+
     setDataTableFixed("#despachosTable");
 
     var mouseDown = 0;

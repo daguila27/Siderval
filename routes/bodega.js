@@ -4,7 +4,6 @@ var connection  = require('express-myconnection');
 var mysql = require('mysql');
 
 router.use(
-
     connection(mysql,{
 
         host: '127.0.0.1',
@@ -41,16 +40,35 @@ router.get('/crear_gdd', function(req, res, next){
                 num = num[0].id+1;
                 connection.query("SELECT * FROM cliente", function(err, cli) {
                     if (err) {console.log("Error Selecting : %s", err);}
-                    connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem,pedido.cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                    connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                         +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
+                        +" left join (select pedido.idpedido, palet_item.cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null and palet.idpalet) as pl on pl.idpedido = pedido.idpedido"
                         +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
                         +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
-                        +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad group by pedido.idpedido order by pedido.f_entrega asc",
+                        +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
                         function(err, rows){
                             if(err)
                                 console.log("Error Selecting :%s", err);
-        					res.render('bodega/g_despacho', {data: rows, num: num, blanco: 0, cli: cli});
-                            //res.render('jefeprod/ordenes_produccion', {data: rows});
+
+                            connection.query("select " +
+                                "palet_item.*, " +
+                                "material.detalle, material.idmaterial,pedido.idpedido," +
+                                "odc.numoc," +
+                                "q_palet.peso_palet, cliente.sigla," +
+                                "material.peso " +
+                                "from palet_item " +
+                                "left join palet on palet.idpalet = palet_item.idpalet " +
+                                "left join pedido on pedido.idpedido = palet_item.idpedido " +
+                                "left join odc on odc.idodc = pedido.idodc " +
+                                "left join cliente on cliente.idcliente = odc.idcliente " +
+                                "left join material on material.idmaterial = pedido.idmaterial " +
+                                "left join (select palet.idpalet, sum(material.peso*palet_item.cantidad) as peso_palet from palet_item left join palet on palet.idpalet = palet_item.idpalet left join pedido on pedido.idpedido = palet_item.idpedido left join material on material.idmaterial = pedido.idmaterial group by palet.idpalet) as q_palet on q_palet.idpalet = palet.idpalet " +
+                                "where palet.idpackinglist is null", function(err, palet){
+                                if(err)
+                                    console.log("Error Selecting :%s", err);
+
+                                res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 0, cli: cli});
+                            });
                         });
                 });
             });
@@ -392,15 +410,43 @@ router.post('/save_gdd', function (req, res, next) {
                 //ID ultima GD y lista vacia que contendra pedidos
                 let idgd = results.insertId;
                 let despachos = [];
-                for (let i = 0; i < Object.keys(input).length - 3; i++) {
+                var case_p = [];
+                var case_pl = [];
+                //matriz que contiene los id de palet
+                var ids_palets = [];
+                var ids_palet_item = [];
+                for (let i = 0; i < Object.keys(input).length - 4 ; i++) {
+                    if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
+                        if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) == -1){
+                            ids_palets.push( input['list[' + i + '][]'][3].split('-')[0]);
+                            case_pl.push("WHEN palet.idpalet = "+input['list[' + i + '][]'][3].split('-')[0]+" THEN '"+input.pl+"'");
+                        }
+                        ids_palet_item.push(input['list[' + i + '][]'][3].split('-')[1]);
+                        case_p.push("WHEN palet_item.idpalet_item = "+input['list[' + i + '][]'][3].split('-')[1]+" THEN "+parseInt(input['list[' + i + '][]'][2]));
+                    }
                     //despachoss([idgd, iddespacho, idmaterial, cantidad])
-                    despachos.push([idgd, input['list[' + i + '][]'][0], input['list[' + i + '][]'][1], input['list[' + i + '][]'][2]]);
+                    despachos.push([idgd, input['list[' + i + '][]'][0], input['list[' + i + '][]'][1], input['list[' + i + '][]'][2] ]);
                     if (despachos[i][1] === "0") {
                         despachos[i][1] = null;
                     }
                 }
+
+
+                //SE IDENTIFICA SI EXISTEN CONDICIONES PARA CREAR LA QUERY UPDATE CASE
+                // Y ACTUALIZAR CANTIDADES EN PALET Y NÚMERO DE PACKING LIST
+                var update_bool = false;
+                if(case_p.length > 0){
+                    case_p = "UPDATE palet_item SET palet_item.cantidad = CASE "+case_p.join(" ")+" ELSE palet_item.cantidad END WHERE palet_item.idpalet_item IN ("+ids_palet_item.join(',')+")";
+                    update_bool = true;
+                }
+
+                if(case_pl.length > 0){
+                    update_bool = true;
+                    case_pl = "UPDATE palet SET palet.idpackinglist = CASE "+case_pl.join(" ")+" ELSE palet.idpackinglist END WHERE palet.idpalet IN ("+ids_palets.join(",")+")" ;
+                }
+
                 //Insertamos cada Despacho asociado a la GD
-                connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?", [despachos], function () {
+                connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?", [despachos], function (err, rows) {
                     if (err) {throw err;}
                     //Variables necesarias para definir la operacion de la query
                     let op1, op2;
@@ -423,7 +469,9 @@ router.post('/save_gdd', function (req, res, next) {
                     idmaterial += ')';
                     update_stock += 'ELSE material.stock END WHERE material.idmaterial IN ' + idmaterial;
                     //Actualizamos el stock de material
-                    connection.query(update_stock, function () {
+                    connection.query(update_stock, function (err, rows) {
+                        if (err) {throw err;}
+
                         //Si la operacion es de Traslado, no existen pedidos.
                         if (input.estado !== "Traslado") {
                             let update_saldo = "";
@@ -440,11 +488,39 @@ router.post('/save_gdd', function (req, res, next) {
                             stringIds += ')';
                             update_saldo += 'ELSE pedido.despachados END WHERE pedido.idpedido IN ' + stringIds;
                             //Actualizamos la cantidad de despachados del pedido
-                            connection.query(update_saldo, function () {
-                                res.redirect('/bodega/crear_gdd');
+                            connection.query(update_saldo, function (err, rows) {
+                                if (err) {throw err;}
+
+                                if(update_bool){
+                                    connection.query(case_p, function (err, rows) {
+                                        if (err) {throw err;}
+                                        connection.query(case_pl, function (err, rows) {
+                                            if (err) {throw err;}
+                                            res.redirect('/bodega/crear_gdd');
+                                        });
+
+                                    });
+                                }
+                                else{
+                                    res.redirect('/bodega/crear_gdd');
+                                }
+
                             });
-                        } else {
-                            res.redirect('/bodega/crear_gdd');
+                        }
+                        else {
+                            if(update_bool){
+                                connection.query(case_p, function (err, rows) {
+                                    if (err) {throw err;}
+                                    connection.query(case_pl, function (err, rows) {
+                                        if (err) {throw err;}
+                                        res.redirect('/bodega/crear_gdd');
+                                    });
+
+                                });
+                            }
+                            else{
+                                res.redirect('/bodega/crear_gdd');
+                            }
                         }
                     });
                 });
@@ -1137,7 +1213,7 @@ router.post('/table_pendientes', function(req, res, next){
              + " coalesce(queryCC.enCC, 0) as enCC"
              + " from pedido"
              + " left join odc on odc.idodc = pedido.idodc"
-             + " left join (select idpedido, sum(cantidad) as preparando from palet_item group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
+             + " left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
              + " left join material on material.idmaterial = pedido.idmaterial"
              + " left join (select material.idmaterial, sum(produccion.`7`) as encc from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by material.idmaterial) as queryCC on queryCC.idmaterial = material.idmaterial"
              + " left join cliente on cliente.idcliente = odc.idcliente"
@@ -1152,11 +1228,10 @@ router.post('/table_pendientes', function(req, res, next){
                 else{
                     tipo = 'true';
                 }
-                if(!req.session.arrayPL){
+                /*if(!req.session.arrayPL){
                     req.session.arrayPL = new Array();
-                }
-                console.log(req.session.arrayPL.join('-'));
-                res.render('bodega/table_pendientes', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: req.session.arrayPL.join('-')});
+                }*/
+                res.render('bodega/table_pendientes', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: input.arrayPL});
             });
         });
     }
@@ -1249,7 +1324,7 @@ router.post('/table_palets', function(req, res, next){
             connection.query("select " +
                 "palet.idpalet, " +
                 "palet.creacion, " +
-                "sum(coalesce(material.peso, 0.0)) as peso_palet, " +
+                "sum(coalesce(material.peso, 0.0)*palet_item.cantidad) as peso_palet, " +
                 "min(pedido.f_entrega) as entrega," +
                 "group_concat(coalesce(material.peso, 0.0)) as pesos, " +
                 "group_concat(material.detalle) as detalles, " +
@@ -1318,34 +1393,68 @@ router.get('/check_session_peds/:value', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-router.get('/get_session_peds', function(req, res, next){
+
+//RENDERIZA TABLA DE PRE-CREACIÓN DE PALET (DESDE views/bodega/view_pendientes.ejs)
+router.get('/get_session_peds/:select', function(req, res, next){
     if(verificar(req.session.userData)){
         var where = "";
-        if(req.session.arrayPL.length>0){
-            where = "where pedido.idpedido in ("+req.session.arrayPL.join(',')+")";
+        console.log(req.params);
+        var select = req.params.select.split('-');
+        if(select.length>0){
+            where = "where pedido.idpedido in ("+select.join(',')+")";
         }
         console.log(where);
         req.getConnection(function(err, connection){
             if(err){throw err;}
             connection.query("select " +
-                "pedido.idpedido,pedido.cantidad-pedido.despachados as xdespachar,pedido.f_entrega," +
+                "pedido.idpedido,pedido.cantidad-pedido.despachados-enpreparacion.preparando as xdespachar,pedido.f_entrega," +
                 "cliente.sigla,cliente.razon," +
                 "odc.numoc,pedido.numitem," +
                 "material.detalle," +
-                "material.peso," +
+                "material.peso,material.stock," +
                 "material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar " +
                 "from pedido " +
+                "left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido " +
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 "left join odc on odc.idodc=pedido.idodc " +
                 "left join cliente on cliente.idcliente = odc.idcliente " +
                 where, function(err, xdesp){
                 if(err){throw err;}
-                res.render('bodega/pre_packinglist_table', {xdesp: xdesp});
+                res.render('bodega/pre_palet_table', {xdesp: xdesp});
             });
         });
     }
     else{res.redirect('bad_login');}
 });
+
+
+router.get('/get_session_palets/:select', function(req, res, next){
+        if(verificar(req.session.userData)){
+            var where = "";
+            console.log(req.params);
+            var select = req.params.select.split('-');
+            if(select.length>0){
+                where = "where palet.idpalet in ("+select.join(',')+")";
+            }
+            console.log(where);
+            req.getConnection(function(err, connection){
+                if(err){throw err;}
+                connection.query("select " +
+                    "palet.*, " +
+                    "sum(material.peso*palet_item.cantidad) as peso_palet, " +
+                    "min( pedido.f_entrega ) as f_entrega " +
+                    "from palet_item " +
+                    "left join palet on palet.idpalet = palet_item.idpalet " +
+                    "left join pedido on pedido.idpedido = palet_item.idpedido " +
+                    "left join material on material.idmaterial = pedido.idmaterial " +
+                    where+" group by palet_item.idpalet", function(err, xdesp){
+                    if(err){throw err;}
+                    res.render('bodega/pre_packinglist_table', {xdesp: xdesp});
+                });
+            });
+        }
+        else{res.redirect('bad_login');}
+    });
 
 
 router.post('/create_palet', function(req, res, next){
@@ -1374,6 +1483,30 @@ router.post('/create_palet', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
+
+
+
+router.post('/create_packinglist', function(req, res, next){
+        if(verificar(req.session.userData)){
+            var input = JSON.parse(JSON.stringify(req.body));
+            input.idpalet = input.idpalet.split('-');
+            var data = [];
+            req.getConnection(function(err, connection){
+                if(err){throw err;}
+                connection.query("INSERT INTO packinglist (creacion) VALUES (now())", function(err, inPL){
+                    if(err){throw err;}
+
+                    console.log(inPL);
+
+                    connection.query("UPDATE palet SET idpackinglist = ? WHERE idpalet in ("+input.idpalet.join(',')+")", [inPL.insertId], function(inItemPL){
+                        if(err){throw err;}
+                        res.send('ok');
+                    });
+                });
+            });
+        }
+        else{res.redirect('bad_login');}
+    });
 
 
 

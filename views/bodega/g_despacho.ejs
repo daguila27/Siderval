@@ -28,13 +28,15 @@ function letraMayus(string) {
         </div>
     </div>
     <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
-<%if(blanco){%>
-    <form id="act_gdd" type="post">
-<%}else{%>
-    <form id="send_gdd" type="post">
-<%}%>    
-        <div class="panel panel-primary panel-defecto">
-            <div class="panel-heading" style="display: flex;">
+      <%var idtag;
+        if(blanco){
+            idtag = 'act_gdd';
+        }else{
+            idtag = 'send_gdd';
+        }%>
+        <form id="<%= idtag%>" type="post">
+            <div class="panel panel-primary panel-defecto">
+                <div class="panel-heading" style="display: flex;">
                 <div style="width: 50%">
                     <h3>Crear Guía de Despacho N° <%=num%></h3>
                     <!--<div>
@@ -53,7 +55,7 @@ function letraMayus(string) {
                         </select>
                     </label>
             </div>
-            <table class="table table-striped">
+                <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>N° OC</th>
@@ -79,9 +81,9 @@ function letraMayus(string) {
                     </tr>
                 </tbody>
             </table>
-            <div class="panel-footer">
+                <div class="panel-footer">
                 <div class="row">
-                    <div class="col-md-offset-1 col-md-7" style="padding-right: 8px">
+                    <div class="col-md-offset-1 col-md-6" style="padding-right: 8px">
                         <div class="form-group" id="gddobs" style="display: none; margin: 0">
                             <textarea name="obs" class="form-control" rows="1" placeholder="Observaciones"></textarea>
                         </div>
@@ -94,6 +96,10 @@ function letraMayus(string) {
                             <option value="Otro" class="notT">Otro</option>
                             <option value="Blanco" class="notT">Blanco</option>
                         </select>
+                    </div>
+                    <div class="num_pl_input col-md-1 hidden"  style="padding-left: 0; padding-right: 8px">
+                        <input class="form-control" type="text" placeholder="N° Packing List">
+                        </input>
                     </div>
                     <div class="col-md-1" style="padding: 0; padding-right: 8px">
                         <button type="button" class="btn btn-info" onclick="comment()" id="btn_comment" style="width: 80px">+ <i class="fa fa-comment"></i></button>
@@ -130,13 +136,14 @@ function letraMayus(string) {
     <ul class="nav nav-tabs" style="box-shadow: 0 0px 0px;">
         <li class="pestana_xdespachar active" onclick="tab_prod()"><a data-toggle="tab" href="#prodxdeps">Productos por Despachar</a></li>
         <li class="pestana_insumos" onclick="tab_insum()"><a data-toggle="tab" href="#insum">Insumos</a></li>
+        <li class="pestana_palets" onclick="tab_palets()"><a data-toggle="tab" href="#palets">Palets</a></li>
     </ul>
 
     <div class="tab-content">     
         <div class="tab-pane fade in active" id="prodxdeps" style="display: block;">
             <div class="panel panel-default">
                 <div class="panel-body" style="padding: 0; padding-top: 10px">
-                    <table id="DataTableGD" class="table table-condensed table-striped" style="width: 100%;">
+                    <table id="DataTableGD" class="table table-condensed table-striped DataTableGD_new" style="width: 100%;">
                         <thead>
                             <tr>
                                 <th>N°OC</th>
@@ -146,6 +153,7 @@ function letraMayus(string) {
                                 <th>Detalle</th>
                                 <th>Sin Despachar</th>
                                 <th>En Stock</th>
+                                <th>Paletizado</th>
                                 <th class="hidden">A Enviar</th>
                                 <th>Fecha de Entrega</th>
                                 <th></th>
@@ -170,8 +178,10 @@ function letraMayus(string) {
                                 <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
                                 
                                 <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock %></td>
-                                
-                                <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" class="form-control" value="1" style="width: 80px;margin: 0"></td>
+
+                                <td id="pl<%=data[i].idpedido%>" style="text-align: center;" class="parsear_nro pl_cantidad"><%= data[i].pl_cantidad %></td>
+
+                                <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" data-idpaletitem="0"  data-idpalet='0' class="form-control" value="1" style="width: 80px;margin: 0"></td>
                                 
                                 <td id="date<%= data[i].idpedido%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
 
@@ -185,8 +195,7 @@ function letraMayus(string) {
                             </tr>
                         <%}%>
                         </tbody>
-                    </table
-                    >
+                    </table>
                 </div>
             </div>
         </div>
@@ -220,6 +229,56 @@ function letraMayus(string) {
             </div>
             </div>
         </div>
+
+        <div class="tab-pane fade in active" id="palets">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="display: flex;">
+
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped table-hover table-bordered DataTableGD_new" id="DataTablePalets">
+                        <thead>
+                        <tr>
+                            <th>#Palet</th>
+                            <th>OC</th>
+                            <th>Cliente</th>
+                            <th>Item</th>
+                            <th>Detalle</th>
+                            <th>Cantidad</th>
+                            <th>Peso Unitario</th>
+                            <th>Peso Total</th>
+                            <th>Peso Palet</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <%for(var i=0; i< palet.length; i++){%>
+                                <tr class="mat_desp palet<%= palet[i].idpalet%>" data-idpalet="<%= palet[i].idpalet%>">
+                                    <td class="idp" style="text-align: center"><%= palet[i].idpalet%></td>
+                                    <td class="numoc" style="text-align: left"><%= palet[i].numoc%></td>
+                                    <td class="clien" style="text-align: left"><%= palet[i].sigla%></td>
+                                    <td class="item">Item</td>
+                                    <td class="det"><%= palet[i].detalle%></td>
+                                    <td class="sin_desp hidden" style="text-align: center;"><%=palet[i].cantidad%> (En Palet <%= palet[i].idpalet%>)</td>
+                                    <td class="stock hidden" style="text-align: center;">-</td>
+                                    <td class="cant" style="text-align: center"><%= palet[i].cantidad%></td>
+                                    <td class="cant_input hidden data-gd" style="text-align: center;padding: 2px"><input type="number" min="0" max="<%= palet[i].cantidad%>" data-idpedido="<%= palet[i].idpedido%>" data-idmat="<%= palet[i].idmaterial%>" data-idpalet="<%= palet[i].idpalet%>" data-idpaletitem="<%= palet[i].idpalet_item%>" class="form-control" value="<%= palet[i].cantidad%>" style="width: 80px;margin: 0"></td>
+                                    <td class="peso" style="text-align: center"><%= palet[i].peso%></td>
+                                    <td class="peso_item" style="text-align: center"><%= palet[i].peso*palet[i].cantidad %></td>
+                                    <td class="peso_palet" style="text-align: center"><%= palet[i].peso_palet%></td>
+                                    <td class="adj" style="text-align: center">
+                                        <a data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-success btn-xs addrow_palet"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span>  Adjuntar Palet</a>
+                                    </td>
+                                    <td class="rmv hidden" class="hidden">
+                                        <a onclick="remove_row_palet(this)" data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-danger btn-xs rmvrow_palet"><span class="glyphicon glyphicon-remove" style="padding-left: 1px"></span></a>
+                                    </td>
+                                </tr>
+                            <%}%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <!-- Funcion para parsear nros -->
@@ -237,9 +296,31 @@ function letraMayus(string) {
     });
 
 
+    function checkIfPaletIsInGD(){
+        paletInGD = false;
+        $("#session_prod input.form-control").each(function(e){
+            if($(this).data('idpalet') != '0'){
+                paletInGD = true;
+            }
+        });
+
+        if(paletInGD){
+            $(".num_pl_input").removeClass('hidden');
+            $(".num_pl_input input").prop('required',true);
+        }else{
+            $(".num_pl_input").addClass('hidden');
+            $(".num_pl_input input").prop('required',false);
+        }
+    }
+
     $(".addrow").on('click', function(e){
         e.preventDefault();
         add_row(this);
+    });
+    $(".addrow_palet").on('click', function(e){
+        e.preventDefault();
+        add_row_palet(this);
+        checkIfPaletIsInGD();
     });
 
     // Oculta la seccion de insumos
@@ -254,6 +335,7 @@ function letraMayus(string) {
         if(display == "none"){
             $("#prodxdeps").css("display","block");
             $("#insum").css("display","none");
+            $("#palets").css("display","none");
             $('.divSelect option[value="Venta"]').prop('selected', true);
             $(".notT").css('display', 'block');
         }
@@ -266,7 +348,21 @@ function letraMayus(string) {
         if(display == "none"){
             $("#insum").css("display","block");
             $("#prodxdeps").css("display","none");
+            $("#palets").css("display","none");
             $('.divSelect option[value="Traslado"]').prop('selected', true);
+            $(".notT").css('display', 'none');
+        }
+    }
+
+    // Muestra el tab presionado y oculta el otro
+    function tab_palets() {
+        $(this).tab('show');
+        var display = $("#palets").css("display");
+        if(display == "none"){
+            $("#palets").css("display","block");
+            $("#insum").css("display","none");
+            $("#prodxdeps").css("display","none");
+            $('.divSelect option[value="Venta"]').prop('selected', true);
             $(".notT").css('display', 'none');
         }
     }
@@ -307,21 +403,18 @@ function letraMayus(string) {
         }
     };
 
-    // Tabla superior(TS)
-    /*$('#DataTableCGD').DataTable( {
-        "lengthChange": false,
-        "searching": false,
-        "bInfo": false,
-        "paging": false,
-        "language": idioma_español
-    });*/
-
     // Tabla inferior(TI)
     $('#DataTableGD').DataTable( {
         "lengthChange": false,
         "paging": false,
         "language": idioma_español
     });
+
+    /*$('#DataTablePalets').DataTable( {
+        "lengthChange": false,
+        "paging": false,
+        "language": idioma_español
+    });*/
 
     //Funcion para agregar datos de la tabla inferior a la superior
     function add_row(yo){
@@ -333,10 +426,49 @@ function letraMayus(string) {
         $("#anom" + row.data('idpedido')).addClass("hidden");      //Oculta la Aleacion en TS
         $("#date" + row.data('idpedido')).addClass("hidden");      //Oculta la fecha en TS
         $("#add" + row.data('idpedido')).addClass("hidden");       //Oculta el boton agregar en TS
+        $("#pl" + row.data('idpedido')).addClass("hidden");     //Oculta cantidad paletizada en TS
         $("#in" + row.data('idpedido')).removeClass("hidden");     //Muestra input en TS
         $("#session_prod").append("<tr id='TS" + row.data('idpedido') + "'>"+$("#" + row.data('idpedido')).html()+"</tr>"); //Agrega fila de TI en TS
     }
+    function add_row_palet(yo){
+        if(confirm("Se adjuntaran todos los productos del palet a la GDD. ¿Está seguro?")){
+            $("#0").remove();                             //Elimina la primera fila en TS
+            $(".palet"+$(yo).data('idpalet')).each(function(){
+                var row = $(this);
+                row.children(".idp").addClass("hidden");
+                row.children(".cant").addClass("hidden");
+                row.children(".sin_desp").removeClass("hidden");
+                row.children(".stock").removeClass("hidden");
+                row.children(".cant_input").removeClass("hidden");
+                row.children(".peso").addClass("hidden");
+                row.children(".peso_item").addClass("hidden");
+                row.children(".peso_palet").addClass("hidden");
+                row.children(".adj").addClass("hidden");
+                row.children(".rmv").removeClass("hidden");
+                $("#session_prod").append("<tr class='TS" + row.data('idpalet') + "_p'>"+row.html()+"</tr>"); //Agrega fila de TI en TS
+                row.addClass("hidden");
+            });
+        }
+    }
+    function remove_row_palet(yo){
+        if(confirm("Se eliminarán de la GDD todos los productos correspondientes al mismo palet. ¿Está seguro?")){
+            var row = $(".palet"+$(yo).data('idpalet'));
+            row.children(".idp").removeClass("hidden");
+            row.children(".cant").removeClass("hidden");
+            row.children(".sin_desp").addClass("hidden");
+            row.children(".stock").addClass("hidden");
+            row.children(".cant_input").addClass("hidden");
+            row.children(".peso").removeClass("hidden");
+            row.children(".peso_item").removeClass("hidden");
+            row.children(".peso_palet").removeClass("hidden");
+            row.children(".adj").removeClass("hidden");
+            row.children(".rmv").addClass("hidden");
+            row.removeClass('hidden');
 
+            $(".TS" + $(yo).data('idpalet')+"_p").remove();
+            checkIfPaletIsInGD();
+        }
+    }
     //Funcion para eliminar datos de la tabla inferior a la superior
     function remove_row(yo){
         var row = $(yo);
@@ -347,6 +479,7 @@ function letraMayus(string) {
         $("#anom" + row.data('idpedido')).removeClass("hidden");   //Muestra la Aleacion en TS
         $("#date" + row.data('idpedido')).removeClass("hidden");   //Muestra la fecha en TS
         $("#add" + row.data('idpedido')).removeClass("hidden");    //Muestra el boton agregar en TS
+        $("#pl" + row.data('idpedido')).removeClass("hidden");    //Muestra cantidad paletizada en TS
         $("#in" + row.data('idpedido')).addClass("hidden");        //Oculta input en TS
     }
 
@@ -361,6 +494,7 @@ function letraMayus(string) {
             }
         });
     });
+
     function comprobarCliente(){
         if($("#cliente_gd").val() == 0){
             return false;
@@ -369,14 +503,24 @@ function letraMayus(string) {
             return true;
         }
     }
+
+
     $("form#send_gdd").on('submit',function(e){
         e.preventDefault();
+        $(this).serializeArray();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
-
-            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value]);
+            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value, $(this).data('idpalet')+"-"+$(this).data('idpaletitem')]);
         });
         var est = $("#estadoselect").val();
+        var pl;
+        if($(".num_pl_input").hasClass('hidden')){
+            pl = null;
+        }
+        else{
+            pl = $(".num_pl_input input").val();
+        }
+
         if(comprobarCliente()){
             if(aux.length == 0){
                 conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
@@ -394,6 +538,7 @@ function letraMayus(string) {
                 data: {
                     list: aux,
                     estado: est,
+                    pl: pl,
                     obs:$("#gddobs .form-control").val(),
                     idcliente: $("#cliente_gd").val()
                 },
@@ -411,7 +556,7 @@ function letraMayus(string) {
         e.preventDefault();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
-            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value]);
+            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value, $(this).data('idpalet')+"-"+$(this).data('idpaletitem')]);
         });
         var conf = true;
         var est = $("#estadoselect").val();

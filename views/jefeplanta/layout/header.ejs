@@ -89,10 +89,10 @@
 
         <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
             <li>
-                <div style="font-family: 'Lobster'; font-size: 15px; color: white;">Bienvenido Jefe de Planta</div>
+                <div style="font-family: 'Lobster';margin-right:10px; font-size: 15px; color: white;">Bienvenido Jefe de Planta</div>
             </li>
             <li>
-                <div><a href="../user/log_out">Cerrar sesión</a></div>
+                <div style="font-size: 15px; margin-right: 5px"><a href="../user/log_out"><i class="fa fa-sign-out" aria-hidden="true"></i></a></div>
             </li>
         </ul>
 
@@ -153,7 +153,7 @@
                                 </span>
                         </a>
                     </li>
-                    <li class="active" onclick="ajax(this)" data-link="/jefeplanta/stats">
+                    <li onclick="ajax(this)" data-link="/jefeplanta/stats">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Graficos
@@ -163,11 +163,11 @@
                     <li onclick="ajax(this)" data-link="/jefeplanta/view_planta">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Deberes
+                                    Por Despachar
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/jefeplanta/view_fusion">
+                    <li class="active" onclick="ajax(this)" data-link="/jefeplanta/view_fusion">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Fundidos

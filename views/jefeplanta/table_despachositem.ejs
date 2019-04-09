@@ -48,7 +48,7 @@ function fechaLatino(string){
             <td data-toggle="tooltip" title="Despachados" data-valor="<%= data[e].cantidad%>" data-name="despachados" class="checkFunction despachados center-number parsear_nro"><%= data[e].cantidad%></td>
             <td data-toggle="tooltip" title="Peso Unitario" class="peso center-number parsear_nro"><%= data[e].peso%></td>
             <td data-toggle="tooltip" title="Peso Despachado" data-valor="<%= data[e].peso*data[e].cantidad%>" data-name="pesodespachado" class="checkFunction pesodespachado center-number parsear_nro"><%= data[e].peso*data[e].cantidad%></td>
-            <td data-toggle="tooltip" title="Fecha" class="fecha center-number" data-order="<%= new Date(data[e].fecha).getTime()%>"><%= new Date(data[e].fecha).toLocaleDateString()%></td>
+            <td data-toggle="tooltip" title="Fecha" class="fecha center-number" data-order="<%= new Date(data[e].fecha).getTime()%>"><%= data[e].esp_fecha_gd%></td>
         </tr>
     <%}%>
     </tbody>
