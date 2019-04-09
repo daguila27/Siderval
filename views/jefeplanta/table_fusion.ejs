@@ -42,7 +42,6 @@ function fechaLatino(string){
         <th>Fundidos</th>
         <th>Peso Pieza (kg)</th>
         <th>Peso (kg)</th>
-        <th>Inicio Producción</th>
         <th>Fecha Fusión</th>
     </tr>
     </thead>
@@ -61,7 +60,6 @@ function fechaLatino(string){
             <% kilos_totales += data[i].peso*data[i].enviados;
                piezas_totales += data[i].enviados;%>
             <td class="parsear_nro body_k" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
-            <td style="text-align: center" data-order="<%= new Date(data[i].f_gen).getTime()%>"><%= data[i].esp_fecha_gen%></td>
             <td style="text-align: center" data-order="<%= new Date(data[i].fecha).getTime()%>"><%= data[i].esp_fecha_mov%></td>
         </tr>
     <%}%>
@@ -75,7 +73,6 @@ function fechaLatino(string){
         <td id="footer_pt" class="parsear_nro" style="text-align: center"><%= piezas_totales%></td>
         <td></td>
         <td id="footer_kt" class="parsear_nro" style="text-align: center"><%= kilos_totales%></td>
-        <td></td>
         <td></td>
     </tr>
     </tfoot>

@@ -42,6 +42,21 @@
         display: flex;
     }
 </style>
+
+<%
+function getMonday(d) {
+    d = new Date(d);
+    var day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+    return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
+}
+function getSunday(d) {
+    d = new Date(d);
+    var day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6:1) + 6; // adjust when day is sunday
+    return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
+}
+%>
 <div class="hidden tipovista listafusion"></div>
 <div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
@@ -108,6 +123,11 @@ Maestranza	6-->
                         <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Acotar
                             <span class="caret"></span></button>
                         <ul class="dropdown-menu" style="padding: 7px">
+                            <li style="padding: 0px 10px; display:flex; width: 100%">
+                                <!--<button class="setdates-buttons btn btn-xs btn-default" data-value="<%= new Date().toLocaleDateString().split(' ')[0]+'@'+new Date().toLocaleDateString().split(' ')[0]%>">Hoy</button>
+                                <button class="setdates-buttons btn btn-xs btn-default active" data-value="<%= getMonday(new Date())+'@'+getSunday(new Date())%>">Esta Semana</button>
+                                <button class="setdates-buttons btn btn-xs btn-default" data-value="<%= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString().split(' ')[0]+'@'+new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString().split(' ')[0]%>">Este Mes</button>-->
+                            </li>
                             <li class="dropdown-header">Desde:</li>
                             <li><input id="fecha-desde" class="form-control" type="date"></li>
                             <li class="divider"></li>
@@ -168,6 +188,42 @@ Maestranza	6-->
         "Descripción@primary",
         "Cliente@success"
     ];
+    $(".setdates-buttons").on('click', function(e){
+        e.preventDefault();
+        $(".setdates-buttons").removeClass('active');
+        $(this).addClass('active');
+        var mes1, mes2, dia1, dia2;
+
+        if( new Date($(this).data('value').split('@')[0]).getMonth().toString().length == 1 ){
+            mes1 = '0'+new Date($(this).data('value').split('@')[0]).getMonth();
+        }
+        else{
+            mes1 = new Date($(this).data('value').split('@')[0]).getMonth();
+        }
+        if( new Date($(this).data('value').split('@')[1]).getMonth().toString().length == 1 ){
+            mes2 = '0'+new Date($(this).data('value').split('@')[1]).getMonth();
+        }
+        else{
+            mes2 = new Date($(this).data('value').split('@')[1]).getMonth();
+        }
+
+        if( new Date($(this).data('value').split('@')[0]).getDay().toString().length == 1 ){
+            dia1 = '0'+new Date($(this).data('value').split('@')[0]).getDay();
+        }
+        else{
+            dia1 = new Date($(this).data('value').split('@')[0]).getMonth();
+        }
+
+        if( new Date($(this).data('value').split('@')[1]).getDay().toString().length == 1 ){
+            dia2 = '0'+new Date($(this).data('value').split('@')[1]).getDay();
+        }
+        else{
+            dia2 = new Date($(this).data('value').split('@')[1]).getMonth();
+        }
+        $("#fecha-desde").val(new Date($(this).data('value').split('@')[0]).getFullYear()+"-"+mes1+"-"+dia1);
+        $("#fecha-hasta").val(new Date($(this).data('value').split('@')[1]).getFullYear()+"-"+mes2+"-"+dia2);
+        setFechas();
+    });
     var filtros_seleccionados = [];
     var rango = [];
     $(document).ready(function(){

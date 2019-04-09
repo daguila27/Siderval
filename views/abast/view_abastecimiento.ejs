@@ -125,12 +125,15 @@
             },
             beforeSend: function(){
 			    destroyDataTable();
+                $("#buscar_abastecimiento").prop('disabled', true);
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
             },
 			url: '/abastecimiento/table_abastecimientos/' + global_page,
 			success: function(data){
 				$(".main-page").html(data);
-				//Muestra la cantidad de pedidos
+                $("#buscar_abastecimiento").prop('disabled', false);
+
+                //Muestra la cantidad de pedidos
 				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
             }
@@ -266,6 +269,7 @@
                 url: '/abastecimiento/table_abastecimientos/1',
                 beforeSend: function(){
                     destroyDataTable();
+                    $("#buscar_abastecimiento").prop('disabled', true);
                     $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
                 },
                 success: function(data){
@@ -277,6 +281,7 @@
                         }
                     });
                     $(".main-page").html(data);
+                    $("#buscar_abastecimiento").prop('disabled', false);
                     //Muestra la cantidad de pedidos
 					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
                 }

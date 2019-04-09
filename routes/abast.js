@@ -2377,14 +2377,14 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
 	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token," +
-                    " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento" +
+                    " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento" +
                     " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda" +
                     " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial" +
                     " LEFT JOIN (select facturacion.idabast, coalesce(sum(cantidad), 0) as cantidad, GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion ON abastecimiento.idabast = facturacion.idabast" +
                     " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
                     " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast" +
                     " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion" +
-                    " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)" +
+                    " LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc" +
                     " GROUP BY abastecimiento.idabast ORDER BY abastecimiento.idoda DESC) AS abastecimiento "+where, function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
