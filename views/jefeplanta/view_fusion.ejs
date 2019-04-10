@@ -124,15 +124,15 @@ Maestranza	6-->
                             <span class="caret"></span></button>
                         <ul class="dropdown-menu" style="padding: 7px">
                             <li style="padding: 0px 10px; display:flex; width: 100%">
-                                <!--<button class="setdates-buttons btn btn-xs btn-default" data-value="<%= new Date().toLocaleDateString().split(' ')[0]+'@'+new Date().toLocaleDateString().split(' ')[0]%>">Hoy</button>
-                                <button class="setdates-buttons btn btn-xs btn-default active" data-value="<%= getMonday(new Date())+'@'+getSunday(new Date())%>">Esta Semana</button>
-                                <button class="setdates-buttons btn btn-xs btn-default" data-value="<%= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString().split(' ')[0]+'@'+new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString().split(' ')[0]%>">Este Mes</button>-->
+                                <button class="setdates-buttons btn btn-xs btn-default" data-value="<%= new Date().toLocaleDateString().split(' ')[0]+'@'+new Date().toLocaleDateString().split(' ')[0]%>">Hoy</button>
+                                <button class="setdates-buttons btn btn-xs btn-default" data-value="<%= getMonday(new Date())+'@'+getSunday(new Date())%>">Esta Semana</button>
+                                <button class="setdates-buttons btn btn-xs btn-default active" data-value="<%= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString().split(' ')[0]+'@'+new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString().split(' ')[0]%>">Este Mes</button>
                             </li>
                             <li class="dropdown-header">Desde:</li>
-                            <li><input id="fecha-desde" class="form-control" type="date"></li>
+                            <li><input id="fecha-desde" class="form-control" type="date" value="<%= new Date(new Date().getFullYear(), new Date().getMonth(), 1)%>"></li>
                             <li class="divider"></li>
                             <li class="dropdown-header">Hasta:</li>
-                            <li><input id="fecha-hasta" class="form-control" type="date"></li>
+                            <li><input id="fecha-hasta" class="form-control" type="date" value="<%= new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)%>"></li>
                             <li class="divider"></li>
                             <li class="pull-right" style="padding: 0px 10px">
                                 <button class="btn btn-xs btn-primary" onclick="restartFechas()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
@@ -194,32 +194,39 @@ Maestranza	6-->
         $(this).addClass('active');
         var mes1, mes2, dia1, dia2;
 
-        if( new Date($(this).data('value').split('@')[0]).getMonth().toString().length == 1 ){
-            mes1 = '0'+new Date($(this).data('value').split('@')[0]).getMonth();
+        if( (new Date($(this).data('value').split('@')[0]).getMonth()+ 1).toString().length == 1 ){
+            mes1 = '0'+(new Date($(this).data('value').split('@')[0]).getMonth() + 1).toString();
         }
         else{
-            mes1 = new Date($(this).data('value').split('@')[0]).getMonth();
-        }
-        if( new Date($(this).data('value').split('@')[1]).getMonth().toString().length == 1 ){
-            mes2 = '0'+new Date($(this).data('value').split('@')[1]).getMonth();
-        }
-        else{
-            mes2 = new Date($(this).data('value').split('@')[1]).getMonth();
+            mes1 = new Date($(this).data('value').split('@')[0]).getMonth().toString();
         }
 
-        if( new Date($(this).data('value').split('@')[0]).getDay().toString().length == 1 ){
-            dia1 = '0'+new Date($(this).data('value').split('@')[0]).getDay();
+
+        if( (new Date($(this).data('value').split('@')[1]).getMonth()+1).toString().length == 1 ){
+            mes2 = '0'+(new Date($(this).data('value').split('@')[1]).getMonth() + 1).toString();
         }
         else{
-            dia1 = new Date($(this).data('value').split('@')[0]).getMonth();
+            mes2 = (new Date($(this).data('value').split('@')[1]).getMonth()+1).toString();
         }
 
-        if( new Date($(this).data('value').split('@')[1]).getDay().toString().length == 1 ){
-            dia2 = '0'+new Date($(this).data('value').split('@')[1]).getDay();
+
+
+        if( new Date($(this).data('value').split('@')[0]).getDate().toString().length == 1 ){
+            dia1 = '0'+new Date($(this).data('value').split('@')[0]).getDate().toString();
         }
         else{
-            dia2 = new Date($(this).data('value').split('@')[1]).getMonth();
+            dia1 = (new Date($(this).data('value').split('@')[0]).getDate()).toString();
         }
+
+
+
+        if( new Date($(this).data('value').split('@')[1]).getDate().toString().length == 1 ){
+            dia2 = '0'+new Date($(this).data('value').split('@')[1]).getDate().toString();
+        }
+        else{
+            dia2 = (new Date($(this).data('value').split('@')[1]).getDate()).toString();
+        }
+
         $("#fecha-desde").val(new Date($(this).data('value').split('@')[0]).getFullYear()+"-"+mes1+"-"+dia1);
         $("#fecha-hasta").val(new Date($(this).data('value').split('@')[1]).getFullYear()+"-"+mes2+"-"+dia2);
         setFechas();

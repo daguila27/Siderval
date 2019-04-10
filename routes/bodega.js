@@ -454,7 +454,8 @@ router.post('/save_gdd', function (req, res, next) {
                         op1 = "+";
                         op2 = "-";
                     } else if (input.estado === "Devolucion") {
-                        op1 = ""
+                        op2 = "+";
+                        op1 = "-";
                     }
                     //Creamos el Query para actualizar stock de materiales
                     let update_stock = 'UPDATE material SET material.stock = CASE ';
