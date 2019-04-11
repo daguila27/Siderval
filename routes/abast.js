@@ -2385,7 +2385,7 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
                     " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast" +
                     " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion" +
                     " LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc" +
-                    " GROUP BY abastecimiento.idabast ORDER BY abastecimiento.idoda DESC) AS abastecimiento "+where, function(err, abs){
+                    " GROUP BY abastecimiento.idabast ORDER BY abastecimiento.idoda DESC) AS abastecimiento "+where +" LIMIT 600", function(err, abs){
 	        		if(err) { console.log("Error Selecting : %s", err);
 	        		}else {
 		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1},function(err,html){
