@@ -228,14 +228,20 @@ $("#send_of").submit(function(e){
         } else {
           alert("La OC fue creada exitosamente.");
           $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+
           $(".hidden form").submit();
-          $.ajax({
+          /*$.ajax({
             type: 'GET',
             url: '/abastecimiento/abast_myself',
             success: function(data){
               $("#page-wrapper").html(data);
             }
-          });
+          });*/
+
+          setTimeout(function(){
+              location.reload();
+          }, 1000);
+
         }
       }
     });
