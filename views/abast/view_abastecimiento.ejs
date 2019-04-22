@@ -43,7 +43,11 @@
 		display: flex;
 	}
 </style>
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+<%if(username == 'abastecimiento'){%>
+	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 90%;transition:0.5s; ;z-index: 10;">
+<%}else{%>
+	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; ;z-index: 10;">
+<%}%>
 	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra</li>
@@ -76,11 +80,11 @@
 			</div>
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-DESC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
+		        <!--<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
+	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>-->
 	    		<div class="search-option-list" style="display: flex;">
 	    			<label style="margin-left: 30px; margin-top: 6px">Mostrar Todos</label>
-					<input type="checkbox" id="pend" style="margin-left: 5px; margin-top: 6px; width: 20px; height: 20px" onchange="buscar_oda(true)">
+					<input type="checkbox" id="pend" style="margin-left: 5px; margin-top: 6px; width: 20px; height: 20px" onchange="global_page='1';buscar_oda(true)">
 					<h5 style="margin-left: 10px" class="indicator-of-check"><small>Mostrando solo pedidos sin facturar</small></h5>
 				</div>
 	        </div>
@@ -101,7 +105,17 @@
 	</div>
 </div>
 
+<style>
+	.ch_page:hover{
+		cursor:pointer;
+		color: black;
+		font-size: 15px;
+	}
+</style>
+
 <script type="text/javascript">
+
+
 	var cc_fill = [];
 	var array_fill = [
         "OC@default",
@@ -114,7 +128,10 @@
 	var filtros_seleccionados = [];
 	// Pagina actual
 	var global_page = '1';
-	$(document).ready(function(){
+	var lastpage = false;
+    var limit = ( ( (parseInt(global_page)-1)*100) + 1 )+","+((parseInt(global_page)-1)*100 + 100);
+
+    $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         $.ajax({
 			type: 'POST',
@@ -124,24 +141,42 @@
                 showPend: $("#pend").is(':checked')
             },
             beforeSend: function(){
-			    destroyDataTable();
+                destroyDataTable(undefined);
                 $("#buscar_abastecimiento").prop('disabled', true);
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
             },
-			url: '/abastecimiento/table_abastecimientos/' + global_page,
+			url: '/abastecimiento/table_abastecimientos/'+global_page,
 			success: function(data){
 				$(".main-page").html(data);
                 $("#buscar_abastecimiento").prop('disabled', false);
 
                 //Muestra la cantidad de pedidos
-				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                if(global_page == '1' && lastpage){
+                    $("#pedidos").html("<h5><small>Mostrando de " + limit.split(',')[0] + " a "+limit.split(',')[1]+" pedido(s)</small></h5>");
+                }
+                else if(global_page == '1'){
+                    $("#pedidos").html("<h5><small>Mostrando de " + limit.split(',')[0] + " a "+limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s)</small></h5>");
+				}
+                else if(lastpage){
+                    $("#pedidos").html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + limit.split(',')[0] + " a "+limit.split(',')[1]+"  pedido(s)</small></h5>");
+                }
+                else{
+                    $("#pedidos").html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + limit.split(',')[0] + " a "+limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s)</small></h5>");
+				}
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
             }
 		});
 
         $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
-
+    function next_page(){
+        global_page = (parseInt(global_page) + 1).toString();
+        buscar_oda(false);
+    }
+	function previus_page(){
+        global_page = (parseInt(global_page) - 1).toString();
+        buscar_oda(false);
+    }
 	function saveinSession(option){
 		if(cc_fill.indexOf($(option).val()) == -1 ){
             alert( $(option).val() );
@@ -177,22 +212,23 @@
 	   var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
 	   var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
 	   $(".etiqueta-filtro-div").append(
-	       "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
+	       "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_abastecimiento").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()+"' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
 		   +$("#buscar_abastecimiento").val()+
-		   "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+		   "</strong>  <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
 	   );
         $(".etiqueta-filtro-div").data('cant', labels+1);
 	   if($("#buscar_abastecimiento-value").val() == '' || $("#buscar_abastecimiento-value").val() == null || $("#buscar_abastecimiento-value").val() == undefined){
-           $("#buscar_abastecimiento-value").val($(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val());
+           $("#buscar_abastecimiento-value").val($(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()+"@off");
        }
 	   else{
-           $("#buscar_abastecimiento-value").val([$("#buscar_abastecimiento-value").val(),$(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()].join(','));
+           $("#buscar_abastecimiento-value").val([$("#buscar_abastecimiento-value").val(),$(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()+"@off"].join(','));
        }
-       filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val());
+       filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()+"@off");
 	   $(".o_searchview_autocomplete").css('display', 'none');
 	   $(".o_searchview_autocomplete strong").html('');
         $("#buscar_abastecimiento").val('');
         $("#buscar_abastecimiento").focus();
+        global_page = '1';
         buscar_oda(false);
     });
 
@@ -210,7 +246,36 @@
         buscar_oda(false);
 	}
 
+    function cambiarEtiqueta(yo){
+        if($(yo).data('state') == 'off') {
+            $(yo).parent().removeClass('label-primary');
+            $(yo).parent().addClass('label-danger');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
 
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Removiendo "+'"'+$(yo).parent().children('strong').text()+'"'+" de la busqueda");
+            $(yo).removeClass('fa-toggle-off');
+            $(yo).addClass('fa-toggle-on');
+            $(yo).data('state', 'on');
+        }
+        else{
+            $(yo).parent().removeClass('label-danger');
+            $(yo).parent().addClass('label-primary');
+            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'off'].join('@'));
+
+            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
+
+            $(yo).parent().attr('title', "Buscando "+'"'+$(yo).parent().children('strong').text()+'"');
+
+            $(yo).removeClass('fa-toggle-on');
+            $(yo).addClass('fa-toggle-off');
+
+            $(yo).data('state', 'off');
+        }
+        buscar_oda();
+    }
 
     function despInput(event){
         var char = event.which || event.keyCode;
@@ -266,24 +331,30 @@
                     showPend: $("#pend").is(':checked')
                     /*cc_selected: $(".select_cc").val().join(',')*/
                 },
-                url: '/abastecimiento/table_abastecimientos/1',
+                url: '/abastecimiento/table_abastecimientos/'+global_page,
                 beforeSend: function(){
-                    destroyDataTable();
+                    destroyDataTable(undefined);
                     $("#buscar_abastecimiento").prop('disabled', true);
                     $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
                 },
                 success: function(data){
-
-                    $(".page-item").each(function(){
-                        if($(this).hasClass('first')){
-							$(this).click();
-
-                        }
-                    });
                     $(".main-page").html(data);
                     $("#buscar_abastecimiento").prop('disabled', false);
                     //Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+
+                    if(global_page == '1' && lastpage){
+                        $("#pedidos").html("<h5><small>Mostrando de " + limit.split(',')[0] + " a "+limit.split(',')[1]+" pedido(s)</small></h5>");
+                    }
+                    else if(global_page == '1'){
+                        $("#pedidos").html("<h5><small>Mostrando de " + limit.split(',')[0] + " a "+limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s)</small></h5>");
+                    }
+                    else if(lastpage){
+                        $("#pedidos").html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + limit.split(',')[0] + " a "+limit.split(',')[1]+"  pedido(s)</small></h5>");
+                    }
+                    else{
+                        $("#pedidos").html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + limit.split(',')[0] + " a "+limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s)</small></h5>");
+                    }
+					//$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
                 }
             });
         }
@@ -314,7 +385,7 @@
 			// Muestra el nav de paginacion
 			$("#paginacion").css('display','block');
             $(".search-option-list").css('display', 'flex');
-            $.ajax({
+            /*$.ajax({
                 type: 'POST',
                 data: {
                     clave: $("#buscar_abastecimiento").val(),
@@ -322,7 +393,7 @@
                     showPend: $("#pend").is(':checked')
                 },
 				beforeSend: function(){
-                    destroyDataTable();
+                    destroyDataTable(undefined);
 				},
                 url: '/abastecimiento/table_abastecimientos/' + global_page,
                 success: function(data){
@@ -331,7 +402,8 @@
                     //Muestra la cantidad de pedidos
 					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
                 }
-            });
+            });*/
+            buscar_oda(false);
 		}
 		else{
 			// Quita el nav de paginacion

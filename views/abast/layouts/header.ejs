@@ -68,7 +68,7 @@
 
 
 
-<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 100%; z-index: 10;">
+<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 90%;margin-left:10%; z-index: 10; transition: 0.5s">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <div style="margin: 5px 0px" onclick="show_menu();">
@@ -80,8 +80,8 @@
     <div class="navbar-collapse collapse">
 
         <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
-            <li onclick="show_menu()" style="cursor:pointer;">
-                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="fa fa-bars"></i> Menu</span></a>
+            <li onclick="close_menu()" style="cursor:pointer;">
+                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-times"></i> Menu</span></a>
             </li>
             <li>
                 <a class="oe_menu_leaf"><span class="oe_menu_text"></span></a>
@@ -128,9 +128,8 @@
 
 
 <div class="o_main">
-    <div class="o_sub_menu" style="position: fixed; z-index: 20; height: 100%; left: -15%; width: 15%; transition: 1s;">
+    <div class="o_sub_menu" style="position: fixed; z-index: 20; height: 100%; left: 0%; width: 10%; transition: 0.5s;">
         <a class="o_sub_menu_logo" style="background-color: white">
-            <div style="padding: 6px; cursor: pointer" onclick="close_menu()"><i class="fa fa-times pull-right"></i></div>
             <img src="/assets/img/logo.png" style="margin: 0; padding: 0; width: 100%">
         </a>
         <div class="o_sub_menu_content">
@@ -304,4 +303,4 @@
         </div>
     </div>
 
-    <div id="page-wrapper" style="width: 100%;">
+    <div id="page-wrapper" style="width: 90%;margin-left:10%; transition: 0.5s;" data-view="/abastecimiento/abast_myself">

@@ -69,7 +69,7 @@
               <tr>
                 <th>Exento</th>
                 <th>Descripción</th>
-                <th>Mínimo de Compra</th>
+                <th style="text-align: center">U.C.</th>
                 <th>Cantidad</th>
                 <th>Precio x Unidad</th>
                 <th>Total</th>
@@ -83,11 +83,19 @@
           </table>
         </div>
         <div class="panel-footer">
-          <h4 style="width: 100%;display: flex;">
-            <div style="margin-left: 10%;width: 30%;text-align: left" class="total-neto"><small>Neto: </small></div> 
-            <div style="margin-left: 0%;width: 30%;text-align: left" class="total-iva"><small>IVA: </small></div>  
-            <div style="margin-left: 0%;width: 30%;text-align: left" class="total-total"><small>Total: </small></div> 
-          </h4>
+            <h4 style="margin-top: 0">
+                <div class="row">
+                    <div class="col-md-2 col-md-offset-1">
+                        <div class="total-neto"><small>Neto: </small></div>
+                    </div>
+                    <div class="col-md-2 col-md-offset-2">
+                        <div class="total-iva"><small>IVA: </small></div>
+                    </div>
+                    <div class="col-md-2 col-md-offset-2">
+                        <div class="total-total"><small>Total: </small></div>
+                    </div>
+                </div>
+            </h4>
           <div style="width: 100%;text-align: center; cursor: pointer; margin-bottom: 5px"><a data-toggle="collapse" data-target="#generalInfo"><b>Información general <i class="fa fa-caret-down desp-arrow"></i></b></a></div>
           <div class="collapse" id="generalInfo">
             <div class="form-group" style="display: flex; width: 100%">
@@ -159,24 +167,48 @@
           <div class="panel-body">
             <form id="strimform">
               <div class="form-inline">
-                <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
-                <label style="font-weight: normal; margin-left: 20px; margin-right: 20px">
-                <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="showProd" id="showProd"> Mostrar Productos (Fundidos)
+                <!--<input name="det" placeholder="Descripción" class="form-control strim_input" id="det">-->
+                <label class="pull-right" style="font-weight: normal; margin-left: 20px; margin-right: 20px">
+                <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="showProd" id="showProd" onchange="refreshTableProduct()"> Mostrar Productos (Fundidos)
                 </label>
-                <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
+                <!--<a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>-->
               </div>
             </form>
           </div>
-          <table class="table table-responsive">
+          <table class="table table-responsive" id="viewProductos">
             <thead>
               <tr>
-                <th>Descripción</th>
-                <th>Caracteristica</th>
-                <th>Stock</th>
-                <th></th>
+                    <th>Descripción</th>
+                    <th>Unidad de Medida</th>
+                    <th>Stock Aviso</th>
+                    <th>Stock Crítico</th>
+                    <th>Unidad Mínima de Compra</th>
+                    <th>Stock Actual</th>
+                    <th>Precio</th>
+                    <th></th>
               </tr>
             </thead>
             <tbody id="prefabrs">
+                <% for(var t=0; t < mats.length; t++){%>
+                    <tr>
+                        <td><%= mats[t].detalle%></td>
+                        <td style="text-align: center"><%= mats[t].u_medida%></td>
+                        <td style="text-align: center"><%= mats[t].stock_i%></td>
+                        <td style="text-align: center"><%= mats[t].stock_c%></td>
+                        <td style="text-align: center"><%= mats[t].u_compra%></td>
+                        <td style="text-align: center"><%= mats[t].stock%></td>
+                        <%if(mats[t].precio == null || mats[t].precio == 8888){%>
+                            <td style="text-align: center">Sin Precio</td>
+                        <%}else{%>
+                            <td style="text-align: center"><%= mats[t].precio%></td>
+                        <%}%>
+                        <td style="text-align: center">
+                            <div class="btn-group">
+                                <a data-idm="<%= mats[t].idmaterial%>" class="btn btn-success btn-xs" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                <%}%>
             </tbody>
           </table>
         </div>
@@ -280,6 +312,69 @@
     }
 </style>
 <script>
+
+    function refreshTableProduct(){
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/refreshProductWhitP/'+$("#showProd").is(':checked'),
+            beforeSend: function(){
+                $('#viewProductos').DataTable().destroy();
+                $('#viewProductos').html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+            success: function(data){
+                $('#viewProductos').html(data);
+                $('#viewProductos').DataTable({
+                    pageLength: 10,
+                    language: {
+                        "sProcessing":     "Procesando...",
+                        "sZeroRecords":    "No se encontraron resultados",
+                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                        "sSearch":         "Buscar:",
+                        "sLoadingRecords": "Cargando...",
+                        "oPaginate": {
+                            "sFirst":    "Primero",
+                            "sLast":     "Último",
+                            "sNext":     "&raquo",
+                            "sPrevious": "&laquo"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                        }
+                    }
+                });
+            }
+        })
+    }
+
+    $('#viewProductos').DataTable({
+        pageLength: 10,
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
   $(document).ready(function(){
      $.ajax({
          type: 'GET',
@@ -288,6 +383,8 @@
              $(".renderizar_ofs").html(data)
          }
      });
+
+
   });
   function moveArrow(){
     $(".desp-arrow").css('transform', 'rotate(180deg)');  
@@ -392,13 +489,16 @@
                   alert("La OC fue creada exitosamente.");
                   $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
                   $(".hidden form").submit();
-                  $.ajax({
+                  /*$.ajax({
                       type: 'GET',
                       url: '/abastecimiento/abast_myself',
                       success: function(data){
                           $("#page-wrapper").html(data);
                       }
-                  });
+                  });*/
+                  setTimeout(function(){
+                      location.reload();
+                  }, 1000);
               }
           }
       });

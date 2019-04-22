@@ -489,18 +489,25 @@ router.get('/abast_myself', function(req, res, next) {
 					connection.query("select subcuenta from material where subcuenta!=null or subcuenta!='' group by subcuenta", function(err, subc){
 						if(err)
 							console.log("Error Selecting : %s", err);					
+						connection.query("select " +
+							"material.*,coalesce(caracteristica.cnom,'Sin Característica') as cnom from material " +
+							"left join caracteristica on caracteristica.idcaracteristica = SUBSTRING(material.codigo, 4, 2) " +
+							"where codigo like 'C%' or codigo like 'M%' or codigo like 'I%' or codigo like 'O%'", function(err, mats){
+                            if(err)
+                                console.log("Error Selecting : %s", err);
+							connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, id){
+								if(err)
+									console.log("Error Selecting : %s", err);
+								if(id.length){
+									id[0].numoda = id[0].numoda+1;
+									res.render('abast/lanzar_oc', {last: id[0].numoda, ofs: ins, subc: subc, mats: mats});
+								}
+								else{
+									res.render('abast/lanzar_oc', {last: 1, ofs: ins, subc: subc, mats: mats});
+								}
+							});
+                        });
 
-						connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, id){
-							if(err)
-								console.log("Error Selecting : %s", err);
-							if(id.length){
-								id[0].numoda = id[0].numoda+1;
-								res.render('abast/lanzar_oc', {last: id[0].numoda, ofs: ins, subc: subc});
-							}
-							else{
-								res.render('abast/lanzar_oc', {last: 1, ofs: ins, subc: subc});
-							}
-						});
 					});
 			});
 		});
@@ -810,8 +817,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     		res.send("<tr>" +
 									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
@@ -822,8 +829,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     		res.send("<tr>" +
 									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
@@ -836,8 +843,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     		res.send("<tr>" +
 									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
@@ -848,8 +855,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     		res.send("<tr>" +
 									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
@@ -1165,7 +1172,7 @@ router.post('/get_table_fact', function(req, res, next){
         		console.log("Error Connection : %s", err);
         	// Se consigue cada fila de la OCA, acompaada del nombre del material de cada fila y la cantidad ya facturada por fila, además de la razón
         	connection.query("select abastecimiento.idabast,oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
-        		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*abastecimiento.cantidad as odacosto,"
+        		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*(abastecimiento.cantidad - SUM(COALESCE(facturacion.cantidad,0))) as odacosto,"
         		+" oda.tokenoda,SUM(COALESCE(facturacion.cantidad,0)) AS facturados from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
         		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor" +
 				" LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast WHERE abastecimiento.idoda = ? GROUP BY abastecimiento.idabast",[idoda],
@@ -2294,7 +2301,7 @@ router.get('/view_abastecimiento', function(req, res, next) {
 			        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) WHERE  abastecimiento.cantidad > abastecimiento.recibidos", function(err, abs){
 			        		if(err) { console.log("Error Selecting : %s", err);
 			        		}else {
-				        		res.render('abast/view_abastecimiento', {cc: cc, largo: abs.length});
+				        		res.render('abast/view_abastecimiento', {cc: cc, largo: abs.length, username: req.session.userData.nombre});
 				        	}
 			        	});
 			        }
@@ -2311,10 +2318,9 @@ router.get('/view_abastecimiento', function(req, res, next) {
 router.post('/table_abastecimientos/:page', function(req, res, next){
 	if(verificar(req.session.userData)){
 		//Obtiene la pagina de la url y obtiene el nro de registros a solicitar
-		var page = req.params.page - 1;
-        var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
-        var array_fill = [
+		var limit = ( ( (parseInt(req.params.page)-1)*100) )+",100";
+		var array_fill = [
             "abastecimiento.idodabast",
             "abastecimiento.factura_token",
             "abastecimiento.gd_token",
@@ -2322,13 +2328,21 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
             "abastecimiento.detalle",
             "abastecimiento.cuenta"
         ];
+        var object_fill = {
+            "abastecimiento.idodabast-off":[],
+            "abastecimiento.factura_token-off":[],
+            "abastecimiento.gd_token-off":[],
+            "abastecimiento.sigla-off":[],
+            "abastecimiento.detalle-off":[],
+            "abastecimiento.cuenta-off":[],
+            "abastecimiento.idodabast-on":[],
+            "abastecimiento.factura_token-on":[],
+            "abastecimiento.gd_token-on":[],
+            "abastecimiento.sigla-on":[],
+            "abastecimiento.detalle-on":[],
+            "abastecimiento.cuenta-on":[]
+        };
         var clave;
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-        	clave = input.clave.split(',');
-		}
         var orden;
         if(input.orden.split('/').length > 1){
         	orden = input.orden.split('/')[1];
@@ -2342,28 +2356,43 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         var condiciones_where = [];
         var condiciones_cc = [];
 
-        if(clave.length>0){
-			for(var e=0; e < clave.length; e++){
-				condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-			}
+        if(input.clave == '' || input.clave == null || input.clave == undefined){
+            clave = [];
         }
-        var cc_cond = " ";
+        else{
+            clave = input.clave.split(',');
+        }
+
+        if(clave.length>0){
+            for(var e=0; e < clave.length; e++){
+                if(clave[e].split('@')[2] == 'off') {
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                else{
+                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+                }
+                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+            }
+
+        }
+        for(var w=0; w < Object.keys(object_fill).length; w++){
+            if(object_fill[Object.keys(object_fill)[w]].length > 0){
+                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+                }
+                else{
+                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+                }
+            }
+        }
+        console.log(condiciones_where);
+
         if(showPend == 'false'){
             //condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
             condiciones_where.push("abastecimiento.cantidad > abastecimiento.facturados");
         }
-        where += condiciones_where.join(" AND ");
-        /*if(cc_selected.length>0){
-            for(var cc=0; cc <  cc_selected.length ; cc++){
-                if(cc_selected[cc] == 'all'){
-                    condiciones_cc.push(" abastecimiento.cc LIKE '%%'");
-                    break;
-                }
-                else{
-                    condiciones_cc.push(" abastecimiento.cc LIKE '%"+cc_selected[cc]+"%'");
-                }
-            }
-        }*/
+
 
         if(condiciones_where.length==0){
         	condiciones_where.push('true');
@@ -2376,25 +2405,23 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token," +
-                    " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento" +
-                    " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda" +
-                    " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial" +
-                    " LEFT JOIN (select facturacion.idabast, coalesce(sum(cantidad), 0) as cantidad, GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion ON abastecimiento.idabast = facturacion.idabast" +
-                    " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
-                    " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast" +
-                    " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion" +
-                    " LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc" +
-                    " GROUP BY abastecimiento.idabast ORDER BY abastecimiento.idoda DESC) AS abastecimiento "+where +" LIMIT 600", function(err, abs){
-	        		if(err) { console.log("Error Selecting : %s", err);
-	        		}else {
-		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1},function(err,html){
-		        			if(err) console.log(err);
-		        			res.send(html);
-						});
-		        	}
-	        	});
-	        }
+                connection.query("select * from (select abastecimiento.*,coalesce(recepciones.cantidad,0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,recepciones.gd_token, " +
+                    "COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle from abastecimiento " +
+                    "left join (select facturacion.idabast, facturacion.cantidad,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast " +
+                    "left join (select recepcion_detalle.idabast,sum(recepcion_detalle.cantidad) as cantidad, group_concat(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token from recepcion_detalle left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion group by recepcion_detalle.idabast) as recepciones on recepciones.idabast = abastecimiento.idabast " +
+                    "LEFT JOIN oda ON oda.idoda=abastecimiento.idoda " +
+                    "LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial " +
+                    "LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor " +
+                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc) as abastecimiento "+where +" LIMIT "+limit, function(err, abs){
+                    if(err) { console.log("Error Selecting : %s", err);
+                    }else {
+                        res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: parseInt(req.params.page), largoData: abs.length },function(err,html){
+                            if(err) console.log(err);
+                            res.send(html);
+                        });
+                    }
+                });
+            }
         });
     } else res.redirect("/bad_login");
 });
@@ -3658,7 +3685,28 @@ router.post('/new_cliente/', function (req, res, next) {
     });
 });
 
+router.get('/refreshProductWhitP/:check', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+        var cond ;
+        if(req.params.check){
+        	cond = " OR codigo like 'P%'";
+		}
+		else{
+			cond = " ";
+		}
 
+        connection.query("select " +
+            "material.*,coalesce(caracteristica.cnom,'Sin Característica') as cnom from material " +
+            "left join caracteristica on caracteristica.idcaracteristica = SUBSTRING(material.codigo, 4, 2) " +
+            "where codigo like 'C%' or codigo like 'M%' or codigo like 'I%' or codigo like 'O%'"+ cond, function(err, mats){
+            if(err)
+                console.log("Error Selecting : %s", err);
+
+            res.render('abast/table_session_preoda', {mats: mats});
+        });
+    });
+});
 router.get('/visualizar_ofs', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);

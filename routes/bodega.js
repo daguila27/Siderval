@@ -53,7 +53,7 @@ router.get('/crear_gdd', function(req, res, next){
                             connection.query("select " +
                                 "palet_item.*, " +
                                 "material.detalle, material.idmaterial,pedido.idpedido," +
-                                "odc.numoc," +
+                                "odc.numoc,pedido.numitem," +
                                 "palet.idpackinglist," +
                                 "q_palet.peso_palet, cliente.sigla," +
                                 "material.peso " +
@@ -1399,6 +1399,7 @@ router.get('/get_session_peds/:select', function(req, res, next){
         console.log(where);
         req.getConnection(function(err, connection){
             if(err){throw err;}
+
             connection.query("select pedido.idpedido, coalesce(enpreparacion.preparando,0) as preparando, pedido.cantidad - pedido.despachados as xdespachar,pedido.f_entrega, cliente.sigla,cliente.razon,"
                 + " odc.numoc,pedido.numitem, material.detalle, material.peso,material.stock, material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar"
                 + " from pedido"
@@ -1409,6 +1410,31 @@ router.get('/get_session_peds/:select', function(req, res, next){
                 + " left join cliente on cliente.idcliente = odc.idcliente" +
                 where, function(err, xdesp){
                 if(err){throw err;}
+                console.log(xdesp);
+                res.render('bodega/pre_palet_table', {xdesp: xdesp});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
+router.get('/modal_palet_table/:idpalet', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var where = "";
+        console.log(req.params);
+        var select = req.params.select.split('-');
+        if(select.length>0){
+            where = "where pedido.idpedido in ("+select.join(',')+")";
+        }
+        console.log(where);
+        req.getConnection(function(err, connection){
+            if(err){throw err;}
+            connection.query("select material.detalle, palet_item.*, odc.numoc,pedido.numitem, palet.creacion from palet_item left join pedido on pedido.idpedido = palet_item.idpedido left join palet on palet.idpalet = palet_item.idpalet left join material on material.idmaterial = pedido.idmaterial left join odc on odc.idodc = pedido.idodc " +
+                where, function(err, xdesp){
+                if(err){throw err;}
+                console.log(xdesp);
                 res.render('bodega/pre_palet_table', {xdesp: xdesp});
             });
         });

@@ -193,7 +193,6 @@ function fechaLatino(string){
                 notification_pendientes();
             }
         }
-
     });
     $(".select-desp").mousedown(function(){
         // Si posee stock se selecciona
@@ -202,6 +201,7 @@ function fechaLatino(string){
             $(this).toggleClass('danger');
             // Si ahora posee la clase danger
             if($(this).hasClass('danger')){
+                //act_session('add', this);
                 //Agrega el pedido en la lista
                 if(!insertar_pedido($(this))){
                     $(this).toggleClass('danger');
