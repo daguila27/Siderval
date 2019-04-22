@@ -54,9 +54,9 @@ function fechaLatino(string){
             cctotal += desp[i].enCC;
             xdespachartotal += desp[i].xdespachar;
             if(arraypl.indexOf(desp[i].idpedido.toString()) != -1){%>
-                <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpedido="<%=desp[i].idpedido%>">
+                <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>">
             <%}else{%>
-                <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpedido="<%=desp[i].idpedido%>">
+                <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>">
             <%}%>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].numoc%></td>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].numitem%></td>
@@ -68,11 +68,13 @@ function fechaLatino(string){
                 <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].enCC%></td>
                 <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].pesoxdespachar%></td>
             <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].f_entrega).toLocaleDateString()%></td>
-            <%if(desp[i].preparando > 0){%>
+            <%if(desp[i].palets > 0){%>
                 <td class="o_data_cell o_readonly_modifier o_required_modifier">
-                    <button class="btn btn-xs btn-danger view_PL" style="z-index: 10;"><i>P</i></button>
+                <%for(var j=0; j< desp[i].palets; j++){%>
+                    <button class="btn btn-xs btn-danger view_PL" data-idpedido="<%=desp[i].idpedido%>" data-numpalet="<%=j%>" style="z-index: 10;"><i>P</i></button>
+                <%}%>
                 </td>
-             <%}else{%>
+            <%}else{%>
                 <td class="o_data_cell o_readonly_modifier o_required_modifier"></td>
             <%}%>
             </tr>
@@ -118,39 +120,98 @@ function fechaLatino(string){
         check_session();
 
     }
-    $(".select-desp").mouseenter(function(){
-        if(mouseDown == '1'){
-            $(this).toggleClass('danger');
-            if($(this).hasClass('danger')){
-                $(this).data('state', 'selec');
-                //el pedido no esta en la lista
-                seleccionados.push($(this).data('idpedido'));
-                //act_session('add', this);
 
+    // Agrega a la matriz seleccionados[] el idoc si no existe, y su idpedido al array
+    function insertar_pedido(yo){
+        console.log(yo.data("idoc"));
+        // Si existe en la matriz un idoc
+        if(matriz_seleccionados[0]){
+            // Si es igual al que intento insertar
+            if(yo.data("idoc") == matriz_seleccionados[0]){
+                //Agrego el idpedido al array
+                matriz_seleccionados[1].push(yo.data('idpedido'));
+                return 1;
+            } else { // Si no es igual retorno 0 diciendo que este pedido no se puede seleccionar
+                return 0;
             }
-            else{
+        } else {
+            matriz_seleccionados.push(yo.data('idoc'));
+            matriz_seleccionados.push([yo.data('idpedido')]);
+            return 1;
+        }
+    }
+
+    // Quita de la matriz seleccionados[] el idpedido
+    function quitar_pedido(yo){
+        console.log(yo.data("idoc"));
+        // Si existe en la matriz un idoc
+        if(matriz_seleccionados[0]){
+            // Si es igual al que intento eliminar
+            if(yo.data("idoc") == matriz_seleccionados[0]){
+                // Si me queda 1 solo dato para eliminar reset a la matriz
+                if(matriz_seleccionados[1].length == 1){
+                    matriz_seleccionados = [];
+                } else {
+                    //Elimino el idpedido al array
+                    matriz_seleccionados[1].splice(matriz_seleccionados[1].indexOf( yo.data('idpedido') ), 1);
+                }
+            } else { // Si no es igual retorno 0 diciendo que este pedido no se puede seleccionar
+                console.log("Esto no deberia ocurrir");
+            }
+        } else if(matriz_seleccionados.length == 0) {
+            console.log("No hay seleccionados");
+            matriz_seleccionados = [];
+        }
+    }
+
+    $(".select-desp").mouseenter(function(){
+        // Si ha sido seleccionado o posee stock se selecciona
+        if(mouseDown == '1' && $(this).data('stock') > 0){
+            // Quita o agrega la clase danger
+            $(this).toggleClass('danger');
+            // Si ahora posee la clase danger
+            if($(this).hasClass('danger')){
+                //Agrega el pedido en la lista
+                if(!insertar_pedido($(this))){
+                    $(this).toggleClass('danger');
+                } else {
+                    $(this).data('state', 'selec');
+                }
+                //seleccionados.push($(this).data('idpedido'));
+            }
+            else{ // Sino deselecciono los pedidos
                 $(this).data('state', 'noselec');
-                //act_session('rm', this);
-                seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
+                // Elimina el pedido de la lista
+                quitar_pedido($(this));
+                //seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
             }
             //check_session();
         }
 
     });
     $(".select-desp").mousedown(function(){
+        // Si posee stock se selecciona
+        if($(this).data("stock") > 0){
+            // Quita o agrega la clase danger
             $(this).toggleClass('danger');
+            // Si ahora posee la clase danger
             if($(this).hasClass('danger')){
-                $(this).data('state', 'selec');
-                seleccionados.push($(this).data('idpedido'));
-                //act_session('add', this);
-
+                //Agrega el pedido en la lista
+                if(!insertar_pedido($(this))){
+                    $(this).toggleClass('danger');
+                } else {
+                    $(this).data('state', 'selec');
+                }
+                //seleccionados.push($(this).data('idpedido'));
             }
-            else{
+            // Si no posee la clase danger
+            else{ // Sino deselecciono los pedidos
                 $(this).data('state', 'noselec');
-                //act_session('rm', this);
-                seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
-
-            }
+                // Elimina el pedido de la lista
+                quitar_pedido($(this));
+                //seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
+            }            
+        }
 
     });
 
@@ -165,23 +226,33 @@ function fechaLatino(string){
     }
 
     function check_session(){
-        if(seleccionados.length == 0){
+        var array_pedidos = [];
+        if(matriz_seleccionados.length != 0){
+            array_pedidos = matriz_seleccionados[1];
+        }
+        if(matriz_seleccionados.length == 0){
             $("#newpl_button").css('bottom', '-50px');
         }
         else{
+            console.log(matriz_seleccionados);
             $("#newpl_button").css('bottom', '20px');
+            $("#pedidos").html("<h5><small>"+matriz_seleccionados[1].length+" pedidos seleccionados.</small></h5>");
         }
-        $("#pedidos").html("<h5><small>"+seleccionados.length+" pedidos seleccionados.</small></h5>");
     }
-    $("#pedidos").html("<h5><small>"+seleccionados.length+" pedidos seleccionados.</small></h5>");
-    if(seleccionados.length == 0){
-        $("#newpl_button").css('bottom', '-50px');
-    }
-    else{
-        $("#newpl_button").css('bottom', '20px');
-    }
+
+    check_session();
+
 
     $(".view_PL").on('click', function(e){
        e.preventDefault();
+       $.ajax({
+            type: 'POST',
+            data: {idpedido: $(this).data("idpedido"), numpalet: $(this).data("numpalet")},
+            url: '/bodega/view_item_palet',
+            success: function(data){
+                $("#items_palet-content").html(data);
+                $("#items_palet").modal('show');
+            }
+        });
     });
 </script>

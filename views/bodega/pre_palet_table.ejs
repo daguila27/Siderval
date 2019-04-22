@@ -6,8 +6,8 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title">Crear Palet</h4>
         </div>
-        <div class="modal-body" id="newPLModal-body">
-            <table id="palet_list_table" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+        <div class="modal-body" id="newPLModal-body" style="padding: 0">
+            <table id="palet_list_table" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; top: -7px">
                 <thead>
                 <tr>
                     <th class="o_column_sortable">OC</th>
@@ -17,7 +17,7 @@
                     <th class="o_column_sortable">Stock</th>
                     <th class="o_column_sortable">Pendientes</th>
                     <th class="o_column_sortable">Preparar</th>
-                    <th class="o_column_sortable"></th>
+                    <th class="o_column_sortable">Peso de Pedido</th>
                     <th class="o_column_sortable">Peso</th>
                     <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
                     <th class="o_column_sortable" style="text-align: center;"></th>
@@ -36,9 +36,9 @@
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].sigla%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].detalle%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=xdesp[i].stock%></td>
-                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=xdesp[i].xdespachar%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=xdesp[i].xdespachar-xdesp[i].preparando%></td>
                     <td style="width: 15%" class="o_data_cell o_readonly_modifier o_required_modifier cantidad_preparar" data-peso="<%=xdesp[i].peso%>">
-                        <input style="width: 100%" type="number" class="form-control" name="cantidad" onkeyup="recalculatePeso('<%=xdesp[i].idpedido%>', this)" onchange="recalculatePeso('<%=xdesp[i].idpedido%>', this)" min="1" max="<%=Math.min(xdesp[i].stock, xdesp[i].xdespachar)%>" required>
+                        <input style="width: 100%" type="number" class="form-control" name="cantidad" onkeyup="recalculatePeso('<%=xdesp[i].idpedido%>', this)" onchange="recalculatePeso('<%=xdesp[i].idpedido%>', this)" min="1" max="<%=Math.min(xdesp[i].stock, xdesp[i].xdespachar-xdesp[i].preparando)%>" required>
                     </td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier number_peso">0</td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].pesoxdespachar%></td>
@@ -77,7 +77,9 @@
     $(".pedido_preparar").each(function(){
         form.push([$(this).data('idpedido'),$(this).children(".cantidad_preparar")]);
     });
+
     console.log(form);
+    
     function removeItemPL(yo){
         $(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']").toggleClass('danger');
         $(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']").data('state', 'noselec');
@@ -118,6 +120,7 @@
             }
         });
     });
+
     $("#palet_list_table").DataTable( {
         paging: false,
         fixedColumns: true,

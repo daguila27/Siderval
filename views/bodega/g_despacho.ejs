@@ -98,7 +98,7 @@ function letraMayus(string) {
                         </select>
                     </div>
                     <div class="num_pl_input col-md-1 hidden"  style="padding-left: 0; padding-right: 8px">
-                        <input class="form-control" type="text" placeholder="N° Packing List">
+                        <input id="input_idpackinglist" class="form-control" type="text" placeholder="N° Packing List">
                         </input>
                     </div>
                     <div class="col-md-1" style="padding: 0; padding-right: 8px">
@@ -267,7 +267,7 @@ function letraMayus(string) {
                                     <td class="peso_item" style="text-align: center"><%= palet[i].peso*palet[i].cantidad %></td>
                                     <td class="peso_palet" style="text-align: center"><%= palet[i].peso_palet%></td>
                                     <td class="adj" style="text-align: center">
-                                        <a data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-success btn-xs addrow_palet"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span>  Adjuntar Palet</a>
+                                        <a data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-success btn-xs addrow_palet" data-idpackinglist="<%= palet[i].idpackinglist%>"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span>  Adjuntar Palet</a>
                                     </td>
                                     <td class="rmv hidden" class="hidden">
                                         <a onclick="remove_row_palet(this)" data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-danger btn-xs rmvrow_palet"><span class="glyphicon glyphicon-remove" style="padding-left: 1px"></span></a>
@@ -320,6 +320,7 @@ function letraMayus(string) {
     $(".addrow_palet").on('click', function(e){
         e.preventDefault();
         add_row_palet(this);
+        $("#input_idpackinglist").val($(this).data("idpackinglist"));
         checkIfPaletIsInGD();
     });
 

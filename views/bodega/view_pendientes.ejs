@@ -35,6 +35,49 @@
     .etiqueta-filtro-div{
         display: flex;
     }
+
+    /* Notificacion emergente inferior */
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @-webkit-keyframes fadein {
+        from {bottom: 0; opacity: 0;} 
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @-webkit-keyframes fadeout {
+        from {bottom: 30px; opacity: 1;} 
+        to {bottom: 0; opacity: 0;}
+    }
+
+    @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+    }
 </style>
 <div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
@@ -70,8 +113,8 @@
                 </div>
                 <div style="padding: 5px; margin-left: 15px">
                     <ul class="nav nav-pills"  style="display: flex;">
-                        <li class="pill-vista active" data-name="pedido-view"><a href="#">Pedidos</a></li>
-                        <li class="pill-vista" data-name="palets-view"><a href="#">Palets</a></li>
+                        <li class="pill-vista active" data-name="pedido-view"><a style="padding: 6px" href="#">Pedidos</a></li>
+                        <li class="pill-vista" data-name="palets-view"><a style="padding: 6px" href="#">Palets</a></li>
                     </ul>
                 </div>
             </div>
@@ -86,9 +129,14 @@
     </div>
 </div>
 
+<div id="items_palet-content" style="z-index: 5;"></div>
+
 <button id="newpl_button" style="position: fixed; bottom: -50px; right: 20px; z-index: 12; transition: 0.5s" class="btn btn-lg btn-primary btn-circle"><i class="fa fa-plus"></i></button>
+
 <script type="text/javascript">
-    var seleccionados = [];
+    //var seleccionados = [];
+    // Ej: matriz_seleccionados = [idoc,[idpedido1, idpedido2]]
+    var matriz_seleccionados = [];
     var array_fill = [
         "OC@default",
         "Detalle@primary",
@@ -112,9 +160,13 @@
     }
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        var array_pedidos = [];
+        if(matriz_seleccionados.length != 0){
+            array_pedidos = matriz_seleccionados[1];
+        }
         $.ajax({
             type: 'POST',
-            data: {clave: $("#buscar_pendientes").val(), orden: 'despacho.fecha-DESC', tipo: $("#select_tipo_despacho").val(), arrayPL: seleccionados.join('-')},
+            data: {clave: $("#buscar_pendientes").val(), orden: 'despacho.fecha-DESC', tipo: $("#select_tipo_despacho").val(), arrayPL: array_pedidos.join('-')},
             url: '/bodega/table_pendientes',
             beforeSend: function(){
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
@@ -162,9 +214,13 @@
     }
     function buscar_pendientes(){
         if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+            var array_pedidos = [];
+            if(matriz_seleccionados.length != 0){
+                array_pedidos = matriz_seleccionados[1];
+            }
             $.ajax({
                 type: 'POST',
-                data: {clave: filtros_seleccionados.join(','), orden: 'despacho.fecha', tipo: $("#select_tipo_despacho").val(), arrayPL: seleccionados.join('-')},
+                data: {clave: filtros_seleccionados.join(','), orden: 'despacho.fecha', tipo: $("#select_tipo_despacho").val(), arrayPL: array_pedidos.join('-')},
                 url: '/bodega/table_pendientes',
                 beforeSend: function(){
                     destroyDataTable();
@@ -369,9 +425,13 @@
 
     $("#newpl_button").on('click', function(e){
         e.preventDefault();
+        var array_pedidos = [];
+        if(matriz_seleccionados.length != 0){
+            array_pedidos = matriz_seleccionados[1];
+        }
         $.ajax({
             type: 'GET',
-            url: '/bodega/get_session_peds/'+seleccionados.join('-'),
+            url: '/bodega/get_session_peds/' + array_pedidos.join('-'),
             success: function(data){
                 $("#newPLModal-content").html(data);
                 $("#newPLModal").modal('show');

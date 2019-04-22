@@ -6,8 +6,8 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
             <h4 class="modal-title">Crear Packing List</h4>
         </div>
-        <div class="modal-body" id="newPLModal-body">
-            <table id="palet_list_table" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+        <div class="modal-body" id="newPLModal-body" style="padding: 0">
+            <table id="palet_list_table" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;top: -7px">
                 <thead>
                 <tr>
                     <th class="o_column_sortable" style="text-align: center">#Palet</th>
@@ -42,8 +42,11 @@
             </table>
         </div>
         <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Crear Packing List</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            <div class="form-group">
+                <input type="number" class="form-control" style="width: 20%; display: inline-block;" value="" id="idpackinglist" min="1" placeholder="# Número de Packinglist" required>
+                <button type="submit" class="btn btn-primary">Crear Packing List</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </form>
 </div>
@@ -54,6 +57,7 @@
     $(".pedido_preparar").each(function(){
         form.push([$(this).data('idpalet'),$(this).children(".cantidad_preparar")]);
     });
+
     function removeItemPL(yo){
         $(".select-desp[data-idpalet='" + $(yo).parent().parent().data('idpalet') +"']").toggleClass('danger');
         $(".select-desp[data-idpalet='" + $(yo).parent().parent().data('idpalet') +"']").data('state', 'noselec');
@@ -79,16 +83,19 @@
         for(var t=0; t < array.length; t++){
             object[array[t].name].push(array[t].value);
         }
-        console.log(object);
+        console.log(object.idpalet);
+        console.log($("#idpackinglist").val());
         $.ajax({
             type: 'POST',
-            data: {idpalet: object.idpalet.join('-')},
+            data: {idpalet: object.idpalet.join('-'), idpackinglist: $("#idpackinglist").val()},
             url: '/bodega/create_packinglist',
             success: function(data){
                 if(data=='ok'){
                     seleccionados = [];
                     buscar_pendientes();
                     $("#newPLModal").modal('hide');
+                } else if("error"){
+                    alert("Este número de Packinglist ya existe, inserte uno nuevo.");
                 }
             }
         });

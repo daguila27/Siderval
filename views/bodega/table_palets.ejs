@@ -31,10 +31,10 @@ function fechaLatino(string){
     <thead>
     <tr>
         <th class="o_column_sortable">Palet</th>
-        <th class="o_column_sortable">Peso Total</th>
-        <th class="o_column_sortable">Fecha de Entrega Minima</th>
-        <th class="o_column_sortable">Creación</th>
-        <th>Ver Item's</th>
+        <th class="o_column_sortable" style="text-align: center">Peso Total</th>
+        <th class="o_column_sortable" style="text-align: center">Fecha de Entrega Minima</th>
+        <th class="o_column_sortable" style="text-align: center">Creación</th>
+        <th style="text-align: center">Ver Item's</th>
     </tr>
     </thead>
     <tbody class="ui-sortable">
@@ -42,12 +42,12 @@ function fechaLatino(string){
     var peso = 0;
     for(var i=0; i < desp.length; i++){
         peso += desp[i].peso_palet;%>
-        <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>">
+        <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>" data-idpackinglist="<%=desp[i].idpackinglist%>">
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].idpalet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
-            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
-            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs"><i class="fa fa-eye"></i></button></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs view_PL" data-idpalet="<%=desp[i].idpalet%>"><i class="fa fa-eye"></i></button></td>
         </tr>
     <%}%>
     </tbody>
@@ -96,37 +96,46 @@ function fechaLatino(string){
         check_session();
     }
     $(".select-desp").mouseenter(function(){
-        if(mouseDown == '1'){
-            $(this).toggleClass('danger');
-            if($(this).hasClass('danger')){
-                $(this).data('state', 'selec');
-                seleccionados.push($(this).data('idpalet'));
-                //act_session('add', this);
+        // Si ya esta paletizado
+        if($(this).data('idpackinglist') == 0){
+            if(mouseDown == '1'){
+                $(this).toggleClass('danger');
+                if($(this).hasClass('danger')){
+                    $(this).data('state', 'selec');
+                    seleccionados.push($(this).data('idpalet'));
+                    //act_session('add', this);
 
+                }
+                else{
+                    $(this).data('state', 'noselec');
+                    //act_session('rm', this);
+                    seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
+                }
+                //check_session();
             }
-            else{
-                $(this).data('state', 'noselec');
-                //act_session('rm', this);
-                seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
-            }
-            //check_session();
+        } else{
+            // Notificacion de palet invalido o ya en packinglist
         }
 
     });
     $(".select-desp").mousedown(function(){
-        $(this).toggleClass('danger');
-        if($(this).hasClass('danger')){
-            $(this).data('state', 'selec');
-            seleccionados.push($(this).data('idpalet'));
+        // Si ya esta paletizado
+        if($(this).data('idpackinglist') == 0){
+            $(this).toggleClass('danger');
+            if($(this).hasClass('danger')){
+                $(this).data('state', 'selec');
+                seleccionados.push($(this).data('idpalet'));
 
-            //act_session('add', this);
+                //act_session('add', this);
 
-        }
-        else{
-            $(this).data('state', 'noselec');
-            //act_session('rm', this);
-            seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
+            } else{
+                $(this).data('state', 'noselec');
+                //act_session('rm', this);
+                seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
 
+            }
+        } else{
+            // Notificacion de palet invalido o ya en packinglist
         }
 
     });
@@ -160,6 +169,17 @@ function fechaLatino(string){
     }
 
     $(".view_PL").on('click', function(e){
-        e.preventDefault();
+       e.preventDefault();
+       $.ajax({
+            type: 'POST',
+            data: {idpalet: $(this).data("idpalet"), numpalet: -1, idpalet: 0},
+            url: '/bodega/view_item_palet',
+            success: function(data){
+                $("#items_palet-content").html(data);
+                $("#items_palet").modal('show');
+            }
+        });
     });
+
+
 </script>
