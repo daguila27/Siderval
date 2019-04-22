@@ -1,0 +1,105 @@
+<div id="items_palet" class="modal fade bs-example-modal-lg" role="dialog" style="top: 20%; left: 2%">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Palet</h4>
+        </div>
+        <div class="modal-body" id="items_palet-body" style="padding: 0">
+            <table id="palet_list" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; top: -7px">
+                <thead>
+                <tr>
+                    <th class="o_column_sortable">OC</th>
+                    <th class="o_column_sortable">Item</th>
+                    <th class="o_column_sortable">Cliente</th>
+                    <th class="o_column_sortable">Detalle</th>
+                    <th class="o_column_sortable">Stock real</th>
+                    <th class="o_column_sortable">Cantidad solicitada</th>
+                    <th class="o_column_sortable">Despachados</th>
+                    <th class="o_column_sortable">Pendientes</th>
+                    <th class="o_column_sortable">Preparación</th>
+                    <th class="o_column_sortable">Cantidad Palet Actual</th>
+                    <th class="o_column_sortable">Peso</th>
+                    <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
+                    <!-- <th class="o_column_sortable" style="text-align: center;">Eliminar</th> -->
+                </tr>
+                </thead>
+                <tbody class="ui-sortable">
+                <%
+                var pesototal = 0;
+                for(var i=0; i < data.length; i++){
+                    pesototal += data[i].pesoxdespachar;
+                %>
+                <tr class="o_data_row pedido_preparar" data-idpedido="<%=data[i].idpedido%>">
+                    <input type="hidden" value="<%=data[i].idpedido%>" name="idpedido">
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numoc%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numitem%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].sigla%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=data[i].stock_real%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=data[i].cantidad%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=data[i].despachados%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=data[i].pendientes%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=data[i].preparando%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=data[i].cantidadxpalet%></td>
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].pesoxdespachar%></td>
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(data[i].f_entrega).toLocaleDateString()%></td>
+                    <!-- <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><button class="btn btn-xs btn-danger" onclick="removeItemPL(this)"><i class="fa fa-times"></i></button></td> -->
+                </tr>
+                <%}%>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th class="peso_suma" ></th>
+                    <th style="text-align: center"><%=pesototal%></th>
+                    <th></th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $("#palet_list").DataTable( {
+        paging: false,
+        fixedColumns: true,
+        responsive: true,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    } );
+</script>

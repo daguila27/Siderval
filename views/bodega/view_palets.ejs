@@ -35,6 +35,49 @@
     .etiqueta-filtro-div{
         display: flex;
     }
+
+    /* Notificacion emergente inferior */
+    #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @-webkit-keyframes fadein {
+        from {bottom: 0; opacity: 0;} 
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @-webkit-keyframes fadeout {
+        from {bottom: 30px; opacity: 1;} 
+        to {bottom: 0; opacity: 0;}
+    }
+
+    @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+    }
 </style>
 
 <div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
@@ -84,8 +127,8 @@
                 </div>
                 <div style="padding: 5px; margin-left: 15px">
                     <ul class="nav nav-pills"  style="display: flex;">
-                        <li class="pill-vista" data-name="pedido-view"><a href="#">Pedidos</a></li>
-                        <li class="pill-vista active" data-name="palets-view"><a href="#">Palets</a></li>
+                        <li class="pill-vista" data-name="pedido-view"><a style="padding: 6px" href="#">Pedidos</a></li>
+                        <li class="pill-vista active" data-name="palets-view"><a style="padding: 6px" href="#">Palets</a></li>
                     </ul>
                 </div>
             </div>
@@ -103,6 +146,12 @@
 </div>
 
 <button id="newpl_button" style="position: fixed; bottom: -50px; right: 20px; z-index: 12; transition: 0.5s" class="btn btn-lg btn-primary btn-circle"><i class="fa fa-plus"></i></button>
+
+<!-- Modal Palet -->
+<div id="items_palet-content" style="z-index: 5;"></div>
+
+<div id="snackbar">Aviso: No puede seleccionar Pedidos que tengan stock en cero</div>
+
 <script type="text/javascript">
     var seleccionados = [];
     var array_fill = [

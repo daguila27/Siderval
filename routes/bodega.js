@@ -54,6 +54,7 @@ router.get('/crear_gdd', function(req, res, next){
                                 "palet_item.*, " +
                                 "material.detalle, material.idmaterial,pedido.idpedido," +
                                 "odc.numoc,pedido.numitem," +
+                                "palet.idpackinglist," +
                                 "q_palet.peso_palet, cliente.sigla," +
                                 "material.peso " +
                                 "from palet_item " +
@@ -63,10 +64,10 @@ router.get('/crear_gdd', function(req, res, next){
                                 "left join cliente on cliente.idcliente = odc.idcliente " +
                                 "left join material on material.idmaterial = pedido.idmaterial " +
                                 "left join (select palet.idpalet, sum(material.peso*palet_item.cantidad) as peso_palet from palet_item left join palet on palet.idpalet = palet_item.idpalet left join pedido on pedido.idpedido = palet_item.idpedido left join material on material.idmaterial = pedido.idmaterial group by palet.idpalet) as q_palet on q_palet.idpalet = palet.idpalet " +
-                                "where palet.idpackinglist is null", function(err, palet){
+                                "where palet.idpackinglist is not null and palet.desp is false", function(err, palet){
                                 if(err)
                                     console.log("Error Selecting :%s", err);
-
+                                console.log(palet);
                                 res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 0, cli: cli});
                             });
                         });
@@ -1198,26 +1199,17 @@ router.post('/table_pendientes', function(req, res, next){
         //where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
         //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
-            connection.query("select "
-             + " odc.numoc,"
-             + " material.detalle,"
-             + " pedido.numitem,"
-             + " pedido.idpedido,"
-             + " coalesce(enpreparacion.preparando,0) as preparando,"
-             + " material.peso,"
-             + " material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar,"
-             + " pedido.cantidad - pedido.despachados as xdespachar,"
-             + " material.stock,"
-             + " pedido.f_entrega,"
-             + " cliente.sigla,"
-             + " cliente.razon,"
-             + " coalesce(queryCC.enCC, 0) as enCC"
-             + " from pedido"
-             + " left join odc on odc.idodc = pedido.idodc"
-             + " left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
-             + " left join material on material.idmaterial = pedido.idmaterial"
-             + " left join (select material.idmaterial, sum(produccion.`7`) as encc from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by material.idmaterial) as queryCC on queryCC.idmaterial = material.idmaterial"
-             + " left join cliente on cliente.idcliente = odc.idcliente"
+            connection.query("select odc.numoc, material.detalle, pedido.numitem, pedido.idpedido, coalesce(enpreparacion.preparando,0) as preparando,"
+                + " (select COUNT(palet.idpalet) from palet"
+                + " left join palet_item on palet.idpalet = palet_item.idpalet"
+                + " where palet_item.idpedido = pedido.idpedido) as palets,"
+                + " material.peso, material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar, pedido.cantidad - pedido.despachados as xdespachar,"
+                + " material.stock, pedido.f_entrega, cliente.sigla, cliente.razon,  coalesce(queryCC.enCC, 0) as enCC from pedido"
+                + " left join odc on odc.idodc = pedido.idodc"
+                + " left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
+                + " left join material on material.idmaterial = pedido.idmaterial"
+                + " left join (select material.idmaterial, sum(produccion.`7`) as encc from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by material.idmaterial) as queryCC on queryCC.idmaterial = material.idmaterial"
+                + " left join cliente on cliente.idcliente = odc.idcliente"
              + where,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
@@ -1324,7 +1316,7 @@ router.post('/table_palets', function(req, res, next){
         req.getConnection(function(err, connection){
             connection.query("select " +
                 "palet.idpalet, " +
-                "palet.creacion, " +
+                "palet.creacion, IFNULL(palet.idpackinglist, 0) as idpackinglist, " +
                 "sum(coalesce(material.peso, 0.0)*palet_item.cantidad) as peso_palet, " +
                 "min(pedido.f_entrega) as entrega," +
                 "group_concat(coalesce(material.peso, 0.0)) as pesos, " +
@@ -1402,23 +1394,20 @@ router.get('/get_session_peds/:select', function(req, res, next){
         console.log(req.params);
         var select = req.params.select.split('-');
         if(select.length>0){
-            where = "where pedido.idpedido in ("+select.join(',')+")";
+            where = " where pedido.idpedido in ("+select.join(',')+")";
         }
         console.log(where);
         req.getConnection(function(err, connection){
             if(err){throw err;}
-            connection.query("select " +
-                "pedido.idpedido,pedido.cantidad-coalesce(pedido.despachados,0)-coalesce(enpreparacion.preparando,0) as xdespachar,pedido.f_entrega," +
-                "cliente.sigla,cliente.razon," +
-                "odc.numoc,pedido.numitem," +
-                "material.detalle," +
-                "material.peso,material.stock," +
-                "material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar " +
-                "from pedido " +
-                "left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido " +
-                "left join material on material.idmaterial = pedido.idmaterial " +
-                "left join odc on odc.idodc=pedido.idodc " +
-                "left join cliente on cliente.idcliente = odc.idcliente " +
+
+            connection.query("select pedido.idpedido, coalesce(enpreparacion.preparando,0) as preparando, pedido.cantidad - pedido.despachados as xdespachar,pedido.f_entrega, cliente.sigla,cliente.razon,"
+                + " odc.numoc,pedido.numitem, material.detalle, material.peso,material.stock, material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar"
+                + " from pedido"
+                + " left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item"
+                + " left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
+                + " left join material on material.idmaterial = pedido.idmaterial"
+                + " left join odc on odc.idodc=pedido.idodc"
+                + " left join cliente on cliente.idcliente = odc.idcliente" +
                 where, function(err, xdesp){
                 if(err){throw err;}
                 console.log(xdesp);
@@ -1510,29 +1499,89 @@ router.post('/create_palet', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-
+router.post('/view_item_palet', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        req.getConnection(function(err, connection){
+            if(err){throw err;}
+            if(input.numpalet == -1){ //Utilice la misma ruta para 2 vistas distintas, las reconozco por numpalet
+                var idpalet = input.idpalet;
+                connection.query("select palet_item.idpalet_item, odc.numoc, palet_item.idpalet, pedido.*, coalesce(enpreparacion.preparando,0) as preparando,"
+                    + " ((pedido.cantidad - pedido.despachados) - palet_item.cantidad) as cantidadxpalet, ((pedido.cantidad - pedido.despachados) - coalesce(enpreparacion.preparando,0)) as pendientes, material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar,"
+                    + " (material.stock - queryPalet.paletizado) as stock_real, cliente.sigla, material.detalle"
+                    + " from palet_item"
+                    + " left join pedido on pedido.idpedido = palet_item.idpedido"
+                    + " left join odc on odc.idodc = pedido.idodc"
+                    + " left join cliente on cliente.idcliente = odc.idcliente"
+                    + " left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item"
+                    + " left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
+                    + " left join palet on palet.idpalet = palet_item.idpalet"
+                    + " left join material on material.idmaterial = pedido.idmaterial"
+                    + " left join (select pedido.idmaterial,sum(palet_item.cantidad) as paletizado from palet_item"
+                    + " left join palet on palet.idpalet = palet_item.idpalet"
+                    + " left join pedido on pedido.idpedido = palet_item.idpedido"
+                    + " where !palet.desp group by pedido.idmaterial) as queryPalet on queryPalet.idmaterial = material.idmaterial"
+                    + " where !palet.desp and palet.idpalet=" + idpalet, function(err, palet){
+                    if(err){throw err;}
+                    console.log(palet);
+                    res.render('bodega/view_item_palet', {data: palet});
+                });
+            } else{
+                connection.query("select palet.idpalet from palet"
+                    + " left join palet_item on palet.idpalet = palet_item.idpalet"
+                    + " where palet_item.idpedido = " + input.idpedido, function(err, idpalets){
+                    if(err){throw err;}
+                    var idpalet = idpalets[parseInt(input.numpalet)].idpalet;
+                    connection.query("select palet_item.idpalet_item, odc.numoc, palet_item.idpalet, pedido.*, coalesce(enpreparacion.preparando,0) as preparando,"
+                        + " ((pedido.cantidad - pedido.despachados) - palet_item.cantidad) as cantidadxpalet, ((pedido.cantidad - pedido.despachados) - coalesce(enpreparacion.preparando,0)) as pendientes, material.peso*(pedido.cantidad - pedido.despachados) as pesoxdespachar,"
+                        + " (material.stock - queryPalet.paletizado) as stock_real, cliente.sigla, material.detalle"
+                        + " from palet_item"
+                        + " left join pedido on pedido.idpedido = palet_item.idpedido"
+                        + " left join odc on odc.idodc = pedido.idodc"
+                        + " left join cliente on cliente.idcliente = odc.idcliente"
+                        + " left join (select idpedido, sum(cantidad) as preparando, palet.idpalet from palet_item"
+                        + " left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null group by idpedido) as enpreparacion on enpreparacion.idpedido = pedido.idpedido"
+                        + " left join palet on palet.idpalet = palet_item.idpalet"
+                        + " left join material on material.idmaterial = pedido.idmaterial"
+                        + " left join (select pedido.idmaterial,sum(palet_item.cantidad) as paletizado from palet_item"
+                        + " left join palet on palet.idpalet = palet_item.idpalet"
+                        + " left join pedido on pedido.idpedido = palet_item.idpedido"
+                        + " where !palet.desp group by pedido.idmaterial) as queryPalet on queryPalet.idmaterial = material.idmaterial"
+                        + " where !palet.desp and palet.idpalet=" + idpalet, function(err, palet){
+                        if(err){throw err;}
+                        console.log(palet);
+                        res.render('bodega/view_item_palet', {data: palet});
+                    });
+                });
+            }
+        });
+    }
+    else{res.redirect('bad_login');}
+});
 
 router.post('/create_packinglist', function(req, res, next){
-        if(verificar(req.session.userData)){
-            var input = JSON.parse(JSON.stringify(req.body));
-            input.idpalet = input.idpalet.split('-');
-            var data = [];
-            req.getConnection(function(err, connection){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        input.idpalet = input.idpalet.split('-');
+        var data = [];
+        req.getConnection(function(err, connection){
+            if(err){throw err;}
+            connection.query("select * from palet where palet.idpackinglist = " + input.idpackinglist, function(err, palet){
                 if(err){throw err;}
-                connection.query("INSERT INTO packinglist (creacion) VALUES (now())", function(err, inPL){
-                    if(err){throw err;}
-
-                    console.log(inPL);
-
-                    connection.query("UPDATE palet SET idpackinglist = ? WHERE idpalet in ("+input.idpalet.join(',')+")", [inPL.insertId], function(inItemPL){
+                if(palet.length == 0){
+                    connection.query("UPDATE palet SET idpackinglist = " + input.idpackinglist + " WHERE idpalet in ("+input.idpalet.join(',')+")", function(err, inItemPL){
                         if(err){throw err;}
                         res.send('ok');
                     });
-                });
+                } else{
+                    res.send("error");
+                }
             });
-        }
-        else{res.redirect('bad_login');}
-    });
+            
+        });
+    }
+    else{res.redirect('bad_login');}
+});
 
 
 
