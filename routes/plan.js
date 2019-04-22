@@ -5127,7 +5127,7 @@ router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
         if(err)
             console.log("Error Connection : %s", err);
 
-        connection.query("select coalesce(combustible.idmaterial, 0) as idcombustible,material.detalle,sub_ccontable.idccontable as subcuenta, abastecimiento.costo as precio, abastecimiento.cantidad,abastecimiento.exento from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on material.idmaterial=abastecimiento.idmaterial left join sub_ccontable on abastecimiento.cc = sub_ccontable.idsub left join (SELECT idmaterial FROM material where codigo in('I030000990004')) as combustible on combustible.idmaterial = material.idmaterial where oda.idoda=?", [req.params.idoda],
+        connection.query("select coalesce(combustible.idmaterial, 0) as idcombustible,coalesce(producto.det_producto,material.detalle) as detalle,sub_ccontable.idccontable as subcuenta, abastecimiento.costo as precio, abastecimiento.cantidad,abastecimiento.exento from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on material.idmaterial=abastecimiento.idmaterial left join producto on (producto.idmaterial = material.idmaterial) left join sub_ccontable on abastecimiento.cc = sub_ccontable.idsub left join (SELECT idmaterial FROM material where codigo in('I030000990004')) as combustible on combustible.idmaterial = material.idmaterial where oda.idoda=?", [req.params.idoda],
          function(err, mats){
             if(err)
                 console.log("Error Selecting : %s", err);
