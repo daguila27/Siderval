@@ -57,6 +57,7 @@
 
         <!-- Modal content-->
         <form id="factura-form">
+            <input type="hidden" id="viewModal">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -108,7 +109,7 @@
                     <label for="subcuentasModal"></label>
                     <select class="form-control" id="cuentaSelect" onchange="act_contable()">
                         <%for(var e=0; e < cuenta.length; e++){%>
-                            <option data-cuenta="<%= cuenta[e][0]%>" value="<%= cuenta[e][0]%>-<%= cuenta[e][1]%>"><%= cuenta[e][1]%></option>
+                            <option data-cuenta="<%= cuenta[e][0]%>" value="<%= cuenta[e][0]%>-<%= cuenta[e][1]%>"><%= cuenta[e][0]%>-<%= cuenta[e][1]%></option>
                         <%}%>
                     </select>
                 </div>
@@ -128,22 +129,6 @@
                         <%}%>
                     </select>
                 </div>
-
-                <script>
-
-                    function act_contable(){
-                        $(".option_c").addClass('hidden');
-                        $("#contableSelect .option"+$("#cuentaSelect option:selected").data('cuenta')).removeClass('hidden');
-                        $('#contableSelect option:not(.hidden):first').prop('selected', true);
-                        act_subcontable();
-                    }
-                    function act_subcontable(){
-                        $(".option_subc").addClass('hidden');
-                        $("#subcontableSelect .option"+$("#contableSelect option:selected").data('contable')).removeClass('hidden');
-                        $('#subcontableSelect option:not(.hidden):first').prop('selected', true);
-                    }
-                    act_contable();
-                </script>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="finSelectCC()">Seleccionar</button>
@@ -233,11 +218,6 @@
 
 
 
-
-
-
-
-
 <script src="/js/pdftex.js"></script>
 
 <script src="https://togetherjs.com/togetherjs-min.js"></script>
@@ -278,12 +258,41 @@
 
 
 </body>
+</html>
 <script>
     function show_menu(){
         $('.o_sub_menu').css('left', '0%');
+        $("#oe_main_menu_navbar").css('width', '90%');
+        $("#oe_main_menu_navbar").css('margin-left', '10%');
+        $("#page-wrapper").css('width', '90%');
+        $("#page-wrapper").css('margin-left', '10%');
+        $("#up-fills").css('width', '90%');
+        if($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento"){
+            //ajax($(".oe_secondary_submenu li.active"));
+            destroyDataTable(buscar_oda);
+            //setTimeout(function(){ buscar_oda(false); }, 750);
+        }
+        $(".menu-icon").removeClass('fa-bars');
+        $(".menu-icon").addClass('fa-times');
+        $(".menu-icon").parent().parent().parent().attr('onclick', 'close_menu()');
+
     }
     function close_menu() {
-        $('.o_sub_menu').css('left', '-15%');
+        $('.o_sub_menu').css('left', '-10%');
+        $("#oe_main_menu_navbar").css('width', '100%');
+        $("#oe_main_menu_navbar").css('margin-left', '0%');
+        $("#page-wrapper").css('width', '100%');
+        $("#page-wrapper").css('margin-left', '0%');
+        $("#up-fills").css('width', '100%');
+        if($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento"){
+            //ajax($(".oe_secondary_submenu li.active"));
+            destroyDataTable(buscar_oda);
+            //setTimeout(function(){ buscar_oda(false); }, 750);
+
+        }
+        $(".menu-icon").removeClass('fa-times');
+        $(".menu-icon").addClass('fa-bars');
+        $(".menu-icon").parent().parent().parent().attr('onclick', 'show_menu()');
     }
 
 
@@ -356,7 +365,6 @@
             }
         } );
     }
-
     function setDataTableSmall(str){
         return $(str).DataTable({
             responsive: true,
@@ -386,8 +394,6 @@
             }
         });
     }
-
-
     function setDataTable(str){
         return $(str).DataTable({
             responsive: true,
@@ -417,7 +423,6 @@
             }
         });
     }
-
     function setDataTable2(str){
         return $(str).DataTable({
             responsive: true,
@@ -477,9 +482,6 @@
             }
         });
     }
-
-
-
     function setDataTableOF(str){
         return $(str).DataTable({
             responsive: true,
@@ -512,9 +514,14 @@
         });
     }
 
-    function destroyDataTable(){
+
+    function destroyDataTable(callback){
         if ( $.fn.DataTable.isDataTable('table') ) {
             $('table').DataTable().destroy();
+            $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            if(callback != undefined){
+                setTimeout(function(){ callback(false); }, 750);
+            }
         }
     }
 
@@ -559,7 +566,6 @@
             }
         });
     }
-
     function modal_guia(label) {
         $.ajax({
             type: 'GET',
@@ -570,9 +576,6 @@
             }
         });
     }
-
-
-
     function oda_data(yo){
         $.ajax({
             type: 'GET',
@@ -653,19 +656,32 @@
                 success: function(data){
                     if(!data.err){
                         alert(data.msg);
-                        $.ajax({
-                            type: 'GET',
-                            url: '/abastecimiento/page_oda/'+$('#factura_idoda').val(),
-                            success: function(data){
-                                $(".main-page").html(data);
-                            }
-                        });
+                        if($("#viewModal").val() == 'lista'){
+                            global_page = '1';
+                            buscar_oda(false);
+                        }
+                        else{
+                            $.ajax({
+                                type: 'GET',
+                                url: '/abastecimiento/page_oda/'+$('#factura_idoda').val(),
+                                success: function(data){
+                                    $(".main-page").html(data);
+                                }
+                            });
+                        }
                         $("#facturaModal").modal('toggle');
                     } else alert(data.msg);
                 }
             });
         }
     });
+
+
+    function verPdf(yo){
+        window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
+    }
+
+
     $.ajax({
         type: 'GET',
         url: '/abastecimiento/notif_abast',
@@ -689,7 +705,6 @@
             $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcuentasModal").val());
         }
     }
-
     function finSelectCC(){
 
         /*if( $(".SCModal").css('display') != 'none'  ){
@@ -738,7 +753,7 @@
             beforeSend: function(){
                 destroyDataTable();
                 $("#page-wrapper").css('display', 'none');
-                close_menu();
+                $("#page-wrapper").data('view', $(yo).data('link'));
             },
             success: function(data){
                 $("#page-wrapper").html(data);
@@ -994,6 +1009,7 @@
     function setFactuNum(yo){
         $(".numFac").html($(yo).data('numoda'));
         $("#modalIdOda").val($(yo).data('idoda'));
+        $("#viewModal").val($(yo).data('view'));
         $.ajax({
             type: 'POST',
             data: {idoda: $(yo).data('idoda')},
@@ -1007,5 +1023,17 @@
 
         });
     }
+
+    function act_contable(){
+        $(".option_c").addClass('hidden');
+        $("#contableSelect .option"+$("#cuentaSelect option:selected").data('cuenta')).removeClass('hidden');
+        $('#contableSelect option:not(.hidden):first').prop('selected', true);
+        act_subcontable();
+    }
+    function act_subcontable(){
+        $(".option_subc").addClass('hidden');
+        $("#subcontableSelect .option"+$("#contableSelect option:selected").data('contable')).removeClass('hidden');
+        $('#subcontableSelect option:not(.hidden):first').prop('selected', true);
+    }
+    act_contable();
 </script>
-</html>

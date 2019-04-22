@@ -38,7 +38,7 @@ function fechaLatino(string){
                                     <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
                                 </a>
                                 <%if(user.nombre != 'siderval'){%>
-                                    <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
+                                    <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" data-view="pagina" onclick="setFactuNum(this)">
                                         <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
                                     </a>
                                 <%}%>
@@ -390,9 +390,7 @@ function fechaLatino(string){
         setDataTable2('#tablaODA');
     });
 
-    function verPdf(yo){
-       window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
-    }
+
 
     function receiveAll(self) {
         if (confirm("¿Esta seguro que desea recepcionar todo lo que falte por recepcionar?")){

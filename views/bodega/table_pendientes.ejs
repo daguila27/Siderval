@@ -135,7 +135,6 @@ function fechaLatino(string){
             }
             //check_session();
         }
-
     });
     $(".select-desp").mousedown(function(){
             $(this).toggleClass('danger');
@@ -143,12 +142,14 @@ function fechaLatino(string){
                 $(this).data('state', 'selec');
                 seleccionados.push($(this).data('idpedido'));
                 //act_session('add', this);
-
             }
             else{
                 $(this).data('state', 'noselec');
                 //act_session('rm', this);
-                seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
+                //[1,2,3,4,5,6]
+                //splice(3,1)
+                //[1,2,3,5,6]
+                seleccionados.splice( seleccionados.indexOf($(this).data('idpedido')) , 1);
 
             }
 

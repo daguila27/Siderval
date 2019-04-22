@@ -47,7 +47,7 @@ function fechaLatino(string){
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
-            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs"><i class="fa fa-eye"></i></button></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs" data-idpalet="<%= desp[i].idpalet%>" onclick="viewPaletItems(this)"><i class="fa fa-eye"></i></button></td>
         </tr>
     <%}%>
     </tbody>
@@ -74,6 +74,9 @@ function fechaLatino(string){
 
 <script type="text/javascript">
     setDataTableFixed("#paletsTable");
+
+
+
     function refreshCount(){
         var c = 0;
         $(".select-desp.danger").each(function(){

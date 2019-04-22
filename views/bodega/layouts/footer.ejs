@@ -11,6 +11,15 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div id="viewPaletModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" id="viewPaletModal-content" >
+
+
+
+    </div>
+</div>
+
 
 <script src="/js/pdftex.js"></script>
 
@@ -39,6 +48,18 @@
 <!-- Custom Theme JavaScript -->
 <script src="/dist/js/sb-admin-2.js"></script>
 <script>
+
+    function viewPaletItems(yo){
+        /*$.ajax({
+            type: 'GET',
+            url: '/bodega/modal_palet_table/'+$(yo).data('idpalet'),
+            success: function(data){
+                $("#viewPaletModal-content").html(data);
+            }
+        })*/
+    }
+
+
     function show_menu(){
         $('.o_sub_menu').css('left', '0%');
     }
