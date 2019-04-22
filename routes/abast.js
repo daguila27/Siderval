@@ -2407,12 +2407,12 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
         	} else {
                 connection.query("select * from (select abastecimiento.*,oda.creacion as oda_creacion,coalesce(recepciones.cantidad,0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,recepciones.gd_token, " +
                     "COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle from abastecimiento " +
-                    "left join (select facturacion.idabast, facturacion.cantidad,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast " +
+                    "left join (select facturacion.idabast, sum(facturacion.cantidad) as cantidad,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast " +
                     "left join (select recepcion_detalle.idabast,sum(recepcion_detalle.cantidad) as cantidad, group_concat(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token from recepcion_detalle left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion group by recepcion_detalle.idabast) as recepciones on recepciones.idabast = abastecimiento.idabast " +
                     "LEFT JOIN oda ON oda.idoda=abastecimiento.idoda " +
                     "LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial " +
                     "LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor " +
-                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc) as abastecimiento "+where +" ORDER BY oda_creacion DESC LIMIT "+limit, function(err, abs){
+                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc) as abastecimiento "+where +" ORDER BY abastecimiento.oda_creacion DESC LIMIT "+limit, function(err, abs){
                     if(err) { console.log("Error Selecting : %s", err);
                     }else {
                         res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: parseInt(req.params.page), largoData: abs.length },function(err,html){
