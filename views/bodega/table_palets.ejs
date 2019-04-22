@@ -34,6 +34,7 @@ function fechaLatino(string){
         <th class="o_column_sortable" style="text-align: center">Peso Total</th>
         <th class="o_column_sortable" style="text-align: center">Fecha de Entrega Minima</th>
         <th class="o_column_sortable" style="text-align: center">Creación</th>
+        <th class="o_column_sortable" style="text-align: center">Packing List</th>
         <th style="text-align: center">Ver Item's</th>
     </tr>
     </thead>
@@ -47,7 +48,8 @@ function fechaLatino(string){
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
-            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs" data-idpalet="<%= desp[i].idpalet%>" onclick="viewPaletItems(this)"><i class="fa fa-eye"></i></button></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= desp[i].idpackinglist%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs view_PL" data-idpalet="<%= desp[i].idpalet%>"><i class="fa fa-eye"></i></button></td>
         </tr>
     <%}%>
     </tbody>
@@ -55,6 +57,7 @@ function fechaLatino(string){
         <tr>
             <th></th>
             <th style="text-align: center;"><%= peso%></th>
+            <th></th>
             <th></th>
             <th></th>
             <th></th>

@@ -42,7 +42,7 @@ router.get('/crear_gdd', function(req, res, next){
                     if (err) {console.log("Error Selecting : %s", err);}
                     connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                         +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                        +" left join (select pedido.idpedido, palet_item.cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null and palet.idpalet) as pl on pl.idpedido = pedido.idpedido"
+                        +" left join (select pedido.idpedido, sum(palet_item.cantidad) as cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where !palet.desp group by palet_item.idpedido) as pl on pl.idpedido = pedido.idpedido"
                         +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
                         +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
                         +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
@@ -420,7 +420,7 @@ router.post('/save_gdd', function (req, res, next) {
                     if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
                         if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) == -1){
                             ids_palets.push( input['list[' + i + '][]'][3].split('-')[0]);
-                            case_pl.push("WHEN palet.idpalet = "+input['list[' + i + '][]'][3].split('-')[0]+" THEN '"+input.pl+"'");
+                            case_pl.push(input['list[' + i + '][]'][3].split('-')[0]);
                         }
                         ids_palet_item.push(input['list[' + i + '][]'][3].split('-')[1]);
                         case_p.push("WHEN palet_item.idpalet_item = "+input['list[' + i + '][]'][3].split('-')[1]+" THEN "+parseInt(input['list[' + i + '][]'][2]));
@@ -443,7 +443,7 @@ router.post('/save_gdd', function (req, res, next) {
 
                 if(case_pl.length > 0){
                     update_bool = true;
-                    case_pl = "UPDATE palet SET palet.idpackinglist = CASE "+case_pl.join(" ")+" ELSE palet.idpackinglist END WHERE palet.idpalet IN ("+ids_palets.join(",")+")" ;
+                    case_pl = "UPDATE palet SET palet.desp = true where palet.idpalet in ("+case_pl.join(",")+")" ;
                 }
 
                 //Insertamos cada Despacho asociado a la GD
@@ -1316,7 +1316,7 @@ router.post('/table_palets', function(req, res, next){
         req.getConnection(function(err, connection){
             connection.query("select " +
                 "palet.idpalet, " +
-                "palet.creacion, IFNULL(palet.idpackinglist, 0) as idpackinglist, " +
+                "palet.creacion, IFNULL(palet.idpackinglist, 'Sin P.L.') as idpackinglist, " +
                 "sum(coalesce(material.peso, 0.0)*palet_item.cantidad) as peso_palet, " +
                 "min(pedido.f_entrega) as entrega," +
                 "group_concat(coalesce(material.peso, 0.0)) as pesos, " +

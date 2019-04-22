@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>PACKING LIST</title>
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+    <h1>Packing List #<%= pl[0].idpackinglist%></h1>
+    <%for(var e=0; e < pl.length; e++){%>
+        <h3>Palet #<%= pl[e].idpalet%></h3>
+        <table style="width:100%">
+            <tr>
+                <th>Detalle</th>
+                <th>Cantidad</th>
+            </tr>
+        <%for(var w = 0 ; w < pl[e].cantidad.split(',').length; w++ ){%>
+            <tr>
+                <td><%= pl[e].detalle.split('@')[w]%></td>
+                <td><%= pl[e].cantidad.split(',')[w]%></td>
+            </tr>
+        <%}%>
+        </table>
+    <%}%>
+</body>
+
+</html>

@@ -14,7 +14,7 @@ router.use(
     },'pool')
 );
 function verificar(usr){
-  if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento' || usr.nombre == 'siderval' || usr.nombre == 'jefeplanta'){
+  if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento' || usr.nombre == 'siderval' || usr.nombre == 'jefeplanta' || usr.nombre == 'bodega'){
     return true;
   }else{
     return false;
@@ -4855,6 +4855,127 @@ router.post('/view_ordenpdf', function(req,res,next){
          });
     });    
 
+});
+
+router.post('/view_PLpdf', function(req,res,next){
+    var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+
+
+         connection.query("SELECT * FROM palet_item " +
+             "left join palet on palet.idpalet = palet_item.idpalet " +
+             "left join pedido on pedido.idpedido = palet_item.idpedido " +
+             "left join material on material.idmaterial = pedido.idmaterial " +
+             "where palet.idpackinglist = ?", [idoda], function(err, oda){
+             if(err)
+                 console.log("Error Selecting : %s", err);
+
+             var phantom = require('phantom');
+             phantom.create().then(function(ph) {
+                 ph.createPage().then(function(page) {
+                     page.property('viewportSize',{width:612,height:792});
+                     page.open("http://localhost:4300/plan/view_PLpdf_get/"+oda[0].idpackinglist).then(function(status) {
+                         page.render('public/pdf/pl'+oda[0].idpackinglist+'.pdf').then(function() {
+                             console.log('Page Rendered');
+                             ph.exit();
+                             var fs = require('fs');
+                             var filePath = '\\pdf\\pl'+oda[0].idpackinglist+'.pdf';
+                             console.log(__dirname.replace('routes','public') + filePath);
+                             fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
+                                 res.contentType("application/pdf");
+                                 console.log(data);
+                                 res.redirect('/plan/show_pdf_PL/'+oda[0].idpackinglist);
+                             });
+                         });
+                     });
+                 });
+             });
+
+
+         });
+    });
+
+});
+
+router.get('/show_pdf_PL/:numpl', function(req,res,next){
+    var fs = require('fs');
+    var filePath = '\\pdf\\pl'+req.params.numpl+'.pdf';
+    console.log(__dirname.replace('routes','public') + filePath);
+
+    fs.readFile(__dirname.replace('routes','public') + filePath, (err, data) => {
+        if(err) {
+            console.log('error: ', err);
+            console.log("ARCHIVO INEXISTENTE");
+            res.redirect('/plan/view_PLpdf_after/'+req.params.numpl);
+
+        } else {
+            console.log(data);
+            console.log("ARCHIVO SI EXISTE");
+            fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
+                res.contentType("application/pdf");
+                res.send(data);
+            });
+        }
+    });
+
+});
+router.get('/view_PLpdf_after/:numpl', function(req,res,next){
+    var idoda = req.params.numpl;
+
+
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+        connection.query("SELECT * FROM palet_item " +
+            "left join palet on palet.idpalet = palet_item.idpalet " +
+            "left join pedido on pedido.idpedido = palet_item.idpedido " +
+            "left join material on material.idmaterial = pedido.idmaterial " +
+            "where palet.idpackinglist = ?", [idoda], function(err, oda){
+            if(err)
+                console.log("Error Selecting : %s", err);
+
+            var phantom = require('phantom');
+            phantom.create().then(function(ph) {
+                ph.createPage().then(function(page) {
+                    page.property('viewportSize',{width:612,height:792});
+                    page.open("http://localhost:4300/plan/view_PLpdf_get/"+oda[0].idpackinglist).then(function(status) {
+                        page.render('public/pdf/pl'+oda[0].idpackinglist+'.pdf').then(function() {
+                            console.log('Page Rendered');
+                            ph.exit();
+                            var fs = require('fs');
+                            var filePath = '\\pdf\\pl'+oda[0].idpackinglist+'.pdf';
+                            console.log(__dirname.replace('routes','public') + filePath);
+                            fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
+                                res.contentType("application/pdf");
+                                console.log(data);
+                                res.redirect('/plan/show_pdf_PL/'+oda[0].idpackinglist);
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+});
+router.get('/view_PLpdf_get/:numpl', function(req,res,next){
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+        connection.query("SELECT group_concat(material.detalle separator '@') as detalle, group_concat(palet_item.cantidad) as cantidad, palet.idpalet, palet.idpackinglist FROM palet_item " +
+                         "left join palet on palet.idpalet = palet_item.idpalet "  +
+                         "left join pedido on pedido.idpedido = palet_item.idpedido " +
+                         "left join material on material.idmaterial = pedido.idmaterial " +
+                         "where palet.idpackinglist = ? group by palet_item.idpalet", [req.params.numpl],
+            function(err, pl){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                console.log(pl);
+                res.render('bodega/template_pl', {pl: pl});
+            });
+    });
 });
 
 
