@@ -115,6 +115,9 @@ function fechaLatino(string){
             }
         } else{
             // Notificacion de palet invalido o ya en packinglist
+            if(mouseDown == '1'){
+                notification_pendientes();
+            }
         }
 
     });
@@ -136,6 +139,7 @@ function fechaLatino(string){
             }
         } else{
             // Notificacion de palet invalido o ya en packinglist
+            notification_pendientes();
         }
 
     });
@@ -172,7 +176,7 @@ function fechaLatino(string){
        e.preventDefault();
        $.ajax({
             type: 'POST',
-            data: {idpalet: $(this).data("idpalet"), numpalet: -1, idpalet: 0},
+            data: {idpalet: $(this).data("idpalet"), numpalet: -1},
             url: '/bodega/view_item_palet',
             success: function(data){
                 $("#items_palet-content").html(data);

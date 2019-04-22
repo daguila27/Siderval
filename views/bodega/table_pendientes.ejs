@@ -157,6 +157,7 @@ function fechaLatino(string){
                 }
             } else { // Si no es igual retorno 0 diciendo que este pedido no se puede seleccionar
                 console.log("Esto no deberia ocurrir");
+                notification_pendientes();
             }
         } else if(matriz_seleccionados.length == 0) {
             console.log("No hay seleccionados");
@@ -174,6 +175,7 @@ function fechaLatino(string){
                 //Agrega el pedido en la lista
                 if(!insertar_pedido($(this))){
                     $(this).toggleClass('danger');
+                    notification_pendientes();
                 } else {
                     $(this).data('state', 'selec');
                 }
@@ -186,6 +188,10 @@ function fechaLatino(string){
                 //seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
             }
             //check_session();
+        } else{
+            if(mouseDown == '1'){
+                notification_pendientes();
+            }
         }
 
     });
@@ -211,6 +217,8 @@ function fechaLatino(string){
                 quitar_pedido($(this));
                 //seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
             }            
+        } else{
+            notification_pendientes();
         }
 
     });

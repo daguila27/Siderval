@@ -48,7 +48,7 @@
         padding: 16px;
         position: fixed;
         z-index: 1;
-        left: 50%;
+        left: 70%;
         bottom: 30px;
         font-size: 17px;
     }
@@ -129,9 +129,14 @@
     </div>
 </div>
 
-<div id="items_palet-content" style="z-index: 5;"></div>
 
 <button id="newpl_button" style="position: fixed; bottom: -50px; right: 20px; z-index: 12; transition: 0.5s" class="btn btn-lg btn-primary btn-circle"><i class="fa fa-plus"></i></button>
+
+<!-- Modal de Items de palet -->
+<div id="items_palet-content" style="z-index: 5;"></div>
+
+<!-- Notificacion de pedido sin stock o de otra ODC -->
+<div id="snackbar">Aviso: Debe seleccionar pedidos de la misma Orden de compra o que tengan stock suficiente.</div>
 
 <script type="text/javascript">
     //var seleccionados = [];
@@ -484,6 +489,13 @@
         else{
             alert("NO");
         }
+    }
+
+    // Notificacion
+    function notification_pendientes() {
+        var x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 
 </script>

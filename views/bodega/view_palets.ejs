@@ -48,7 +48,7 @@
         padding: 16px;
         position: fixed;
         z-index: 1;
-        left: 50%;
+        left: 70%;
         bottom: 30px;
         font-size: 17px;
     }
@@ -150,7 +150,8 @@
 <!-- Modal Palet -->
 <div id="items_palet-content" style="z-index: 5;"></div>
 
-<div id="snackbar">Aviso: No puede seleccionar Pedidos que tengan stock en cero</div>
+<!-- Notificacion de Palet -->
+<div id="snackbar">Aviso: No puede seleccionar Palet que estan en un Packinglist</div>
 
 <script type="text/javascript">
     var seleccionados = [];
@@ -491,4 +492,10 @@
         }
     }
 
+    // Notificacion
+    function notification_pendientes() {
+        var x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
 </script>
