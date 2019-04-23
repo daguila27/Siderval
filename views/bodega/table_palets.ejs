@@ -48,7 +48,13 @@ function fechaLatino(string){
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
-            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= desp[i].idpackinglist%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center">
+                <%if(desp[i].idpackinglist == 0){%>
+                    Sin P.L.
+                <%}else{%>
+                    <%= desp[i].idpackinglist%>
+                <%}%>
+            </td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><button class="btn btn-xs view_PL" data-idpalet="<%= desp[i].idpalet%>"><i class="fa fa-eye"></i></button></td>
         </tr>
     <%}%>

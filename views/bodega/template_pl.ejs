@@ -1,6 +1,6 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<html>
 <head>
 
     <meta charset="utf-8">
@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>PACKING LIST</title>
+    <title>Orden de fabricacion MIL</title>
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Morris Charts CSS -->
@@ -19,24 +19,141 @@
     <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
 </head>
+<style type='text/css'>
+    html{
+        padding: 0.5cm;
+    }
+    body{
+        display: block;
+        align-content: center;
+        width: 100%;
+        height: 792px;
+        background-color: white;
+        padding: 0;
+    }
+    .headerss{
+        margin: 0;
+        padding: 0;
+    }
+    .fecha{
+        text-align: right;
+    }
+    .info{
+        border: 1px solid;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        padding-left:1%;
+    }
+    .cab_table th{
+        padding-left: 1%;
+        border: 1px solid;
+    }
+    .tabla tbody > tr td{
+        border: 1px solid;
+        text-align: center;
+    }
+    .columna{
+        float: left;
+        width: 70px;
+    }
 
-<body>
-    <h1>Packing List #<%= pl[0].idpackinglist%></h1>
-    <%for(var e=0; e < pl.length; e++){%>
-        <h3>Palet #<%= pl[e].idpalet%></h3>
-        <table style="width:100%">
-            <tr>
+    .tabla tfoot{
+        border: 1px solid;
+        text-align: center;
+    }
+    .fund{
+        border: 1px solid;
+    }
+    .obs{
+        margin-top: 2%;
+    }
+    .obs div{
+        border: 1px solid;
+    }
+</style>
+<%function numberFormat(numero){
+    var resultado = "";
+    if(numero[0]=="-")
+    {
+        nuevoNumero=numero.replace(/\./g,'').substring(1);
+    }else{
+        nuevoNumero=numero.replace(/\./g,'');
+    }
+    if(numero.indexOf(",")>=0)
+        nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+
+    for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+        resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+    if(numero.indexOf(",")>=0)
+        resultado+=numero.substring(numero.indexOf(","));
+    if(numero[0]=="-")
+    {
+        return "-"+resultado;
+    }else{
+        return resultado;
+    }
+}
+function toFixed(num, fixed) {
+    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+    return num.toString().match(re)[0];
+}%>
+
+
+<%for(var e=0; e < pl.length; e++){%>
+    <body>
+        <div class='headerss' style="width: 100%; margin-bottom: 20px;float: left;">
+            <div style='width: 35%; margin: 0;float:left;'>
+                <img src='/assets/img/logo.png'>
+            </div>
+        </div>
+        <div class='bodyss' style="font-size: 15px;font-weight: 600;">
+        <div class='info' style="float: left;margin-bottom: 10px">
+            <div class="columna" style="text-align: center; width: 100%;">PACKING LIST #<%= pl[e].idpackinglist %></div>
+        </div>
+
+        <div class='info' style="float: left;margin-bottom: 10px; border: none;">
+
+            <div class="columna" style="width: 50%;">
+                <div class="columna" style="width: 40%; border: 1px solid;margin-left: 20%">N° OC</div>
+                <div class="columna" style="width: 40%; border: 1px solid;text-align: center"><%= pl[e].numoc%></div>
+            </div>
+            <div class="columna" style="width: 50%;padding-left: 20%">
+                <div class="columna" style="width: 40%; border: 1px solid">FECHA: </div>
+                <div class="columna" style="width: 40%; border: 1px solid;text-align: center"><%= [new Date(pl[e].creacion).toLocaleDateString().split('-')[2],new Date(pl[e].creacion).toLocaleDateString().split('-')[1],new Date(pl[e].creacion).toLocaleDateString().split('-')[0]].join('-')%></div>
+            </div>
+
+            <div class="columna" style="width: 100%;">
+                <div class="columna" style="width: 20%;margin-left: 10%; border: 1px solid">N° OF</div>
+                <div class="columna" style="width: 20%; border: 1px solid;text-align: center"><%= pl[e].idorden_f%></div>
+            </div>
+
+            <div class="columna" style="width: 100%;">
+                <div class="columna" style="width: 20%;margin-left: 10%; border: 1px solid">CLIENTE</div>
+                <div class="columna" style="width: 20%; border: 1px solid;text-align: center"><%= pl[e].sigla%></div>
+            </div>
+
+        </div>
+
+        <div style="width: 100%; float: left"></div>
+        <h6>Palet #<%= pl[e].idpalet%></h6>
+        <table style='width: 100%; font-size: 15px;font-weight: 700;' class='tabla' cellspacing="3">
+            <tr class='cab_table'>
                 <th>Detalle</th>
                 <th>Cantidad</th>
             </tr>
-        <%for(var w = 0 ; w < pl[e].cantidad.split(',').length; w++ ){%>
-            <tr>
-                <td><%= pl[e].detalle.split('@')[w]%></td>
-                <td><%= pl[e].cantidad.split(',')[w]%></td>
-            </tr>
-        <%}%>
+            <%for(var w = 0 ; w < pl[e].cantidad.split(',').length; w++ ){%>
+                <tr>
+                    <td style="text-align: left; padding-left: 15px"><%= pl[e].detalle.split('@')[w]%></td>
+                    <td><%= pl[e].cantidad.split(',')[w]%></td>
+                </tr>
+            <%}%>
         </table>
-    <%}%>
-</body>
+    </div>
+    </body>
+<%}%>
+
+
 
 </html>
+

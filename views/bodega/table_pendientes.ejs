@@ -34,7 +34,7 @@ function fechaLatino(string){
             <th class="o_column_sortable">Detalle</th>
             <th class="o_column_sortable">Pendientes</th>
             <th class="o_column_sortable">Paletizado</th>
-            <th class="o_column_sortable">Stock</th>
+            <th class="o_column_sortable">Stock Disponible</th>
             <th class="o_column_sortable">En CC</th>
             <th class="o_column_sortable">Peso</th>
             <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
@@ -54,9 +54,9 @@ function fechaLatino(string){
             cctotal += desp[i].enCC;
             xdespachartotal += desp[i].xdespachar;
             if(arraypl.indexOf(desp[i].idpedido.toString()) != -1){%>
-                <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>">
+                <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock-desp[i].preparando%>">
             <%}else{%>
-                <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>">
+                <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock-desp[i].preparando%>">
             <%}%>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].numoc%></td>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].numitem%></td>
@@ -64,7 +64,7 @@ function fechaLatino(string){
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].detalle%></td>
                 <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].xdespachar-desp[i].preparando%></td>
                 <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].preparando%></td>
-                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].stock%></td>
+                <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].stock - desp[i].preparando%></td>
                 <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].enCC%></td>
                 <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].pesoxdespachar%></td>
             <td style="text-align: center" class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].f_entrega).toLocaleDateString()%></td>

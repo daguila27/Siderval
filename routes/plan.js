@@ -4964,9 +4964,12 @@ router.get('/view_PLpdf_get/:numpl', function(req,res,next){
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Connection : %s", err);
-        connection.query("SELECT group_concat(material.detalle separator '@') as detalle, group_concat(palet_item.cantidad) as cantidad, palet.idpalet, palet.idpackinglist FROM palet_item " +
+        connection.query("SELECT group_concat(material.detalle separator '@') as detalle, odc.numoc, fabricaciones.idorden_f, cliente.sigla, group_concat(palet_item.cantidad) as cantidad, palet.idpalet,palet.creacion, palet.idpackinglist FROM palet_item " +
                          "left join palet on palet.idpalet = palet_item.idpalet "  +
                          "left join pedido on pedido.idpedido = palet_item.idpedido " +
+                         "left join fabricaciones on fabricaciones.idpedido = pedido.idpedido " +
+                         "left join odc on odc.idodc = pedido.idodc " +
+                         "left join cliente on cliente.idcliente = odc.idcliente " +
                          "left join material on material.idmaterial = pedido.idmaterial " +
                          "where palet.idpackinglist = ? group by palet_item.idpalet", [req.params.numpl],
             function(err, pl){

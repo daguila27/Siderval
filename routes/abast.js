@@ -2287,6 +2287,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     }
 });
 
+
+
 /*  Funcion que renderiza la cabecera que posee un buscador de abastecimientos*/
 router.get('/view_abastecimiento', function(req, res, next) {
 	if(verificar(req.session.userData)){
