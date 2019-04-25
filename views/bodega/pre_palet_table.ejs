@@ -56,7 +56,7 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    <th class="peso_suma" ></th>
+                    <th style="text-align: center" class="peso_suma" ></th>
                     <th style="text-align: center"><%=pesototal%></th>
                     <th></th>
                     <th></th>
@@ -107,19 +107,24 @@
         for(var t=0; t < array.length; t++){
             object[array[t].name].push(array[t].value);
         }
-        console.log(object);
-        $.ajax({
-            type: 'POST',
-            data: {idpedido: object.idpedido.join('-'), cantidad: object.cantidad.join('-')},
-            url: '/bodega/create_palet',
-            success: function(data){
-                if(data=='ok'){
-                    seleccionados = [];
-                    buscar_pendientes();
-                    $("#newPLModal").modal('hide');
+        // Si no excede el limite 1200 del palet
+        if(parseInt($(".peso_suma").html()) < 1200){
+            // console.log(object);
+            $.ajax({
+                type: 'POST',
+                data: {idpedido: object.idpedido.join('-'), cantidad: object.cantidad.join('-')},
+                url: '/bodega/create_palet',
+                success: function(data){
+                    if(data=='ok'){
+                        seleccionados = [];
+                        buscar_pendientes();
+                        $("#newPLModal").modal('hide');
+                    }
                 }
-            }
-        });
+            });
+        } else{
+            notification_limite_palet();
+        }
     });
 
     $("#palet_list_table").DataTable( {
