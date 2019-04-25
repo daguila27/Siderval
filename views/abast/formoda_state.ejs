@@ -187,6 +187,7 @@ function getPredictions(yo){
 $("#send_of").submit(function(e){
   e.preventDefault();
   lista = $(this).serializeArray();
+  console.log(lista);
   var data = {
     idm: [],
     idp: [],

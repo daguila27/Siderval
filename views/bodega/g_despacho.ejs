@@ -88,7 +88,8 @@ function letraMayus(string) {
                             <textarea name="obs" class="form-control" rows="1" placeholder="Observaciones"></textarea>
                         </div>
                     </div>
-                    <div class="divSelect col-md-2"  style="padding-left: 0; padding-right: 8px">
+                    <div class="divSelect col-md-offset-1 col-md-1"  style="padding-left: 0; padding-right: 8px;">
+                        <label for="estado">Tipo de GD:
                         <select name="estado" id="estadoselect" class="form-control">
                             <option value="Venta" class="notT">Venta</option>
                             <option value="Traslado">Traslado</option>
@@ -96,10 +97,12 @@ function letraMayus(string) {
                             <option value="Otro" class="notT">Otro</option>
                             <option value="Blanco" class="notT">Blanco</option>
                         </select>
+                        </label>
                     </div>
                     <div class="num_pl_input col-md-1 hidden"  style="padding-left: 0; padding-right: 8px">
-                        <input id="input_idpackinglist" class="form-control" type="text" placeholder="N° Packing List">
-                        </input>
+                        <label for="input_idpackinglist">N° Packing List:
+                        <input id="input_idpackinglist" class="form-control" type="text" placeholder="N° Packing List" disabled></input>
+                        </label>
                     </div>
                     <div class="col-md-1" style="padding: 0; padding-right: 8px">
                         <button type="button" class="btn btn-info" onclick="comment()" id="btn_comment" style="width: 80px">+ <i class="fa fa-comment"></i></button>
@@ -140,7 +143,7 @@ function letraMayus(string) {
     </ul>
 
     <div class="tab-content">     
-        <div class="tab-pane fade in active" id="prodxdeps" style="display: block;">
+        <div class="tab-pane fade in active" id="prodxdeps">
             <div class="panel panel-default">
                 <div class="panel-body" style="padding: 0; padding-top: 10px">
                     <table id="DataTableGD" class="table table-condensed table-striped DataTableGD_new" style="width: 100%;">
@@ -152,7 +155,7 @@ function letraMayus(string) {
                                 <th>Item</th>
                                 <th>Detalle</th>
                                 <th>Sin Despachar</th>
-                                <th>En Stock</th>
+                                <th>En Stock (Sin Paletizar)</th>
                                 <th>Paletizado</th>
                                 <th class="hidden">A Enviar</th>
                                 <th>Fecha de Entrega</th>
@@ -177,7 +180,7 @@ function letraMayus(string) {
 
                                 <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
                                 
-                                <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock %></td>
+                                <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock - data[i].pl_cantidad%></td>
 
                                 <td id="pl<%=data[i].idpedido%>" style="text-align: center;" class="parsear_nro pl_cantidad"><%= data[i].pl_cantidad %></td>
 
@@ -199,7 +202,7 @@ function letraMayus(string) {
                 </div>
             </div>
         </div>
-        <div class="tab-pane fade in active" id="insum">
+        <div class="tab-pane fade" id="insum">
             <div class="panel panel-default">
                 <div class="panel-heading" style="display: flex;">
                     <div style="width: 45%; margin-right: 5%;">
@@ -230,30 +233,33 @@ function letraMayus(string) {
             </div>
         </div>
 
-        <div class="tab-pane fade in active" id="palets">
+        <div class="tab-pane fade" id="palets" style="display: block;">
             <div class="panel panel-default">
-                <div class="panel-heading" style="display: flex;">
-
-                </div>
                 <div class="panel-body">
-                    <table class="table table-striped table-hover table-bordered DataTableGD_new" id="DataTablePalets">
+                    <table id="DataTablePalets" class="table table-condensed table-striped">
                         <thead>
                         <tr>
+                            <th>#Packing List</th>
                             <th>#Palet</th>
                             <th>OC</th>
                             <th>Cliente</th>
                             <th>Item</th>
                             <th>Detalle</th>
+                            <th class="hidden"></th>
+                            <th class="hidden"></th>
                             <th>Cantidad</th>
+                            <th class="hidden"></th>
                             <th>Peso Unitario</th>
                             <th>Peso Total</th>
                             <th>Peso Palet</th>
                             <th></th>
+                            <th class="hidden"></th>
                         </tr>
                         </thead>
                         <tbody>
                             <%for(var i=0; i< palet.length; i++){%>
-                                <tr class="mat_desp palet<%= palet[i].idpalet%>" data-idpalet="<%= palet[i].idpalet%>">
+                                <tr class="mat_desp palet_desp palet<%= palet[i].idpalet%>" data-idpalet="<%= palet[i].idpalet%>" data-idpackinglist="<%= palet[i].idpackinglist%>">
+                                    <td class="idpackinglist" style="text-align: center"><%= palet[i].idpackinglist%></td>
                                     <td class="idp" style="text-align: center"><%= palet[i].idpalet%></td>
                                     <td class="numoc" style="text-align: left"><%= palet[i].numoc%></td>
                                     <td class="clien" style="text-align: left"><%= palet[i].sigla%></td>
@@ -285,6 +291,32 @@ function letraMayus(string) {
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
+    var inTabPL = false;
+
+    var idioma_español = {
+        "sProcessing":     "Procesando...",
+        "sLengthMenu":     "Mostrar _MENU_ registros",
+        "sZeroRecords":    "No se encontraron resultados",
+        "sEmptyTable":     "Ningún dato disponible en esta tabla",
+        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+        "sInfoPostFix":    "",
+        "sSearch":         "Buscar:",
+        "sUrl":            "",
+        "sInfoThousands":  ",",
+        "sLoadingRecords": "Cargando...",
+        "oPaginate": {
+            "sFirst":    "Primero",
+            "sLast":     "Último",
+            "sNext":     "Siguiente",
+            "sPrevious": "Anterior"
+        },
+        "oAria": {
+            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+        }
+    };
     $(".mat_desp").each(function(){
         var stock = parseInt($(this).children('.mat_stock').html());
         if(stock <= 0){
@@ -307,9 +339,11 @@ function letraMayus(string) {
         if(paletInGD){
             $(".num_pl_input").removeClass('hidden');
             $(".num_pl_input input").prop('required',true);
+            return true;
         }else{
             $(".num_pl_input").addClass('hidden');
             $(".num_pl_input input").prop('required',false);
+            return false;
         }
     }
 
@@ -327,6 +361,7 @@ function letraMayus(string) {
     // Oculta la seccion de insumos
     $(document).ready(function(){
         $("#insum").css("display","none");
+
     });
 
     // Muestra el tab presionado y oculta el otro
@@ -339,6 +374,7 @@ function letraMayus(string) {
             $("#palets").css("display","none");
             $('.divSelect option[value="Venta"]').prop('selected', true);
             $(".notT").css('display', 'block');
+
         }
     }
 
@@ -365,7 +401,9 @@ function letraMayus(string) {
             $("#prodxdeps").css("display","none");
             $('.divSelect option[value="Venta"]').prop('selected', true);
             $(".notT").css('display', 'none');
+
         }
+
     }
 
     // Muestra/oculta el textarea para comentario
@@ -379,30 +417,7 @@ function letraMayus(string) {
         }
     }
 
-    var idioma_español = {
-        "sProcessing":     "Procesando...",
-        "sLengthMenu":     "Mostrar _MENU_ registros",
-        "sZeroRecords":    "No se encontraron resultados",
-        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-        "sInfoPostFix":    "",
-        "sSearch":         "Buscar:",
-        "sUrl":            "",
-        "sInfoThousands":  ",",
-        "sLoadingRecords": "Cargando...",
-        "oPaginate": {
-            "sFirst":    "Primero",
-            "sLast":     "Último",
-            "sNext":     "Siguiente",
-            "sPrevious": "Anterior"
-        },
-        "oAria": {
-            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-        }
-    };
+
 
     // Tabla inferior(TI)
     $('#DataTableGD').DataTable( {
@@ -410,6 +425,16 @@ function letraMayus(string) {
         "paging": false,
         "language": idioma_español
     });
+
+
+    $('#DataTablePalets').DataTable( {
+        "lengthChange": false,
+        "paging": false,
+        "language": idioma_español
+    });
+
+
+
 
 
 
@@ -432,6 +457,7 @@ function letraMayus(string) {
             $("#0").remove();                             //Elimina la primera fila en TS
             $(".palet"+$(yo).data('idpalet')).each(function(){
                 var row = $(this);
+                row.children(".idpackinglist").addClass("hidden");
                 row.children(".idp").addClass("hidden");
                 row.children(".cant").addClass("hidden");
                 row.children(".sin_desp").removeClass("hidden");
@@ -445,11 +471,22 @@ function letraMayus(string) {
                 $("#session_prod").append("<tr class='TS" + row.data('idpalet') + "_p'>"+row.html()+"</tr>"); //Agrega fila de TI en TS
                 row.addClass("hidden");
             });
+
+
+            //Se eliminan las columnas que no pertenescan al mismo número de packing list
+            var pack = $(yo).data('idpackinglist');
+            $(".palet_desp").each(function(){
+                if($(this).data('idpackinglist') != pack){
+                    $(this).addClass("hidden");
+                }
+            });
+
         }
     }
     function remove_row_palet(yo){
         if(confirm("Se eliminarán de la GDD todos los productos correspondientes al mismo palet. ¿Está seguro?")){
             var row = $(".palet"+$(yo).data('idpalet'));
+            row.children(".idpackinglist").removeClass("hidden");
             row.children(".idp").removeClass("hidden");
             row.children(".cant").removeClass("hidden");
             row.children(".sin_desp").addClass("hidden");
@@ -463,7 +500,10 @@ function letraMayus(string) {
             row.removeClass('hidden');
 
             $(".TS" + $(yo).data('idpalet')+"_p").remove();
-            checkIfPaletIsInGD();
+            if(!checkIfPaletIsInGD()){
+                //Si no quedan palets en la GDD => mostrar todas las columnas
+                $(".palet_desp").removeClass("hidden");
+            }
         }
     }
     //Funcion para eliminar datos de la tabla inferior a la superior

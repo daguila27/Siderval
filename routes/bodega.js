@@ -42,7 +42,7 @@ router.get('/crear_gdd', function(req, res, next){
                     if (err) {console.log("Error Selecting : %s", err);}
                     connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                         +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                        +" left join (select pedido.idpedido, palet_item.cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where palet.idpackinglist is null and palet.idpalet) as pl on pl.idpedido = pedido.idpedido"
+                        +" left join (select pedido.idpedido, sum(palet_item.cantidad) as cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where !palet.desp group by palet_item.idpedido) as pl on pl.idpedido = pedido.idpedido"
                         +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
                         +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
                         +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
@@ -420,7 +420,7 @@ router.post('/save_gdd', function (req, res, next) {
                     if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
                         if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) == -1){
                             ids_palets.push( input['list[' + i + '][]'][3].split('-')[0]);
-                            case_pl.push("WHEN palet.idpalet = "+input['list[' + i + '][]'][3].split('-')[0]+" THEN '"+input.pl+"'");
+                            case_pl.push(input['list[' + i + '][]'][3].split('-')[0]);
                         }
                         ids_palet_item.push(input['list[' + i + '][]'][3].split('-')[1]);
                         case_p.push("WHEN palet_item.idpalet_item = "+input['list[' + i + '][]'][3].split('-')[1]+" THEN "+parseInt(input['list[' + i + '][]'][2]));
@@ -443,7 +443,7 @@ router.post('/save_gdd', function (req, res, next) {
 
                 if(case_pl.length > 0){
                     update_bool = true;
-                    case_pl = "UPDATE palet SET palet.idpackinglist = CASE "+case_pl.join(" ")+" ELSE palet.idpackinglist END WHERE palet.idpalet IN ("+ids_palets.join(",")+")" ;
+                    case_pl = "UPDATE palet SET palet.desp = true where palet.idpalet in ("+case_pl.join(",")+")" ;
                 }
 
                 //Insertamos cada Despacho asociado a la GD
@@ -988,6 +988,91 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                     }
                 });
             });
+    }
+    else res.redirect('/bad_login');
+});
+
+router.get("/gen_excelPL/:idpacking", function(req, res, next){
+    if(verificar(req.session.userData)){
+        var id = parseInt(req.params.iddespacho);
+        console.log(id);
+        var meses = new Array ("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+        var Excel = require('exceljs');
+        var workbook = new Excel.Workbook();
+        var sheet = workbook.addWorksheet('gdd');
+        sheet.mergeCells('B9:F10');
+        sheet.mergeCells('G9:I9');
+        sheet.mergeCells('B11:G12');
+        sheet.mergeCells('H11:I11');
+        sheet.mergeCells('B13:G14');
+        sheet.mergeCells('H13:I13');
+        sheet.mergeCells('A15:I18');
+        sheet.getColumn('B').width = 24.14;
+        sheet.getColumn('H').width = 40.43;
+        sheet.getColumn('I').width = 11.57;
+        console.log(sheet.getColumn('B'));
+        req.getConnection(function(err, connection) {
+            if(err) console.log("Error connection : %s", err);
+            connection.query("SELECT despachos.*,odc.numoc, gd.estado, gd.fecha, gd.last_mod, gd.obs, pedido.precio as precioPedido,fabricaciones.idorden_f,pedido.idodc,material.detalle, material.codigo, cliente.* FROM despachos"
+                + " LEFT JOIN gd ON despachos.idgd=gd.idgd"
+                + " LEFT JOIN cliente ON cliente.idcliente=gd.idcliente"
+                + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial"
+                + " LEFT JOIN pedido ON pedido.idpedido = despachos.idpedido"
+                + " LEFT JOIN odc ON odc.idodc = pedido.idodc"
+                + " LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido"
+                + " WHERE despachos.idgd ="+ id,function(err, rows) {
+                if (err) console.log("Error Select : %s ",err );
+                if(rows.length>0){
+                    var nombre = 'csvs/gdd' + rows[0].idgd + '.xlsx';
+                    sheet.getCell('B9').value = rows[0].razon;
+                    sheet.getCell('G9').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
+                    sheet.getCell('B11').value = rows[0].direccion;
+                    sheet.getCell('H11').value = rows[0].ciudad;
+                    sheet.getCell('B13').value = rows[0].giro;
+                    sheet.getCell('H13').value = rows[0].rut;
+                    var count = 0;
+                    var neto = 0;
+                    for(var j=0; j<rows.length; j++){
+                        sheet.mergeCells('C' + (20 + count).toString() + ':F' + (20 + count).toString());
+                        sheet.getCell('B' + (20 + count).toString()).value = rows[j].codigo;
+                        sheet.getCell('C' + (20 + count).toString()).value = rows[j].detalle;
+                        sheet.getCell('G' + (20 + count).toString()).value = rows[j].cantidad;
+                        sheet.getCell('H' + (20 + count).toString()).value = rows[j].precioPedido;
+                        sheet.getCell('I' + (20 + count).toString()).value = rows[j].precioPedido*rows[j].cantidad;
+                        neto += rows[j].precioPedido*rows[j].cantidad;
+                        count++;
+                    }
+                    sheet.mergeCells('B36:H36');
+                    sheet.mergeCells('B37:H37');
+                    if(rows[0].estado == 'Traslado'){
+                        sheet.getCell('B36').value = "NO CONSTITUYE VENTA SOLO TRASLADO";
+                        sheet.getCell('B37').value = "En virtud del Art. 55 D.L. 825";
+                    }
+                    sheet.mergeCells('C38:D38');
+                    sheet.mergeCells('F38:G38');
+                    sheet.mergeCells('C39:D39')
+                    sheet.getCell('B38').value = "OF:";
+                    sheet.getCell('C38').value = rows[0].idorden_f;
+                    sheet.getCell('E38').value = "OC: ";
+                    sheet.getCell('F38').value = rows[0].numoc;
+                    sheet.getCell('B39').value = "CHOFER";
+                    sheet.getCell('B40').value = "PATENTE";
+                    sheet.getCell('H40').value = "NETO";
+                    sheet.getCell('H41').value = "IVA";
+                    sheet.getCell('H44').value = "TOTAL";
+
+                    sheet.getCell('I40').value = neto;
+                    sheet.getCell('I41').value = neto*0.19;
+                    sheet.getCell('I44').value = neto*1.19;
+
+                    workbook.xlsx.writeFile('public/' + nombre)
+                        .then(function() {
+                            res.send('/csvs/gdd'+ rows[0].idgd + '.xlsx');
+
+                        });
+                }
+            });
+        });
     }
     else res.redirect('/bad_login');
 });

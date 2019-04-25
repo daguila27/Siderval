@@ -51,6 +51,8 @@
     </form>
 </div>
 
+<div class="form-hidden hidden"></div>
+
 
 <script>
     var form = [];
@@ -92,6 +94,9 @@
             success: function(data){
                 if(data=='ok'){
                     seleccionados = [];
+                    $(".form-hidden").html("<form method='POST' action='/plan/view_PLpdf' target='_blank'><input type='hidden' name='idoda' value='"+$("#idpackinglist").val()+"'></form>");
+
+                    $(".form-hidden form").submit();
                     buscar_pendientes();
                     $("#newPLModal").modal('hide');
                 } else if("error"){

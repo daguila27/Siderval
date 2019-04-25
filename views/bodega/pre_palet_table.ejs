@@ -81,11 +81,12 @@
     console.log(form);
     
     function removeItemPL(yo){
-        $(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']").toggleClass('danger');
+        //$(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']").toggleClass('danger');
+        //$(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']").data('state', 'noselec');
         $(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']").data('state', 'noselec');
-        seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
-        check_session();
-        //act_session('rm', ".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']");
+        $(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']").toggleClass('danger');
+        // Elimina el pedido de la lista
+        quitar_pedido($(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']"));
         $(yo).parent().parent().remove();
         refreshCount();
         var peso = 0;
