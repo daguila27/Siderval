@@ -31,6 +31,7 @@ function fechaLatino(string){
     <thead>
     <tr>
         <th class="o_column_sortable">Palet</th>
+        <th class="o_column_sortable">Cliente</th>
         <th class="o_column_sortable" style="text-align: center">Peso Total</th>
         <th class="o_column_sortable" style="text-align: center">Fecha de Entrega Minima</th>
         <th class="o_column_sortable" style="text-align: center">Creación</th>
@@ -45,6 +46,7 @@ function fechaLatino(string){
         peso += desp[i].peso_palet;%>
         <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>" data-idpackinglist="<%=desp[i].idpackinglist%>">
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].idpalet%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].sigla%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>

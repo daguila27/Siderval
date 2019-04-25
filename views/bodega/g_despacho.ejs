@@ -233,7 +233,7 @@ function letraMayus(string) {
             </div>
         </div>
 
-        <div class="tab-pane fade" id="palets" style="display: block;">
+        <div class="tab-pane fade" id="palets" style="display: block; margin: 0 ; padding: 0">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <table id="DataTablePalets" class="table table-condensed table-striped">
@@ -273,7 +273,7 @@ function letraMayus(string) {
                                     <td class="peso_item" style="text-align: center"><%= palet[i].peso*palet[i].cantidad %></td>
                                     <td class="peso_palet" style="text-align: center"><%= palet[i].peso_palet%></td>
                                     <td class="adj" style="text-align: center">
-                                        <a data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-success btn-xs addrow_palet" data-idpackinglist="<%= palet[i].idpackinglist%>"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span>  Adjuntar Palet</a>
+                                        <a data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-success btn-xs addrow_palet" data-idpackinglist="<%= palet[i].idpackinglist%>" data-idcliente="<%= palet[i].idcliente%>"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span>  Adjuntar Palet</a>
                                     </td>
                                     <td class="rmv hidden" class="hidden">
                                         <a onclick="remove_row_palet(this)" data-idpalet="<%= palet[i].idpalet%>" aria-disabled="false" class="btn btn-danger btn-xs rmvrow_palet"><span class="glyphicon glyphicon-remove" style="padding-left: 1px"></span></a>
@@ -330,6 +330,7 @@ function letraMayus(string) {
 
     function checkIfPaletIsInGD(){
         paletInGD = false;
+        //RECORRE TODAS LAS COLUMNAS Y VERIFICA SI EXITE ALGÚN PALET ADJUNTO (si idpalet es distinto a '0')
         $("#session_prod input.form-control").each(function(e){
             if($(this).data('idpalet') != '0'){
                 paletInGD = true;
@@ -339,10 +340,13 @@ function letraMayus(string) {
         if(paletInGD){
             $(".num_pl_input").removeClass('hidden');
             $(".num_pl_input input").prop('required',true);
+
+
             return true;
         }else{
             $(".num_pl_input").addClass('hidden');
             $(".num_pl_input input").prop('required',false);
+
             return false;
         }
     }
@@ -355,7 +359,11 @@ function letraMayus(string) {
         e.preventDefault();
         add_row_palet(this);
         $("#input_idpackinglist").val($(this).data("idpackinglist"));
-        checkIfPaletIsInGD();
+        if(checkIfPaletIsInGD()){
+            $("#cliente_gd option[value='"+$(this).data('idcliente')+"']").prop('selected', true);
+
+            $("#cliente_gd").prop('disabled',true);
+        }
     });
 
     // Oculta la seccion de insumos
@@ -503,6 +511,8 @@ function letraMayus(string) {
             if(!checkIfPaletIsInGD()){
                 //Si no quedan palets en la GDD => mostrar todas las columnas
                 $(".palet_desp").removeClass("hidden");
+                $("#cliente_gd").prop('disabled',false);
+
             }
         }
     }

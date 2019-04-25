@@ -545,7 +545,7 @@ router.get('/stock_matp', function(req, res, next) {
 			connection.query("select material.idmaterial as idmatpri, detalle"
 				+" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
 				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
-				"where codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%'",
+				"where codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%' or material.show_abast",
 				 function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);

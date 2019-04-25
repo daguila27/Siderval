@@ -32,7 +32,7 @@
                 <tr class="o_data_row pedido_preparar" data-idpedido="<%=xdesp[i].idpedido%>">
                     <input type="hidden" value="<%=xdesp[i].idpedido%>" name="idpedido">
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].numoc%></td>
-                    <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].numitem%></td>
+                    <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=xdesp[i].numitem%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].sigla%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].detalle%></td>
                     <td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=xdesp[i].stock%></td>
@@ -41,7 +41,7 @@
                         <input style="width: 100%" type="number" class="form-control" name="cantidad" onkeyup="recalculatePeso('<%=xdesp[i].idpedido%>', this)" onchange="recalculatePeso('<%=xdesp[i].idpedido%>', this)" min="1" max="<%=Math.min(xdesp[i].stock, xdesp[i].xdespachar-xdesp[i].preparando)%>" required>
                     </td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier number_peso">0</td>
-                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].pesoxdespachar%></td>
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier total_peso"><%=xdesp[i].pesoxdespachar%></td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(xdesp[i].f_entrega).toLocaleDateString()%></td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><button class="btn btn-xs btn-danger" onclick="removeItemPL(this)"><i class="fa fa-times"></i></button></td>
                 </tr>
@@ -56,8 +56,8 @@
                     <th></th>
                     <th></th>
                     <th></th>
-                    <th class="peso_suma" ></th>
-                    <th style="text-align: center"><%=pesototal%></th>
+                    <th class="peso_suma" style="text-align: center;"></th>
+                    <th class="peso_total" style="text-align: center;"><%=pesototal%></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -88,13 +88,18 @@
         // Elimina el pedido de la lista
         quitar_pedido($(".select-desp[data-idpedido='" + $(yo).parent().parent().data('idpedido') +"']"));
         $(yo).parent().parent().remove();
-        refreshCount();
+
+        //ACTUALIZANDO PESOS TOTALES
         var peso = 0;
+        var total = 0;
         $(".number_peso").each(function(){
             peso += parseFloat($(this).html());
         });
+        $(".total_peso").each(function(){
+            total += parseFloat($(this).html());
+        });
         $(".peso_suma").html(peso);
-
+        $(".peso_total").html(total);
     }
 
     $("form#PL_form").submit(function(e){

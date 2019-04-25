@@ -3,7 +3,12 @@ function fechaLatino(string){
     return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
 }
 %>
-<div class="o_view_manager_content">
+
+
+<div class="o_view_manager_content" style="padding-top: 3%">
+    <div class="pull-left" style="font-size: 150%; margin-left: 20px" onclick="change_gdd(-1)"><i class="fa fa-arrow-left"></i>Anterior</div>
+    <div class="pull-right" style="font-size: 150%; margin-right: 20px" onclick="change_gdd(1)">Siguiente <i class="fa fa-arrow-right"></i></div>
+
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
             <div class="o_form_sheet_bg">
@@ -169,6 +174,21 @@ function fechaLatino(string){
 </div>
 
 <script>
+    var idgd = parseInt('<%= oda.idgd%>');
+
+    //d = es la diferencia que se aplica al id de guía de despacho , por lo general es +1 o -1 (siguiente o anterior)
+    function change_gdd(d){
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/page_gdd/'+(parseInt(idgd)+parseInt(d)).toString(),
+            beforeSend: function(){
+                destroyDataTable();
+            },
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
     setDataTableSmall('#tablaODA');
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
