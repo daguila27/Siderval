@@ -1315,7 +1315,7 @@ router.post('/table_palets', function(req, res, next){
         //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
             connection.query("select " +
-                "palet.idpalet, " +
+                "palet.idpalet, cliente.sigla, " +
                 "palet.creacion, IFNULL(palet.idpackinglist, 0) as idpackinglist, " +
                 "sum(coalesce(material.peso, 0.0)*palet_item.cantidad) as peso_palet, " +
                 "min(pedido.f_entrega) as entrega," +
@@ -1325,6 +1325,8 @@ router.post('/table_palets', function(req, res, next){
                 "from palet_item " +
                 "left join palet on palet.idpalet = palet_item.idpalet " +
                 "left join pedido on pedido.idpedido = palet_item.idpedido " +
+                "left join odc on odc.idodc=pedido.idodc " +
+                "left join cliente on cliente.idcliente = odc.idcliente " +
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 where + " group by palet.idpalet",function(err, desp){
                 if(err)

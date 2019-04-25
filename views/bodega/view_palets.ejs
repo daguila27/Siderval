@@ -37,7 +37,7 @@
     }
 
     /* Notificacion emergente inferior */
-    #snackbar {
+    #snackbar, #snackbar2 {
         visibility: hidden;
         min-width: 250px;
         margin-left: -125px;
@@ -53,7 +53,7 @@
         font-size: 17px;
     }
 
-    #snackbar.show {
+    #snackbar.show, #snackbar2.show {
         visibility: visible;
         -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
         animation: fadein 0.5s, fadeout 0.5s 2.5s;
@@ -151,15 +151,20 @@
 <div id="items_palet-content" style="z-index: 5;"></div>
 
 <!-- Notificacion de Palet -->
-<div id="snackbar">Aviso: No puede seleccionar Palet que estan en un Packinglist</div>
+<div id="snackbar"><span class="glyphicon glyphicon-alert"></span> El palet esta contenido en otro packinglist.</div>
+
+<!-- Notificacion de Palet con cliente diferente -->
+<div id="snackbar2"><span class="glyphicon glyphicon-alert"></span> Debe seleccionar palets del mismo cliente.</div>
 
 <script type="text/javascript">
     var seleccionados = [];
+    var cliente_packinglist = "";
     var array_fill = [
         "Palet@default",
         "Detalle@primary"
     ];
     var filtros_seleccionados = [];
+
     function refreshTable(){
         $.ajax({
             type: 'POST',
@@ -175,6 +180,7 @@
             }
         });
     }
+
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         $.ajax({
@@ -225,6 +231,7 @@
             });
         }
     }
+
     function buscar_pendientes(){
         if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
             $.ajax({
@@ -262,6 +269,7 @@
         $(this).addClass("o-selection-focus");
         $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
     });
+
     $("#buscar_pendientes").on('keyup', function(e){
         e.preventDefault();
         if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
@@ -273,7 +281,6 @@
             $(".o_searchview_autocomplete strong").html($(this).val());
         }
     });
-
 
     $(".fill-item-abast").on('click', function(e){
         e.preventDefault();
@@ -311,6 +318,7 @@
         $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
         buscar_pendientes();
     }
+
     function cambiarEtiqueta(yo){
         if($(yo).data('state') == 'off') {
             $(yo).parent().removeClass('label-primary');
@@ -384,7 +392,6 @@
 
     }
 
-
     $('.view-option').on('click', function(e){
         e.preventDefault();
         $('.view-option').removeClass('active');
@@ -419,7 +426,6 @@
 
     });
 
-
     $(".getcsvof").click(function(e){
         var yo = $(this);
         $.ajax({
@@ -453,8 +459,6 @@
             render_view($(this).data('name'));
         }
     });
-
-
 
     function render_view(clase){
         if(clase == 'pedido-view'){
@@ -492,9 +496,15 @@
         }
     }
 
-    // Notificacion
+    // Notificaciones
     function notification_pendientes() {
         var x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+    function notification_cliente_dif() {
+        var x = document.getElementById("snackbar2");
         x.className = "show";
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }

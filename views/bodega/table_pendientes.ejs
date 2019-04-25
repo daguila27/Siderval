@@ -54,9 +54,9 @@ function fechaLatino(string){
             cctotal += desp[i].enCC;
             xdespachartotal += desp[i].xdespachar;
             if(arraypl.indexOf(desp[i].idpedido.toString()) != -1){%>
-                <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>">
+                <tr style="z-index: 9;" class="o_data_row select-desp danger" data-state="sele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>" data-peso="<%=desp[i].pesoxdespachar%>">
             <%}else{%>
-                <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>">
+                <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpedido="<%=desp[i].idpedido%>" data-idoc="<%=desp[i].numoc%>" data-stock="<%=desp[i].stock%>" data-peso="<%=desp[i].pesoxdespachar%>">
             <%}%>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=desp[i].numoc%></td>
                 <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].numitem%></td>
@@ -123,27 +123,52 @@ function fechaLatino(string){
 
     // Agrega a la matriz seleccionados[] el idoc si no existe, y su idpedido al array
     function insertar_pedido(yo){
-        console.log(yo.data("idoc"));
+        //console.log(yo.data("idoc"));
         // Si existe en la matriz un idoc
         if(matriz_seleccionados[0]){
             // Si es igual al que intento insertar
             if(yo.data("idoc") == matriz_seleccionados[0]){
-                //Agrego el idpedido al array
-                matriz_seleccionados[1].push(yo.data('idpedido'));
+                //Si el peso NO excede el limite 1200 kg continua
+                contador_peso += yo.data('peso');
+                console.log(contador_peso);
+                //Agrega el pedido en la lista
+                if(contador_peso <= 1200){
+                    //Agrego el idpedido al array
+                    matriz_seleccionados[1].push(yo.data('idpedido'));
+                } else {
+                    //Quito el peso actual ya que no se ha insertado en la matriz
+                    contador_peso -= yo.data('peso');
+                    // Excede el limite del deseo
+                    notification_limite_palet();
+                    return 0;
+                }
                 return 1;
             } else { // Si no es igual retorno 0 diciendo que este pedido no se puede seleccionar
+                notification_pendientes();
                 return 0;
             }
         } else {
-            matriz_seleccionados.push(yo.data('idoc'));
-            matriz_seleccionados.push([yo.data('idpedido')]);
-            return 1;
+            //Si el peso NO excede el limite 1200 kg continua
+            contador_peso += yo.data('peso');
+            console.log(contador_peso);
+            //Agrega el pedido en la lista
+            if(contador_peso <= 1200){
+                matriz_seleccionados.push(yo.data('idoc'));
+                matriz_seleccionados.push([yo.data('idpedido')]);
+                return 1;
+            } else {
+                //Quito el peso actual ya que no se ha insertado en la matriz
+                contador_peso -= yo.data('peso');
+                // Excede el limite del deseo
+                notification_limite_palet();
+                return 0;
+            }
         }
     }
 
     // Quita de la matriz seleccionados[] el idpedido
     function quitar_pedido(yo){
-        console.log(yo.data("idoc"));
+        //console.log(yo.data("idoc"));
         // Si existe en la matriz un idoc
         if(matriz_seleccionados[0]){
             // Si es igual al que intento eliminar
@@ -155,6 +180,8 @@ function fechaLatino(string){
                     //Elimino el idpedido al array
                     matriz_seleccionados[1].splice(matriz_seleccionados[1].indexOf( yo.data('idpedido') ), 1);
                 }
+                //Quito el peso actual ya que no se ha insertado en la matriz
+                contador_peso -= yo.data('peso');
             } else { // Si no es igual retorno 0 diciendo que este pedido no se puede seleccionar
                 console.log("Esto no deberia ocurrir");
                 notification_pendientes();
@@ -173,27 +200,24 @@ function fechaLatino(string){
             // Si ahora posee la clase danger
             if($(this).hasClass('danger')){
                 //Agrega el pedido en la lista
-                if(!insertar_pedido($(this))){
-                    $(this).toggleClass('danger');
-                    notification_pendientes();
-                } else {
+                if(insertar_pedido($(this))){
+                    //Marca como seleccionado
                     $(this).data('state', 'selec');
+                } else {
+                    $(this).toggleClass('danger');
                 }
-                //seleccionados.push($(this).data('idpedido'));
-            }
-            else{ // Sino deselecciono los pedidos
+            } else{ // Sino deselecciono los pedidos
                 $(this).data('state', 'noselec');
                 // Elimina el pedido de la lista
                 quitar_pedido($(this));
-                //seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
             }
-            //check_session();
         } else{
             if(mouseDown == '1'){
                 notification_pendientes();
             }
         }
     });
+
     $(".select-desp").mousedown(function(){
         // Si posee stock se selecciona
         if($(this).data("stock") > 0){
@@ -201,22 +225,18 @@ function fechaLatino(string){
             $(this).toggleClass('danger');
             // Si ahora posee la clase danger
             if($(this).hasClass('danger')){
-                //act_session('add', this);
                 //Agrega el pedido en la lista
-                if(!insertar_pedido($(this))){
-                    $(this).toggleClass('danger');
-                } else {
+                if(insertar_pedido($(this))){
+                    //Marca como seleccionado
                     $(this).data('state', 'selec');
+                } else {
+                    $(this).toggleClass('danger');
                 }
-                //seleccionados.push($(this).data('idpedido'));
-            }
-            // Si no posee la clase danger
-            else{ // Sino deselecciono los pedidos
+            } else{ // Si no posee la clase danger, deselecciono los pedidos
                 $(this).data('state', 'noselec');
                 // Elimina el pedido de la lista
                 quitar_pedido($(this));
-                //seleccionados.splice(seleccionados.indexOf( $(this).data('idpedido') ), 1);
-            }            
+            }
         } else{
             notification_pendientes();
         }
@@ -240,9 +260,10 @@ function fechaLatino(string){
         }
         if(matriz_seleccionados.length == 0){
             $("#newpl_button").css('bottom', '-50px');
+            $("#pedidos").html("<h5><small>0 pedidos seleccionados.</small></h5>");
         }
         else{
-            console.log(matriz_seleccionados);
+            //console.log(matriz_seleccionados);
             $("#newpl_button").css('bottom', '20px');
             $("#pedidos").html("<h5><small>"+matriz_seleccionados[1].length+" pedidos seleccionados.</small></h5>");
         }

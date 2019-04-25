@@ -37,11 +37,12 @@
     }
 
     /* Notificacion emergente inferior */
-    #snackbar {
+    #snackbar,#snackbar2 {
         visibility: hidden;
         min-width: 250px;
         margin-left: -125px;
         background-color: #333;
+        opacity: 0.8;
         color: #fff;
         text-align: center;
         border-radius: 2px;
@@ -53,7 +54,7 @@
         font-size: 17px;
     }
 
-    #snackbar.show {
+    #snackbar.show, #snackbar2.show {
         visibility: visible;
         -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
         animation: fadein 0.5s, fadeout 0.5s 2.5s;
@@ -129,19 +130,22 @@
     </div>
 </div>
 
-
 <button id="newpl_button" style="position: fixed; bottom: -50px; right: 20px; z-index: 12; transition: 0.5s" class="btn btn-lg btn-primary btn-circle"><i class="fa fa-plus"></i></button>
 
 <!-- Modal de Items de palet -->
 <div id="items_palet-content" style="z-index: 5;"></div>
 
 <!-- Notificacion de pedido sin stock o de otra ODC -->
-<div id="snackbar">Aviso: Debe seleccionar pedidos de la misma Orden de compra o que tengan stock suficiente.</div>
+<div id="snackbar"><span class="glyphicon glyphicon-alert"></span> Debe seleccionar pedidos de la misma Orden de compra o que tengan stock suficiente.</div>
+
+<!-- Notificacion limite de peso en palet -->
+<div id="snackbar2" style="background-color: red; right: 1%; z-index: 15"><span class="glyphicon glyphicon-alert"></span> ¡El palet no debe exceder los 1200 Kg!</div>
 
 <script type="text/javascript">
     //var seleccionados = [];
     // Ej: matriz_seleccionados = [idoc,[idpedido1, idpedido2]]
     var matriz_seleccionados = [];
+    var contador_peso = 0;
     var array_fill = [
         "OC@default",
         "Detalle@primary",
@@ -482,7 +486,6 @@
                 success: function(data){
                     $("#page-wrapper").html(data);
                     $("#page-wrapper").fadeIn();
-
                 }
             });
         }
@@ -491,9 +494,15 @@
         }
     }
 
-    // Notificacion
+    // Notificaciones
     function notification_pendientes() {
         var x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+    function notification_limite_palet() {
+        var x = document.getElementById("snackbar2");
         x.className = "show";
         setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
