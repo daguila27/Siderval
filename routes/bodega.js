@@ -17,6 +17,54 @@ router.use(
 
 );
 
+
+
+function getConditionArray(object_fill,array_fill, condiciones_where, input_clave){
+    var where;
+    var clave;
+    if(input_clave == '' || input_clave == null || input_clave == undefined){
+        clave = [];
+    }
+    else{
+        clave = input_clave.split(',');
+    }
+    if(clave.length>0){
+        for(var e=0; e < clave.length; e++){
+            if(clave[e].split('@')[2] == 'off') {
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            else{
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+        }
+
+    }
+    for(var w=0; w < Object.keys(object_fill).length; w++){
+        if(object_fill[Object.keys(object_fill)[w]].length > 0){
+            //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+            if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+            }
+            else{
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+            }
+        }
+    }
+
+
+
+    var where = " ";
+
+    if(condiciones_where.length==0){
+        where = "";
+    }
+    else{
+        where = " WHERE "+ condiciones_where.join(" AND ");
+    }
+    return where;
+}
+
 function verificar(usr){
 	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'|| usr.nombre == 'jefeplanta'|| usr.nombre == 'test'){
 		return true;
@@ -56,7 +104,7 @@ router.get('/crear_gdd', function(req, res, next){
                                 "odc.numoc,pedido.numitem," +
                                 "palet.idpackinglist," +
                                 "q_palet.peso_palet, cliente.sigla," +
-                                "material.peso " +
+                                "material.peso,cliente.idcliente " +
                                 "from palet_item " +
                                 "left join palet on palet.idpalet = palet_item.idpalet " +
                                 "left join pedido on pedido.idpedido = palet_item.idpedido " +
@@ -78,6 +126,8 @@ router.get('/crear_gdd', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
+
+
 
 //Buscador de materiales para traslado en vista Crear GDD (pestaña insumos)
 router.get('/buscar_insumos/:detalle', function(req, res, next){
@@ -1212,6 +1262,61 @@ router.get('/view_pendientes', function(req, res, next){
 });
 
 
+router.get('/view_bodega', function(req, res, next){
+    if(verificar(req.session.userData)){
+        res.render('bodega/view_bodega');
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
+router.post('/table_bodega', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var tipo;
+        if(input.tipo == 'inv'){
+            tipo = 'inv';
+        }
+        else{
+            tipo = 'otro';
+        }
+        var array_fill = [
+            "material.codigo",
+            "material.detalle"
+        ];
+        var object_fill = {
+            "material.codigo-off": [],
+            "material.detalle-off": [],
+            "material.codigo-on": [],
+            "material.detalle-on": []
+        };
+        var condiciones_where = [];
+
+
+        condiciones_where.push("(material.codigo like 'P%' or material.codigo like 'S%')");
+        if(input.zeros == 'false'){
+            condiciones_where.push("material.stock > 0");
+        }
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var where = getConditionArray(object_fill, array_fill, condiciones_where, input.clave);
+        console.log(where);
+        req.getConnection(function(err, connection){
+            connection.query("select material.idmaterial, codigo, detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
+                " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
+                + where,function(err, desp){
+                if(err)
+                    console.log("Error Selecting :%s", err);
+
+                res.render('bodega/table_bodega', {data: desp, tipo: tipo});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+
 
 router.post('/table_pendientes', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1357,7 +1462,7 @@ router.post('/table_palets', function(req, res, next){
         };
         var clave;
         var where;
-        var condiciones_where = [];
+        var condiciones_where = ["!palet.desp"];
         if(input.clave == '' || input.clave == null || input.clave == undefined){
             clave = [];
         }
@@ -1400,7 +1505,7 @@ router.post('/table_palets', function(req, res, next){
         //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
             connection.query("select " +
-                "palet.idpalet, cliente.sigla, " +
+                "palet.idpalet, cliente.idcliente, cliente.sigla, " +
                 "palet.creacion, IFNULL(palet.idpackinglist, 0) as idpackinglist, " +
                 "sum(coalesce(material.peso, 0.0)*palet_item.cantidad) as peso_palet, " +
                 "min(pedido.f_entrega) as entrega," +
@@ -1410,8 +1515,8 @@ router.post('/table_palets', function(req, res, next){
                 "from palet_item " +
                 "left join palet on palet.idpalet = palet_item.idpalet " +
                 "left join pedido on pedido.idpedido = palet_item.idpedido " +
-                "left join odc on odc.idodc=pedido.idodc " +
-                "left join cliente on cliente.idcliente = odc.idcliente " +
+                "left join odc on pedido.idodc = odc.idodc " +
+                "left join cliente on odc.idcliente = cliente.idcliente " +
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 where + " group by palet.idpalet",function(err, desp){
                 if(err)
