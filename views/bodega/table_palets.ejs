@@ -44,12 +44,12 @@ function fechaLatino(string){
     var peso = 0;
     for(var i=0; i < desp.length; i++){
         peso += desp[i].peso_palet;%>
-        <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>" data-idpackinglist="<%=desp[i].idpackinglist%>">
+        <tr style="z-index: 9;" class="o_data_row select-desp" data-state="nosele" data-idpalet="<%=desp[i].idpalet%>" data-toggle="collapse" data-target="#<%=desp[i].idpalet%>" data-idpackinglist="<%=desp[i].idpackinglist%>" data-cliente="<%=desp[i].sigla%>">
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].idpalet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].sigla%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=desp[i].peso_palet%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%= new Date(desp[i].entrega).toLocaleDateString()%></td>
-            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
+            <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center"><%=new Date(desp[i].creacion).toLocaleDateString()%></td>
             <td class="hover-select o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center">
                 <%if(desp[i].idpackinglist == 0){%>
                     Sin P.L.
@@ -63,6 +63,7 @@ function fechaLatino(string){
     </tbody>
     <tfoot>
         <tr>
+            <th></th>
             <th></th>
             <th style="text-align: center;"><%= peso%></th>
             <th></th>
@@ -86,8 +87,6 @@ function fechaLatino(string){
 <script type="text/javascript">
     setDataTableFixed("#paletsTable");
 
-
-
     function refreshCount(){
         var c = 0;
         $(".select-desp.danger").each(function(){
@@ -101,31 +100,42 @@ function fechaLatino(string){
         }
         $("#pedidos").html("<h5><small>"+c+" pedidos seleccionados.</small></h5>");
     }
+
     var mouseDown = 0;
     document.body.onmousedown = function() {
         mouseDown = 1;
     }
+
     document.body.onmouseup = function() {
         mouseDown = 0;
         check_session();
     }
+
     $(".select-desp").mouseenter(function(){
-        // Si ya esta paletizado
+        // Si no esta en packinglist
         if($(this).data('idpackinglist') == 0){
             if(mouseDown == '1'){
-                $(this).toggleClass('danger');
-                if($(this).hasClass('danger')){
-                    $(this).data('state', 'selec');
-                    seleccionados.push($(this).data('idpalet'));
-                    //act_session('add', this);
+                // Si su cliente es igual a cliente_packinglist
+                if(cliente_packinglist == $(this).data('cliente') || cliente_packinglist == ""){
+                    cliente_packinglist = $(this).data('cliente');
+                    $(this).toggleClass('danger');
 
+                    if($(this).hasClass('danger')){
+                        $(this).data('state', 'selec');
+                        seleccionados.push($(this).data('idpalet'));
+                    }
+                    else{
+                        $(this).data('state', 'noselec');
+                        seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
+                        // Si el array esta vacio, se inicializa el cliente
+                        if(seleccionados.length == 0){
+                            cliente_packinglist = "";
+                        }
+                    }
+                } else{
+                    // Notificacion de palet con cliente dif
+                    notification_cliente_dif();
                 }
-                else{
-                    $(this).data('state', 'noselec');
-                    //act_session('rm', this);
-                    seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
-                }
-                //check_session();
             }
         } else{
             // Notificacion de palet invalido o ya en packinglist
@@ -136,20 +146,26 @@ function fechaLatino(string){
 
     });
     $(".select-desp").mousedown(function(){
-        // Si ya esta paletizado
+        // Si no esta en packinglist
         if($(this).data('idpackinglist') == 0){
-            $(this).toggleClass('danger');
-            if($(this).hasClass('danger')){
-                $(this).data('state', 'selec');
-                seleccionados.push($(this).data('idpalet'));
-
-                //act_session('add', this);
-
-            } else{
-                $(this).data('state', 'noselec');
-                //act_session('rm', this);
-                seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
-
+            // Si su cliente es igual a cliente_packinglist
+            if(cliente_packinglist == $(this).data('cliente') || cliente_packinglist == ""){
+                cliente_packinglist = $(this).data('cliente');
+                $(this).toggleClass('danger');
+                if($(this).hasClass('danger')){
+                    $(this).data('state', 'selec');
+                    seleccionados.push($(this).data('idpalet'));
+                } else{ //Deselecciona y elimina del array
+                    $(this).data('state', 'noselec');
+                    seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
+                    // Si el array esta vacio, se inicializa el cliente
+                    if(seleccionados.length == 0){
+                        cliente_packinglist = "";
+                    }
+                }
+            } else {
+                // Notificacion de palet con cliente dif
+                notification_cliente_dif();
             }
         } else{
             // Notificacion de palet invalido o ya en packinglist
