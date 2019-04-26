@@ -128,41 +128,17 @@ function fechaLatino(string){
         if(matriz_seleccionados[0]){
             // Si es igual al que intento insertar
             if(yo.data("idoc") == matriz_seleccionados[0]){
-                //Si el peso NO excede el limite 1200 kg continua
-                contador_peso += yo.data('peso');
-                console.log(contador_peso);
-                //Agrega el pedido en la lista
-                if(contador_peso <= 1200){
-                    //Agrego el idpedido al array
-                    matriz_seleccionados[1].push(yo.data('idpedido'));
-                } else {
-                    //Quito el peso actual ya que no se ha insertado en la matriz
-                    contador_peso -= yo.data('peso');
-                    // Excede el limite del deseo
-                    notification_limite_palet();
-                    return 0;
-                }
+                //Agrego el idpedido al array
+                matriz_seleccionados[1].push(yo.data('idpedido'));
                 return 1;
             } else { // Si no es igual retorno 0 diciendo que este pedido no se puede seleccionar
                 notification_pendientes();
                 return 0;
             }
         } else {
-            //Si el peso NO excede el limite 1200 kg continua
-            contador_peso += yo.data('peso');
-            console.log(contador_peso);
-            //Agrega el pedido en la lista
-            if(contador_peso <= 1200){
-                matriz_seleccionados.push(yo.data('idoc'));
-                matriz_seleccionados.push([yo.data('idpedido')]);
-                return 1;
-            } else {
-                //Quito el peso actual ya que no se ha insertado en la matriz
-                contador_peso -= yo.data('peso');
-                // Excede el limite del deseo
-                notification_limite_palet();
-                return 0;
-            }
+            matriz_seleccionados.push(yo.data('idoc'));
+            matriz_seleccionados.push([yo.data('idpedido')]);
+            return 1;
         }
     }
 
@@ -180,8 +156,6 @@ function fechaLatino(string){
                     //Elimino el idpedido al array
                     matriz_seleccionados[1].splice(matriz_seleccionados[1].indexOf( yo.data('idpedido') ), 1);
                 }
-                //Quito el peso actual ya que no se ha insertado en la matriz
-                contador_peso -= yo.data('peso');
             } else { // Si no es igual retorno 0 diciendo que este pedido no se puede seleccionar
                 console.log("Esto no deberia ocurrir");
                 notification_pendientes();
