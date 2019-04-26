@@ -36,10 +36,33 @@
         display: flex;
     }
 </style>
+
+<!-- Modal -->
+<div id="inventarioModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Finalizar Inventario:</h4>
+            </div>
+            <div class="modal-body">
+                <p>Some text in the modal.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 <div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
-            <li class="active">Bodega Productos Terminados</li>
+            <li class="active change-inv-title">Bodega Productos Terminados</li>
+            <li class="hidden hidden-inv-buttons"><button class="btn btn-success btn-xs" onclick="save_inventario()">Guardar</button></li>
+            <li class="hidden hidden-inv-buttons"><button class="btn btn-primary btn-xs" onclick="fin_inventario()">Finalizar</button></li>
             <!-- Mostrar cantidad de datos -->
             <div id="pedidos" style="margin-top: 8px"></div>
 
@@ -62,7 +85,7 @@
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
                     <li><a href="#" class="getcsvof" data-tipo="stock"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
-                    <li onclick="buscar_bodega('inv')" class="option_inventario"><a><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Realizar Inventario</a></li>
+                    <li onclick="tipo='inv';buscar_bodega()" class="option_inventario"><a><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Realizar Inventario</a></li>
                 </ul>
             </div>
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
@@ -92,6 +115,48 @@
 </style>
 
 <script type="text/javascript">
+    var tipo = 'otro';
+    var idinventario;
+    function save_inventario(){
+        var inv = {
+            idmaterial: [],
+            cantidades: [],
+            idinventario: idinventario
+        };
+        $(".inv-col input").each(function(){
+            aux = $(this).val();
+            if($(this).val()){
+                inv.idmaterial.push($(this).data('idmaterial'));
+                inv.cantidades.push($(this).val());
+            }
+        });
+        console.log(inv.idmaterial);
+        if(!inv.idmaterial){
+            inv.idmaterial = [];
+            inv.cantidades = [];
+        }
+        $.ajax({
+            type:'POST',
+            data: inv,
+            url: '/bodega/save_inventario',
+            success: function(data){
+                alert(data);
+            }
+        });
+    }
+    ;
+    function fin_inventario(){
+
+        $.ajax({
+            type:'GET',
+            url: '/bodega/fin_inventario',
+            success: function(data){
+                $("#inventarioModal .modal-dialog .modal-content .modal-body").html(data);
+                $("#inventarioModal").modal('show');
+            }
+        });
+    }
+
     function changeSize(yo){
         $(".row_main").css('font-size', $(yo).val()+"px");
     }
@@ -124,7 +189,8 @@
 
 
 
-    function buscar_bodega(tipo){
+    function buscar_bodega(){
+        var idin;
         $.ajax({
             type: 'POST',
             data: {clave: filtros_seleccionados.join(','), zeros: $('#show_zeros').is(":checked"), tipo: tipo},
@@ -137,6 +203,20 @@
                 $(".main-page").html(data);
                 //Muestra la cantidad de pedidos
                 $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                if(tipo == 'inv'){
+                    $.ajax({
+                        type: 'GET',
+                        url: '/bodega/get_last_inventario',
+                        success: function (data) {
+                            for(var c = 0; c < data.length; c++){
+                                idin = data[c.toString()].idinventario;
+                                $(".inv-col input[data-idmaterial='"+data[c.toString()].idmaterial+"']").val(data[c.toString()].cantidad);
+                            }
+                            $(".change-inv-title").html("Inventario N° "+idin);
+                            idinventario = idin;
+                        }
+                    });
+                }
             }
         });
     }

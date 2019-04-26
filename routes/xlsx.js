@@ -57,23 +57,23 @@ informe.getdatos = function(fecha,callback, condiciones){
             ",COALESCE(necesario.neto,0) AS necesario_neto,COALESCE(rechazados.rechazados,0) AS rechazados,COALESCE(fundidos.fundidos,0) AS fundidos, COALESCE(necesario.necesarios,0) AS necesarios,COALESCE(salidas_mp.sum_sal,0) as sum_sal" +
             ",coalesce(devs.sum_devs,0) as sum_dev, coalesce(ing_oda.sum_ing,0) as ing_oda FROM material" +
             " LEFT JOIN stock_mes ON stock_mes.idmaterial_stock = material.idmaterial" +
-            //Salidas De CC a BPT - as fabrs.fabricados
+            //Salidas De CC a BPT - as fabrs.fabricados . SE OBTIENEN LAS LLEGADAS A BPT POR LO QUE NO ES NECESARIO QUITARLE LOS RECHAZOS
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fabricados FROM produccion_history" +
             " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
             " WHERE produccion_history.to='8' AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " GROUP BY fabricaciones.idmaterial) AS fabrs ON fabrs.idmaterial = material.idmaterial" +
-
+            //SE OBTIENEN LOS RECHAZADOS DESDE TODAS LAS ETAPAS MENOS FUSION Y MOLDEO
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as rechazados FROM produccion_history" +
             " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-            " WHERE (produccion_history.to='s' AND produccion_history.from != '1') AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " WHERE (produccion_history.to='s' AND produccion_history.from != '1' AND produccion_history.from != '2') AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " GROUP BY fabricaciones.idmaterial) AS rechazados ON rechazados.idmaterial = material.idmaterial" +
-
+            //SE OBTIENEN LAS SALIDAS DE FUSION SIN CONTAR LOS RECHAZOS
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fundidos FROM produccion_history" +
             " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-            " WHERE produccion_history.from='2' AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " WHERE produccion_history.from = '2' AND produccion_history.to != 's' AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " GROUP BY fabricaciones.idmaterial) AS fundidos ON fundidos.idmaterial = material.idmaterial" +
 
             // Solicitado Teorico desde Bom -  as necesario.necesarios

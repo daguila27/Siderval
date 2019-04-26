@@ -25,7 +25,7 @@
                 <tr class="o_data_row pedido_preparar" data-idpalet="<%=xdesp[i].idpalet%>">
                     <input type="hidden" value="<%=xdesp[i].idpalet%>" name="idpalet">
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].idpalet%></td>
-                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].peso_palet%></td>
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier pesopalet" data-peso="<%=xdesp[i].peso_palet%>"><%=xdesp[i].peso_palet%></td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(xdesp[i].f_entrega).toLocaleDateString()%></td>
                     <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><button class="btn btn-xs btn-danger" onclick="removeItemPL(this)"><i class="fa fa-times"></i></button></td>
                 </tr>
@@ -34,7 +34,7 @@
                 <tfoot>
                 <tr>
                     <th></th>
-                    <th style="text-align: center"><%=pesototal%></th>
+                    <th style="text-align: center" class="pesototal"><%=pesototal%></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -43,7 +43,10 @@
         </div>
         <div class="modal-footer">
             <div class="form-group">
-                <input type="number" class="form-control" style="width: 20%; display: inline-block;" value="" id="idpackinglist" min="1" placeholder="# Número de Packinglist" required>
+                <label for="idpackinglist">
+                    Número de P.L:
+                </label>
+                <input type="text" class="form-control" style="width: 20%; display: inline-block;" value="<%= idpl%>" id="idpackinglist" min="1" placeholder="# Número de Packinglist" disabled required>
                 <button type="submit" class="btn btn-primary">Crear Packing List</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
@@ -69,10 +72,10 @@
         $(yo).parent().parent().remove();
         refreshCount();
         var peso = 0;
-        $(".number_peso").each(function(){
-            peso += parseFloat($(this).html());
+        $(".pesopalet").each(function(){
+            peso += parseFloat($(this).data('peso'));
         });
-        $(".peso_suma").html(peso);
+        $(".pesototal").html(peso);
 
     }
 

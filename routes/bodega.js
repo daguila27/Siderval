@@ -115,7 +115,7 @@ router.get('/crear_gdd', function(req, res, next){
                                 "where palet.idpackinglist is not null and palet.desp is false", function(err, palet){
                                 if(err)
                                     console.log("Error Selecting :%s", err);
-                                console.log(palet);
+
                                 res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 0, cli: cli});
                             });
                         });
@@ -463,6 +463,7 @@ router.post('/save_gdd', function (req, res, next) {
                 let despachos = [];
                 var case_p = [];
                 var case_pl = [];
+                var case_gdd = [];
                 //matriz que contiene los id de palet
                 var ids_palets = [];
                 var ids_palet_item = [];
@@ -494,6 +495,7 @@ router.post('/save_gdd', function (req, res, next) {
                 if(case_pl.length > 0){
                     update_bool = true;
                     case_pl = "UPDATE palet SET palet.desp = true where palet.idpalet in ("+case_pl.join(",")+")" ;
+                    case_gdd = "UPDATE gd SET gd.idpackinglist = '"+input.pl+"' where gd.idgd in ("+idgd+")" ;
                 }
 
                 //Insertamos cada Despacho asociado a la GD
@@ -548,7 +550,13 @@ router.post('/save_gdd', function (req, res, next) {
                                         if (err) {throw err;}
                                         connection.query(case_pl, function (err, rows) {
                                             if (err) {throw err;}
-                                            res.redirect('/bodega/crear_gdd');
+
+                                            connection.query(case_gdd, function (err, rows) {
+                                                if (err) {throw err;}
+
+                                                    res.redirect('/bodega/crear_gdd');
+                                            });
+
                                         });
 
                                     });
@@ -955,30 +963,145 @@ router.post('/activar_gdd', function(req,res,next){
         });
 });
 
+router.get("/fin_inventario", function(req, res, next){
+    if(verificar(req.session.userData)){
 
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+
+            connection.query("SELECT MAX(idinventario) AS idinv FROM inventario WHERE !fin", function(err, idinv){
+                if(err) throw err;
+
+                idinv = idinv[0].idinv;
+                connection.query("select " +
+                    "material.detalle, " +
+                    "material.stock, " +
+                    "inventario_detalle.idinventario_detalle, " +
+                    "inventario_detalle.cantidad " +
+                    "from inventario_detalle " +
+                    "left join material on material.idmaterial = inventario_detalle.idmaterial " +
+                    "where idinventario = ?", [idinv],function(err, mats){
+                        if(err) throw err;
+
+                        console.log(mats);
+                        res.send("hola muñeco");
+                });
+            });
+        });
+    }
+    else res.redirect('/bad_login');
+});
+router.post("/save_inventario", function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        if(!input['idmaterial[]']){
+            input['idmaterial[]'] = [];
+            input['cantidades[]'] = [];
+        }
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+
+            connection.query("SELECT inventario_detalle.idmaterial FROM inventario_detalle WHERE idinventario = ?",[input.idinventario], function(err, invent){
+                if(err) throw err;
+                /* *
+                UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)* */
+                var aux = [];
+                for(var e = 0; e < invent.length; e++){
+                    aux.push(invent[e].idmaterial);
+                }
+                invent = aux;
+                var query = "UPDATE inventario_detalle SET cantidad = CASE";
+                var cases = false;
+                var insert = [];
+                console.log(invent);
+                if(typeof input['idmaterial[]'] == 'string' ){
+                    input['idmaterial[]'] = [input['idmaterial[]']];
+                    input['cantidades[]'] = [input['cantidades[]']];
+                }
+
+                for(var t=0; t < input['idmaterial[]'].length; t++){
+                    //SI EL PRODUCTO YA SE ENCUENTRA EN BD DE INVENTARIO, SOLO BASTA CON ACTUALIZAR EL NUMERO
+                    if(invent.indexOf( parseInt(input['idmaterial[]'][t])) != -1){
+                        cases = true;
+                        query += " WHEN idmaterial = "+input['idmaterial[]'][t]+" THEN "+input['cantidades[]'][t];
+                    }
+                    //SI EL PRODUCTO NO ESTA REGISTRADO EN EL INVENTARIO, SE DEBE INSERTAR EN LA BD
+                    else{
+                        //idmaterial, cantidad
+                        insert.push([input.idinventario, input['idmaterial[]'][t], input['cantidades[]'][t]]);
+                    }
+                }
+                query += " ELSE cantidad END WHERE idmaterial IN ("+invent.join(',')+")";
+                console.log(insert);
+                if(insert.length > 0){
+                    connection.query("INSERT INTO inventario_detalle(idinventario, idmaterial, cantidad) VALUES ?",[insert], function(err, data){
+                        if(err) throw err;
+                        console.log(data);
+                        if(cases){
+                            connection.query(query, function(err, inCases){
+                                if(err) throw err;
+                                console.log(inCases);
+                                res.send("¡Inventario Actualizado!");
+
+                            });
+                        }
+                        else{
+                            res.send("¡Inventario Actualizado!");
+                        }
+
+                    });
+                }
+                else{
+                    if(cases){
+                        connection.query(query, function(err, inCases){
+                            if(err) throw err;
+                            console.log(inCases);
+                            res.send("¡Inventario Actualizado!");
+                        });
+                    }
+                    else{
+                        res.send("¡Inventario Actualizado!");
+                    }
+                }
+
+            });
+        });
+    }
+    else res.redirect('/bad_login');
+});
 
 router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
     if(verificar(req.session.userData)){
         var id = parseInt(req.params.iddespacho);
-        console.log(id);
         var meses = new Array ("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
         var sheet = workbook.addWorksheet('gdd');
         sheet.mergeCells('B9:F10');
-        sheet.mergeCells('G9:I9');
+        sheet.mergeCells('H10:I10');
         sheet.mergeCells('B11:G12');
         sheet.mergeCells('H11:I11');
         sheet.mergeCells('B13:G14');
         sheet.mergeCells('H13:I13');
         sheet.mergeCells('A15:I18');
-        sheet.getColumn('B').width = 15.43;
-        sheet.getColumn('H').width = 11.71;
-        sheet.getColumn('I').width = 11.57;
-        console.log(sheet.getColumn('B'));
+        sheet.getColumn('B').width = 14.71;
+        sheet.getColumn('H').width = 11;
+        sheet.getColumn('I').width = 10.86;
+        sheet.getRow(8).height = 24;
+        sheet.getCell('H40').alignment = { horizontal: 'right' };
+        sheet.getCell('H41').alignment = { horizontal: 'right' };
+        sheet.getCell('H44').alignment = { horizontal: 'right' };
+
         req.getConnection(function(err, connection) {
             if(err) console.log("Error connection : %s", err);
-            connection.query("SELECT despachos.*,odc.numoc, gd.estado, gd.fecha, gd.last_mod, gd.obs, pedido.precio as precioPedido,fabricaciones.idorden_f,pedido.idodc,material.detalle, material.codigo, cliente.* FROM despachos"
+            connection.query("SELECT despachos.*,odc.numoc, gd.estado,gd.idpackinglist, gd.fecha, gd.last_mod, gd.obs, pedido.precio as precioPedido,fabricaciones.idorden_f,pedido.idodc,material.detalle, material.codigo, cliente.* FROM despachos"
                 + " LEFT JOIN gd ON despachos.idgd=gd.idgd"
                 + " LEFT JOIN cliente ON cliente.idcliente=gd.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=despachos.idmaterial"
@@ -990,7 +1113,7 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                     if(rows.length>0){
                         var nombre = 'csvs/gdd' + rows[0].idgd + '.xlsx';
                         sheet.getCell('B9').value = rows[0].razon;
-                        sheet.getCell('G9').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
+                        sheet.getCell('H10').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
                         sheet.getCell('B11').value = rows[0].direccion;
                         sheet.getCell('H11').value = rows[0].ciudad;
                         sheet.getCell('B13').value = rows[0].giro;
@@ -1025,6 +1148,9 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                         sheet.getCell('H40').value = "NETO";
                         sheet.getCell('H41').value = "IVA";
                         sheet.getCell('H44').value = "TOTAL";
+
+                        sheet.getCell('E39').value = "PL:";
+                        sheet.getCell('F39').value = rows[0].idpackinglist;
 
                         sheet.getCell('I40').value = neto;
                         sheet.getCell('I41').value = neto*0.19;
@@ -1317,6 +1443,22 @@ router.post('/table_bodega', function(req, res, next){
 
 });
 
+router.get('/get_last_inventario', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            connection.query("select inventario_detalle.idinventario,inventario_detalle.idmaterial,inventario_detalle.cantidad from inventario_detalle " +
+                "inner join (select max(idinventario) as idinventario from inventario where !fin) " +
+                "as inv on inv.idinventario = inventario_detalle.idinventario",function(err, inv){
+                if(err)
+                    console.log("Error Selecting :%s", err);
+                res.send(inv);
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+
 
 router.post('/table_pendientes', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1507,7 +1649,7 @@ router.post('/table_palets', function(req, res, next){
             connection.query("select " +
                 "palet.idpalet, cliente.idcliente, cliente.sigla, " +
                 "palet.creacion, IFNULL(palet.idpackinglist, 0) as idpackinglist, " +
-                "sum(coalesce(material.peso, 0.0)*palet_item.cantidad) as peso_palet, " +
+                "sum(coalesce(material.peso, 0.0)*palet_item.cantidad)+20 as peso_palet, " +
                 "min(pedido.f_entrega) as entrega," +
                 "group_concat(coalesce(material.peso, 0.0)) as pesos, " +
                 "group_concat(material.detalle) as detalles, " +
@@ -1648,7 +1790,7 @@ router.get('/get_session_palets/:select', function(req, res, next){
                 if(err){throw err;}
                 connection.query("select " +
                     "palet.*, " +
-                    "sum(material.peso*palet_item.cantidad) as peso_palet, " +
+                    "sum(material.peso*palet_item.cantidad)+20 as peso_palet, " +
                     "min( pedido.f_entrega ) as f_entrega " +
                     "from palet_item " +
                     "left join palet on palet.idpalet = palet_item.idpalet " +
@@ -1656,7 +1798,33 @@ router.get('/get_session_palets/:select', function(req, res, next){
                     "left join material on material.idmaterial = pedido.idmaterial " +
                     where+" group by palet_item.idpalet", function(err, xdesp){
                     if(err){throw err;}
-                    res.render('bodega/pre_packinglist_table', {xdesp: xdesp});
+
+                    var idpl = new Date();
+                    var mes;
+                    var dia;
+                    if((idpl.getMonth()+1).toString().length == 1){
+                        mes = "0"+(idpl.getMonth()+1).toString();
+                    }
+                    else{
+                        mes = (idpl.getMonth()+1).toString();
+                    }
+
+                    if((idpl.getDate()).toString().length == 1){
+                        dia = "0"+idpl.getDate().toString();
+                    }
+                    else{
+                        dia = idpl.getDate().toString();
+                    }
+                    idpl = dia+mes+""+idpl.getFullYear().toString().substring(2,4);
+
+                    console.log(idpl);
+                    connection.query("select count(*) as pl_today from palet where idpackinglist like '"+idpl+"%'", function(err, idplist){
+                        if(err){throw err;}
+                        idpl = idpl+(idplist[0].pl_today+1).toString();
+                        console.log(idpl);
+                        res.render('bodega/pre_packinglist_table', {xdesp: xdesp, idpl: idpl});
+
+                    });
                 });
             });
         }

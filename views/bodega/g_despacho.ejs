@@ -292,6 +292,7 @@ function letraMayus(string) {
 
 <script type="text/javascript">
     var inTabPL = false;
+    var idgdd = '<%= num%>';
 
     var idioma_español = {
         "sProcessing":     "Procesando...",
@@ -580,6 +581,7 @@ function letraMayus(string) {
             alert("Seleccione Cliente.");
         }
         if(conf){
+
             $.ajax({
                 type: 'POST',
                 data: {
@@ -591,8 +593,15 @@ function letraMayus(string) {
                 },
                 url: 'bodega/save_gdd',
                 success: function(data){
-                    alert("Guía Creada!")
-                    $("#page-wrapper").html(data);
+                    $.ajax({
+                        type: 'GET',
+                        url: 'bodega/gen_pdfgdd/'+idgdd,
+                        success: function(data2){
+                            window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
+                            alert("Guía Creada!");
+                            $("#page-wrapper").html(data);
+                        }
+                    });
                 }
             });
         }

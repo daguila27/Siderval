@@ -24,7 +24,9 @@
                 <td style="text-align: center" data-toggle="tooltip" title="En Planta"><%= data[i].enplanta%></td>
                 <td style="text-align: center" data-toggle="tooltip" title="Stock Actual"><%= data[i].stock%></td>
                 <% if( tipo == 'inv'){%>
-                    <td style="text-align: center" data-toggle="tooltip" title="Ingresar Inventario" class="inv-col"><input type="number" class="form-control"></td>
+                    <td style="text-align: center" data-toggle="tooltip" title="Ingresar Inventario" class="inv-col">
+                        <input type="number" class="form-control" data-idmaterial="<%= data[i].idmaterial%>">
+                    </td>
                 <%}%>
                 <td style="text-align: center" data-toggle="tooltip" title="Stock Aviso"><%= data[i].stock_i%></td>
                 <td style="text-align: center" data-toggle="tooltip" title="Stock Crítico"><%= data[i].stock_c%></td>
@@ -53,3 +55,9 @@
     setDataTableFixed("#DataTableBodega");
     
 </script>
+
+<% if( tipo == 'inv'){%>
+    <script>
+        $(".hidden-inv-buttons").removeClass('hidden');
+    </script>
+<%}%>

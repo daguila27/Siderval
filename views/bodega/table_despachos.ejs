@@ -77,6 +77,9 @@
 		$.ajax({
 			type: 'GET',
 			url: 'bodega/gen_pdfgdd/'+$(file).attr("data-id"),
+			beforeSend: function(){
+                $(file).html("<i class='fa fa-spinner fa-pulse'></i>");
+			},
 			success: function(data){
 				console.log(data);
                 $(file).attr("href",data);
@@ -85,6 +88,9 @@
                 $(file).removeAttr("onclick");
                 $(file).addClass("genok");
                 $(file).html("<i class='fa fa-download'></i>");
+
+                //window.open("/csvs/gdd" + $(file).attr("data-id")+".xlsx",'_blank');
+
 			}
 		});
     }
