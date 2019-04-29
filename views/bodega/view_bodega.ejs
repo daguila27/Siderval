@@ -35,6 +35,24 @@
     .etiqueta-filtro-div{
         display: flex;
     }
+    .indicator-color::before {
+        content: 'aa';
+        width: 2px;
+        height: 2px;
+        margin-right: 2px;
+    }
+
+
+    .indicator-color-green::before {
+        color: rgb(223,240,216);
+        background-color: rgb(223,240,216);
+    }
+    .indicator-color-red::before {
+        color: rgb(242,222,222);
+        background-color: rgb(242,222,222);
+    }
+
+
 </style>
 
 <!-- Modal -->
@@ -45,12 +63,17 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Finalizar Inventario:</h4>
+                <h4 class="modal-title">Finalizar Inventario: <small>45 diferencias encontradas</small></h4>
+                <ol style="list-style: none; position:absolute; top: 10px; right: 10%; display:flex" class="pull-right">
+                    <li class="indicator-color indicator-color-green" style="margin: 2px">Excedente</li>
+                    <li class="indicator-color indicator-color-red" style="margin: 2px">Faltante</li>
+                </ol>
             </div>
             <div class="modal-body">
                 <p>Some text in the modal.</p>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="send_inventario()">Enviar</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -116,7 +139,35 @@
 
 <script type="text/javascript">
     var tipo = 'otro';
-    var idinventario;
+    var idinventario = '<%= %>';
+
+
+    function send_inventario(){
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/fin_inventario/'+idinventario,
+            success: function(data){
+                $("#inventarioModal").modal('hide');
+                setTimeout(function(){
+                    alert("¡Inventario realizado con exito!");
+                    $("#page-wrapper").html(data);
+                    $("#page-wrapper").fadeIn();
+                }, 550);
+            }
+        });
+    }
+
+    function changeStateInventario(yo){
+        if(parseInt($(yo).parent().parent().children('.dif-inv').html()) == 0){
+            $(yo).parent().parent().removeClass('danger');
+            $(yo).parent().parent().addClass('success');
+
+        }
+        else{
+            $(yo).parent().parent().removeClass('success');
+            $(yo).parent().parent().addClass('danger');
+        }
+    }
     function save_inventario(){
         var inv = {
             idmaterial: [],
@@ -144,12 +195,12 @@
             }
         });
     }
-    ;
+
     function fin_inventario(){
 
         $.ajax({
             type:'GET',
-            url: '/bodega/fin_inventario',
+            url: '/bodega/show_fin_inventario',
             success: function(data){
                 $("#inventarioModal .modal-dialog .modal-content .modal-body").html(data);
                 $("#inventarioModal").modal('show');
@@ -188,7 +239,6 @@
     });
 
 
-
     function buscar_bodega(){
         var idin;
         $.ajax({
@@ -203,20 +253,30 @@
                 $(".main-page").html(data);
                 //Muestra la cantidad de pedidos
                 $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                if(tipo == 'inv'){
+                /*if(tipo == 'inv'){
                     $.ajax({
                         type: 'GET',
                         url: '/bodega/get_last_inventario',
                         success: function (data) {
+                            $(".dif-inv").html(0);
+                            $(".dif-inv").parent().addClass('success');
                             for(var c = 0; c < data.length; c++){
                                 idin = data[c.toString()].idinventario;
                                 $(".inv-col input[data-idmaterial='"+data[c.toString()].idmaterial+"']").val(data[c.toString()].cantidad);
+                                $(".dif-inv[data-idmaterial='"+data[c.toString()].idmaterial+"']").html(
+                                    $(".inv-col input[data-idmaterial='"+data[c.toString()].idmaterial+"']").val() - $(".stock-inv[data-idmaterial='"+data[c.toString()].idmaterial+"']").data('stock')
+                                );
+
+                                if(parseInt($(".dif-inv[data-idmaterial='"+data[c.toString()].idmaterial+"']").html()) != 0){
+                                    $(".dif-inv[data-idmaterial='"+data[c.toString()].idmaterial+"']").parent().removeClass('success');
+                                    $(".dif-inv[data-idmaterial='"+data[c.toString()].idmaterial+"']").parent().addClass('danger');
+                                }
                             }
                             $(".change-inv-title").html("Inventario N° "+idin);
                             idinventario = idin;
                         }
                     });
-                }
+                }*/
             }
         });
     }

@@ -963,7 +963,7 @@ router.post('/activar_gdd', function(req,res,next){
         });
 });
 
-router.get("/fin_inventario", function(req, res, next){
+router.get("/show_fin_inventario", function(req, res, next){
     if(verificar(req.session.userData)){
 
         req.getConnection(function(err, connection){
@@ -976,15 +976,16 @@ router.get("/fin_inventario", function(req, res, next){
                 connection.query("select " +
                     "material.detalle, " +
                     "material.stock, " +
+                    "inventario_detalle.cantidad - material.stock as diferencia, " +
                     "inventario_detalle.idinventario_detalle, " +
                     "inventario_detalle.cantidad " +
                     "from inventario_detalle " +
                     "left join material on material.idmaterial = inventario_detalle.idmaterial " +
-                    "where idinventario = ?", [idinv],function(err, mats){
+                    "where idinventario = ? and inventario_detalle.cantidad - material.stock != 0", [idinv],function(err, mats){
                         if(err) throw err;
 
-                        console.log(mats);
-                        res.send("hola muñeco");
+
+                        res.render("bodega/table_inventario_modal", {invent: mats});
                 });
             });
         });
@@ -1071,6 +1072,24 @@ router.post("/save_inventario", function(req, res, next){
                     }
                 }
 
+            });
+        });
+    }
+    else res.redirect('/bad_login');
+});
+
+
+router.get("/fin_inventario/:idinventario", function(req, res, next){
+    if(verificar(req.session.userData)){
+        var idinv = req.params.idinventario;
+        console.log(idinv);
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+
+            connection.query("UPDATE inventario SET fin = true, fecha_fin = now() WHERE idinventario = ?",[idinv], function(err, invent){
+                if(err) throw err;
+                console.log(invent);
+                res.redirect('/bodega/view_bodega');
             });
         });
     }
@@ -1429,13 +1448,38 @@ router.post('/table_bodega', function(req, res, next){
         var where = getConditionArray(object_fill, array_fill, condiciones_where, input.clave);
         console.log(where);
         req.getConnection(function(err, connection){
-            connection.query("select material.idmaterial, codigo, detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
-                " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
-                + where,function(err, desp){
+            connection.query("SELECT max(idinventario) as idinventario from inventario where !fin", function(err, idInv){
                 if(err)
                     console.log("Error Selecting :%s", err);
 
-                res.render('bodega/table_bodega', {data: desp, tipo: tipo});
+                idInv = idInv[0].idinventario;
+                //SI NO SE OBTIENE UN NUMERO DE INVENTARIO VIGENTE SE CREA
+                if(idInv == null){
+                    connection.query("INSERT INTO inventario () VALUES ()", function(err, newInv){
+                        if(err)
+                            console.log("Error Selecting :%s", err);
+                        console.log(newInv);
+                         idInv = newInv.insertId;
+                         connection.query("select material.idmaterial, inv.inventariados, codigo,detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
+                             " left join (select inventario_detalle.idinventario as idinv, idmaterial, cantidad as inventariados from inventario_detalle where inventario_detalle.idinventario = '"+idInv+"') as inv on inv.idmaterial = material.idmaterial " +
+                             " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
+                             + where,function(err, desp){
+                             if(err)
+                                 console.log("Error Selecting :%s", err);
+                             res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv});
+                         });
+                    });
+                }
+                else{
+                    connection.query("select material.idmaterial, inv.inventariados, codigo,detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
+                        " left join (select inventario_detalle.idinventario as idinv, idmaterial, cantidad as inventariados from inventario_detalle where inventario_detalle.idinventario = '"+idInv+"') as inv on inv.idmaterial = material.idmaterial " +
+                        " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
+                        + where,function(err, desp){
+                        if(err)
+                            console.log("Error Selecting :%s", err);
+                        res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv});
+                    });
+                }
             });
         });
     }
