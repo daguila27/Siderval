@@ -593,15 +593,21 @@ function letraMayus(string) {
                 },
                 url: 'bodega/save_gdd',
                 success: function(data){
-                    $.ajax({
-                        type: 'GET',
-                        url: 'bodega/gen_pdfgdd/'+idgdd,
-                        success: function(data2){
-                            window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
-                            alert("Guía Creada!");
-                            $("#page-wrapper").html(data);
-                        }
-                    });
+                    if(est != 'Blanco'){
+                        $.ajax({
+                            type: 'GET',
+                            url: 'bodega/gen_pdfgdd/'+idgdd,
+                            success: function(data2){
+                                window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
+                                alert("Guía Creada!");
+                                $("#page-wrapper").html(data);
+                            }
+                        });
+                    }
+                    else{
+                        alert("Guía Creada!");
+                        $("#page-wrapper").html(data);
+                    }
                 }
             });
         }
