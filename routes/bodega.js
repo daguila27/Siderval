@@ -1088,8 +1088,19 @@ router.get("/fin_inventario/:idinventario", function(req, res, next){
 
             connection.query("UPDATE inventario SET fin = true, fecha_fin = now() WHERE idinventario = ?",[idinv], function(err, invent){
                 if(err) throw err;
+
                 console.log(invent);
-                res.redirect('/bodega/view_bodega');
+
+                connection.query("UPDATE " +
+                    "inventario_detalle " +
+                    "LEFT JOIN material ON material.idmaterial = inventario_detalle.idmaterial " +
+                    "SET diferencia = inventario_detalle.cantidad - material.stock " +
+                    "WHERE inventario_detalle.idinventario = ? AND inventario_detalle.idinventario_detalle>0", [idinv], function(err, detInv){
+                        if(err) throw err;
+
+                        console.log(detInv);
+                        res.redirect('/bodega/view_bodega');
+                });
             });
         });
     }
