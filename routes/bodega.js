@@ -19,14 +19,19 @@ router.use(
 
 
 
-function getConditionArray(object_fill,array_fill, condiciones_where, input_clave){
-    var where;
+function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;
-    if(input_clave == '' || input_clave == null || input_clave == undefined){
+    var limit = "";
+    console.log(input);
+    if(input.ispage === 'true'){
+        limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
+    }
+
+    if(input.clave == '' || input.clave == null || input.clave == undefined){
         clave = [];
     }
     else{
-        clave = input_clave.split(',');
+        clave = input.clave.split(',');
     }
     if(clave.length>0){
         for(var e=0; e < clave.length; e++){
@@ -52,9 +57,15 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input_clav
         }
     }
 
-
-
     var where = " ";
+    if(input.rango.length > 0){
+        if(input.isRango === 'true'){
+            console.log(input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+            condiciones_where.push( input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+        }
+    }
+
+
 
     if(condiciones_where.length==0){
         where = "";
@@ -62,7 +73,8 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input_clav
     else{
         where = " WHERE "+ condiciones_where.join(" AND ");
     }
-    return where;
+
+    return [where, limit];
 }
 
 function verificar(usr){
@@ -184,15 +196,9 @@ router.post('/buscar_despacho_list', function(req, res, next){
 
 router.post('/table_despachos', function(req, res, next){
     if(verificar(req.session.userData)){
+
         var input = JSON.parse(JSON.stringify(req.body));
-        var orden = input.orden.replace('-', ' ');
-        var clave = input.clave;
-        var tipo = input.tipo;
-        console.log(input);
-        //clave ES EL TEXTO QUE SE ENCUENTRA EN LA BARRA BUSCAR . Por ejemplo : "Inserto"
-        //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
-        // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
-        //
+
         var array_fill = [
             "gd.idgd",
             "cliente.sigla",
@@ -208,61 +214,29 @@ router.post('/table_despachos', function(req, res, next){
             "cliente.sigla-on": [],
             "material.detalle-on": [],
             "gd.obs-on": []
+
         };
-        var clave;
-        var where;
-        var condiciones_where = ["gd.estado LIKE '%" + tipo + "%'"];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
+        var condiciones_where = [];
 
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
 
-
-
-        var where = " ";
-
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ")+" GROUP BY gd.idgd ORDER BY gd.fecha DESC";
-        }
-        console.log(where);
+        var where = result[0];
+        var limit = result[1];
 
         req.getConnection(function(err, connection){
             connection.query("SELECT gd.*,COUNT(despachos.iddespacho) as n_items,COALESCE(cliente.razon,'Sin Cliente') AS cliente FROM gd"
                 + " LEFT JOIN despachos ON despachos.idgd=gd.idgd"
                 + " LEFT JOIN material ON material.idmaterial = despachos.idmaterial"
-                + " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" + where,function(err, desp){
+                + " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" + where+" GROUP BY gd.idgd order by gd.fecha desc "+limit,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
-                // console.log(desp);
-                //console.log(desp);
+
                 var tipo;
                 if(req.session.userData.nombre == 'test'){
                     tipo = 'false';
@@ -270,7 +244,7 @@ router.post('/table_despachos', function(req, res, next){
                 else{
                     tipo = 'true';
                 }
-                res.render('bodega/table_despachos', {desp: desp, key: orden.replace(' ', '-'), user: req.session.userData, view_tipo: tipo});
+                res.render('bodega/table_despachos', {desp: desp, user: req.session.userData, view_tipo: tipo, largoData: desp.length});
             });
         });
     }
@@ -1432,7 +1406,7 @@ router.post('/table_bodega', function(req, res, next){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
         var tipo;
-        if(input.tipo == 'inv'){
+        if(input.extraInfo == 'inv'){
             tipo = 'inv';
         }
         else{
@@ -1450,14 +1424,19 @@ router.post('/table_bodega', function(req, res, next){
         };
         var condiciones_where = [];
 
-
-        condiciones_where.push("(material.codigo like 'P%' or material.codigo like 'S%')");
-        if(input.zeros == 'false'){
-            condiciones_where.push("material.stock > 0");
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
+            }
         }
+        condiciones_where.push("(material.codigo like 'P%' or material.codigo like 'S%')");
         //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
-        var where = getConditionArray(object_fill, array_fill, condiciones_where, input.clave);
-        console.log(where);
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        console.log(result);
+
+        var where = result[0];
+        var limit = result[1];
+
         req.getConnection(function(err, connection){
             connection.query("SELECT max(idinventario) as idinventario from inventario where !fin", function(err, idInv){
                 if(err)
@@ -1474,10 +1453,10 @@ router.post('/table_bodega', function(req, res, next){
                          connection.query("select material.idmaterial, inv.inventariados, codigo,detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
                              " left join (select inventario_detalle.idinventario as idinv, idmaterial, cantidad as inventariados from inventario_detalle where inventario_detalle.idinventario = '"+idInv+"') as inv on inv.idmaterial = material.idmaterial " +
                              " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
-                             + where,function(err, desp){
+                             + where+" "+limit,function(err, desp){
                              if(err)
                                  console.log("Error Selecting :%s", err);
-                             res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv});
+                             res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv,largoData: desp.length});
                          });
                     });
                 }
@@ -1485,10 +1464,10 @@ router.post('/table_bodega', function(req, res, next){
                     connection.query("select material.idmaterial, inv.inventariados, codigo,detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
                         " left join (select inventario_detalle.idinventario as idinv, idmaterial, cantidad as inventariados from inventario_detalle where inventario_detalle.idinventario = '"+idInv+"') as inv on inv.idmaterial = material.idmaterial " +
                         " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
-                        + where,function(err, desp){
+                        + where+" "+limit,function(err, desp){
                         if(err)
                             console.log("Error Selecting :%s", err);
-                        res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv});
+                        res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv,largoData: desp.length});
                     });
                 }
             });
@@ -1518,14 +1497,9 @@ router.get('/get_last_inventario', function(req, res, next){
 router.post('/table_pendientes', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        var orden = input.orden.replace('-', ' ');
-        var clave = input.clave;
-        var tipo = input.tipo;
         console.log(input);
-        //clave ES EL TEXTO QUE SE ENCUENTRA EN LA BARRA BUSCAR . Por ejemplo : "Inserto"
-        //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
-        // material.detalle , gd.idgd, gd.estado (DE LA NUEVA BD)
-        //
+        var arrayPL = input.extraInfo;
+        var condiciones_where = [];
         var array_fill = [
             "odc.numoc",
             "material.detalle",
@@ -1539,52 +1513,17 @@ router.post('/table_pendientes', function(req, res, next){
             "material.detalle-on": [],
             "cliente.sigla-on": []
         };
-        var clave;
-        var where;
-        var condiciones_where = ["pedido.cantidad > pedido.despachados"];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
-
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
+        console.log(condiciones_where);
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
 
-
-
-        var where = " ";
-
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
-        console.log(where);
-        //where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
-        //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
+        var where = result[0];
+        var limit = result[1];
         req.getConnection(function(err, connection){
             connection.query("select odc.numoc, material.detalle, pedido.numitem, pedido.idpedido, coalesce(enpreparacion.preparando,0) as preparando,"
                 + " (select COUNT(palet.idpalet) from palet"
@@ -1597,7 +1536,7 @@ router.post('/table_pendientes', function(req, res, next){
                 + " left join material on material.idmaterial = pedido.idmaterial"
                 + " left join (select material.idmaterial, sum(produccion.`7`) as encc from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by material.idmaterial) as queryCC on queryCC.idmaterial = material.idmaterial"
                 + " left join cliente on cliente.idcliente = odc.idcliente"
-             + where,function(err, desp){
+             + where+" "+limit,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
                 // console.log(desp);
@@ -1611,7 +1550,11 @@ router.post('/table_pendientes', function(req, res, next){
                 /*if(!req.session.arrayPL){
                     req.session.arrayPL = new Array();
                 }*/
-                res.render('bodega/table_pendientes', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: input.arrayPL});
+                if(arrayPL == undefined){
+                    arrayPL = '';
+                }
+                console.log(arrayPL);
+                res.render('bodega/table_pendientes', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: arrayPL, largoData: desp.length});
             });
         });
     }
@@ -1639,9 +1582,7 @@ router.get('/view_palets', function(req, res, next){
 router.post('/table_palets', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        var orden = input.orden.replace('-', ' ');
-        var clave = input.clave;
-        var tipo = input.tipo;
+
         console.log(input);
         //clave ES EL TEXTO QUE SE ENCUENTRA EN LA BARRA BUSCAR . Por ejemplo : "Inserto"
         //SE CONCATENAN LAS CONDICIONES QUE SE COLOCARAN EN LA QUERY, ACA LA clave DEBE BUSCAR TANTO PARA
@@ -1649,55 +1590,32 @@ router.post('/table_palets', function(req, res, next){
         //
         var array_fill = [
             "palet.idpalet",
-            "material.detalle"
+            "material.detalle",
+            "cliente.sigla"
         ];
         var object_fill = {
             "palet.idpalet-off": [],
             "material.detalle-off": [],
+            "cliente.sigla-off": [],
             "palet.idpalet-on": [],
-            "material.detalle-on": []
+            "material.detalle-on": [],
+            "cliente.sigla-on": []
         };
-        var clave;
-        var where;
-        var condiciones_where = ["!palet.desp"];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
-
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        var condiciones_where = [];
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
-        var where = " ";
 
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
-        console.log(where);
+        console.log(condiciones_where);
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+
+        console.log(result);
+
+        var where = result[0];
+        var limit = result[1];
+
         //where = " WHERE gd.idgd LIKE '%" + clave + "%' AND gd.estado LIKE '%" + tipo + "%' GROUP BY gd.idgd ORDER BY gd.fecha DESC";
         //var query = "SELECT despacho.*, coalesce(mat_token, 'Nulo') FROM despacho"+where+" ORDER BY "+orden;
         req.getConnection(function(err, connection){
@@ -1715,7 +1633,7 @@ router.post('/table_palets', function(req, res, next){
                 "left join odc on pedido.idodc = odc.idodc " +
                 "left join cliente on odc.idcliente = cliente.idcliente " +
                 "left join material on material.idmaterial = pedido.idmaterial " +
-                where + " group by palet.idpalet",function(err, desp){
+                where + " group by palet.idpalet "+limit ,function(err, desp){
                 if(err)
                     console.log("Error Selecting :%s", err);
                 // console.log(desp);
@@ -1730,7 +1648,7 @@ router.post('/table_palets', function(req, res, next){
                     req.session.arrayPL = new Array();
                 }
                 console.log(req.session.arrayPL.join('-'));
-                res.render('bodega/table_palets', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: req.session.arrayPL.join('-')});
+                res.render('bodega/table_palets', {desp: desp, user: req.session.userData, view_tipo: tipo, arraypl: req.session.arrayPL.join('-'), largoData: desp.length});
             });
         });
     }

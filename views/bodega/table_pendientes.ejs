@@ -25,7 +25,7 @@ function fechaLatino(string){
     return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
 }
 %>
-<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top:0px !important;">
     <thead>
         <tr>
             <th class="o_column_sortable">OC</th>
@@ -44,7 +44,7 @@ function fechaLatino(string){
     <tbody class="ui-sortable">
         <%
         if(arraypl.length>0){
-            arraypl = arraypl.split('-');
+            arraypl = arraypl.split(',');
         }
         var pesototal = 0;
         var cctotal = 0;
@@ -110,6 +110,10 @@ function fechaLatino(string){
 <script type="text/javascript">
 
     setDataTableFixed("#despachosTable");
+    $("#indicador_paginas").data('total', parseInt('<%= largoData%>'));
+    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#indicador_paginas");
+
+
 
     var mouseDown = 0;
     document.body.onmousedown = function() {
@@ -138,6 +142,15 @@ function fechaLatino(string){
         } else {
             matriz_seleccionados.push(yo.data('idoc'));
             matriz_seleccionados.push([yo.data('idpedido')]);
+            var array_pedidos = [];
+            if(matriz_seleccionados.length != 0){
+                array_pedidos = matriz_seleccionados[1];
+                busc.extraInfo= [matriz_seleccionados[1]];
+            }
+            if(array_pedidos.length>0){
+                //SE CONCATENAN LOS PEDIDOS EN SELECCIÓN, LUEGO SE NORMALIZA EN EL CONTROLADOR
+                busc.extraInfo= [matriz_seleccionados[1]];
+            }
             return 1;
         }
     }
@@ -163,6 +176,15 @@ function fechaLatino(string){
         } else if(matriz_seleccionados.length == 0) {
             console.log("No hay seleccionados");
             matriz_seleccionados = [];
+        }
+        var array_pedidos = [];
+        if(matriz_seleccionados.length != 0){
+            array_pedidos = matriz_seleccionados[1];
+            busc.extraInfo= [matriz_seleccionados[1]];
+        }
+        if(array_pedidos.length>0){
+            //SE CONCATENAN LOS PEDIDOS EN SELECCIÓN, LUEGO SE NORMALIZA EN EL CONTROLADOR
+            busc.extraInfo= [matriz_seleccionados[1]];
         }
     }
 

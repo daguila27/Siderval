@@ -57,7 +57,7 @@
 	}
 </style>
 
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%" id="dataTableOdoo">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: 0px !important;" id="dataTableOdoo">
 	<thead>
 		<tr>
 			<th>OC</th>
@@ -198,14 +198,11 @@
 <script src="parsear_nro.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-	lastpage = '<%= largoData%>' < 100 ;
-	if(lastpage){
-        limit = ( ( (parseInt(global_page)-1)*100) + 1 )+","+((parseInt(global_page)-1)*100 + parseInt('<%= largoData%>'));
-	}
-	else{
-        limit = ( ( (parseInt(global_page)-1)*100) + 1 )+","+((parseInt(global_page)-1)*100 + 100);
+	$("#indicador_paginas").data('total', parseInt('<%= largoData%>'));
+    busc.renderPagesIndicator("#indicador_paginas");
 
-    }
+
+
     function changeIcon(yo){
 	    if($(yo).data('state') == 'open' ){
             $(yo).children('i').removeClass('fa-arrow-up');

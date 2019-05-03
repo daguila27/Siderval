@@ -1,7 +1,6 @@
 
 </div>
 </div>
-
 <!-- Modal -->
 <div id="newPLModal" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg" id="newPLModal-content" >
@@ -120,8 +119,12 @@
         }
     });
 
-    function  setDataTableFixed(str){
-        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 6;
+    function  setDataTableFixed(str, margin){
+        if(margin){
+            var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight()-margin;
+        }else{
+            var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight()-2;
+        }
         return $(str).DataTable( {
             fixedHeader: {
                 header: true,
@@ -239,6 +242,7 @@
         });
 
     });
+
 
 
 </script>

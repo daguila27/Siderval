@@ -27,7 +27,7 @@ function fechaLatino(string){
 }
 %>
 
-<table id="paletsTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+<table id="paletsTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-top: 0px !important;">
     <thead>
     <tr>
         <th class="o_column_sortable">Palet</th>
@@ -86,6 +86,7 @@ function fechaLatino(string){
 
 <script type="text/javascript">
     setDataTableFixed("#paletsTable");
+    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#indicador_paginas");
 
     function refreshCount(){
         var c = 0;

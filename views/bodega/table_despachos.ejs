@@ -5,7 +5,7 @@
 	}
 %>
 
-<table id="gdTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTabla" style="width: 100%; margin-top:0;">
+<table id="gdTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTabla" style="width: 100%; margin-top:0px !important;">
 		<thead>
 			<tr>
 				<th class="o_column_sortable">GDD</th>
@@ -23,12 +23,14 @@
 		<%
 		for(var i=0; i < desp.length; i++){ %>
 			<tr class="o_data_row">
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" ><%=desp[i].idgd%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
-				<td id="item<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" data-order="<%= new Date(desp[i].fecha).getTime()%>"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
-				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].estado%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier">
+					<a class="btn btn-xs btn-primary" onclick="ver_gdd(this)" data-idgd="<%= desp[i].idgd%>" data-toggle="tooltip" data-placement="bottom" title="Ver GD"><%=desp[i].idgd%></a>
+				</td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
+				<td id="item<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" data-idgd="<%= desp[i].idgd%>" data-order="<%= new Date(desp[i].fecha).getTime()%>"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
+				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].estado%></td>
 				<%if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){%>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 					<%if(desp[i].estado != 'Anulado'){%>
@@ -73,6 +75,9 @@
 
 <script type="text/javascript">
     setDataTableFixed("#gdTable");
+    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), ".indicador_paginas");
+
+
     function getxlsx(file){
 		$.ajax({
 			type: 'GET',
@@ -116,7 +121,12 @@
 			type: 'GET',
 			url: '/bodega/page_gdd/'+$(yo).data('idgd'),
 			beforeSend: function(){
-			  	destroyDataTable();
+
+                $('#gdTable').DataTable().destroy();
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                //destroyDataTable();
+
+                //$("#"+busc.idtabla).DataTable().destroy();
 			},
 			success: function(data){
 				$(".main-page").html(data);
@@ -135,3 +145,4 @@
         });
 	}
 </script>
+

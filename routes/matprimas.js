@@ -17,6 +17,63 @@ router.use(
 
 );
 
+function getConditionArray(object_fill,array_fill, condiciones_where, input){
+    var clave;
+    var limit = "";
+    console.log(input);
+    if(input.ispage === 'true'){
+        limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
+    }
+
+    if(input.clave == '' || input.clave == null || input.clave == undefined){
+        clave = [];
+    }
+    else{
+        clave = input.clave.split(',');
+    }
+    if(clave.length>0){
+        for(var e=0; e < clave.length; e++){
+            if(clave[e].split('@')[2] == 'off') {
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            else{
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+        }
+
+    }
+    for(var w=0; w < Object.keys(object_fill).length; w++){
+        if(object_fill[Object.keys(object_fill)[w]].length > 0){
+            //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+            if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+            }
+            else{
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+            }
+        }
+    }
+
+    var where = " ";
+    if(input.rango.length > 0){
+        if(input.isRango === 'true'){
+            console.log(input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+            condiciones_where.push( input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+        }
+    }
+
+
+
+    if(condiciones_where.length==0){
+        where = "";
+    }
+    else{
+        where = " WHERE "+ condiciones_where.join(" AND ");
+    }
+
+    return [where, limit];
+}
 function verificar(usr){
 	if(usr.nombre == 'matprimas' || usr.nombre == 'siderval'){
 		return true;
@@ -253,7 +310,7 @@ router.post("/table_movimientos",function(req,res,next){
     if(req.session.userData){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
-        var orden = input.orden.replace('-', ' ');
+        //var orden = input.orden.replace('-', ' ');
         var etapas = [
             "jefe de produccion",
             "moldeo",
@@ -274,18 +331,33 @@ router.post("/table_movimientos",function(req,res,next){
             "all_data.tipo",
             "all_data.receptor"
         ];
+        var object_fill = {
+            "all_data.idmovimiento-on": [],
+            "all_data.detalle-on": [],
+            "all_data.nombre_etapa-on": [],
+            "all_data.tipo-on": [],
+            "all_data.receptor-on": [],
+            "all_data.idmovimiento-off": [],
+            "all_data.detalle-off": [],
+            "all_data.nombre_etapa-off": [],
+            "all_data.tipo-off": [],
+            "all_data.receptor-off": []
+        };
         var clave;
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
+        console.log(clave);
+
+        if(input.clave === '' || input.clave == null || input.clave == undefined){
             clave = [];
         }
         else{
             clave = input.clave.split(',');
         }
+        console.log(clave);
+
         var where = "";
         var condiciones_where = [];
         var coalesce_in = [];
         var coalesce_tip = [];
-
         for(var a=0; a < clave.length; a++){
             if(clave[a].split('@')[0] == '2'){
                 for(var b=0; b < etapas.length; b++){
@@ -324,20 +396,30 @@ router.post("/table_movimientos",function(req,res,next){
                 }
             }
         }
+
+        if(input.rango != ''){
+            condiciones_where.push("all_data.f_gen BETWEEN '" +input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59'")
+        }
         if(condiciones_where.length>0){
             where = " WHERE ("+condiciones_where.join(' AND ')+")";
         }
         console.log(where);
+
+        var result = getConditionArray(object_fill,array_fill, condiciones_where, input);
+
+        console.log(result);
+        var limit = result[1];
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (select movimiento.*, movimiento.tipo as tipo_mov, movimiento_detalle.cantidad, material.detalle,"
+            connection.query("SELECT * FROM (select movimiento.*, movimiento.tipo as tipo_mov, coalesce(movimiento_detalle.cantidad,0) as cantidad, material.detalle,"
                 +"movimiento.etapa as nombre_etapa"
                 +" from movimiento_detalle"
                 +" left join movimiento on movimiento.idmovimiento=movimiento_detalle.idmovimiento"
                 +" left join material on material.idmaterial=movimiento_detalle.idmaterial"
-                +" left join etapafaena on etapafaena.value = movimiento.etapa) as all_data "+where+" ORDER BY all_data.f_gen DESC", function(err, mov){
+                +" left join etapafaena on etapafaena.value = movimiento.etapa) as all_data "+where+" ORDER BY all_data.f_gen DESC"+ limit, function(err, mov){
                 if(err) throw err;
-                res.render('matprimas/table_movimientos', {data: mov, key: orden.replace(' ', '-')});
+
+                res.render('matprimas/table_movimientos', {data: mov});
             });
         } );
     } else res.redirect("/bad_login");

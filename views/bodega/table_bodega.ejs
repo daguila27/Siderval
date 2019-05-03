@@ -1,7 +1,7 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTableBodega" class="o_list_view table table-condensed table-striped" style="width: 100%">
+<table id="DataTableBodega" class="o_list_view table table-condensed table-striped" style="width: 100%; margin-top: 0 !important;">
     <thead>
         <tr>
             <th>Código</th>
@@ -80,7 +80,9 @@
 
 <script type="text/javascript">
     setDataTableFixed("#DataTableBodega");
-    
+
+    $("#pedidos").data('total', parseInt('<%= largoData%>'));
+    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#pedidos");
 </script>
 
 <% if( tipo == 'inv'){%>

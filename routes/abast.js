@@ -19,9 +19,63 @@ router.use(
 );
 
 
+function getConditionArray(object_fill,array_fill, condiciones_where, input){
+    var clave;
+    var limit = "";
+    console.log(input);
+    if(input.ispage === 'true'){
+        limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
+    }
+
+    if(input.clave == '' || input.clave == null || input.clave == undefined){
+        clave = [];
+    }
+    else{
+        clave = input.clave.split(',');
+    }
+    if(clave.length>0){
+        for(var e=0; e < clave.length; e++){
+            if(clave[e].split('@')[2] == 'off') {
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            else{
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+        }
+
+    }
+    for(var w=0; w < Object.keys(object_fill).length; w++){
+        if(object_fill[Object.keys(object_fill)[w]].length > 0){
+            //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+            if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+            }
+            else{
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+            }
+        }
+    }
+
+    var where = " ";
+    if(input.rango.length > 0){
+        if(input.isRango === 'true'){
+            console.log(input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+            condiciones_where.push( input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+        }
+    }
 
 
 
+    if(condiciones_where.length==0){
+        where = "";
+    }
+    else{
+        where = " WHERE "+ condiciones_where.join(" AND ");
+    }
+
+    return [where, limit];
+}
 function verificar(usr){
 	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
 		return true;
@@ -2318,11 +2372,11 @@ router.get('/view_abastecimiento', function(req, res, next) {
 /*  Funcion que busca los abastecimientos y los ordena segun paramentro orden en la url, muestra solo pendiente si showPend es true
 	Renderiza una tabla con los abastecimientos solicitados
 */
-router.post('/table_abastecimientos/:page', function(req, res, next){
+router.post('/table_abastecimientos', function(req, res, next){
 	if(verificar(req.session.userData)){
 		//Obtiene la pagina de la url y obtiene el nro de registros a solicitar
         var input = JSON.parse(JSON.stringify(req.body));
-		var limit = ( ( (parseInt(req.params.page)-1)*100) )+",100";
+        console.log(input);
 		var array_fill = [
             "abastecimiento.idodabast",
             "abastecimiento.factura_token",
@@ -2345,80 +2399,34 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
             "abastecimiento.detalle-on":[],
             "abastecimiento.cuenta-on":[]
         };
-        var clave;
-        var orden;
-        if(input.orden.split('/').length > 1){
-        	orden = input.orden.split('/')[1];
-		}
-		else{
-            orden = input.orden;
-		}
-        var showPend = input.showPend;
-        //var cc_selected = input.cc_selected.split(',');
-        var where = " WHERE ";
+
         var condiciones_where = [];
-        var condiciones_cc = [];
-
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+		if(input.cond != ''){
+            for(var e=0; e < input.cond.split('@').length; e++){
+                condiciones_where.push(input.cond.split('@')[e]);
             }
-
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
-            }
-        }
-        console.log(condiciones_where);
-
-        if(showPend == 'false'){
-            //condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
-            condiciones_where.push("abastecimiento.cantidad > abastecimiento.facturados");
-        }
-
-
-        if(condiciones_where.length==0){
-        	condiciones_where.push('true');
 		}
-        if(condiciones_cc.length==0){
-            condiciones_cc.push('true');
-        }
-        where = "WHERE "+ condiciones_where.join(" AND ")+ " AND ("+condiciones_cc.join(' OR ')+")";
-        orden = orden.replace('-', ' ');
+
+
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+		console.log(result);
+        var where = result[0];
+        var limit = result[1];
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-                connection.query("select * from (select abastecimiento.*,oda.creacion as oda_creacion,coalesce(recepciones.cantidad,0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,recepciones.gd_token, " +
+                connection.query("select * from (select abastecimiento.*,oda.anulado,oda.creacion as oda_creacion,coalesce(recepciones.cantidad,0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,recepciones.gd_token, " +
                     "COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle from abastecimiento " +
                     "left join (select facturacion.idabast, sum(facturacion.cantidad) as cantidad,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast " +
                     "left join (select recepcion_detalle.idabast,sum(recepcion_detalle.cantidad) as cantidad, group_concat(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token from recepcion_detalle left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion group by recepcion_detalle.idabast) as recepciones on recepciones.idabast = abastecimiento.idabast " +
                     "LEFT JOIN oda ON oda.idoda=abastecimiento.idoda " +
                     "LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial " +
                     "LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor " +
-                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc) as abastecimiento "+where +" ORDER BY abastecimiento.oda_creacion DESC LIMIT "+limit, function(err, abs){
+                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc) as abastecimiento "+where +" ORDER BY abastecimiento.oda_creacion DESC "+limit, function(err, abs){
                     if(err) { console.log("Error Selecting : %s", err);
                     }else {
-                        res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: parseInt(req.params.page), largoData: abs.length },function(err,html){
+                        res.render('abast/table_abastecimientos', {data: abs,  page: parseInt(req.params.page), largoData: abs.length },function(err,html){
                             if(err) console.log(err);
                             res.send(html);
                         });

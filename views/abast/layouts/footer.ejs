@@ -269,7 +269,8 @@
         $("#up-fills").css('width', '90%');
         if($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento"){
             //ajax($(".oe_secondary_submenu li.active"));
-            destroyDataTable(buscar_oda);
+            busc.destroyDataTable(true);
+            //destroyDataTable(buscar_oda);
             //setTimeout(function(){ buscar_oda(false); }, 750);
         }
         $(".menu-icon").removeClass('fa-bars');
@@ -286,7 +287,8 @@
         $("#up-fills").css('width', '100%');
         if($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento"){
             //ajax($(".oe_secondary_submenu li.active"));
-            destroyDataTable(buscar_oda);
+            busc.destroyDataTable(true);
+            //destroyDataTable(busc.buscar_action);
             //setTimeout(function(){ buscar_oda(false); }, 750);
 
         }
@@ -297,7 +299,7 @@
 
 
     function  setDataTableFixed(str){
-        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 6;
+        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight()-2;
         return $(str).DataTable({
             fixedHeader: {
                 header: true,
@@ -520,7 +522,7 @@
             $('table').DataTable().destroy();
             $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
             if(callback != undefined){
-                setTimeout(function(){ callback(false); }, 750);
+                setTimeout(function(){ callback(); }, 750);
             }
         }
     }
