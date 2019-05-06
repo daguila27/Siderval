@@ -205,14 +205,12 @@ router.post('/table_mprimas', function(req,res,next){
     var where = result[0];
     var limit = result[1];
     console.log(result);
-    var c = "select material.idmaterial as idmatpri, detalle"
-        +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
-        +" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
-        where +" "+limit;
-    console.log(c);
     req.getConnection(function(err, connection){
         if(err) throw err;
-        connection.query(c ,
+        connection.query("select material.idmaterial as idmatpri, detalle"
+            +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
+            +" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
+            where +" "+limit ,
             function(err, mat){
                 if(err)
                     console.log("Error Selecting : %s", err);
