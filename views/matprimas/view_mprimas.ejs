@@ -50,9 +50,9 @@
         "Detalle@success",
         "Unidad@warning"
     ];
-    var busc = new Buscador("buscar_mprimas", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", true, false);
+    var busc = new Buscador("buscar_mprimas", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", false, false);
 
-    busc.add_cond = "(codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%')";
+    busc.add_cond = "(material.show_mp is true)";
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         busc.buscar_action();
@@ -64,7 +64,7 @@
 
     $("#filtro_estado").on('change', function(e){
         e.preventDefault();
-        busc.add_cond = "((codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%') and "+$(this).val()+")";
+        busc.add_cond = "((material.show_mp is true) and "+$(this).val()+")";
         busc.buscar_action();
     });
 
