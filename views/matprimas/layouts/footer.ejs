@@ -156,7 +156,7 @@
 
     $.ajax({
         type: 'GET',
-        url: '/abastecimiento/stock_matp',
+        url: '/matprimas/view_mprimas',
         beforeSend: function(){
             $("#page-wrapper").css('display', 'none');
         },
@@ -174,7 +174,7 @@
 
 
     function  setDataTableFixed(str){
-        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 1;
+        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 2;
         return $(str).DataTable({
             fixedHeader: {
                 header: true,

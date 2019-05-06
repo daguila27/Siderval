@@ -116,7 +116,7 @@
 		"CC@danger"
 	];
 
-    var busc = new Buscador("buscar_abastecimiento", ".o_searchview", array_fill, "/abastecimiento/table_abastecimientos", "dataTableOdoo", true);
+    var busc = new Buscador("buscar_abastecimiento", ".o_searchview", array_fill, "/abastecimiento/table_abastecimientos", "dataTableOdoo", true, false);
 
     busc.add_cond = "abastecimiento.cantidad>abastecimiento.facturados AND !abastecimiento.anulado";
 
@@ -134,42 +134,6 @@
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         busc.buscar_action();
-
-        /*$.ajax({
-			type: 'POST',
-            data: {
-                clave: filtros_seleccionados.join(','),
-                orden: $(".o_cp_switch_buttons .active").data('view'),
-                showPend: $("#pend").is(':checked')
-            },
-            beforeSend: function(){
-                destroyDataTable(undefined);
-                $("#buscar_abastecimiento").prop('disabled', true);
-                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-            },
-			url: '/abastecimiento/table_abastecimientos/'+global_page,
-			success: function(data){
-				$(".main-page").html(data);
-                $("#buscar_abastecimiento").prop('disabled', false);
-
-                //Muestra la cantidad de pedidos
-                if(global_page == '1' && lastpage){
-                    $("#pedidos").html("<h5><small>Mostrando de " + limit.split(',')[0] + " a "+limit.split(',')[1]+" pedido(s)</small></h5>");
-                }
-                else if(global_page == '1'){
-                    $("#pedidos").html("<h5><small>Mostrando de " + limit.split(',')[0] + " a "+limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s)</small></h5>");
-				}
-                else if(lastpage){
-                    $("#pedidos").html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + limit.split(',')[0] + " a "+limit.split(',')[1]+"  pedido(s)</small></h5>");
-                }
-                else{
-                    $("#pedidos").html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + limit.split(',')[0] + " a "+limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s)</small></h5>");
-				}
-                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
-            }
-		});*/
-
-        //$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
 
 	function saveinSession(option){
@@ -193,25 +157,7 @@
 			// Muestra el nav de paginacion
 			$("#paginacion").css('display','block');
             $(".search-option-list").css('display', 'flex');
-            /*$.ajax({
-                type: 'POST',
-                data: {
-                    clave: $("#buscar_abastecimiento").val(),
-                    orden: $(".o_cp_switch_buttons .active").data('view'),
-                    showPend: $("#pend").is(':checked')
-                },
-				beforeSend: function(){
-                    destroyDataTable(undefined);
-				},
-                url: '/abastecimiento/table_abastecimientos/' + global_page,
-                success: function(data){
-
-                    $(".main-page").html(data);
-                    //Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                }
-            });*/
-            buscar_oda(false);
+            busc.buscar_action();
 		}
 		else{
 			// Quita el nav de paginacion

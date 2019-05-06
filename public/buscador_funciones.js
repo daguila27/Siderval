@@ -198,6 +198,7 @@ function next_page(){
     busc.buscar_action();
 }
 function previus_page(){
+
     busc.page = (parseInt(busc.page) - 1).toString();
     busc.buscar_action();
 }

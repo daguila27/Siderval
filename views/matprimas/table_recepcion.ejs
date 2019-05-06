@@ -22,7 +22,7 @@
         "Otros"
     ];
 %>
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="receps_table" style="width: 100%">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="receps_table" style="width: 100%; margin-top: 0px !important;">
     <thead>
     <tr>
         <th id="numof" class="cabecera o_column_sortable" data-order="recepcion_detalle.idrecepcion-ASC">GDD</th>
@@ -63,4 +63,7 @@
 
     setDataTableFixed("#receps_table");
 
+
+    $("#indicador_paginas").data('total', parseInt('<%= data.length%>'));
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), "#indicador_paginas");
 </script>

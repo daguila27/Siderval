@@ -198,8 +198,9 @@
 <script src="parsear_nro.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-	$("#indicador_paginas").data('total', parseInt('<%= largoData%>'));
-    busc.renderPagesIndicator("#indicador_paginas");
+    setDataTableFixed("#dataTableOdoo");
+    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#indicador_paginas");
+
 
 
 
@@ -218,7 +219,6 @@
 	$(".collapseLabel").each(function(){
 		$(this).parent().css('width', $(this).css('width'));
 	});
-    setDataTableFixed("#dataTableOdoo");
     $(document).ready(function(){
         /*$('[data-toggle="tooltip"]').tooltip({
             container: 'body'

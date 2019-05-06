@@ -141,6 +141,8 @@ router.get('/crear_gdd', function(req, res, next){
 
 
 
+
+
 //Buscador de materiales para traslado en vista Crear GDD (pestaña insumos)
 router.get('/buscar_insumos/:detalle', function(req, res, next){
     if(verificar(req.session.userData)){

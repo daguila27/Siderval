@@ -611,6 +611,8 @@ router.get('/stock_matp', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
+
+
 /*router.get('/set_recursos', function(req, res, next) {
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){

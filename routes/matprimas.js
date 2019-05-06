@@ -174,9 +174,64 @@ router.post("/save_movimiento",function(req,res,next){
         });
     } else res.redirect("/bad_login");
 });
+
+router.get("/view_mprimas",function(req,res,next){
+    if(req.session.userData){
+        res.render('matprimas/view_mprimas');
+    } else res.redirect("/bad_login");
+});
+
+
+router.post('/table_mprimas', function(req,res,next){
+    var input = JSON.parse(JSON.stringify(req.body));
+
+    var array_fill = [
+        "material.detalle",
+        "material.u_medida"
+    ];
+    var object_fill = {
+        "material.detalle-on": [],
+        "material.u_medida-on": [],
+        "material.detalle-off": [],
+        "material.u_medida-off": []
+    };
+    var condiciones_where = ["(codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%')"];
+    if(input.cond != ''){
+        for(var e=0; e < input.cond.split('@').length; e++){
+            condiciones_where.push(input.cond.split('@')[e]);
+        }
+    }
+    var result = getConditionArray(object_fill,array_fill, condiciones_where, input);
+    var where = result[0];
+    var limit = result[1];
+    console.log(result);
+
+    req.getConnection(function(err, connection){
+        if(err) throw err;
+        connection.query("select material.idmaterial as idmatpri, detalle"
+            +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
+            +" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
+            where +" "+limit ,
+            function(err, mat){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+
+
+                res.render('matprimas/table_mprimas', {mat: mat});
+            });
+    });
+});
+
+
+
+
+
 /*
 * CONTROLADOR QUE RENDERIZA LA VISTA PRINCIPAL DE Materias Primas --> Movimientos --> Ver Movimientos
 * */
+
+
+
 router.get("/busq_oda",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function (err,connection) {
@@ -442,30 +497,30 @@ router.post("/table_recepcion",function(req,res,next){
     if(req.session.userData){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
-        var orden = input.orden.replace('-', ' ');
         var array_fill = [
             "recepcion.numgd",
             "material.detalle",
             "recepcion.fecha"
         ];
-        var clave;
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        var where = "";
+        var object_fill = {
+            "recepcion.numgd-on": [],
+            "material.detalle-on": [],
+            "recepcion.fecha-on": [],
+            "recepcion.numgd-off": [],
+            "material.detalle-off": [],
+            "recepcion.fecha-off": []
+        };
+
         var condiciones_where = ["recepcion.visible"];
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+        if(input.cond != ''){
+            for(var e=0; e < input.cond.split('@').length; e++){
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
-        if(condiciones_where.length>0){
-            where = " WHERE "+condiciones_where.join(' AND ');
-        }
-        console.log(where);
+        var result = getConditionArray(object_fill,array_fill, condiciones_where, input);
+        var where = result[0];
+        var limit = result[1];
+        console.log(result);
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("select recepcion.*, recepcion_detalle.*, material.*"
@@ -473,9 +528,9 @@ router.post("/table_recepcion",function(req,res,next){
                 +" left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion"
                 +" left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast"
                 +" left join material on material.idmaterial=abastecimiento.idmaterial"
-                + where + " GROUP BY recepcion_detalle.idrecepcion_d ORDER BY recepcion.fecha DESC", function(err, mov){
+                + where + " GROUP BY recepcion_detalle.idrecepcion_d ORDER BY recepcion.fecha DESC "+ limit, function(err, mov){
                 if(err) throw err;
-                res.render('matprimas/table_recepcion', {data: mov, key: orden.replace(' ', '-')});
+                res.render('matprimas/table_recepcion', {data: mov});
             });
         } );
     } else res.redirect("/bad_login");
