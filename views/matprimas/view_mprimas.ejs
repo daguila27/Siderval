@@ -20,8 +20,8 @@
             <div class="form-group pull-right filtro_estado" style="margin-top: 10px;">
                 <select class="form-control" id="filtro_estado">
                     <option value="true" selected>Todos</option>
-                    <option value="(material.stock<material.stock_c)">Crítico</option>
-                    <option value="(material.stock<material.stock_i and material.stock>material.stock_c)">Aviso</option>
+                    <option value="(material.stock<=material.stock_c)">Crítico</option>
+                    <option value="(material.stock<=material.stock_i and material.stock>material.stock_c)">Aviso</option>
                     <option value="(material.stock>material.stock_i)">Abastecido</option>
 
                 </select>
