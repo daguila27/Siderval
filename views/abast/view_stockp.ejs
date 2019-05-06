@@ -1,5 +1,8 @@
-
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+<%if(username == 'abastecimiento'){%>
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 90%;transition:0.5s; ;z-index: 10;">
+<%}else{%>
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; ;z-index: 10;">
+<%}%>
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
             <li class="active">Stock de Materias Primas</li>
@@ -19,7 +22,7 @@
             </div>
             <div class="form-group pull-right filtro_estado" style="margin-top: 10px;">
                 <select class="form-control" id="filtro_estado">
-                    <option value="true" selected>Todos</option>
+                    <option value="" selected>Todos</option>
                     <option value="(material.stock<material.stock_c)">Crítico</option>
                     <option value="(material.stock<material.stock_i and material.stock>material.stock_c)">Aviso</option>
                     <option value="(material.stock>material.stock_i)">Abastecido</option>
@@ -50,9 +53,9 @@
         "Detalle@success",
         "Unidad@warning"
     ];
-    var busc = new Buscador("buscar_mprimas", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", true, false);
+    var busc = new Buscador("buscar_stockp", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", true, false);
 
-    busc.add_cond = "(codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%')";
+    busc.add_cond = "material.show_abast is true";
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         busc.buscar_action();
@@ -64,7 +67,7 @@
 
     $("#filtro_estado").on('change', function(e){
         e.preventDefault();
-        busc.add_cond = "((codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%') and "+$(this).val()+")";
+        busc.add_cond = $(this).val();
         busc.buscar_action();
     });
 
@@ -85,20 +88,6 @@
 
     });
 
-    function fill_oda_cc(yo){
-        $('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');
-    }
-
-    function change_mulselected(yo){
-        var beforeCheck = $(yo).data('allbeforecheck');
-        if($("#all_option_cc").is(':selected') && !beforeCheck){
-            $(yo).data('allbeforecheck', 1);
-            $(".option_multiple_select").prop("selected", true);
-        }
-        else if(!$("#all_option_cc").is(':selected')){
-            $(yo).data('allbeforecheck', 0);
-        }
-    }
 
 
 

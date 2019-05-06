@@ -2371,6 +2371,15 @@ router.get('/view_abastecimiento', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
+
+
+router.get('/view_stockp', function(req, res, next) {
+    if(verificar(req.session.userData)){
+        res.render('abast/view_stockp', {username: req.session.userData.nombre});
+    }
+    else{res.redirect('bad_login');}
+});
+
 /*  Funcion que busca los abastecimientos y los ordena segun paramentro orden en la url, muestra solo pendiente si showPend es true
 	Renderiza una tabla con los abastecimientos solicitados
 */

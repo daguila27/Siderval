@@ -195,7 +195,7 @@ router.post('/table_mprimas', function(req,res,next){
         "material.detalle-off": [],
         "material.u_medida-off": []
     };
-    var condiciones_where = ["(codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%')"];
+    var condiciones_where = [];
     if(input.cond != ''){
         for(var e=0; e < input.cond.split('@').length; e++){
             condiciones_where.push(input.cond.split('@')[e]);
@@ -205,13 +205,14 @@ router.post('/table_mprimas', function(req,res,next){
     var where = result[0];
     var limit = result[1];
     console.log(result);
-
+    var c = "select material.idmaterial as idmatpri, detalle"
+        +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
+        +" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
+        where +" "+limit;
+    console.log(c);
     req.getConnection(function(err, connection){
         if(err) throw err;
-        connection.query("select material.idmaterial as idmatpri, detalle"
-            +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
-            +" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
-            where +" "+limit ,
+        connection.query(c ,
             function(err, mat){
                 if(err)
                     console.log("Error Selecting : %s", err);

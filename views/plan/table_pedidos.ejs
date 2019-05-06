@@ -24,6 +24,7 @@
 				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">OC</th>
 				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
 				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
+				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">Unidad</th>
 				<th class="o_column_sortable order-column" data-order="pedido.cantidad-ASC">Solicitados</th>
 				<th class="o_column_sortable order-column" >Por Fabricar</th>
 				<th class="o_column_sortable order-column" >En Producción</th>
@@ -69,7 +70,8 @@
 			<td data-toggle="tooltip" title="OC" class="col-numoc o_data_cell o_readonly_modifier o_required_modifier" data-idodc="<%=data[i].idodc%>" onclick="submit_oc(this)"><button class="btn btn-primary btn-xs"><%=data[i].numoc%></button></td>
 			<td data-toggle="tooltip" title="Cliente" class="col-cliente o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
 			<td data-toggle="tooltip" title="Descripción" class="col-descrip o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
-            <%
+			<td data-toggle="tooltip" title="Unidad" class="col-numoc o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center ;"><%=data[i].u_medida%></td>
+			<%
                 t_sol += data[i].cantidad;
                 t_xfabs  += data[i].x_fabricar;
                 t_enprod  += (parseInt(data[i].sol_op) - parseInt(data[i].rech_op) - parseInt(data[i].bpt_op));
@@ -106,6 +108,7 @@
 			<td id="col-numoc"></td>
 			<td id="col-cliente"></td>
 			<td id="col-descrip"></td>
+			<td id="col-unidad"></td>
 			<td data-toggle="tooltip" title="Total Solicitado" style="text-align: center;" class="parsear_nro"    id="col-solic"><%=t_sol%></td>
 			<td data-toggle="tooltip" title="Total por Fabricar" style="text-align: center;" class="parsear_nro"  id="col-xfabs"><%=t_xfabs%></td>
 			<td data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro" id="col-enprod"><%=t_enprod%></td>
