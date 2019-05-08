@@ -1090,20 +1090,22 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
         var sheet = workbook.addWorksheet('gdd');
-        sheet.mergeCells('B9:F10');
+        sheet.mergeCells('B6:F7');
+        sheet.mergeCells('H7:I7');
+        sheet.mergeCells('B8:G9');
+        sheet.mergeCells('H8:I8');
+        sheet.mergeCells('B10:G11');
         sheet.mergeCells('H10:I10');
-        sheet.mergeCells('B11:G12');
-        sheet.mergeCells('H11:I11');
-        sheet.mergeCells('B13:G14');
-        sheet.mergeCells('H13:I13');
-        sheet.mergeCells('A15:I18');
+        sheet.mergeCells('A12:I15');
+        sheet.getColumn('A').width = 2.43;
         sheet.getColumn('B').width = 14.71;
         sheet.getColumn('H').width = 11;
         sheet.getColumn('I').width = 10.86;
-        sheet.getRow(8).height = 24;
-        sheet.getCell('H40').alignment = { horizontal: 'right' };
-        sheet.getCell('H41').alignment = { horizontal: 'right' };
-        sheet.getCell('H44').alignment = { horizontal: 'right' };
+        sheet.getRow(5).height = 24;
+        sheet.getCell('H40').alignment = {horizontal: 'right'};
+        sheet.getCell('H41').alignment = {horizontal: 'right'};
+        sheet.getCell('H44').alignment = {horizontal: 'right'};
+        sheet.getCell('E35').alignment = {horizontal: 'right'};
 
         req.getConnection(function(err, connection) {
             if(err) console.log("Error connection : %s", err);
@@ -1118,49 +1120,49 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                     if (err) console.log("Error Select : %s ",err );
                     if(rows.length>0){
                         var nombre = 'csvs/gdd' + rows[0].idgd + '.xlsx';
-                        sheet.getCell('B9').value = rows[0].razon;
-                        sheet.getCell('H10').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
-                        sheet.getCell('B11').value = rows[0].direccion;
-                        sheet.getCell('H11').value = rows[0].ciudad;
-                        sheet.getCell('B13').value = rows[0].giro;
-                        sheet.getCell('H13').value = rows[0].rut;
+                        sheet.getCell('B6').value = rows[0].razon;
+                        sheet.getCell('H7').value = rows[0].fecha.getDate() + " de " + meses[rows[0].fecha.getMonth()] + " de " + rows[0].fecha.getFullYear();
+                        sheet.getCell('B8').value = rows[0].direccion;
+                        sheet.getCell('H8').value = rows[0].ciudad;
+                        sheet.getCell('B10').value = rows[0].giro;
+                        sheet.getCell('H10').value = rows[0].rut;
                         var count = 0;
                         var neto = 0;
                         for(var j=0; j<rows.length; j++){
-                            sheet.mergeCells('C' + (20 + count).toString() + ':F' + (20 + count).toString());
-                            sheet.getCell('B' + (20 + count).toString()).value = rows[j].codigo;
-                            sheet.getCell('C' + (20 + count).toString()).value = rows[j].detalle;
-                            sheet.getCell('G' + (20 + count).toString()).value = rows[j].cantidad;
-                            sheet.getCell('H' + (20 + count).toString()).value = rows[j].precioPedido;
-                            sheet.getCell('I' + (20 + count).toString()).value = rows[j].precioPedido*rows[j].cantidad;
+                            sheet.mergeCells('C' + (17 + count).toString() + ':F' + (17 + count).toString());
+                            sheet.getCell('B' + (17 + count).toString()).value = rows[j].codigo;
+                            sheet.getCell('C' + (17 + count).toString()).value = rows[j].detalle;
+                            sheet.getCell('G' + (17 + count).toString()).value = rows[j].cantidad;
+                            sheet.getCell('H' + (17 + count).toString()).value = rows[j].precioPedido;
+                            sheet.getCell('I' + (17 + count).toString()).value = rows[j].precioPedido*rows[j].cantidad;
                             neto += rows[j].precioPedido*rows[j].cantidad;
                             count++;
                         }
-                        sheet.mergeCells('B36:H36');
-                        sheet.mergeCells('B37:H37');
+                        sheet.mergeCells('B33:H33');
+                        sheet.mergeCells('B34:H34');
                         if(rows[0].estado == 'Traslado'){
-                            sheet.getCell('B36').value = "NO CONSTITUYE VENTA SOLO TRASLADO";
-                            sheet.getCell('B37').value = "En virtud del Art. 55 D.L. 825";
+                            sheet.getCell('B33').value = "NO CONSTITUYE VENTA SOLO TRASLADO";
+                            sheet.getCell('B34').value = "En virtud del Art. 55 D.L. 825";
                         }
-                        sheet.mergeCells('C38:D38');
-                        sheet.mergeCells('F38:G38');
-                        sheet.mergeCells('C39:D39')
-                        sheet.getCell('B38').value = "OF:";
-                        sheet.getCell('C38').value = rows[0].idorden_f;
-                        sheet.getCell('E38').value = "OC: ";
-                        sheet.getCell('F38').value = rows[0].numoc;
-                        sheet.getCell('B39').value = "CHOFER";
-                        sheet.getCell('B40').value = "PATENTE";
-                        sheet.getCell('H40').value = "NETO";
-                        sheet.getCell('H41').value = "IVA";
-                        sheet.getCell('H44').value = "TOTAL";
+                        sheet.mergeCells('C35:D35');
+                        sheet.mergeCells('F35:G35');
+                        sheet.mergeCells('C36:D36')
+                        sheet.getCell('B35').value = "OF:";
+                        sheet.getCell('C35').value = rows[0].idorden_f;
+                        sheet.getCell('E35').value = "OC: ";
+                        sheet.getCell('F35').value = rows[0].numoc;
+                        sheet.getCell('B36').value = "CHOFER";
+                        sheet.getCell('B37').value = "PATENTE";
+                        sheet.getCell('H37').value = "NETO";
+                        sheet.getCell('H38').value = "IVA";
+                        sheet.getCell('H41').value = "TOTAL";
 
-                        sheet.getCell('E39').value = "PL:";
-                        sheet.getCell('F39').value = rows[0].idpackinglist;
+                        sheet.getCell('E33').value = "PL:";
+                        sheet.getCell('F33').value = rows[0].idpackinglist;
 
-                        sheet.getCell('I40').value = neto;
-                        sheet.getCell('I41').value = neto*0.19;
-                        sheet.getCell('I44').value = neto*1.19;
+                        sheet.getCell('I37').value = neto;
+                        sheet.getCell('I38').value = neto*0.19;
+                        sheet.getCell('I41').value = neto*1.19;
 
                         workbook.xlsx.writeFile('public/' + nombre)
                             .then(function() {
