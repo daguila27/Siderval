@@ -1446,7 +1446,7 @@ router.get('/xlsx_desp', function(req,res){
                         sheet.getCell('H1').value = 'Cliente';
                         for (var i = 0; i < rows.length; i++) {
                             sheet.getCell('A' + (i+2).toString()).value = rows[i].idgd;
-                            sheet.getCell('B' + (i+2).toString()).value = rows[i].idodc;
+                            sheet.getCell('B' + (i+2).toString()).value = rows[i].numoc;
                             sheet.getCell('C' + (i+2).toString()).value = rows[i].idorden_f;
                             sheet.getCell('D' + (i+2).toString()).value = rows[i].detalle;
                             sheet.getCell('E' + (i+2).toString()).value = rows[i].cantidad;
