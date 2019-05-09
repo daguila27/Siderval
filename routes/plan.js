@@ -653,12 +653,12 @@ router.get('/page_oc/:idodc', function(req, res, next){
                 if(err) console.log("Connection Error: %s",err);
                 connection.query("SELECT * FROM odc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente WHERE odc.idodc = ?",[idodc], function(err, odc){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT pedido.*, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
+                    connection.query("SELECT pedido.*,pedido.precio as precioOC, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
                         +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial WHERE pedido.idodc = ? ORDER BY (pedido.numitem*1)",[idodc], function(err ,ped){
                             if(err) console.log("Select Error: %s",err);
                             
-                            //res.redirect('/plan');
-                            res.render('plan/page_oc', {odc: odc[0], ped: ped});
+                            console.log(req.session);
+                            res.render('plan/page_oc', {odc: odc[0], ped: ped, username: req.session.userData.nombre});
                     });
                 });
             });
