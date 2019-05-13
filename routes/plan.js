@@ -21,6 +21,67 @@ function verificar(usr){
   }
 }
 
+
+
+function getConditionArray(object_fill,array_fill, condiciones_where, input){
+    var clave;
+    var limit = "";
+    console.log(input);
+    if(input.ispage === 'true'){
+        limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
+    }
+
+
+    if(input.clave == '' || input.clave == null || input.clave == undefined){
+        clave = [];
+    }
+    else{
+        clave = input.clave.split(',');
+    }
+    if(clave.length>0){
+        for(var e=0; e < clave.length; e++){
+            if(clave[e].split('@')[2] == 'off') {
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            else{
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+        }
+
+    }
+    for(var w=0; w < Object.keys(object_fill).length; w++){
+        if(object_fill[Object.keys(object_fill)[w]].length > 0){
+            //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+            if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+            }
+            else{
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+            }
+        }
+    }
+
+    var where = " ";
+    if(input.rango.length > 0){
+        if(input.isRango === 'true'){
+            console.log(input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+            condiciones_where.push( input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+        }
+    }
+
+
+
+    if(condiciones_where.length==0){
+        where = "";
+    }
+    else{
+        where = " WHERE "+ condiciones_where.join(" AND ");
+    }
+
+    return [where, limit];
+}
+
 function parsear_crl(nro){
     x = nro.toString();
     var parts = x.toString().split(".");
@@ -195,11 +256,8 @@ router.get('/calendar_peds', function(req, res, next){
 /*  Funcion que busca los pedidos y los filtra segun paramentros pasados por url(orden,page).
     Renderiza una tabla con los pedidos en orden solicitado
 */
-router.post('/table_pedidos/:orden/:page', function(req, res, next){
+router.post('/table_pedidos', function(req, res, next){
   if(verificar(req.session.userData)){
-        var orden = req.params.orden;
-        orden = orden.replace('-', ' ');
-        var page = req.params.page - 1;
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
         var array_fill = [
@@ -222,53 +280,19 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
             "coalesce(cliente.sigla,'Sin Cliente')-on": [],
             "estado.estado-on": []
         };
-        var clave;
-        var where;
         var condiciones_where = [];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
 
-        if(input.pendientes == 'false'){
-            condiciones_where.push(['pedido.cantidad > pedido.despachados']);
-        }
-
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
-
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
-        console.log(condiciones_where);
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
 
-        var where = " ";
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
-        console.log(where);
+        var where = result[0];
+        var limit = result[1];
+        console.log(result);
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(GROUP_CONCAT(ordenfabricacion.idordenfabricacion),'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,COALESCE(cliente.sigla, 'Sin Cliente') AS sigla, material.* FROM pedido"
@@ -280,12 +304,12 @@ router.post('/table_pedidos/:orden/:page', function(req, res, next){
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " LEFT JOIN (SELECT pedido.idpedido, EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado FROM pedido) AS estado ON estado.idpedido=pedido.idpedido"
-                + where + " GROUP BY pedido.idpedido) as " + orden.split('.')[0] + " ORDER BY " + orden,
+                + where + " GROUP BY pedido.idpedido) as peds "+limit,
                 function(err, odc){
                     if(err) throw err;
 
 
-                    res.render('plan/table_pedidos', {data: odc, key: orden.replace(' ', '-'), page: page+1});
+                    res.render('plan/table_pedidos', {data: odc});
 
             });
         });
@@ -519,14 +543,56 @@ router.get('/construir', function(req, res, next){
 
 });
 
-router.get('/item_odcs', function(req, res, next){
+router.post('/item_odcs', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
+            var input = JSON.parse(JSON.stringify(req.body));
+            console.log(input);
+            var array_fill = [
+                "odc.numoc",
+                "fabricaciones.idorden_f",
+                "material.detalle",
+                "coalesce(cliente.sigla,'Sin Cliente')",
+                "estado.estado"
+            ];
+
+            var object_fill = {
+                "odc.numoc-off": [],
+                "fabricaciones.idorden_f-off": [],
+                "material.detalle-off": [],
+                "coalesce(cliente.sigla,'Sin Cliente')-off": [],
+                "estado.estado-off": [],
+                "odc.numoc-on": [],
+                "fabricaciones.idorden_f-on": [],
+                "material.detalle-on": [],
+                "coalesce(cliente.sigla,'Sin Cliente')-on": [],
+                "estado.estado-on": []
+            };
+            var condiciones_where = [];
+
+            if(input.cond != '') {
+                for (var e = 0; e < input.cond.split('@').length; e++) {
+                    condiciones_where.push(input.cond.split('@')[e]);
+                }
+            }
+            //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+            var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+
+            var where = result[0];
+            var limit = result[1];
             req.getConnection(function(err, connection){
                 if(err) throw err;
-                connection.query("select odc.*, coalesce(cliente.razon, 'No Definido') as cliente from odc left join cliente on cliente.idcliente=odc.idcliente", function(err, odc){
+                connection.query("select " +
+                    "odc.*, fabricaciones.idorden_f ," +
+                    "coalesce(cliente.razon, 'No Definido') as cliente, " +
+                    "EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado " +
+                    "from odc " +
+                    "left join cliente on cliente.idcliente=odc.idcliente " +
+                    "left join pedido on pedido.idodc = odc.idodc " +
+                    "left join material on material.idmaterial = pedido.idmaterial " +
+                    "left join fabricaciones on fabricaciones.idpedido = pedido.idpedido " +
+                    where + " group by pedido.idodc", function(err, odc){
                     if(err) throw err;
-                    console.log(odc);
                     res.render('plan/item_odcs', {data: odc});
                 });
             });
