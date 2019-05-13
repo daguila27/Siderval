@@ -32,7 +32,7 @@ function fechaLatino(string){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-top: 0px !important;">
     <thead>
     <tr>
         <th id="cab-numof">OF</th>
@@ -88,16 +88,16 @@ function fechaLatino(string){
         <td data-toggle="tooltip" title="Item" class="numitem" style="text-align: center;"><%=data[i].numitem%></td>
         <td data-toggle="tooltip" title="Cliente" class="cliente" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
         <td data-toggle="tooltip" title="Descripción" class="descrip" ><%=data[i].detalle%></td>
-        <td data-toggle="tooltip" title="Peso Unitario" class="pesoxproducir parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
-        <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
-        <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion" class="checkFunction sin_produccion parsear_nro" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
-        <td data-toggle="tooltip" title="Fundidos Totales" data-name = "fundidos" class="checkFunction fundidos parsear_nro" style="text-align: center;" data-valor="<%= data[i].fundidos%>"><%= data[i].fundidos%></td>
-        <td data-toggle="tooltip" title="Por Fundir" data-name = "xfusion" class="checkFunction xfusion parsear_nro" style="text-align: center;" data-valor="<%=data[i].solicitados - data[i].fundidos%>"><%=data[i].solicitados - data[i].fundidos%></td>
-        <td data-toggle="tooltip" title="Peso Por Fundir" data-name = "pesoxfusion" class="checkFunction pesoxfusion parsear_nro" style="text-align: center;" data-valor="<%= (data[i].solicitados - data[i].fundidos)*data[i].peso%>"><%= (data[i].solicitados - data[i].fundidos)*data[i].peso%></td>
-        <td data-toggle="tooltip" title="En Producción" data-name = "en_produccion" class="checkFunction en_produccion parsear_nro" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
-        <td data-toggle="tooltip" title="Peso x Despachar" data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
-        <td data-toggle="tooltip" title="Peso Despachado" data-name= "pesototal" class="checkFunction pesototal parsear_nro" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
-        <td data-toggle="tooltip" title="Stock" class="stock parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
+        <td data-toggle="tooltip" title="Peso Unitario" class="pesoxproducir parsear_nro" data-cs="0" style="text-align: center;"><%= data[i].peso%></td>
+        <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
+        <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion" class="checkFunction sin_produccion parsear_nro" data-cs="0" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
+        <td data-toggle="tooltip" title="Fundidos Totales" data-name = "fundidos" class="checkFunction fundidos parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].fundidos%>"><%= data[i].fundidos%></td>
+        <td data-toggle="tooltip" title="Por Fundir" data-name = "xfusion" class="checkFunction xfusion parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%=data[i].solicitados - data[i].fundidos%>"><%=data[i].solicitados - data[i].fundidos%></td>
+        <td data-toggle="tooltip" title="Peso Por Fundir" data-name = "pesoxfusion" class="checkFunction pesoxfusion parsear_nro" data-cs="2" style="text-align: center;" data-valor="<%= (data[i].solicitados - data[i].fundidos)*data[i].peso%>"><%= (data[i].solicitados - data[i].fundidos)*data[i].peso%></td>
+        <td data-toggle="tooltip" title="En Producción" data-name = "en_produccion" class="checkFunction en_produccion parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
+        <td data-toggle="tooltip" title="Peso x Despachar" data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;"  data-cs="1" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
+        <td data-toggle="tooltip" title="Peso Despachado" data-name= "pesototal" class="checkFunction pesototal parsear_nro"  data-cs="2" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
+        <td data-toggle="tooltip" title="Stock" data-cs="0" class="stock parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
         <td data-toggle="tooltip" title="Fecha de Entrega" class="f_entrega" style="text-align: center;" >
             <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= data[i].esp_fecha_entrega %> </span>
         </td>
@@ -110,16 +110,16 @@ function fechaLatino(string){
         <td id="numitem"></td>
         <td id="cliente"></td>
         <td id="descrip"></td>
-        <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%=solic_total%></td>
         <td id="pesoxproducir"></td>
-        <td id="sin_produccion" data-toggle="tooltip" title="Totales por Despachar" style="text-align: center;" class="parsear_nro"><%=xdesp_total%></td>
-        <td id="fundidos" data-toggle="tooltip" title="Fundidos Totales" style="text-align: center;" class="parsear_nro"></td>
-        <td id="xfusion" data-toggle="tooltip" title="Totales por Fundir" style="text-align: center;" class="parsear_nro"><%=xfusion_total%></td>
-        <td id="pesoxfusion" data-toggle="tooltip" title="Peso por Fundir" style="text-align: center;" class="parsear_nro"><%=pesoxfusion_total%></td>
-        <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%=enpro_total%> </td>
-        <td id="peso" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro"><%=pesot_total%> Kg</td>
-        <td id="pesototal" data-toggle="tooltip" title="Peso Total despachado" style="text-align: center;" class="parsear_nro"><%=pesod_total%></td>
-        <td id="stock"></td>
+        <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro" data-cs="0"><%=solic_total%></td>
+        <td id="sin_produccion" data-toggle="tooltip" title="Totales por Despachar" style="text-align: center;" class="parsear_nro" data-cs="0"><%=xdesp_total%></td>
+        <td></td>
+        <td id="xfusion" data-toggle="tooltip" title="Totales por Fundir" style="text-align: center;" class="parsear_nro" data-cs="0"><%=xfusion_total%></td>
+        <td id="pesoxfusion" data-toggle="tooltip" title="Peso por Fundir" style="text-align: center;" class="parsear_nro" data-cs="2"><%=pesoxfusion_total%></td>
+        <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro" data-cs="0"><%=enpro_total%> </td>
+        <td id="peso" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro" data-cs="1"><%=pesot_total%> Kg</td>
+        <td id="pesototal" data-toggle="tooltip" title="Peso Total despachado" style="text-align: center;" class="parsear_nro" data-cs="2"><%=pesod_total%></td>
+        <td id="stock" class="parsear_nro" data-cs="0"></td>
         <td id="f_entrega"></td>
     </tr>
     </tfoot>
@@ -128,17 +128,31 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    function parsear_nro(x){
+    function parsear_nro(x, cs){
         var parts = x.toString().split(".");
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         if(parts.length > 1){
-            if(parts[1].length > 2){
-                parts[1] = parts[1].substring(0,1);
+            if(parts[1].length >= cs){
+                parts[1] = parts[1].substring(0,cs);
+            }
+            else{
+                parts[1] = parts[1]+'0'.repeat(cs-parts[1].length);
             }
         }
-        var num =  parts.join(",");
+        else{
+            parts[1] = '0'.repeat(cs);
+        }
+        var num;
+
+        if(cs === 0){
+            num =  parts[0];
+        }
+        else{
+            num =  parts.join(",");
+        }
         return num;
     }
+
     setDataTableFixed("#DataTableFabs");
 
 
@@ -166,13 +180,15 @@ function fechaLatino(string){
         }
 
 
-        $("#solicitados").text(parsear_nro(object.solicitados));
-        $("#sin_produccion").text(parsear_nro(object.sin_produccion));
-        $("#en_produccion").text(parsear_nro(object.en_produccion));
-        $("#peso").text(parsear_nro(object.peso));
-        $("#pesototal").text(parsear_nro(object.pesototal));
-        $("#xfusion").text(parsear_nro(object.xfusion));
-        $("#pesoxfusion").text(parsear_nro(object.pesoxfusion));
+        $("#solicitados").text(parsear_nro(object.solicitados, 0));
+        $("#sin_produccion").text(parsear_nro(object.sin_produccion, 0));
+        $("#xfusion").text(parsear_nro(object.xfusion, 0));
+        $("#pesoxfusion").text(parsear_nro(object.pesoxfusion, 2));
+        $("#en_produccion").text(parsear_nro(object.en_produccion, 0));
+        $("#peso").text(parsear_nro(object.peso, 1));
+        $("#pesototal").text(parsear_nro(object.pesototal, 2));
+
+
     }
     var mouseDown = 0;
     document.body.onmousedown = function() {

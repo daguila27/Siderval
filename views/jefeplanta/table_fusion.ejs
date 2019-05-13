@@ -7,6 +7,54 @@ function fechaLatino(string){
         return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
     }
 }
+var etp = [
+    "Moldes",
+    "Fundidos",
+    "Quebrados",
+    "Terminados",
+    "Tratados",
+    "Maestranza",
+    "CC"
+];
+
+var etp_f = [
+    "Moldeo",
+    "Fusión",
+    "Quiebre",
+    "Terminación",
+    "Tratamiento Térmico",
+    "Maestranza",
+    "CC"
+];
+
+
+function fechaEspañol(date){
+    date = new Date(date);
+    var meses = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+    ];
+    var dias = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miercoles",
+        "Jueves",
+        "Viernes",
+        "Sabado"
+    ];
+    return dias[date.getDay()] +" "+date.getDate()+" de "+meses[date.getMonth()]+" de "+date.getFullYear();
+}
 %>
 <script type="text/javascript">
     $("#DataTableFabs tbody").attr('unselectable','on')
@@ -32,17 +80,17 @@ function fechaLatino(string){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-top: 0px !important; margin-bottom: 0px !important;">
     <thead>
     <tr>
         <th>OF</th>
-        <th>OC</th>
+        <th>OC/ODV</th>
         <th>Cliente</th>
         <th>Detalle</th>
-        <th>Fundidos</th>
+        <th><%= etp[parseInt(etapa)-1]%></th>
         <th>Peso Pieza (kg)</th>
         <th>Peso (kg)</th>
-        <th>Fecha Fusión</th>
+        <th>Fecha <%= etp_f[parseInt(etapa)-1]%></th>
     </tr>
     </thead>
     <tbody>
@@ -55,12 +103,12 @@ function fechaLatino(string){
             <td><%= data[i].numoc%></td>
             <td><%= data[i].sigla%></td>
             <td><%= data[i].detalle%></td>
-            <td class="parsear_nro body_p" data-val="<%= data[i].enviados%>" style="text-align: center;"><%= data[i].enviados%></td>
-            <td class="parsear_nro" style="text-align: center;"><%= data[i].peso%></td>
-            <% kilos_totales += data[i].peso*data[i].enviados;
+            <td class="parsear_nro body_p" data-cs="0" data-val="<%= data[i].enviados%>" style="text-align: center;"><%= data[i].enviados%></td>
+            <td class="parsear_nro" data-cs="1" style="text-align: center;"><%= data[i].peso%></td>
+            <% kilos_totales += (data[i].peso*data[i].enviados);
                piezas_totales += data[i].enviados;%>
-            <td class="parsear_nro body_k" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
-            <td style="text-align: center" data-order="<%= new Date(data[i].fecha).getTime()%>"><%= data[i].esp_fecha_mov%></td>
+            <td class="parsear_nro body_k" data-cs="2" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
+            <td style="text-align: left" data-order="<%= new Date(data[i].mov_fecha).getTime()%>"><%= fechaEspañol(data[i].mov_fecha)%></td>
         </tr>
     <%}%>
     </tbody>
@@ -70,9 +118,9 @@ function fechaLatino(string){
         <td></td>
         <td></td>
         <td></td>
-        <td id="footer_pt" class="parsear_nro" style="text-align: center"><%= piezas_totales%></td>
+        <td id="footer_pt" class="parsear_nro" data-cs="0" style="text-align: center"><%= piezas_totales%></td>
         <td></td>
-        <td id="footer_kt" class="parsear_nro" style="text-align: center"><%= kilos_totales%></td>
+        <td id="footer_kt" class="parsear_nro" data-cs="2" style="text-align: center"><%= kilos_totales%></td>
         <td></td>
     </tr>
     </tfoot>
@@ -84,6 +132,8 @@ function fechaLatino(string){
     var total_piezas = parseFloat('<%=piezas_totales%>');
     var total_peso = parseFloat('<%=kilos_totales%>');
     setDataTableFixed("#DataTableFabs");
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), ".indicador_paginas");
+
 
     var mouseDown = 0;
     document.body.onmousedown = function() {
@@ -123,12 +173,12 @@ function fechaLatino(string){
         });
 
         if( no_p || no_k ){
-            $("#footer_pt").html(parsear_nro(total_peso));
-            $("#footer_kt").html(parsear_nro(total_piezas));
+            $("#footer_pt").html(parsear_nro(total_piezas, 0));
+            $("#footer_kt").html(parsear_nro(total_peso, 2));
         }
         else{
-            $("#footer_pt").html(parsear_nro(body_p));
-            $("#footer_kt").html(parsear_nro(body_k));
+            $("#footer_pt").html(parsear_nro(body_p, 0));
+            $("#footer_kt").html(parsear_nro(body_k, 2));
         }
 
     }
@@ -177,15 +227,28 @@ function fechaLatino(string){
             }
         });
     }
-    function parsear_nro(x){
+    function parsear_nro(x, cs){
         var parts = x.toString().split(".");
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         if(parts.length > 1){
-            if(parts[1].length > 2){
-                parts[1] = parts[1].substring(0,1);
+            if(parts[1].length >= cs){
+                parts[1] = parts[1].substring(0,cs);
+            }
+            else{
+                parts[1] = parts[1]+'0'.repeat(cs-parts[1].length);
             }
         }
-        var num =  parts.join(",");
+        else{
+            parts[1] = '0'.repeat(cs);
+        }
+        var num;
+
+        if(cs === 0){
+            num =  parts[0];
+        }
+        else{
+            num =  parts.join(",");
+        }
         return num;
     }
 

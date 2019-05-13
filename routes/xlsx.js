@@ -67,13 +67,13 @@ informe.getdatos = function(fecha,callback, condiciones){
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as rechazados FROM produccion_history" +
             " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-            " WHERE (produccion_history.to='s' AND produccion_history.from != '1' AND produccion_history.from != '2') AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " WHERE (produccion_history.to='s' AND produccion_history.from != '1') AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " GROUP BY fabricaciones.idmaterial) AS rechazados ON rechazados.idmaterial = material.idmaterial" +
             //SE OBTIENEN LAS SALIDAS DE FUSION SIN CONTAR LOS RECHAZOS
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fundidos FROM produccion_history" +
             " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-            " WHERE produccion_history.from = '2' AND produccion_history.to != 's' AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " WHERE produccion_history.from = '1' AND produccion_history.to != 's' AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " GROUP BY fabricaciones.idmaterial) AS fundidos ON fundidos.idmaterial = material.idmaterial" +
 
             // Solicitado Teorico desde Bom -  as necesario.necesarios
@@ -123,7 +123,7 @@ informe.getdatos = function(fecha,callback, condiciones){
             " LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE (gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " AND (gd.estado = 'Venta' OR (gd.estado = 'Traslado' AND (gd.idcliente = 6341  OR gd.idcliente = 6439) )) GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
             // LEFT JOIN produccion AKA cantidad en produccion
-            " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1` - produccion.`2`) as virtuales" +
+            " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1`) as virtuales" +
             " FROM produccion" +
             " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
             " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +

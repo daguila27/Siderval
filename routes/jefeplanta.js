@@ -14,6 +14,66 @@ router.use(
 
     },'pool')
 );
+
+
+
+function getConditionArray(object_fill,array_fill, condiciones_where, input){
+    var clave;
+    var limit = "";
+    console.log(input);
+    if(input.ispage === 'true'){
+        limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
+    }
+
+    if(input.clave == '' || input.clave == null || input.clave == undefined){
+        clave = [];
+    }
+    else{
+        clave = input.clave.split(',');
+    }
+    if(clave.length>0){
+        for(var e=0; e < clave.length; e++){
+            if(clave[e].split('@')[2] == 'off') {
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            else{
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+        }
+
+    }
+    for(var w=0; w < Object.keys(object_fill).length; w++){
+        if(object_fill[Object.keys(object_fill)[w]].length > 0){
+            //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+            if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+            }
+            else{
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+            }
+        }
+    }
+
+    var where = " ";
+    if(input.rango.length > 0){
+        if(input.isRango === 'true'){
+            console.log(input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+            condiciones_where.push( input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+        }
+    }
+
+
+
+    if(condiciones_where.length==0){
+        where = "";
+    }
+    else{
+        where = " WHERE "+ condiciones_where.join(" AND ");
+    }
+
+    return [where, limit];
+}
 function verificar(usr){
     if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta'){
         return true;
@@ -91,7 +151,6 @@ router.get('/stats', function(req, res, next){
 router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var fill = req.params.fill;
         var valetapa = req.params.valetapa;
         var array_fill = [
@@ -107,52 +166,18 @@ router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
             "material.detalle-on": [],
             "cliente.sigla-on": []
         };
-        var clave;
-        var where;
         var condiciones_where = ['produccion_history.from = '+valetapa];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
-
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        var where = result[0];
+        var limit = result[1];
 
 
-
-        var where = " ";
-
-        if(input.rango == undefined || input.rango == null || input.rango == ''){
-            var d = new Date().toLocaleDateString();
-            condiciones_where.push("produccion_history.fecha > '"+[d.split(' ')[0].split('-')[0],d.split(' ')[0].split('-')[1]].join('-')+"-01 00:00:00'");
-        }
-        else{
-            console.log(input.rango);
-            condiciones_where.push("produccion_history.fecha BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59'");
-        }
-        console.log(fill);
         var dataget;
         var group;
         var orderby;
@@ -170,7 +195,7 @@ router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
             condiciones_where.push('cliente.idcliente IS NOT NULL');
         }
 
-        if(input.graphval === 'kg'){
+        if(input.extraInfo === 'kg'){
             dataget += ",sum(produccion_history.enviados*material.peso) as fundidos ";
             orderby = "sum(produccion_history.enviados*material.peso)";
         }
@@ -179,14 +204,6 @@ router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
             orderby = "sum(produccion_history.enviados)";
         }
 
-
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
-        console.log(where);
 
         req.getConnection(function(err, connection){
             if(err)
@@ -253,81 +270,39 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
             "material.detalle-on": [],
             "cliente.sigla-on": []
         };
-        var clave;
-        var where;
-        var condiciones_where = ['produccion_history.from = '+idetapa];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
 
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        var condiciones_where = ['produccion_history.to = '+idetapa];
+
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
-
-
-
-        var where = " ";
-
-        if(input.rango == undefined || input.rango == null || input.rango == ''){
-            var d = new Date().toLocaleDateString();
-            condiciones_where.push("produccion_history.fecha > '"+[d.split(' ')[0].split('-')[0],d.split(' ')[0].split('-')[1]].join('-')+"-01 00:00:00'");
-        }
-        else{
-            console.log(input.rango);
-            condiciones_where.push("produccion_history.fecha BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59'");
-        }
-
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
-        console.log(where);
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        console.log(result);
+        var where = result[0];
+        var limit = result[1];
         req.getConnection(function(err, connection){
             if(err) throw err;
 
                 var consulta = "select " +
                     "material.detalle, material.peso, " +
-                    "produccion_history.*,odc.numoc, " +
-                    "concat(dayname(produccion.f_gen), ' ', day(produccion.f_gen),' de ',monthname(produccion.f_gen),' de ',year(produccion.f_gen)) as esp_fecha_gen," +
-                    "concat(dayname(produccion_history.fecha), ' ', day(produccion_history.fecha),' de ',monthname(produccion_history.fecha),' de ',year(produccion_history.fecha)) as esp_fecha_mov," +
+                    "produccion_history.*, produccion_history.fecha as mov_fecha,coalesce(odc.numoc, 'Producción para Stock') as numoc, " +
                     "fabricaciones.idorden_f, " +
-                    "coalesce(cliente.sigla, 'No Definido') as sigla, cliente.razon " +
+                    "coalesce(cliente.sigla, 'SIDERVAL') as sigla, cliente.razon " +
                     "from produccion_history " +
                     "left join produccion on produccion.idproduccion = produccion_history.idproduccion " +
                     "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
                     "left join material on material.idmaterial = fabricaciones.idmaterial " +
                     "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
                     "left join odc on odc.idodc = pedido.idodc " +
-                    "left join cliente on cliente.idcliente = odc.idcliente "+where;
+                    "left join cliente on cliente.idcliente = odc.idcliente "+where + limit;
                 connection.query(consulta,
                     function(err, fund){
                         if(err) throw err;
 
-                        res.render('jefeplanta/table_fusion', {data: fund});
+                        res.render('jefeplanta/table_fusion', {data: fund, etapa: idetapa});
 
                 });
         });

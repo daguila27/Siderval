@@ -70,8 +70,8 @@ Fusión	2
 Terminación	4
 Control de Calidad	7
 Maestranza	6-->
-                <div class="form-group" style="margin-left: 15px;margin-bottom: 20px; display: flex;">
-                    <select class="form-control seleccionar-proceso" onchange="buscar_fusion()" style="background-color: rgb(249,249,249); border-radius: 0;">
+                <div class="form-group" style="margin-left: 15px;margin-bottom: 10px; display: flex;">
+                    <select class="form-control seleccionar-proceso" style="background-color: rgb(249,249,249); border-radius: 0;">
                         <option value="1">Moldeo</option>
                         <option value="2" selected>Fusión</option>
                         <option value="3">Quiebre</option>
@@ -83,24 +83,11 @@ Maestranza	6-->
                 </div>
             </li>
             <!-- Mostrar cantidad de datos -->
-            <div id="pedidos" style="margin-top: 8px"><h5><small>Mostrando 0 pedido(s)</small></h5></div>
+            <div id="pedidos" class="indicador_paginas" data-total="0" style="margin-top: 8px"><h5><small>Mostrando 0 pedido(s)</small></h5></div>
         </ol>
         <div style="width: 50%; margin-right: 4%">
             <div class="form-group o_searchview" style="margin: 0;padding: 0;">
-                <div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
-                    <div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
-                    </div>
-                    <input disabled="disabled" autocomplete="off" id="buscar_fusion" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
-                    <input disabled="disabled" autocomplete="off" id="buscar_fusion-value" style="display: none" type="text" autocomplete="off">
-                </div>
-                <ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
-                    <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OF</em> para: <strong></strong></a></li>
-                    <li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripción</em> para: <strong></strong></a></li>
-                    <li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Cliente</em> para: <strong></strong></a></li>
-                </ul>
-                <ul class="dropdown-menu o_searchview_autocomplete_graph" data-item="0" role="menu" style="display: none;">
-                    <li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em># OF</em> para: <strong></strong></a></li>
-                </ul>
+
             </div>
 
             <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
@@ -119,26 +106,8 @@ Maestranza	6-->
                         <label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
                         <input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_despachositem()">
                     </div>-->
-                    <div class="dropdown" style="margin-left: 15px">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Acotar
-                            <span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="padding: 7px">
-                            <li style="padding: 0px 10px; display:flex; width: 100%">
-                                <button class="setdates-buttons btn btn-xs btn-default" data-value="<%= new Date().toLocaleDateString().split(' ')[0]+'@'+new Date().toLocaleDateString().split(' ')[0]%>">Hoy</button>
-                                <button class="setdates-buttons btn btn-xs btn-default" data-value="<%= getMonday(new Date())+'@'+getSunday(new Date())%>">Esta Semana</button>
-                                <button class="setdates-buttons btn btn-xs btn-default active" data-value="<%= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString().split(' ')[0]+'@'+new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toLocaleDateString().split(' ')[0]%>">Este Mes</button>
-                            </li>
-                            <li class="dropdown-header">Desde:</li>
-                            <li><input id="fecha-desde" class="form-control" type="date" value="<%= new Date(new Date().getFullYear(), new Date().getMonth(), 1)%>"></li>
-                            <li class="divider"></li>
-                            <li class="dropdown-header">Hasta:</li>
-                            <li><input id="fecha-hasta" class="form-control" type="date" value="<%= new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)%>"></li>
-                            <li class="divider"></li>
-                            <li class="pull-right" style="padding: 0px 10px">
-                                <button class="btn btn-xs btn-primary" onclick="restartFechas()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
-                                <button class="btn btn-xs btn-success" onclick="setFechas()"><i class="fa fa-check"></i></button>
-                            </li>
-                        </ul>
+                    <div class="dropdown date-fill" style="margin-left: 15px">
+
                     </div>
                     <h5 style="margin-left: 10px" class="indicator-of-check indicador_busqueda"><small>Mostrando Fusiones de este Mes</small></h5>
                     <div class="form-group pull-right filtro_graph hidden" style="margin-left: 15px; display: flex;">
@@ -149,7 +118,7 @@ Maestranza	6-->
                             <option value="of">Orden de Fabricación (OF)</option>
                         </select>
 
-                        <div class="radio option_graph" style="margin-left: 10px;margin-top: 0" onchange="buscar_fusion_stats()">
+                        <div class="radio option_graph" style="margin-left: 10px;margin-top: 0">
                             <label><input type="radio" name="optdata" value="pi" checked>Piezas Procesadas</label>
                             <label><input type="radio" name="optdata" value="kg">Kilos Procesados</label>
                         </div>
@@ -188,342 +157,25 @@ Maestranza	6-->
         "Descripción@primary",
         "Cliente@success"
     ];
-    $(".setdates-buttons").on('click', function(e){
-        e.preventDefault();
-        $(".setdates-buttons").removeClass('active');
-        $(this).addClass('active');
-        var mes1, mes2, dia1, dia2;
+    var busc = new Buscador("buscar_fusion", ".o_searchview", array_fill, "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val(), "DataTableFabs", false, true, ".date-fill","produccion_history.fecha");
 
-        if( (new Date($(this).data('value').split('@')[0]).getMonth()+ 1).toString().length == 1 ){
-            mes1 = '0'+(new Date($(this).data('value').split('@')[0]).getMonth() + 1).toString();
-        }
-        else{
-            mes1 = new Date($(this).data('value').split('@')[0]).getMonth().toString();
-        }
-
-
-        if( (new Date($(this).data('value').split('@')[1]).getMonth()+1).toString().length == 1 ){
-            mes2 = '0'+(new Date($(this).data('value').split('@')[1]).getMonth() + 1).toString();
-        }
-        else{
-            mes2 = (new Date($(this).data('value').split('@')[1]).getMonth()+1).toString();
-        }
-
-
-
-        if( new Date($(this).data('value').split('@')[0]).getDate().toString().length == 1 ){
-            dia1 = '0'+new Date($(this).data('value').split('@')[0]).getDate().toString();
-        }
-        else{
-            dia1 = (new Date($(this).data('value').split('@')[0]).getDate()).toString();
-        }
-
-
-
-        if( new Date($(this).data('value').split('@')[1]).getDate().toString().length == 1 ){
-            dia2 = '0'+new Date($(this).data('value').split('@')[1]).getDate().toString();
-        }
-        else{
-            dia2 = (new Date($(this).data('value').split('@')[1]).getDate()).toString();
-        }
-
-        $("#fecha-desde").val(new Date($(this).data('value').split('@')[0]).getFullYear()+"-"+mes1+"-"+dia1);
-        $("#fecha-hasta").val(new Date($(this).data('value').split('@')[1]).getFullYear()+"-"+mes2+"-"+dia2);
-        setFechas();
-    });
-    var filtros_seleccionados = [];
-    var rango = [];
+    busc.add_cond = "";
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
-        $.ajax({
-            type: 'POST',
-            data: {clave: filtros_seleccionados.join(','),  rango: rango.join('@')},
-            url: '/jefeplanta/table_fusion/'+$(".seleccionar-proceso").val(),
-            beforeSend: function(){
-                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-            },
-            success: function(data){
-                $(".main-page").html(data);
-
-                //Muestra la cantidad de pedidos
-                $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$("#up-fills").height()-5);
-            }
-        });
-        $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+        $(".setdates-buttons.mes").click();
     });
 
 
-
-
-    function buscar_fusion(){
-        if($(".tipovista").hasClass('listafusion')) {
-            $.ajax({
-                type: 'POST',
-                data: {clave: filtros_seleccionados.join(','), rango: rango.join('@')},
-                url: '/jefeplanta/table_fusion/'+$(".seleccionar-proceso").val(),
-                beforeSend: function () {
-                    destroyDataTable();
-                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                },
-                success: function (data) {
-                    $(".main-page").html(data);
-                    //Muestra la cantidad de pedidos
-                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                }
-            });
-        }
-        else{
-            buscar_fusion_stats();
-        }
-    }
-
-    function buscar_fusion_stats(){
-        if(!$(".tipovista").hasClass('listafusion')) {
-            $.ajax({
-                type: 'POST',
-                data: {clave: filtros_seleccionados.join(','), rango: rango.join('@'), graphval: $("input[name='optdata']:checked").val()},
-                url: '/jefeplanta/stats_fusion/'+$("#filtro_graph").val()+'/'+$(".seleccionar-proceso").val(),
-                beforeSend: function () {
-                    destroyDataTable();
-                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                },
-                success: function (data) {
-                    $(".main-page").html(data);
-                }
-            });
-        }
-        else{
-            buscar_fusion()
-        }
-    }
-
-
-
-    //FUNCIONES PARA BUSCADORES
-    $("#buscar_fusion").on('keyup', function(e){
-        e.preventDefault();
-        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
-            $(".o_searchview_autocomplete").css('display', 'none');
-            $(".o_searchview_autocomplete strong").html('');
-        }
-        else{
-            $(".o_searchview_autocomplete").css('display', 'block');
-            $(".o_searchview_autocomplete strong").html($(this).val());
-        }
+    $(".seleccionar-proceso").on('change', function(e){
+       e.preventDefault();
+       busc.url = "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val();
+       busc.buscar_action();
     });
 
 
-    $('.fill-item-abast').hover(function() {
-        $(this).css('cursor','pointer');
-        $('.fill-item-abast').removeClass("o-selection-focus");
-        $(this).addClass("o-selection-focus");
-        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
-    });
-
-    $(".fill-item-abast").on('click', function(e){
-        e.preventDefault();
-        var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
-        var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
-        $(".etiqueta-filtro-div").append(
-            "<label id='label"+labels+"' data-toggle='tooltip' title='Buscando "+'"'+$("#buscar_fusion").val()+'"'+" ' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_fusion").val()+"@off' class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>"
-            +$("#buscar_fusion").val()+
-            "</strong> <div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div><div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
-        );
-        $(".etiqueta-filtro-div").data('cant', labels+1);
-        if($("#buscar_fusion-value").val() == '' || $("#buscar_fusion-value").val() == null || $("#buscar_fusion-value").val() == undefined){
-            $("#buscar_fusion-value").val($(this).data('searchcol')+"@"+$("#buscar_fusion").val()+"@off");
-        }
-        else{
-            $("#buscar_fusion-value").val([$("#buscar_fusion-value").val(),$(this).data('searchcol')+"@"+$("#buscar_fusion").val(),'off'].join(','));
-        }
-        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_fusion").val()+"@off");
-        $(".o_searchview_autocomplete").css('display', 'none');
-        $(".o_searchview_autocomplete strong").html('');
-        $("#buscar_fusion").val('');
-        $("#buscar_fusion").focus();
-        buscar_fusion();
-    });
-
-
-
-
-
-
-
-    function eliminarEtiqueta(yo){
-        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
-        $(yo).parent().remove();
-        $(".etiqueta-filtro").removeAttr('id');
-        var count = 0;
-        $(".etiqueta-filtro").each(function(){
-            $(this).attr("id","label"+count);
-            count++;
-        });
-        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
-        buscar_fusion();
+    function buscar_stats(){
+        busc.add_cond = "";
     }
-
-    function cambiarEtiqueta(yo){
-        if($(yo).data('state') == 'off') {
-            $(yo).parent().removeClass('label-primary');
-            $(yo).parent().addClass('label-danger');
-            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'on'].join('@'));
-
-
-            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
-
-            $(yo).parent().attr('title', "Removiendo "+'"'+$(yo).parent().children('strong').text()+'"'+" de la busqueda");
-            $(yo).removeClass('fa-toggle-off');
-            $(yo).addClass('fa-toggle-on');
-            $(yo).data('state', 'on');
-        }
-        else{
-            $(yo).parent().removeClass('label-danger');
-            $(yo).parent().addClass('label-primary');
-            $(yo).parent().data('valor', [$(yo).parent().data('valor').split('@')[0],$(yo).parent().data('valor').split('@')[1],'off'].join('@'));
-
-            filtros_seleccionados[parseInt($(yo).parent().attr('id').substring(5,6))] = $(yo).parent().data('valor');
-
-            $(yo).parent().attr('title', "Buscando "+'"'+$(yo).parent().children('strong').text()+'"');
-
-            $(yo).removeClass('fa-toggle-on');
-            $(yo).addClass('fa-toggle-off');
-
-            $(yo).data('state', 'off');
-        }
-        buscar_fusion();
-    }
-    function despInput(event){
-        var char = event.which || event.keyCode;
-        var item = $(".o_searchview_autocomplete").data('item');
-        //BORRAR LABEL
-        if(char == 8 && ($("#buscar_fusion").val()==null || $("#buscar_fusion").val()=='' || $("#buscar_fusion").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
-            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
-            eliminarEtiqueta($("#label"+labels).children('div'));
-        }
-        //ENTER
-        else if(char == 13){
-            $(".fill-item-abast.o-selection-focus").click();
-        }
-        //ARRIBA
-        else if(char == 38){
-            item = parseInt(item) - 1;
-        }
-        //ABAJO
-        else if(char == 40){
-            item = parseInt(item) + 1;
-        }
-
-
-        //SI SOBREPASA EL LIMITE INFERIOR
-        if(parseInt(item) >= 3){
-            $(".o_searchview_autocomplete").data('item', "0");
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item0").addClass("o-selection-focus");
-        }
-        //SI SOBREPASA EL LIMITE SUPERIOR
-        else if(parseInt(item) < 0){
-            $(".o_searchview_autocomplete").data('item', "2");
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item2").addClass("o-selection-focus");
-        }
-        else{
-            $(".o_searchview_autocomplete").data('item', item);
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item"+item).addClass("o-selection-focus");
-        }
-
-    }
-    $('.view-option').on('click', function(e){
-        e.preventDefault();
-        $('.view-option').removeClass('active');
-        if($(this).data('original-title') == 'Lista'){
-            $("#check_pendientes").css('display', 'inline');
-        }
-        else{
-            $("#check_pendientes").css('display', 'none');
-        }
-        $(this).addClass('active');
-
-
-        if($(this).data('viewtype') == 'list'){
-            //$(".indicador_busqueda").toggleClass('hidden');
-            $(".filtro_graph").toggleClass('hidden');
-            $(".tipovista").toggleClass('listafusion');
-            buscar_fusion();
-            /*$.ajax({
-                type: 'POST',
-                data: {clave: filtros_seleccionados.join(','),  rango: rango.join('@')},
-                url: "/jefeplanta/table_fusion/",
-                beforeSend: function(){
-                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                },
-                success: function(data){
-                    $(".main-page").html(data);
-                    if($(this).data('viewType') == 'list') {
-                        //Muestra la cantidad de pedidos
-                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                    }
-                }
-            });*/
-        }
-        else if($(this).data('viewtype') == 'graph'){
-            //$(".indicador_busqueda").toggleClass('hidden');
-            $(".filtro_graph").toggleClass('hidden');
-            $(".tipovista").toggleClass('listafusion');
-            buscar_fusion_stats();
-        }
-
-
-    });
-
-    // Muestra la tabla antes de ver una OF
-    function mostrar_tabla(){
-        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
-            if($("#buscar_fusion").val() == "" || $("#buscar_fusion").val() == null) {
-                $.ajax({
-                    type: 'POST',
-                    data: {clave: filtros_seleccionados.join(',')},
-                    url: '/jefeplanta/table_fusion/fabricaciones.f_entrega-ASC/true',
-                    beforeSend: function(){
-                        $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                    },
-                    success: function(data){
-                        $(".main-page").html(data);
-                        //Muestra la cantidad de pedidos
-                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                    }
-                });
-                $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
-            }
-            else{
-                $.ajax({
-                    type: 'POST',
-                    data: {clave: $("#buscar_fusion").val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
-                    url: '/jefeplanta/buscar_fusion_list',
-                    success: function(data){
-                        $(".main-page").html(data);
-                        //Muestra la cantidad de pedidos
-                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                    }
-                });
-            }
-        }
-        else {
-            $.ajax({
-                type: 'POST',
-                data: {clave: $("#buscar_fusion").val(),  showPend: $("#pend").is(':checked')},
-                url: '/jefeplanta/buscar_fusion_item',
-                success: function(data){
-                    $(".main-page").html(data);
-                    //Muestra la cantidad de pedidos
-                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                }
-            });
-        }
-    };
-
 
 
     $(".getcsvof").click(function(e){
@@ -540,23 +192,33 @@ Maestranza	6-->
     });
 
 
-    function setFechas(){
-        if($("#fecha-desde").val() == '' || $("#fecha-hasta").val() == ''){
-            alert("Debe ingresar ambas fechas.");
+    $('.option_graph').change(function() {
+        busc.extraInfo = [$(this).val()];
+        busc.buscar_action();
+    });
+    $("#filtro_graph").on('change', function(e){
+        e.preventDefault();
+        busc.url = "/jefeplanta/stats_fusion/"+$(this).val()+"/"+$(".seleccionar-proceso").val();
+        busc.buscar_action();
+    });
+
+    $(".view-option").on('click', function(e){
+        e.preventDefault();
+        $(".view-option").removeClass('active');
+        $(this).addClass('active');
+
+        if($(this).data("viewtype") === "graph" ){
+            busc.extraInfo = ["pi"];
+            busc.url = "/jefeplanta/stats_fusion/cliente/"+$(".seleccionar-proceso").val();
+            $(".filtro_graph").removeClass('hidden');
         }
         else{
-
-            $(".indicator-of-check").css('display', 'none');
-            rango = [$("#fecha-desde").val(),$("#fecha-hasta").val()];
-            buscar_fusion();
+            busc.url = "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val();
+            $(".filtro_graph").addClass('hidden');
         }
-    }
+        busc.buscar_action();
+    });
 
-    function restartFechas(){
-        rango = [];
-        $(".indicator-of-check").css('display', 'block');
-        buscar_fusion();
-    }
 
     function getRidOffAutocomplete(){
         var timer = window.setTimeout( function(){
@@ -569,3 +231,6 @@ Maestranza	6-->
     getRidOffAutocomplete();
 
 </script>
+
+
+<script src="/buscador_funciones.js"></script>

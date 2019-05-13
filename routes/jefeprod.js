@@ -816,46 +816,71 @@ router.post('/save_op', function(req, res, next){
 			}
 			else{
                 var idope = oproduccion.insertId;
+                /*
+                * UPDATE `table` SET `uid` = CASE
+                        WHEN id = 1 THEN 2952
+                        WHEN id = 2 THEN 4925
+                        WHEN id = 3 THEN 1592
+                        ELSE `uid`
+                        END
+                    WHERE id  in (1,2,3)
+                * */
+                var ids = [];
+                var prod_h = [];
 				for(var i=0; i<req.session.arrayProduccion.length; i++ ){
-                    query += "UPDATE fabricaciones SET restantes=restantes-"+input.list[i]+
-                        " WHERE idfabricaciones="+req.session.arrayProduccion[i][0]+"@";
-                        if(input.dates[i] == null){
-        					arrayDBP.push([parseInt(input.list[i]),req.session.arrayProduccion[i][0],oproduccion.insertId,parseInt(input.list[i]), new Date().toLocaleString() ]);
-                        }
-                        else{
-                            arrayDBP.push([parseInt(input.list[i]),req.session.arrayProduccion[i][0],oproduccion.insertId,parseInt(input.list[i]), input.dates[i] ]);
-                        }
+                    if(i == 0){
+                        query += "UPDATE fabricaciones SET restantes = CASE ";
+                    }
+                    query += " WHEN idfabricaciones = "+req.session.arrayProduccion[i][0]+" THEN restantes-"+input.list[i];
+				    ids.push(req.session.arrayProduccion[i][0]);
+                    //query += "UPDATE fabricaciones SET restantes=restantes-"+input.list[i]+" WHERE idfabricaciones="+req.session.arrayProduccion[i][0]+"@";
+                    if(input.dates[i] == null){
+                        prod_h.push([parseInt(input.list[i]), new Date().toLocaleString(), 'i', '1']);
+        				arrayDBP.push([parseInt(input.list[i]),req.session.arrayProduccion[i][0],oproduccion.insertId,parseInt(input.list[i]), new Date().toLocaleString() ]);
+                    }
+                    else{
+                        prod_h.push([parseInt(input.list[i]), input.dates[i], 'i', '1']);
+                        arrayDBP.push([parseInt(input.list[i]),req.session.arrayProduccion[i][0],oproduccion.insertId,parseInt(input.list[i]), input.dates[i] ]);
+                    }
                 }
-                query = query.substring(0, query.length-1) + '';
-                query = query.split('@');
+                query += " ELSE restantes END WHERE idfabricaciones IN ("+ids.join(',')+")";
                 //INSERT INTO `siderval`.`produccion` (`idfabricaciones`, `idordenproduccion`, `cantidad`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `standby`) VALUES ('12825', '14503', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0');
                 var insertquery = "INSERT INTO produccion (`cantidad`, `idfabricaciones`,`idordenproduccion`,`1`) VALUES ";
                 for(var m=0; m<arrayDBP.length; m++){
                     insertquery += "("+arrayDBP[m][0]+","+arrayDBP[m][1]+","+arrayDBP[m][2]+","+arrayDBP[m][3]+"),";
                 } 
                 insertquery = insertquery.substring(0,insertquery.length-1);
-                console.log(arrayDBP);
+                console.log(query);
 				connection.query("INSERT INTO produccion (`cantidad`, `idfabricaciones`,`idordenproduccion`,`1`, `f_program`) VALUES ?", [arrayDBP], function(err, producciones){
 					if(err){
 						console.log("Error Selecting : %s", err);
 						res.send("Error");
 					}
 					else{
-                        for(var j=0; j < query.length; j++){
-                            connection.query(query[j], function(err, rows){
+					    var idin = parseInt(producciones.insertId);
+                        connection.query(query, function(err, rows){
+                            if(err){
+                                console.log("Error Selecting : %s", err);
+                            }
+                            for(var e=0; e < prod_h.length; e++){
+                                prod_h[e].push(idin + e);
+                            }
+                            connection.query("INSERT INTO produccion_history (`enviados`, `fecha`,`from`,`to`, `idproduccion`) VALUES ?", [prod_h], function(err, inProdH){
                                 if(err){
                                     console.log("Error Selecting : %s", err);
                                 }
-                            });
+                                console.log(inProdH);
 
-                        }
-						req.session.arrayProduccion = [];
-	                    //io.emit('refreshfaena1');
-	                    req.app.locals.io.emit('refreshfaena1');
-                        req.app.locals.io.emit('notif-sol-abast');
-                        console.log(idope);
-                        res.send(idope+'');
-                        //res.render('jefeprod/session_stream',{data:[]});
+                                req.session.arrayProduccion = [];
+                                //io.emit('refreshfaena1');
+                                req.app.locals.io.emit('refreshfaena1');
+                                req.app.locals.io.emit('notif-sol-abast');
+                                console.log(idope);
+                                res.send(idope+'');
+                                //res.render('jefeprod/session_stream',{data:[]});
+                            });
+                        });
+
 					}
 				});
 
