@@ -52,17 +52,17 @@
 					<td data-toggle="tooltip" title="Cliente" class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" title="<%= data[i].razon%>"><%=data[i].cliente%></td>
 					<td data-toggle="tooltip" title="Descripción" class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
 					<%cantidad_total += data[i].cantidad %>
-					<td data-toggle="tooltip" title="Solicitados" data-name="solicitados" data-valor="<%= data[i].cantidad %>" class="checkFunction solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad %></td>
+					<td data-toggle="tooltip" title="Solicitados" data-cs="0" data-name="solicitados" data-valor="<%= data[i].cantidad %>" class="checkFunction solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad %></td>
 					<%restantes_total += data[i].restantes %>
-					<td data-toggle="tooltip" title="Por Moldear" data-name="sin_produccion" data-valor="<%= data[i].restantes %>" class="checkFunction sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].restantes %></td>
+					<td data-toggle="tooltip" title="Por Moldear" data-cs="0" data-name="sin_produccion" data-valor="<%= data[i].restantes %>" class="checkFunction sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].restantes %></td>
 					<%enproduccion_total += (data[i].cantidad - data[i].restantes - data[i].finalizados) %>
-					<td data-toggle="tooltip" title="En Producción" data-name="en_produccion" data-valor="<%= data[i].cantidad - data[i].restantes - data[i].finalizados%>" class="checkFunction en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].cantidad - data[i].restantes - data[i].finalizados%></td>
+					<td data-toggle="tooltip" title="En Producción" data-cs="0" data-name="en_produccion" data-valor="<%= data[i].cantidad - data[i].restantes - data[i].finalizados%>" class="checkFunction en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].cantidad - data[i].restantes - data[i].finalizados%></td>
 					<%finalizados_total += data[i].finalizados %>
-					<td data-toggle="tooltip" title="Finalizados" data-name="finalizado" data-valor="<%= data[i].finalizados%>" class="checkFunction finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].finalizados%></td>
+					<td data-toggle="tooltip" title="Finalizados" data-cs="0" data-name="finalizado" data-valor="<%= data[i].finalizados%>" class="checkFunction finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].finalizados%></td>
 					<%peso_u += data[i].peso %>
-					<td data-toggle="tooltip" title="Peso Unitario" data-name="pesoxproducir" data-valor="" class="checkFunction pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
+					<td data-toggle="tooltip" title="Peso Unitario" data-cs="1" data-name="pesoxproducir" data-valor="" class="checkFunction pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
 					<%peso_t += (data[i].peso * data[i].restantes) %>
-					<td data-toggle="tooltip" title="Peso Total (Sin producir)" data-name="pesototal" data-valor="<%= data[i].peso * data[i].restantes%>" class="checkFunction pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].restantes%></td>
+					<td data-toggle="tooltip" title="Peso Total (Sin producir)" data-cs="1" data-name="pesototal" data-valor="<%= data[i].peso * data[i].restantes%>" class="checkFunction pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].restantes%></td>
 					<td data-toggle="tooltip" title="Fecha de Entrega" class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" >
 						<span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
 					</td>
@@ -100,12 +100,12 @@
 			<td id="numoc"></td>
 			<td id="cliente"></td>
 			<td id="descrip"></td>
-			<td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%= cantidad_total%></td>
-			<td id="sin_produccion" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%= restantes_total%></td>
-			<td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%= enproduccion_total%></td>
-			<td id="finalizado" data-toggle="tooltip" title="Total Finalizados" style="text-align: center;" class="parsear_nro"><%= finalizados_total %></td>
-			<td id="pesoxproducir" data-toggle="tooltip" title="Peso Unitario" style="text-align: center;" class="parsear_nro"><%= peso_u%></td>
-			<td id="pesototal" data-toggle="tooltip" title="Peso Total" style="text-align: center;" class="parsear_nro"><%= peso_t%></td>
+			<td id="solicitados" data-cs="0" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%= cantidad_total%></td>
+			<td id="sin_produccion" data-cs="0" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%= restantes_total%></td>
+			<td id="en_produccion" data-cs="0" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%= enproduccion_total%></td>
+			<td id="finalizado" data-cs="0" data-toggle="tooltip" title="Total Finalizados" style="text-align: center;" class="parsear_nro"><%= finalizados_total %></td>
+			<td id="pesoxproducir" data-cs="1" data-toggle="tooltip" title="Peso Unitario" style="text-align: center;" class="parsear_nro"><%= peso_u%></td>
+			<td id="pesototal" data-cs="1" data-toggle="tooltip" title="Peso Total" style="text-align: center;" class="parsear_nro"><%= peso_t%></td>
 			<td id="f_entrega"></td>
 			<%if(user.nombre != 'siderval'&& user.nombre != 'jefeplanta'){%>
 				<td id="habilitar_cand"></td>
