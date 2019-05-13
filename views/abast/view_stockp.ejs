@@ -61,10 +61,10 @@
             </div>
             <div class="form-group pull-right filtro_estado" style="margin-top: 10px;">
                 <select class="form-control" id="filtro_estado">
-                    <option value="" selected>Todos</option>
-                    <option value="(material.stock<material.stock_c)">Crítico</option>
-                    <option value="(material.stock<material.stock_i and material.stock>material.stock_c)">Aviso</option>
-                    <option value="(material.stock>material.stock_i)">Abastecido</option>
+                    <option value="material.show_abast is true" selected>Todos</option>
+                    <option value="material.show_abast is true and (material.stock<material.stock_c)">Crítico</option>
+                    <option value="material.show_abast is true and (material.stock<material.stock_i and material.stock>material.stock_c)">Aviso</option>
+                    <option value="material.show_abast is true and (material.stock>material.stock_i)">Abastecido</option>
 
                 </select>
 
@@ -92,7 +92,7 @@
         "Detalle@success",
         "Unidad@warning"
     ];
-    var busc = new Buscador("buscar_stockp", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", true, false);
+    var busc = new Buscador("buscar_stockp", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", false, false);
 
     busc.add_cond = "material.show_abast is true";
     $(document).ready(function(){
