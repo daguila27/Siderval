@@ -7,6 +7,55 @@ function fechaLatino(string){
         return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
     }
 }
+
+var etp = [
+    "Moldes",
+    "Fundidos",
+    "Quebrados",
+    "Terminados",
+    "Tratados",
+    "Maestranza",
+    "CC"
+];
+
+var etp_f = [
+    "Moldeo",
+    "Fusión",
+    "Quiebre",
+    "Terminación",
+    "Tratamiento Térmico",
+    "Maestranza",
+    "CC"
+];
+
+
+function fechaEspañol(date){
+    date = new Date(date);
+    var meses = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+    ];
+    var dias = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miercoles",
+        "Jueves",
+        "Viernes",
+        "Sabado"
+    ];
+    return dias[date.getDay()] +" "+date.getDate()+" de "+meses[date.getMonth()]+" de "+date.getFullYear();
+}
 %>
 <script type="text/javascript">
     $("#DataTableFabs tbody").attr('unselectable','on')
@@ -99,7 +148,7 @@ function fechaLatino(string){
         <td data-toggle="tooltip" title="Peso Despachado" data-name= "pesototal" class="checkFunction pesototal parsear_nro"  data-cs="2" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
         <td data-toggle="tooltip" title="Stock" data-cs="0" class="stock parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
         <td data-toggle="tooltip" title="Fecha de Entrega" class="f_entrega" style="text-align: center;" >
-            <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= data[i].esp_fecha_entrega %> </span>
+            <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaEspañol(data[i].f_entrega) %> </span>
         </td>
     </tr>
     <%}%>
@@ -154,6 +203,7 @@ function fechaLatino(string){
     }
 
     setDataTableFixed("#DataTableFabs");
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), ".indicador_paginas");
 
 
     function refreshSumas(){

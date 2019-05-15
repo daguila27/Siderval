@@ -22,7 +22,6 @@ router.use(
 function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;
     var limit = "";
-    console.log(input);
     if(input.ispage === 'true'){
         limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
     }

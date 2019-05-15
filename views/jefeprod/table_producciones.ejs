@@ -37,18 +37,18 @@ function fechaLatino(string){
     %>
     <tr>
         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
-        <td><%= datalen[i].idordenproduccion %></td>
-        <td><%= datalen[i].numordenfabricacion %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= datalen[i]['4'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
-        <td class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
+        <td style="text-align: center"><%= datalen[i].idordenproduccion %></td>
+        <td style="text-align: center"><%= datalen[i].numordenfabricacion %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= datalen[i]['4'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
+        <td data-cs="0" class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
+        <td data-cs="0" class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
         <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center" data-order="<%=new Date(datalen[i].creacion).getTime()%>"><%= new Date(datalen[i].creacion).toLocaleDateString() %></td>
     </tr>
     <%  }

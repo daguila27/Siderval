@@ -20,7 +20,6 @@ router.use(
 function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;
     var limit = "";
-    console.log(input);
     if(input.ispage === 'true'){
         limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
     }
@@ -317,64 +316,33 @@ router.post('/table_planta', function(req, res, next){
         var array_fill = [
             "coalesce(fabricaciones.idorden_f,'Sin OF')",
             "pedido.numitem",
-            "material.detalle"
+            "material.detalle",
+            "cliente.sigla"
         ];
         var object_fill = {
             "coalesce(fabricaciones.idorden_f,'Sin OF')-off": [],
             "pedido.numitem-off": [],
             "material.detalle-off": [],
+            "cliente.sigla-off": [],
             "coalesce(fabricaciones.idorden_f,'Sin OF')-on": [],
             "pedido.numitem-on": [],
-            "material.detalle-on": []
+            "material.detalle-on": [],
+            "cliente.sigla-on": []
         };
-        var clave;
-        var where;
-        var condiciones_where = ['coalesce(pedido.cantidad - pedido.despachados,0) > 0'];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
 
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        var condiciones_where = [];
+
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
 
-
-
-        var where = " ";
-        if(input.pendientes == 'false'){
-            condiciones_where.push('(MONTH(pedido.f_entrega) <= MONTH(CURRENT_DATE()) AND YEAR(pedido.f_entrega) <= YEAR(CURRENT_DATE()))');
-            //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
-        }
-
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
-        console.log(where);
+        var where = result[0];
+        var limit = result[1];
+        console.log(result);
         req.getConnection(function(err, connection){
             if(err) throw err;
 
@@ -394,7 +362,7 @@ router.post('/table_planta', function(req, res, next){
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 "left join " +
                 "(select produccion.idfabricaciones, sum(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1` - produccion.`2`) as enproduccion, produccion.`8` as finalizados from produccion group by produccion.idfabricaciones)" +
-                " as queryPlanta on queryPlanta.idfabricaciones = fabricaciones.idfabricaciones "+where;
+                " as queryPlanta on queryPlanta.idfabricaciones = fabricaciones.idfabricaciones "+where +" " + limit;
             connection.query(consulta,
                 function(err, of){
                     if(err) throw err;
