@@ -62,9 +62,10 @@
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
                 <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_planta/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
                 <div style="display: flex;">
-                    <div class="filters" style="margin-right: 10px; margin-left: 10px"></div>
-                    <div>
-                        <select class="form-control" id="select-estado">
+                    <div class="filters" style="margin-right: 40px; margin-left: 10px"></div>
+                    <div style="display: flex">
+                        <label for="select-estado" style="width: 100%; margin-top: 8px">Estado de Pedido: </label>
+                        <select class="form-control" id="select-estado" name="select-estado">
                             <option value="coalesce(pedido.cantidad - pedido.despachados,0)>0@DATEDIFF(pedido.f_entrega,now())<0">Atrasado</option>
                             <option value="coalesce(pedido.cantidad - pedido.despachados,0)>0@DATEDIFF(pedido.f_entrega,now())>=0 and DATEDIFF(pedido.f_entrega,now())<=10">Pronta Entrega</option>
                             <option value="coalesce(pedido.cantidad - pedido.despachados,0)>0@DATEDIFF(pedido.f_entrega,now())>10">Mas de 10 días</option>

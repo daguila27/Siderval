@@ -1088,8 +1088,7 @@ router.get('/lanzar_of/:tipo', function(req,res,next){
                     {
                         if(err)
                             console.log("Error Selecting : %s ",err );
-
-                    res.render("plan/lanzar_" + req.params.tipo.toString(),{caracts: rows, cli: cli});
+                        res.render("plan/lanzar_" + req.params.tipo.toString(),{caracts: rows, cli: cli});
                 });
             });    
         })
@@ -1113,98 +1112,120 @@ router.post('/crear_odc', function(req, res, next){
         if(typeof req.body['idm[]'] != 'undefined'){
             req.getConnection(function(err,connection){
                 var bolfab = false;
-                var bolabast = false;         
-                connection.query("INSERT INTO odc SET ?",[{numoc: req.body.nroordenfabricacion, idcliente: cliente, moneda: moneda}],function(err,odc){
-                    if(err)throw err;
-                    if(typeof req.body['idm[]'] == 'string'){
-                        if(req.body['prov[]'] == '-1'){
-                            bolfab = true;
-                            console.log("prov[]:" + req.body['prov[]']);
-                            console.log("bolfab:" + bolfab);
-                            listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
-                        }
-                        else{
-                            bolfab = true;
-                            bolabast = true;
-                            console.log("prov[]:" + req.body['prov[]']);
-                            console.log("bolfab:" + bolfab);
-                            listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], true, 0, (1)*factor_item]);
-                        }
-                    } else {
-                        for(var i = 0;i<req.body['idm[]'].length;i++){
-                            if(req.body['prov[]'][i] == '-1'){
-                                bolfab = true;
-                                console.log("prov[]:" + req.body['prov[]'][i]);
-                                console.log("bolfab:" + bolfab);
-                                listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], false, 0, (i+1)*factor_item]);
+                var bolabast = false;
+                connection.query("SELECT * FROM " +
+                    "(SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, " +
+                    "material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar " +
+                    "from pedido left join material on material.idmaterial = pedido.idmaterial " +
+                    "group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0", function(err, stocks){
+                    if(err) throw err;
+
+
+
+                    connection.query("INSERT INTO odc SET ?",[{numoc: req.body.nroordenfabricacion, idcliente: cliente, moneda: moneda}],function(err,odc){
+                        if(err)throw err;
+                        if(typeof req.body['idm[]'] == 'string'){
+                            //si el pedido no tiene idcliente significa que NO es externo, NO se crea ABASTECIMIENTO
+                            if(req.body['prov[]'] == '-1'){
+                                bolabast = false;
+                                listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
+                            }
+                            //si el producto tiene STOCK SUFICIENTE , NO se crea FABRICACIÓN
+                            else if(parseInt(req.body['disp[]']) - parseInt(req.body['cants[]']) >= 0){
+                                bolfab = false;
+                                listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
                             }
                             else{
+                                bolfab = false;
                                 bolabast = true;
-                                bolfab = true;
-                                console.log("prov[]:" + req.body['prov[]'][i]);
+                                console.log("prov[]:" + req.body['prov[]']);
                                 console.log("bolfab:" + bolfab);
-                                listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], true, 0,(i+1)*factor_item]);
+                                listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], true, 0, (1)*factor_item]);
+                            }
+                        } else {
+                            for(var i = 0;i<req.body['idm[]'].length;i++){
+                                //si el pedido no tiene idcliente significa que NO es externo, NO se crea ABASTECIMIENTO
+                                if(req.body['prov[]'][i] == '-1'){
+                                    bolabast = false;
+                                    listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], false, 0, (i+1)*factor_item]);
+                                }
+                                //si el producto tiene STOCK SUFICIENTE , NO se crea FABRICACIÓN
+                                else if(parseInt(req.body['disp[]'][i]) - parseInt(req.body['cants[]'][i]) >= 0){
+                                    bolfab = false;
+                                    listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], false, 0, (i+1)*factor_item]);
+                                }
+                                else{
+                                    bolabast = true;
+                                    bolfab = true;
+                                    console.log("prov[]:" + req.body['prov[]'][i]);
+                                    console.log("bolfab:" + bolfab);
+                                    listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], true, 0,(i+1)*factor_item]);
+                                }
                             }
                         }
-                    }
-                    dats.idodc = odc.insertId;
-                connection.query("INSERT INTO pedido " +
-                                    "(`idodc`,`despachados`," +
-                                    "`f_entrega`," +
-                                    "`idmaterial`," +
-                                    "`cantidad`,`precio`, `externo`, `idproveedor`,`numitem`) " +
-                                    "VALUES ?",[listp],function(err,Peds){
-                                    if(err)throw err;
-                                    if(bolfab){
-                                        console.log(Peds);
-                                        connection.query("INSERT INTO ordenfabricacion SET ?",dats,function(err,rows){
-                                            if(err)
-                                                console.log("Error Selecting : %s ",err );
+                        dats.idodc = odc.insertId;
+                        connection.query("INSERT INTO pedido " +
+                                        "(`idodc`,`despachados`," +
+                                        "`f_entrega`," +
+                                        "`idmaterial`," +
+                                        "`cantidad`,`precio`, `externo`, `idproveedor`,`numitem`) " +
+                                        "VALUES ?",[listp],function(err,Peds){
+                                        if(err)throw err;
+                                        if(bolfab){
+                                            console.log(Peds);
+                                            connection.query("INSERT INTO ordenfabricacion SET ?",dats,function(err,rows){
+                                                if(err)
+                                                    console.log("Error Selecting : %s ",err );
 
-                                            var idof = rows.insertId;
-                                            if(typeof req.body['idm[]'] == 'string'){
-                                                    //if(req.body['prov[]']=='-1'){
-                                                        list.push([rows.insertId,req.body['cants[]'],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],req.body['cants[]'], req.body['lock[]'], Peds.insertId, (1)*factor_item]);
-                                                    //}
-                                            } else {
-                                                for(var i = 0;i<req.body['idm[]'].length;i++){
-                                                    //if(req.body['prov[]'][i] == '-1'){
-                                                        list.push([rows.insertId,req.body['cants[]'][i],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i],req.body['cants[]'][i], req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                var idof = rows.insertId;
+                                                if(typeof req.body['idm[]'] == 'string'){
+                                                        if(req.body['prov[]']=='-1'){
+                                                            if(parseInt(req.body['disp[]']) - parseInt(req.body['cants[]']) < 0){
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                            }
+                                                        }
+                                                } else {
+                                                    for(var i = 0;i<req.body['idm[]'].length;i++){
+                                                        if(req.body['prov[]'][i] == '-1'){
+                                                            if(parseInt(req.body['disp[]'][i]) - parseInt(req.body['cants[]'][i]) < 0){
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]),req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                            }
+                                                        }
                                                         Peds.insertId++;
-                                                    //}
+                                                    }
                                                 }
-                                            }
-                                            console.log(list);
-                                            connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`,`idproducto`,`restantes`, `lock`, `idpedido`, `numitem`) VALUES ?",[list],function(err,fabrs){
-                                                if(err)throw err;
+                                                console.log(list);
+                                                connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`,`idproducto`,`restantes`, `lock`, `idpedido`, `numitem`) VALUES ?",[list],function(err,fabrs){
+                                                    if(err)throw err;
 
-                                                //req.session.estadoAlm = { cliente: '6331', nroordenfabricacion: '' };
-                                                
-                                                connection.query("INSERT INTO save (llave,token) VALUES ?",[[['odc', '6331@']]],function(err,inSave){
-                                                    if(err) console.log(err);
-                                                    
-                                                    res.send(idof+'');
-                                                    //res.redirect('/plan/lanzar_of/pedido');
-                                                    //res.redirect('/plan/lanzar_of/of');
-                                                });
-                                                });
-                                            });
-                                    }
-                                    else{
-                                        //req.session.estadoAlm = { cliente: '6331', nroordenfabricacion: '' };
-                                        //res.redirect('/plan/lanzar_of/pedido');
-                                        
-                                                connection.query("INSERT INTO save (llave,token) VALUES ?",[[['odc', '6331@']]],function(err,inSave){
-                                                    if(err) console.log(err);
-                                                    res.send('none');
-                                                    //res.redirect('/plan/lanzar_of/pedido');
-                                                    //res.redirect('/plan/lanzar_of/of');
-                                                });
+                                                    //req.session.estadoAlm = { cliente: '6331', nroordenfabricacion: '' };
 
-                                    }
-                                    });
-                            });
-                        //console.log(query.sql);
+                                                    connection.query("INSERT INTO save (llave,token) VALUES ?",[[['odc', '6331@']]],function(err,inSave){
+                                                        if(err) console.log(err);
+
+                                                        res.send(idof+'');
+                                                        //res.redirect('/plan/lanzar_of/pedido');
+                                                        //res.redirect('/plan/lanzar_of/of');
+                                                    });
+                                                    });
+                                                });
+                                        }
+                                        else{
+                                            //req.session.estadoAlm = { cliente: '6331', nroordenfabricacion: '' };
+                                            //res.redirect('/plan/lanzar_of/pedido');
+
+                                                    connection.query("INSERT INTO save (llave,token) VALUES ?",[[['odc', '6331@']]],function(err,inSave){
+                                                        if(err) console.log(err);
+                                                        res.send('none');
+                                                        //res.redirect('/plan/lanzar_of/pedido');
+                                                        //res.redirect('/plan/lanzar_of/of');
+                                                    });
+
+                                        }
+                                        });
+                                });
+                            //console.log(query.sql);
+                    });
                 });
         } else {
             res.send("error");
@@ -4399,12 +4420,12 @@ router.post('/addsession_prepeds', function(req,res,next){
     var fabricacion;
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("SELECT material.detalle,material.stock,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica WHERE material.idmaterial = ?",
+            connection.query("SELECT material.detalle, coalesce(disp.disponible, 0) as stock,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial WHERE material.idmaterial = ?",
                 [req.body.idm],function(err, details){
                     if(err){console.log("Error Selecting : %s", err);}
                     if(req.body.tipo == 'producido'){fabricacion='Interna'}
                     else{fabricacion='Externa'}
-                    fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'></td><td><strong>" + fabricacion + "</strong></td>";
+                    fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'><input type='hidden' name='disp' value='" + details[0].stock +"'></td><td><strong>" + fabricacion + "</strong></td>";
                     var inputprov = false;
                     switch(req.body.tipo){
                         case "producido":
@@ -4429,7 +4450,7 @@ router.post('/addsession_prepeds', function(req,res,next){
 
 
                         console.log(auxs);
-                        if(inputprov){fila = fila + "<td>" + auxs[0].aux1 +"<input type='text' value='1' name='prov' style='display:none;'></input></td>"/*<div class='predic_text' onkeyup='getPredictions(this)'><input type='text' name='prov' autocomplete='off'></input><div></div></div>*/;}
+                        if(inputprov){fila = fila + "<td>" + auxs[0].aux1 +"<input type='text' value='1' name='prov' style='display:none;'></input></td>";}
                         else{ fila = fila + "<td><input type='text' value='-1' name='prov' style='display:none;'></input>" + auxs[0].aux2 +"</td>";}
                         fila = fila + "<td style='padding: 3px'><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" 
                         +"<td style='padding: 3px'><input class='form-control' type='number' name='cants' min='1' required></td>"
@@ -4467,10 +4488,10 @@ router.post('/buscar_mat', function(req, res, next){
             dats.push(parseInt(input.caract));
         }
         req.getConnection(function(err,connection){
-            connection.query("SELECT material.*,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
+            connection.query("SELECT material.*, coalesce(disp.disponible,0) as disponible,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
-                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion " + wher + " GROUP BY material.idmaterial",function(err,rows)
+                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial " + wher + " GROUP BY material.idmaterial",function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
@@ -5361,11 +5382,11 @@ router.get('/loadStateOC', function(req,res,next){
                 var query_producto = '';
                 if(typeof req.session.estadoAlm['idm[]'] == 'string'){
                         if(req.session.estadoAlm['prov[]'] == '-1'){//PRODUCIDO
-                            query_producido = "SELECT * FROM material left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion";
+                            query_producido = "SELECT material.*, producido.*, disponibles.disponible as disp FROM material left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disponibles ON disponible.idmaterial = material.idmaterial ";
                             query_producido += " WHERE material.idmaterial = "+req.session.estadoAlm['idm[]'];
                         }
                          else{//PRODUCTO
-                            query_producto = "SELECT * FROM material left join producto on producto.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producto.idaleacion";
+                            query_producto = "SELECT material.*, producido.*, disponibles.disponible as disp FROM material left join producto on producto.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producto.idaleacion LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disponibles ON disponible.idmaterial = material.idmaterial ";
                             query_producto += " WHERE material.idmaterial = "+req.session.estadoAlm['idm[]']; 
                         }
 
@@ -5377,7 +5398,7 @@ router.get('/loadStateOC', function(req,res,next){
                     for(var u=0; u<req.session.estadoAlm['idm[]'].length; u++){
                         if(req.session.estadoAlm['prov[]'][u] == '-1'){//PRODUCIDO
                             if(c_int == 0){
-                                query_producido = "SELECT * FROM material left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion";
+                                query_producido = "SELECT material.*, producido.*, disponibles.disponible as disp FROM material left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disponibles ON disponible.idmaterial = material.idmaterial ";
                                 query_producido += " WHERE material.idmaterial = "+req.session.estadoAlm['idm[]'][u];
                             }
                             else{    
@@ -5388,7 +5409,7 @@ router.get('/loadStateOC', function(req,res,next){
                         }
                         else{//PRODUCTO
                             if(c_ext == 0){
-                                query_producto = "SELECT * FROM material left join producto on producto.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producto.idaleacion";
+                                query_producto = "SELECT material.*, producido.*, disponibles.disponible as disp FROM material left join producto on producto.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producto.idaleacion LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disponibles ON disponible.idmaterial = material.idmaterial ";
                                 query_producto += " WHERE material.idmaterial = "+req.session.estadoAlm['idm[]'][u];
                             }
                             else{    
@@ -5417,7 +5438,7 @@ router.get('/loadStateOC', function(req,res,next){
                                                 else{
                                                     datos['alea[]'] = productos[y].subnom;
                                                 }
-                                                datos['stock[]'] = productos[y].stock;
+                                                datos['stock[]'] = productos[y].disp;
                                         }
                                     }
                                     else{
@@ -5430,7 +5451,7 @@ router.get('/loadStateOC', function(req,res,next){
                                                 else{
                                                     datos['alea[]'][t] = productos[y].subnom;
                                                 }
-                                                datos['stock[]'][t] = productos[y].stock;
+                                                datos['stock[]'][t] = productos[y].disp;
                                             }
                                         }
                                     }
@@ -5451,7 +5472,7 @@ router.get('/loadStateOC', function(req,res,next){
                                                     else{
                                                         datos['alea[]'] = producidos[y].subnom;
                                                     }
-                                                    datos['stock[]'] = producidos[y].stock;
+                                                    datos['stock[]'] = producidos[y].disp;
                                                 }
                                         }
                                         else{
@@ -5464,7 +5485,7 @@ router.get('/loadStateOC', function(req,res,next){
                                                     else{
                                                         datos['alea[]'][t] = producidos[y].subnom;
                                                     }
-                                                    datos['stock[]'][t] = producidos[y].stock;
+                                                    datos['stock[]'][t] = producidos[y].disp;
                                                 }
                                             }
                                         }
@@ -5569,7 +5590,8 @@ router.get('/loadStateOCBD', function(req,res,next){
                 for(var u=0; u<datos['idm[]'].length; u++){
                     if(datos['prov[]'][u] == '-1'){//PRODUCIDO
                         if(c_int == 0){
-                            query_producido = "SELECT * FROM material left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion";
+                            query_producido = "SELECT material.*, coalesce(disp.disponible,0) as disp, producido.*, subaleacion.* FROM material left join producido on producido.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producido.idsubaleacion " +
+                                "LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial ";
                             query_producido += " WHERE material.idmaterial = "+datos['idm[]'][u];
                         }
                         else{    
@@ -5580,7 +5602,8 @@ router.get('/loadStateOCBD', function(req,res,next){
                     }
                     else{//PRODUCTO
                         if(c_ext == 0){
-                            query_producto = "SELECT * FROM material left join producto on producto.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producto.idaleacion";
+                            query_producto = "SELECT material.*, coalesce(disp.disponible,0) as disp, producto.*, subaleacion.* FROM material left join producto on producto.idmaterial=material.idmaterial left join subaleacion on subaleacion.idsubaleacion=producto.idaleacion " +
+                                " LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial ";
                             query_producto += " WHERE material.idmaterial = "+datos['idm[]'][u];
                         }
                         else{    
@@ -5608,7 +5631,7 @@ router.get('/loadStateOCBD', function(req,res,next){
                                             else{
                                                 datos['alea[]'][t] = productos[y].subnom;
                                             }
-                                            datos['stock[]'][t] = productos[y].stock;
+                                            datos['stock[]'][t] = productos[y].disp;
                                         }
                                     }
                                 }
@@ -5627,7 +5650,7 @@ router.get('/loadStateOCBD', function(req,res,next){
                                                     else{
                                                         datos['alea[]'] = producidos[y].subnom;
                                                     }
-                                                    datos['stock[]'] = producidos[y].stock;
+                                                    datos['stock[]'] = producidos[y].disp;
                                                 }
                                         
                                             for(var t=0; t < datos['dets[]'].length; t++){
@@ -5639,7 +5662,7 @@ router.get('/loadStateOCBD', function(req,res,next){
                                                     else{
                                                         datos['alea[]'][t] = producidos[y].subnom;
                                                     }
-                                                    datos['stock[]'][t] = producidos[y].stock;
+                                                    datos['stock[]'][t] = producidos[y].disp;
                                                 }
                                             }
                                     }

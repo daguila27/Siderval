@@ -228,14 +228,24 @@
         });
     }
     $(document).ready(function(){
-        $.ajax({
+        /*$.ajax({
             type: 'GET',
             url: '/plan/lanzar_of/pedido',
             success: function(data){
                 $("#page-wrapper").html(data);
                 $("#page-wrapper").fadeIn();
             }
+        });*/
+        $.ajax({
+            type: 'POST',
+            data: {tipo: "prod"},
+            url: '/plan/registro_mat',
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+            }
         });
+
     });
 
     function  setDataTableFixed(str){

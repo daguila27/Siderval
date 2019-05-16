@@ -34,11 +34,20 @@ function letraMayus(string) {
         }else{
             idtag = 'send_gdd';
         }%>
-        <form id="<%= idtag%>" type="post">
+        <form id="send_gdd" type="post">
             <div class="panel panel-primary panel-defecto">
                 <div class="panel-heading" style="display: flex;">
                 <div style="width: 50%">
                     <h3>Crear Guía de Despacho N° <%=num%></h3>
+
+                    <%
+                    console.log(blanco === 1);
+                    if(blanco === 1){%>
+                        <input type="hidden" name="idguia" id="idguia" value="<%=num%>">
+                    <%}else{%>
+                        <input type="hidden" name="idguia" id="idguia" value="0">
+                    <%}%>
+                    <input type="hidden" value="<%= %>">
                     <!--<div>
                         <button class="btn btn-primary saveStateButton"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
                         <button class="btn btn-primary loadStateButton"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
@@ -581,7 +590,11 @@ function letraMayus(string) {
             alert("Seleccione Cliente.");
         }
         if(conf){
-
+            if($("#idguia").val().toString() === '0'){
+                alert("NUEVA GUIA");
+            }else{
+                alert("GUIA EN BLANCO");
+            }
             $.ajax({
                 type: 'POST',
                 data: {
@@ -589,7 +602,8 @@ function letraMayus(string) {
                     estado: est,
                     pl: pl,
                     obs:$("#gddobs .form-control").val(),
-                    idcliente: $("#cliente_gd").val()
+                    idcliente: $("#cliente_gd").val(),
+                    idgd: $("#idguia").val()
                 },
                 url: 'bodega/save_gdd',
                 success: function(data){

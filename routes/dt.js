@@ -36,7 +36,7 @@ router.get('/', function(req, res, next){
 router.get('/render_registro',function(req, res, next){
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
-		connection.query("SELECT producto.idproducto,material.idmaterial,material.detalle FROM producto LEFT JOIN material ON (producto.idmaterial = material.idmaterial) WHERE material.estado = 'pdf'", function(err, rows){
+		connection.query("SELECT producto.idproducto,material.idmaterial,material.detalle FROM producto LEFT JOIN material ON (producto.idmaterial = material.idmaterial) WHERE material.estado = 'fin'", function(err, rows){
 			if(err)
 				console.log("Error Selecting : %s", err);
 			var data = rows;

@@ -38,7 +38,7 @@ router.get('/', function(req, res, next) {
 router.post('/material_pendiente', function(req, res, next){
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
-		connection.query("SELECT idmaterial,detalle FROM material WHERE estado = 'dmCho'", function(err, rows){
+		connection.query("SELECT idmaterial,detalle FROM material WHERE estado = 'fin'", function(err, rows){
 			if(err){console.log("Error Selecting : %s", err);}
 			res.render('dm/material_pendiente', {data: rows});
 		});

@@ -32,7 +32,7 @@ class Buscador{
         this.html += "</ul>";
         if(this.datefill){
             $(this.iddate).html("<div class='dropdown' style='margin-left: 15px'>" +
-                "<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>Acotar" +
+                "<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>Acotar Fecha " +
                 "<span class='caret'></span></button>" +
                 "<ul class='dropdown-menu' style='padding: 7px'>" +
                 "<li style='padding: 0px 10px; display:flex; width: 100%'>" +
@@ -73,8 +73,9 @@ class Buscador{
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
             },
             success: function(data){
-                $(".main-page").html(data);
 
+                $(".main-page").html(data);
+                $("#"+t).css('font-family', '12px');
                 $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height());
 
