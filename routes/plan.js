@@ -1432,15 +1432,16 @@ router.get('/xlsx_of', function(req,res){
                             auxrow = 2 + j;
                             sheet.getCell('A' + auxrow.toString()).value = rows[j].codigo;
                             sheet.getCell('B' + auxrow.toString()).value = rows[j].idorden_f;
+                            fechaEntrega = (new Date(rows[j].f_entrega).getTime())/(1000*60*60*24);
+                            Hoy    = (new Date().getTime())/(1000*60*60*24);
+                            diff = parseInt(Hoy - fechaEntrega);
+                            //console.log(diff);
+                            console.log(diff);
                             if(rows[j].solicitados == rows[j].despachados){
+                                diff = 0;
                                 sheet.getCell('C' + auxrow.toString()).value = "Finalizado";
                             }
-                            else if(new Date(rows[j].f_entrega) > new Date()){
-                                fechaEntrega = new Date(rows[j].f_entrega).getTime();
-                                Hoy    = new Date().getTime();
-                                diff = Hoy - fechaEntrega;
-                                //console.log(diff);
-                                //console.log(diff/(1000*60*60*24));
+                            else if(diff > 0){
                                 sheet.getCell('C' + auxrow.toString()).value = "Atrasado";
                             }
                             else{
