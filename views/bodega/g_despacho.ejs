@@ -327,6 +327,7 @@ function letraMayus(string) {
             "sSortDescending": ": Activar para ordenar la columna de manera descendente"
         }
     };
+
     $(".mat_desp").each(function(){
         var stock = parseInt($(this).children('.mat_stock').html());
         if(stock <= 0){
@@ -336,7 +337,6 @@ function letraMayus(string) {
             $(this).children('.mat_butt').children('a').html("<span class='fa fa-ban' style='padding-left: 2px'></span>");
         }
     });
-
 
     function checkIfPaletIsInGD(){
         paletInGD = false;
@@ -365,6 +365,7 @@ function letraMayus(string) {
         e.preventDefault();
         add_row(this);
     });
+
     $(".addrow_palet").on('click', function(e){
         e.preventDefault();
         add_row_palet(this);
@@ -590,11 +591,6 @@ function letraMayus(string) {
             alert("Seleccione Cliente.");
         }
         if(conf){
-            if($("#idguia").val().toString() === '0'){
-                alert("NUEVA GUIA");
-            }else{
-                alert("GUIA EN BLANCO");
-            }
             $.ajax({
                 type: 'POST',
                 data: {

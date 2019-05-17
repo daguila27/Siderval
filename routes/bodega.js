@@ -452,13 +452,11 @@ router.post('/save_gdd', function (req, res, next) {
                 let despachos = [];
                 var case_p = [];
                 var case_pl = [];
+                var case_pgdd = "";
                 var case_gdd = [];
                 //matriz que contiene los id de palet
                 var ids_palets = [];
                 var ids_palet_item = [];
-                console.log(Object.keys(input).length);
-                console.log("largo lista");
-
                 for (let i = 0; i < Object.keys(input).length - 5 ; i++) {
                     if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
                         if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) == -1){
@@ -468,14 +466,11 @@ router.post('/save_gdd', function (req, res, next) {
                         ids_palet_item.push(input['list[' + i + '][]'][3].split('-')[1]);
                         case_p.push("WHEN palet_item.idpalet_item = "+input['list[' + i + '][]'][3].split('-')[1]+" THEN "+parseInt(input['list[' + i + '][]'][2]));
                     }
-                    //despachoss([idgd, iddespacho, idmaterial, cantidad])
                     despachos.push([idgd, input['list[' + i + '][]'][0], input['list[' + i + '][]'][1], input['list[' + i + '][]'][2] ]);
                     if (despachos[i][1] === "0") {
                         despachos[i][1] = null;
                     }
                 }
-
-
                 //SE IDENTIFICA SI EXISTEN CONDICIONES PARA CREAR LA QUERY UPDATE CASE
                 // Y ACTUALIZAR CANTIDADES EN PALET Y NÚMERO DE PACKING LIST
                 var update_bool = false;
@@ -483,10 +478,12 @@ router.post('/save_gdd', function (req, res, next) {
                     case_p = "UPDATE palet_item SET palet_item.cantidad = CASE "+case_p.join(" ")+" ELSE palet_item.cantidad END WHERE palet_item.idpalet_item IN ("+ids_palet_item.join(',')+")";
                     update_bool = true;
                 }
-
+                var string_pl;
                 if(case_pl.length > 0){
                     update_bool = true;
-                    case_pl = "UPDATE palet SET palet.desp = true where palet.idpalet in ("+case_pl.join(",")+")" ;
+                    string_pl = case_pl.join(",");
+                    case_pl = "UPDATE palet SET palet.desp = true where palet.idpalet in ("+string_pl+")" ;
+                    case_pgdd = "UPDATE palet SET palet.idgd = '"+idgd+"' where palet.idpalet in ("+string_pl+")" ;
                     case_gdd = "UPDATE gd SET gd.idpackinglist = '"+input.pl+"' where gd.idgd in ("+idgd+")" ;
                 }
 
@@ -520,14 +517,28 @@ router.post('/save_gdd', function (req, res, next) {
 
                         //Si la operacion es de Traslado, no existen pedidos.
                         if (input.estado !== "Traslado") {
+                            console.log("DESPACHOS");
+                            //el array de despachos se debe agrupar según PEDIDO para realizar la actualización de los despachados
+                            console.log(despachos);
+                            var idpedido = [];
+                            var cantidades = [];
+                            for(var w=0 ; w < despachos.length; w++){
+                                if(idpedido.indexOf(despachos[w][1]) == -1){
+                                    idpedido.push(despachos[w][1]);
+                                    cantidades.push(parseInt(despachos[w][3]));
+                                }
+                                else{
+                                    cantidades[idpedido.indexOf(despachos[w][1])] += parseInt(despachos[w][3]);
+                                }
+                            }
                             let update_saldo = "";
                             //Creamos la Query para actualizar despachados de pedido
                             update_saldo = 'UPDATE pedido SET pedido.despachados = CASE ';
                             let stringIds = '(';
-                            for (let i = 0; i < despachos.length; i++) {
-                                update_saldo += 'WHEN pedido.idpedido=' + despachos[i][1] + ' THEN pedido.despachados' + op1 + despachos[i][3] + ' ';
-                                stringIds += despachos[i][1];
-                                if (i !== despachos.length - 1) {
+                            for (let i = 0; i < idpedido.length; i++) {
+                                update_saldo += 'WHEN pedido.idpedido=' + idpedido[i] + ' THEN pedido.despachados' + op1 + cantidades[i] + ' ';
+                                stringIds += idpedido[i];
+                                if (i !== idpedido.length - 1) {
                                     stringIds += ','
                                 }
                             }
@@ -542,11 +553,13 @@ router.post('/save_gdd', function (req, res, next) {
                                         if (err) {throw err;}
                                         connection.query(case_pl, function (err, rows) {
                                             if (err) {throw err;}
-
-                                            connection.query(case_gdd, function (err, rows) {
+                                            connection.query(case_pgdd, function (err, rows) {
                                                 if (err) {throw err;}
+                                                connection.query(case_gdd, function (err, rows) {
+                                                    if (err) {throw err;}
 
-                                                    res.redirect('/bodega/crear_gdd');
+                                                        res.redirect('/bodega/crear_gdd');
+                                                });
                                             });
 
                                         });
@@ -847,12 +860,32 @@ router.post('/anular_gdd', function(req, res, next){
                 });
             }
             else{
+                console.log("DESPACHOS");
+                console.log(desp);
+                var idpedido = [];
+                var cant_ped = [];
+                var idmaterial = [];
+                var cant_mat = [];
+                for(var w=0; w < desp.length; w++){
+                    if(idpedido.indexOf(desp[w].idpedido) === -1){
+                        idpedido.push(desp[w].idpedido);
+                        cant_ped.push(parseInt(desp[w].cantidad) );
+                    }else{
+                        cant_ped[idpedido.indexOf(desp[w].idpedido)] += parseInt(desp[w].cantidad);
+                    }
+                    if(idmaterial.indexOf(desp[w].idmaterial) === -1){
+                        idmaterial.push(desp[w].idmaterial);
+                        cant_mat.push(parseInt(desp[w].cantidad) );
+                    }else{
+                        cant_mat[idmaterial.indexOf(desp[w].idmaterial)] += parseInt(desp[w].cantidad);
+                    }
+                }
                 var ped_query = "UPDATE pedido SET pedido.despachados = CASE";
                 var ped_where = "WHERE pedido.idpedido in (";
-                for(var i=0; i < desp.length; i++){
-                    ped_query += " WHEN pedido.idpedido=" + desp[i].idpedido + " THEN pedido.despachados-" + desp[i].cantidad;
-                    ped_where += "" + desp[i].idpedido;
-                    if(i+1 != desp.length){
+                for(var i=0; i < idpedido.length; i++){
+                    ped_query += " WHEN pedido.idpedido=" + idpedido[i] + " THEN pedido.despachados-" + cant_ped[i];
+                    ped_where += "" + idpedido[i];
+                    if(i+1 != idpedido.length){
                         ped_where += ",";
                     }
                 }
@@ -861,10 +894,10 @@ router.post('/anular_gdd', function(req, res, next){
                     if(err) console.log("Error Selecting : %s", err);
                     var mat_query = "UPDATE material SET material.stock = CASE";
                     var mat_where = "WHERE material.idmaterial in (";
-                    for(var i=0; i < desp.length; i++){
-                        mat_query += " WHEN material.idmaterial=" + desp[i].idmaterial + " THEN material.stock+" + desp[i].cantidad;
-                        mat_where += "" + desp[i].idmaterial;
-                        if(i+1 != desp.length){
+                    for(var i=0; i < idmaterial.length; i++){
+                        mat_query += " WHEN material.idmaterial=" + idmaterial[i] + " THEN material.stock+" + cant_mat[i];
+                        mat_where += "" + idmaterial[i];
+                        if(i+1 != idmaterial.length){
                             mat_where += ",";
                         }
                     }
