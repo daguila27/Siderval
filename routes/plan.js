@@ -1105,14 +1105,13 @@ router.post('/crear_odc', function(req, res, next){
         var cliente = JSON.parse(JSON.stringify(req.body)).cliente;
         var moneda = JSON.parse(JSON.stringify(req.body)).moneda;
         var factor_item = JSON.parse(JSON.stringify(req.body)).factor_item;
-        console.log(req.body);
         var list = [];
         var listp = [];
         var abast = [];
         if(typeof req.body['idm[]'] != 'undefined'){
             req.getConnection(function(err,connection){
-                var bolfab = false;
-                var bolabast = false;
+                var bolfab = true;
+                var bolabast = true;
                 connection.query("SELECT * FROM " +
                     "(SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, " +
                     "material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar " +
