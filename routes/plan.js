@@ -1435,8 +1435,6 @@ router.get('/xlsx_of', function(req,res){
                             fechaEntrega = (new Date(rows[j].f_entrega).getTime())/(1000*60*60*24);
                             Hoy    = (new Date().getTime())/(1000*60*60*24);
                             diff = parseInt(Hoy - fechaEntrega);
-                            //console.log(diff);
-                            console.log(diff);
                             if(rows[j].solicitados == rows[j].despachados){
                                 diff = 0;
                                 sheet.getCell('C' + auxrow.toString()).value = "Finalizado";
@@ -1461,7 +1459,7 @@ router.get('/xlsx_of', function(req,res){
                             sheet.getCell('O' + auxrow.toString()).value = rows[j].restantes;
                             sheet.getCell('P' + auxrow.toString()).value = rows[j].solicitados - rows[j].restantes;
                             sheet.getCell('Q' + auxrow.toString()).value = rows[j].pt;
-                            sheet.getCell('R' + auxrow.toString()).value = rows[j].f_entrega;
+                            sheet.getCell('R' + auxrow.toString()).value = new Date(rows[j].f_entrega);
                             if(rows[j+1]){
                                 if(rows[j+1].idorden_f != rows[j].idorden_f ){
                                     numitem = 0;
