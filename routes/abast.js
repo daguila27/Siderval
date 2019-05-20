@@ -399,12 +399,13 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
+								console.log(semi);
 								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
 				});
 			}
 			else{
 				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
-							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
+							+"(coalesce(mat2.precio,0) separator '@') p_token, group_concat(coalesce(bom.cantidad,0) separator '@') as c_token, group_concat(coalesce(mat2.stock,0) separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
 							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
@@ -414,7 +415,9 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
-								res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
+
+    		                    console.log(semi);
+	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
 				});
 			}
 
