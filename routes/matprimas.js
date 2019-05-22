@@ -187,13 +187,16 @@ router.post('/table_mprimas', function(req,res,next){
 
     var array_fill = [
         "material.detalle",
-        "material.u_medida"
+        "material.u_medida",
+        "cliente.sigla"
     ];
     var object_fill = {
         "material.detalle-on": [],
         "material.u_medida-on": [],
+        "cliente.sigla-on": [],
         "material.detalle-off": [],
-        "material.u_medida-off": []
+        "material.u_medida-off": [],
+        "cliente.sigla-off": []
     };
     var condiciones_where = [];
     if(input.cond != ''){
@@ -208,13 +211,12 @@ router.post('/table_mprimas', function(req,res,next){
     req.getConnection(function(err, connection){
         if(err) throw err;
         connection.query("select material.idmaterial as idmatpri, detalle"
-            +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
-            +" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
+            +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, coalesce(cliente.sigla, 'No Definido') as sigla"
+            +" from material left join recurso on recurso.idmaterial=material.idmaterial left join abastecimiento on abastecimiento.idmaterial = material.idmaterial left join oda on oda.idoda = abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor " +
             where +" "+limit ,
             function(err, mat){
                 if(err)
                     console.log("Error Selecting : %s", err);
-
 
                 res.render('matprimas/table_mprimas', {mat: mat});
             });

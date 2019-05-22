@@ -15,6 +15,7 @@ function fechaLatino(string){
         <th colspan="3" style="text-align: center;">Stock</th>
         <th rowspan="2" >Unidad</th>
         <th rowspan="2" >Estado</th>
+        <th rowspan="2" >Proveedor</th>
 
     </tr>
     <tr>
@@ -50,6 +51,7 @@ function fechaLatino(string){
         <td style="text-align: center" class="parsear_nro"><%= mat[j].stock_c %></td>
         <td style="text-align: center"><%= mat[j].u_medida %></td>
         <td style="text-align: center"><%= estado%></td>
+        <td style="text-align: center"><%= mat[j].sigla%></td>
     </tr>
     <%}
     }
@@ -61,7 +63,7 @@ function fechaLatino(string){
         <td></td>
         <td></td>
         <td></td>
-
+        <td></td>
     </tr>
     <%}%>
     </tbody>
@@ -69,6 +71,7 @@ function fechaLatino(string){
     <tr>
         <th></th>
         <th style="text-align: center" class="parsear_nro"><%= stock_total%></th>
+        <th></th>
         <th></th>
         <th></th>
         <th></th>

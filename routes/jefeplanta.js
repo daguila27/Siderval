@@ -282,6 +282,7 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
         console.log(result);
         var where = result[0];
         var limit = result[1];
+        limit += " ORDER BY produccion_history.fecha DESC " + limit;
         req.getConnection(function(err, connection){
             if(err) throw err;
 
