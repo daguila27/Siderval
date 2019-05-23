@@ -270,7 +270,7 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
             "cliente.sigla-on": []
         };
 
-        var condiciones_where = ['produccion_history.to = '+idetapa];
+        var condiciones_where = ["produccion_history.from = '"+idetapa+"' AND produccion_history.to!='s'"];
 
         if(input.cond != '') {
             for (var e = 0; e < input.cond.split('@').length; e++) {

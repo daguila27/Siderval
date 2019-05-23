@@ -112,7 +112,7 @@ Maestranza	6-->
                     <h5 style="margin-left: 10px" class="indicator-of-check indicador_busqueda"><small>Mostrando Fusiones de este Mes</small></h5>
                     <div class="form-group pull-right filtro_graph hidden" style="margin-left: 15px; display: flex;">
                         <label for="filtro_graph">Filtro por:</label>
-                        <select class="form-control" id="filtro_graph" onchange="buscar_fusion_stats()">
+                        <select class="form-control" id="filtro_graph" onchange="busc.buscar_action()">
                             <option value="cliente" selected>Cliente</option>
                             <option value="producto">Producto</option>
                             <option value="of">Orden de Fabricación (OF)</option>
@@ -158,7 +158,6 @@ Maestranza	6-->
         "Cliente@success"
     ];
     var busc = new Buscador("buscar_fusion", ".o_searchview", array_fill, "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val(), "DataTableFabs", false, true, ".date-fill","produccion_history.fecha");
-
     busc.add_cond = "";
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());

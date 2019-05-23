@@ -176,11 +176,18 @@
 
                 <div class="oe_secondary_menu_section">Materias Primas</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
+                    <!--<li onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Materias Primas
                                 </span>
+                        </a>
+                    </li>-->
+                    <li onclick="ajax(this)" data-link="/matprimas/view_mprimas">
+                        <a class="oe_menu_leaf active">
+                                        <span class="oe_menu_text">
+                                            Materias Primas
+                                        </span>
                         </a>
                     </li>
                     <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">

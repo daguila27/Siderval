@@ -107,7 +107,7 @@ function fechaEspañol(date){
             <td class="parsear_nro" data-cs="1" style="text-align: center;"><%= data[i].peso%></td>
             <% kilos_totales += (data[i].peso*data[i].enviados);
                piezas_totales += data[i].enviados;%>
-            <td class="parsear_nro body_k" data-cs="2" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
+            <td class="parsear_nro body_k" data-cs="0" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
             <td style="text-align: left" data-order="<%= new Date(data[i].mov_fecha).getTime()%>"><%= fechaEspañol(data[i].mov_fecha)%></td>
         </tr>
     <%}%>
@@ -120,7 +120,7 @@ function fechaEspañol(date){
         <td></td>
         <td id="footer_pt" class="parsear_nro" data-cs="0" style="text-align: center"><%= piezas_totales%></td>
         <td></td>
-        <td id="footer_kt" class="parsear_nro" data-cs="2" style="text-align: center"><%= kilos_totales%></td>
+        <td id="footer_kt" class="parsear_nro" data-cs="0" style="text-align: center"><%= kilos_totales%></td>
         <td></td>
     </tr>
     </tfoot>
@@ -183,7 +183,6 @@ function fechaEspañol(date){
 
     }
     var dimensiones = {clase: [], ancho: []};
-
     function getMedidas(){
         dimensiones.clase = [];
         dimensiones.ancho = [];
@@ -209,14 +208,6 @@ function fechaEspañol(date){
         for (var w = 0; w < dimensiones.clase.length; w++) {
         }*/
     }
-    //ini_table("#DataTableFabs");
-
-    /*$(window).resize(function(){
-        aqui el codigo que se ejecutara cuando se redimencione la ventana
-        setTimeout(function(){getMedidas();ini_table("#DataTableFabs");}, 3000);
-        ini_table("#DataTableFabs");
-    });*/
-
     function submit_form(yo){
         //$("#form"+$(yo).data('idodc')).submit();
         $.ajax({
