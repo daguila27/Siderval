@@ -1507,12 +1507,21 @@ router.get('/xlsx_desp', function(req,res){
         req.getConnection(function(err, connection) {
             if(err)
                 console.log("Error connection : %s", err);
-                connection.query("select gd.idgd, fabricaciones.idorden_f, odc.numoc, material.detalle, despachos.cantidad, gd.fecha, gd.estado, cliente.sigla from despachos left join gd on gd.idgd = despachos.idgd left join material on material.idmaterial = despachos.idmaterial left join pedido on pedido.idpedido = despachos.idpedido left join odc on odc.idodc = pedido.idodc left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join cliente on gd.idcliente = cliente.idcliente",
+                connection.query("select " +
+                    "gd.idgd, coalesce(fabricaciones.idorden_f,'Sin OF') as idorden_f, " +
+                    "coalesce(odc.numoc, 'Sin OC') as numoc, material.detalle, despachos.cantidad, " +
+                    "gd.fecha, gd.estado, coalesce(cliente.sigla,'No Definido') as sigla " +
+                    "from despachos " +
+                    "left join gd on gd.idgd = despachos.idgd " +
+                    "left join material on material.idmaterial = despachos.idmaterial " +
+                    "left join pedido on pedido.idpedido = despachos.idpedido " +
+                    "left join odc on odc.idodc = pedido.idodc " +
+                    "left join fabricaciones on fabricaciones.idpedido = pedido.idpedido " +
+                    "left join cliente on gd.idcliente = cliente.idcliente",
                 function(err, rows){
                     if (err)
                         console.log("Error Select : %s ",err );
 
-                    console.log(rows);
                     var tokenizer2,tokenizer,aux=2;
                     var f_gen = new Date().toLocaleString();
                     f_gen = f_gen.replace(/\s/g,'');
@@ -1535,7 +1544,7 @@ router.get('/xlsx_desp', function(req,res){
                             sheet.getCell('C' + (i+2).toString()).value = rows[i].idorden_f;
                             sheet.getCell('D' + (i+2).toString()).value = rows[i].detalle;
                             sheet.getCell('E' + (i+2).toString()).value = rows[i].cantidad;
-                            sheet.getCell('F' + (i+2).toString()).value = new Date(rows[i].fecha).toLocaleDateString();
+                            sheet.getCell('F' + (i+2).toString()).value = new Date(rows[i].fecha);
                             sheet.getCell('G' + (i+2).toString()).value = rows[i].estado;
                             sheet.getCell('H' + (i+2).toString()).value = rows[i].sigla;
                         }

@@ -44,14 +44,84 @@ router.get('/render_registro',function(req, res, next){
 				if(err)
 					console.log("Error Selecting : %s", err);
 				res.render('dt/render_registro', {data: data, etapas: rows});
-			
+
 			});
 		});
 	});
 	}
-	else{res.redirect('bad_login');}	
-	
+	else{res.redirect('bad_login');}
+
 });
+
+
+router.get('/create_producto',function(req, res, next){
+    if(verificar(req.session.userData)){
+    	res.render('dt/create_producto');
+    }
+    else{res.redirect('bad_login');}
+
+});
+router.get('/check_code_version/:codigo',function(req, res, next){
+    if(verificar(req.session.userData)){
+    	var codigo = req.params.codigo;
+    	var v;
+    	req.getConnection(function(err, connection){
+    		if(err){console.log("Error Connection: %s", err);}
+    		connection.query("select max(codigo) as codigo from material where codigo like '"+codigo+"%'", function(err, rows){
+                if(err){console.log("Error Selecting: %s", err);}
+
+                console.log(rows);
+                if(rows[0].codigo == null){
+                    res.send(codigo+"@1");
+                }
+				else{
+					v = rows[0].codigo.substring(9, rows[0].codigo.length);
+                    v = parseInt(v) + 1;
+					res.send(codigo+"@"+v);
+                }
+
+            });
+		});
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+router.post('/save_producto',function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var data = [];
+        console.log(input);
+        if(typeof input['cod[]'] === 'string'){
+        	if(input["peso[]"] === ''){
+        		input["peso[]"] = 0;
+			}
+            data.push([input["cod[]"], input["nombre[]"], input["unid[]"], input["peso[]"],input["cod[]"].substring(0,1)]);
+		}
+		else{
+            for(var e=0; e < input["cod[]"].length; e++){
+                if(input["peso[]"][e] === ''){
+                    input["peso[]"][e] = 0;
+                }
+                data.push([input["cod[]"][e], input["nombre[]"][e], input["unid[]"][e],input["peso[]"][e],input["cod[]"][e].substring(0,1)]);
+            }
+		}
+
+		console.log(data);
+        req.getConnection(function(err, connection){
+            connection.query("INSERT INTO material (codigo, detalle, u_medida, peso, tipo) VALUES ?", [data], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                res.redirect('/dt/create_producto');
+            });
+        });
+
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+
 
 router.post('/registrar_material', function(req, res, next){
 	var input = JSON.parse(JSON.stringify(req.body));

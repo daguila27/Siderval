@@ -186,17 +186,17 @@ router.post('/table_mprimas', function(req,res,next){
     var input = JSON.parse(JSON.stringify(req.body));
 
     var array_fill = [
-        "material.detalle",
-        "material.u_medida",
-        "cliente.sigla"
+        "table_query.detalle",
+        "table_query.u_medida",
+        "table_query.sigla"
     ];
     var object_fill = {
-        "material.detalle-on": [],
-        "material.u_medida-on": [],
-        "cliente.sigla-on": [],
-        "material.detalle-off": [],
-        "material.u_medida-off": [],
-        "cliente.sigla-off": []
+        "table_query.detalle-on": [],
+        "table_query.u_medida-on": [],
+        "table_query.sigla-on": [],
+        "table_query.detalle-off": [],
+        "table_query.u_medida-off": [],
+        "table_query.sigla-off": []
     };
     var condiciones_where = [];
     if(input.cond != ''){
@@ -210,9 +210,10 @@ router.post('/table_mprimas', function(req,res,next){
     console.log(result);
     req.getConnection(function(err, connection){
         if(err) throw err;
-        connection.query("select material.idmaterial as idmatpri, detalle"
+        connection.query("select * from (select material.show_abast, material.show_mp, material.idmaterial as idmatpri, detalle"
             +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, coalesce(cliente.sigla, 'No Definido') as sigla"
             +" from material left join recurso on recurso.idmaterial=material.idmaterial left join abastecimiento on abastecimiento.idmaterial = material.idmaterial left join oda on oda.idoda = abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor " +
+            "GROUP BY material.idmaterial) as table_query " +
             where +" "+limit ,
             function(err, mat){
                 if(err)

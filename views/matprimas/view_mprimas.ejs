@@ -53,7 +53,7 @@
     ];
     var busc = new Buscador("buscar_mprimas", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", false, false);
 
-    busc.add_cond = "(material.show_mp is true)";
+    busc.add_cond = "(table_query.show_mp is true)";
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         busc.buscar_action();

@@ -77,7 +77,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
 }
 
 function verificar(usr){
-	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'|| usr.nombre == 'jefeplanta'|| usr.nombre == 'test'){
+	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'|| usr.nombre == 'jefeplanta' || usr.nombre == 'test' || usr.nombre == 'matprimas'){
 		return true;
 	}else{
 		return false;

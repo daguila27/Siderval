@@ -53,8 +53,8 @@
     <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
     <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
     <%function show_user(usename){
-        if(username == 'matprimas'){
-            return "Bodega Materias Primas";
+        if(username == 'abastecimiento'){
+            return "Abastecimiento";
         }
     }%>
 
@@ -68,10 +68,10 @@
 
 
 
-<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 100%; z-index: 10;">
+<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 90%;margin-left:10%; z-index: 10; transition: 0.5s">
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <div style="margin: 5px 0px; color:white" onclick="show_menu();">
+            <div style="margin: 5px 0px" onclick="show_menu();">
                 <i style="color: white" class="fa fa-bars"></i>
             </div>
         </button>
@@ -80,8 +80,8 @@
     <div class="navbar-collapse collapse">
 
         <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
-            <li onclick="show_menu()" style="cursor:pointer;">
-                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="fa fa-bars"></i> Menu</span></a>
+            <li onclick="close_menu()" style="cursor:pointer;">
+                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-times"></i> Menu</span></a>
             </li>
             <li>
                 <a class="oe_menu_leaf"><span class="oe_menu_text"></span></a>
@@ -128,9 +128,8 @@
 
 
 <div class="o_main">
-    <div class="o_sub_menu" style="position: fixed; z-index: 20; height: 100%; left: -15%; width: 15%; transition: 1s;">
+    <div class="o_sub_menu" style="position: fixed; z-index: 20; height: 100%; left: 0%; width: 10%; transition: 0.5s;">
         <a class="o_sub_menu_logo" style="background-color: white">
-            <div style="padding: 6px; cursor: pointer" onclick="close_menu()"><i class="fa fa-times pull-right"></i></div>
             <img src="/assets/img/logo.png" style="margin: 0; padding: 0; width: 100%">
         </a>
         <div class="o_sub_menu_content">
@@ -144,110 +143,26 @@
 
 
             <div class="oe_secondary_menu">
-
                 <div class="oe_secondary_menu_section">
-
-
-
                 </div>
-
                 <div class="oe_secondary_menu_section">
-                    Stock
-                </div>
-
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li class="active" onclick="ajax(this)" data-link="/matprimas/view_mprimas">
-                        <a class="oe_menu_leaf active">
-                           <span class="oe_menu_text">
-                               Materias Primas
-                           </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/bom_mat_uni">
-                        <a class="oe_menu_leaf">
-                           <span class="oe_menu_text">
-                               BOM de Productos
-                           </span>
-                        </a>
-                    </li>
-
-
-
-
-
-                </ul>
-
-
-
-                <div class="oe_secondary_menu_section">
-                    Movimientos de Planta
-                </div>
-
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Movimientos
-                                        </span>
-                        </a>
-                    </li>
-                    <li  onclick="ajax(this)" data-link="/matprimas/crear_movimiento" id="create_retiro">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Registrar Retiro
-                                        </span>
-                        </a>
-                    </li>
-                    <li  onclick="ajax(this)" data-link="/matprimas/crear_movimiento_dev" id="create_devolucion">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Registrar Devolución
-                                        </span>
-                        </a>
-                    </li>
-                </ul>
-                <div class="oe_secondary_menu_section">
-                    Recepción de Externos
+                    Orden de Compra
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li  onclick="ajax(this)" data-link="/matprimas/busq_oda" id="view_movimientos">
+                    <li class="active" onclick="ajax(this)" data-link="/gestionpl/create_production_history">
                         <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Registrar Recepción
-                                        </span>
-                        </a>
-                    </li>
-                    <li  onclick="ajax(this)" data-link="/matprimas/view_recep" id="view_movimientos">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Recepciones
-                                        </span>
+                             <span class="oe_menu_text">
+                                 Registrar Movimientos Diarios
+                             </span>
                         </a>
                     </li>
 
                 </ul>
-
-                <div class="oe_secondary_menu_section">
-                    Inventarios
-                </div>
-
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li  onclick="ajax(this)" data-link="/matprimas/inventarios" id="inventarios">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Inventarios Rotativos
-                                        </span>
-                        </a>
-                    </li>
-                </ul>
-
-
             </div>
 
         </div>
     </div>
 
-
     <script src="/buscador.js"></script>
 
-    <div id="page-wrapper" style="width: 100%;">
+    <div id="page-wrapper" style="width: 90%;margin-left:10%; transition: 0.5s;">
