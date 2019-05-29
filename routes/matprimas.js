@@ -186,15 +186,15 @@ router.post('/table_mprimas', function(req,res,next){
     var input = JSON.parse(JSON.stringify(req.body));
 
     var array_fill = [
-        "table_query.detalle",
+        "table_query.descripcion",
         "table_query.u_medida",
         "table_query.sigla"
     ];
     var object_fill = {
-        "table_query.detalle-on": [],
+        "table_query.descripcion-on": [],
         "table_query.u_medida-on": [],
         "table_query.sigla-on": [],
-        "table_query.detalle-off": [],
+        "table_query.descripcion-off": [],
         "table_query.u_medida-off": [],
         "table_query.sigla-off": []
     };
