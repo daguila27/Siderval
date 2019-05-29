@@ -20,9 +20,9 @@
             <div class="form-group pull-right filtro_estado" style="margin-top: 10px;">
                 <select class="form-control" id="filtro_estado">
                     <option value="true" selected>Todos</option>
-                    <option value="(material.stock<=material.stock_c)">Crítico</option>
-                    <option value="(material.stock<=material.stock_i and material.stock>material.stock_c)">Aviso</option>
-                    <option value="(material.stock>material.stock_i)">Abastecido</option>
+                    <option value="(table_query.stock<=table_query.stock_c)">Crítico</option>
+                    <option value="(table_query.stock<=table_query.stock_i and table_query.stock>table_query.stock_c)">Aviso</option>
+                    <option value="(table_query.stock>table_query.stock_i)">Abastecido</option>
 
                 </select>
 
@@ -65,7 +65,7 @@
 
     $("#filtro_estado").on('change', function(e){
         e.preventDefault();
-        busc.add_cond = "((material.show_mp is true) and "+$(this).val()+")";
+        busc.add_cond = "((table_query.show_mp is true) and "+$(this).val()+")";
         busc.buscar_action();
     });
 
