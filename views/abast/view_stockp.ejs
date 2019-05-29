@@ -61,10 +61,10 @@
             </div>
             <div class="form-group pull-right filtro_estado" style="margin-top: 10px;">
                 <select class="form-control" id="filtro_estado">
-                    <option value="material.show_abast is true" selected>Todos</option>
-                    <option value="material.show_abast is true and (material.stock<material.stock_c)">Crítico</option>
-                    <option value="material.show_abast is true and (material.stock<material.stock_i and material.stock>material.stock_c)">Aviso</option>
-                    <option value="material.show_abast is true and (material.stock>material.stock_i)">Abastecido</option>
+                    <option value="table_query.show_abast is true" selected>Todos</option>
+                    <option value="table_query.show_abast is true and (table_query.stock<table_query.stock_c)">Crítico</option>
+                    <option value="table_query.show_abast is true and (table_query.stock<table_query.stock_i and table_query.stock>table_query.stock_c)">Aviso</option>
+                    <option value="table_query.show_abast is true and (table_query.stock>table_query.stock_i)">Abastecido</option>
 
                 </select>
 
