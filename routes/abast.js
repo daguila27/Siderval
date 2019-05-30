@@ -904,7 +904,7 @@ router.post('/addsession_prepeds', function(req, res, next){
 									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
 									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='number' name='cants' min='"+details[0].u_compra+"' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='"+details[0].u_compra+"' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
