@@ -1178,17 +1178,31 @@ router.post('/crear_odc', function(req, res, next){
 
                                                 var idof = rows.insertId;
                                                 if(typeof req.body['idm[]'] == 'string'){
-                                                        if(req.body['prov[]']=='-1'){
-                                                            if(parseInt(req.body['disp[]']) - parseInt(req.body['cants[]']) < 0){
-                                                                list.push([rows.insertId,parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
-                                                            }
+                                                    //PEDIDO ES DE FABRICACIÓN INTERNA
+                                                    if(req.body['prov[]']=='-1'){
+                                                        if(parseInt(req.body['disp[]']) - parseInt(req.body['cants[]']) < 0){
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
+                                                        else{
+                                                            list.push([rows.insertId,0,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],0, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                        }
+                                                    }
+                                                    else{
+                                                        list.push([rows.insertId,parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), true, Peds.insertId, (1)*factor_item]);
+                                                    }
                                                 } else {
                                                     for(var i = 0;i<req.body['idm[]'].length;i++){
+                                                        //PEDIDO ES DE FABRICACIÓN INTERNA
                                                         if(req.body['prov[]'][i] == '-1'){
                                                             if(parseInt(req.body['disp[]'][i]) - parseInt(req.body['cants[]'][i]) < 0){
                                                                 list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]),req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                            }else{
+                                                                list.push([rows.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }
+                                                        }
+                                                        //SI EL PEDIDO ES EXTERNO, SE CREA LA FABRICACION DESHABILITADA. LUEGO SE HABILITARÁ CUANDO ABASTECIMIENTO RECEPCIONE EL PRODUCTO
+                                                        else{
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) , true, Peds.insertId, (i+1)*factor_item]);
                                                         }
                                                         Peds.insertId++;
                                                     }
