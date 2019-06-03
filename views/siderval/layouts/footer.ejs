@@ -490,38 +490,6 @@
         $(str).DataTable().destroy();
     }
 
-
-
-    $("#all_prod").on('click', function(e){
-        e.preventDefault();
-        $.ajax({
-            type: 'GET',
-            url: '/plan/all_prod',
-            beforeSend: function(){
-                $("#page-wrapper").css('display', 'none');
-            },
-            success: function(data){
-                $("#page-wrapper").html(data);
-                $("#page-wrapper").fadeIn();
-            }
-        });
-    });
-
-    $("#list_of").on('click', function(e){
-        e.preventDefault();
-        $.ajax({
-            type: 'GET',
-            url: '/plan/list_ofs',
-            beforeSend: function(){
-                $("#page-wrapper").css('display', 'none');
-            },
-            success: function(data){
-                $("#page-wrapper").html();
-                $("#page-wrapper").fadeIn();
-            }
-        });
-    });
-
     $(".material_lanzamiento").on('click', function(e){
         e.preventDefault();
         var data = {tipo: $(this).data('tipo')};

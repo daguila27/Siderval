@@ -115,52 +115,6 @@
                 alert("no");
             }
         });
-        $("#naniiiiii").submit(function(e){
-            e.preventDefault();
-            console.log("listo");
-            lista = $(this).serializeArray();
-            var data = {
-                idm: [],
-                idp: [],
-                fechas: [],
-                cants: [],
-                lock: [],
-                cliente: $("#cliente").val()
-            }
-            for(var i =0;i<$(this).serializeArray().length;i++){
-                if(lista[i].name != 'nroordenfabricacion'){
-                    data[lista[i].name].push(lista[i].value);
-                } else{
-                    data[lista[i].name] = lista[i].value;
-                }
-            }
-            data.lock = [];
-            $("#send_of :checkbox").each(function(){
-                if($(this).is(':checked')){
-                    data.lock.push('1');
-                }
-                else{
-                    data.lock.push('0');
-                }
-                //console.log($(this).val());
-            });
-            $.ajax({
-                type: 'POST',
-                data: data,
-                url: '/plan/crear_of',
-                success: function(data){
-                    console.log("no listo");
-                    if(data == 'error'){
-                        alert("El pedido es inválido");
-                    } else {
-                        alert("La OF fue creada exitosamente");
-                        emitToast([data,0]);
-                        loadStateOF();
-                        //$("#page-wrapper").html(data);
-                    }
-                }
-            });
-        });
         loadStateOF();
     });
     function refresh(){
