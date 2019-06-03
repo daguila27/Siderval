@@ -1,8 +1,8 @@
 
 <!-- Modal crear Proveedor-->
-<div id="crearProv" class="modal-primary modal fade" role="dialog">
+<div id="crearProdHist" class="modal-primary modal fade" role="dialog">
     <div class="modal-dialog">
-        <form id="clienteForm">
+        <form id="prodhistForm">
             <!-- addclientform     editclientform-->
             <!-- Modal content-->
             <div class="modal-content">
@@ -11,19 +11,26 @@
                     <h4 class="modal-title">Registrar Movimiento:</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-default" style="background-color: rgb(124,123,173)">
-                        <strong style="color: white;">Inserto 23023</strong><small class="pull-right" style="color: white;"> Siguiente Etapa: Quiebre</small>
+                    <div class="alert alert-default" id="prod_info" style="background-color: rgb(124,123,173); display: flex">
+                        <strong style="color: white; width: 70%; font-size: 15px; margin-top: 15px" id="prod_nombre">Inserto 23023</strong><small class="pull-right" id="sig_etapa" style="color: white; width:30%"> Siguiente Etapa: Quiebre</small>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="email">Procesados:</label>
                         <div>
-                            <input type="number" class="form-control" id="process" placeholder="Procesados">
+                            <input type="number" class="form-control" id="procesados" name="procesados" placeholder="Procesados">
+                            <label class="hidden" id="comentario-rechazo" for="" style="width: 100%;">
+                                Motivo de Rechazo:
+                            <textarea class="form-control" name="" id="" cols="20" rows="3"></textarea>
+                            </label>
                         </div>
+                        <input type="hidden" id="idmaterial" name="idmaterial">
+                        <input type="hidden" id="nom-etapa" name="nom-etapa">
+                        <input type="hidden" id="nom-etapa-previus" name="nom-etapa-previus">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Registrar</button>
-                    <button type="button" class="btn btn-default" id="close-clientemodal" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-default" onclick="$('#crearProdHist').modal('hide')" data-dismiss="modal">Cancelar</button>
                 </div>
             </div>
         </form>
@@ -31,21 +38,40 @@
 </div>
 
 <div style="margin-top: 50px; padding: 0 30px">
-    <ul class="nav nav-tabs col-md-10 col-md-offset-1">
-        <li class="active"><a data-toggle="tab" href="#mol">Moldeo</a></li>
-        <li><a data-toggle="tab" href="#fus">Fusión</a></li>
-        <li><a data-toggle="tab" href="#qui">Quiebre</a></li>
-        <li><a data-toggle="tab" href="#tra">Tratamiento Térmico</a></li>
-        <li><a data-toggle="tab" href="#ter">Terminación</a></li>
-        <li><a data-toggle="tab" href="#mae">Maestranza</a></li>
-        <li><a data-toggle="tab" href="#con">Control de Calidad</a></li>
+    <style>
+        .nav-tabs li.active a{
+            background-color: rgb(124,123,173) !important;
+            color: white !important;
+        }
+    </style>
+    <ul class="nav nav-tabs col-md-10 col-md-offset-1" style="padding-left: 1%">
+        <li class="active"><a data-toggle="tab" data-etp="mol" href="#mol">Moldeo <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="fus" href="#fus">Fusión <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="qui" href="#qui">Quiebre <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="tra" href="#tra">Tratamiento Térmico <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ter" href="#ter">Terminación <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="mae" href="#mae">Maestranza <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="con" href="#con">Control de Calidad <small></small></a></li>
     </ul>
     <div class="tab-content">
         <div id="mol" class="tab-pane fade in active">
             <div class="panel panel-primary col-md-10 col-md-offset-1" style="padding: 0">
-                <div class="panel-heading">Moldeo: </div>
+                <div class="panel-heading"></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -54,9 +80,22 @@
         </div>
         <div id="fus" class="tab-pane fade">
             <div class="panel panel-primary col-md-10 col-md-offset-1" style="padding: 0">
-                <div class="panel-heading">Fusión: </div>
+                <div class="panel-heading"></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -65,9 +104,22 @@
         </div>
         <div id="qui" class="tab-pane fade">
             <div class="panel panel-primary col-md-10 col-md-offset-1" style="padding: 0">
-                <div class="panel-heading">Quiebre: </div>
+                <div class="panel-heading"></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -76,9 +128,22 @@
         </div>
         <div id="tra" class="tab-pane fade">
             <div class="panel panel-primary col-md-10 col-md-offset-1" style="padding: 0">
-                <div class="panel-heading">Tratamiento Térmico: </div>
+                <div class="panel-heading"></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -87,9 +152,22 @@
         </div>
         <div id="ter" class="tab-pane fade">
             <div class="panel panel-primary col-md-10 col-md-offset-1" style="padding: 0">
-                <div class="panel-heading">Terminación: </div>
+                <div class="panel-heading"></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -98,9 +176,22 @@
         </div>
         <div id="mae" class="tab-pane fade">
             <div class="panel panel-primary col-md-10 col-md-offset-1" style="padding: 0">
-                <div class="panel-heading">Maestranza: </div>
+                <div class="panel-heading"></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -109,9 +200,22 @@
         </div>
         <div id="con" class="tab-pane fade">
             <div class="panel panel-primary col-md-10 col-md-offset-1" style="padding: 0">
-                <div class="panel-heading">Control de Calidad: </div>
+                <div class="panel-heading"></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -138,23 +242,30 @@
                         <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
                         <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
                         <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">Rch</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="ruta" style="text-align: center">Ruta</th>
                     </tr>
                     </thead>
                     <tbody>
                     <%if(datalen.length){
                     for(var i = 0; i< datalen.length; i++){%>
-                    <tr>
+                    <tr data-ruta="<%=datalen[i].ruta%>" data-nombre="<%=datalen[i].detalle%>">
                         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
                         <td data-cs="0" class="col-can parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-mol parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-fus parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-qui parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-ter parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= datalen[i]['4'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-tra parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
-                        <td data-cs="0" onclick="col_movh(this)" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
+                        <td data-netapa="mol" data-etapa="1" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-mol parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1"><%= datalen[i]['1'] %></td>
+                        <td data-netapa="fus" data-etapa="2" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-fus parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1"><%= datalen[i]['2'] %></td>
+                        <td data-netapa="qui" data-etapa="3" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-qui parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3"><%= datalen[i]['3'] %></td>
+                        <td data-netapa="ter" data-etapa="4" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-ter parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4"><%= datalen[i]['4'] %></td>
+                        <td data-netapa="tra" data-etapa="5" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-tra parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5"><%= datalen[i]['5'] %></td>
+                        <td data-netapa="mae" data-etapa="6" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6"><%= datalen[i]['6'] %></td>
+                        <td data-netapa="con" data-etapa="7" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7"><%= datalen[i]['7'] %></td>
+                        <td data-netapa="rec" data-etapa="s" data-cs="0" style="text-align: center;" onmouseover="this.style.backgroundColor = '#EEEEEE';" onmouseout="this.style.backgroundColor = ''" onclick="col_movh(this)" class="col-proceso col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-s"><%= datalen[i].standby %></td>
+                        <td data-cs="0" style="text-align: center;" class="col-proceso col-rut" data-toggle="tooltip" data-placement="bottom" title="Ruta de Producción"><%= datalen[i].ruta %></td>
                     </tr>
+                    <style>
+                        .col-proceso{
+                            text-align: center;
+                        }
+                    </style>
                     <%  }
                     } else {
                     %>
@@ -183,7 +294,17 @@
 
 
 <script>
-    $('#prodTable').DataTable({
+    var etapas = [
+        "Moldeo",
+        "Fusión",
+        "Quiebre",
+        "Terminación",
+        "Tratamiento Térmico",
+        "Maestranza",
+        "Control de Calidad",
+        "Producto Terminado"
+    ];
+   $('#prodTable').DataTable({
         pageLength: 10,
         language: {
             "sProcessing":     "Procesando...",
@@ -208,7 +329,57 @@
         }
     });
 
+    function showTextArea(){
+        $("#comentario-rechazo").toggleClass("hidden");
+    }
     function col_movh(yo){
-        $("#crearProv").modal('show');
+        var next;
+        var r = $(yo).parent().data('ruta').split(',');
+        //SE OBTIENE LA SIGUIENTE ETAPA SEGÚN RUTA
+        //SI LA ETAPA ACTUAL NO SE ENCUENTRA EN LA RUTA DE PRODUCCION
+        if(r.indexOf($(yo).data('etapa').toString()) === -1){alert("Producto no pasa por etapa selecionada");}
+        else{
+            //SE ALMACENA EL NOMBRE DE LA ETAPA DESDE DONDE SE LIBERA PARA REFERENCIAR
+            // A LA TABLA DONDE DEBE ADJUNTARSE LA COLUMNA, ENTRE OTRAS ACCIONES
+            $("#nom-etapa-previus").val($(yo).data('netapa'));
+            //SI ETAPA ACTUAL ES CONTROL DE CALIDAD ENTONCES POR DEFECTO ENVIA A PRODUCTO TERMINADO
+            if($(yo).data('etapa') === 7){next = 8;}
+            //EN CASO CONTRARIO SE OBTIENE SIGUIENTE ETAPA TOMANDO EL INDICE SIGUIENTE AL DE LA ETAPA ACTUAL
+            else{next = r[r.indexOf($(yo).data('etapa').toString()) + 1];}
+            $('#prod_info').children('strong').html($(yo).parent().data('nombre'));
+            $('#prod_info').children('small').html("<label>Enviar a:     " +
+                "<select class='form-control' onchange='showTextArea()' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
+                "<option value='1' selected>"+etapas[parseInt(next)-1]+"</option>" +
+                "<option value='s'>Rechazo</option>" +
+                "</select></label>");
+            $("#nom-etapa").val($(yo).data('netapa'));
+            $("#crearProdHist").modal('show');
+        }
+    }
+    $("#prodhistForm").submit(function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        var html = "<tr>" +
+            "<td>"+$("#prod_info strong").html()+"</td>" +
+            "<td style='text-align: center'>"+$("#procesados").val()+"</td>" +
+            "<td style='text-align: center'>"+
+            $('#prod_info > small > label > select > option:selected').html()
+            +"</td><td style='text-align: center'>" +
+            "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+            "</td></tr>";
+        $(".tab-content div#"+$("#nom-etapa").val()+" table tbody").append(html);
+        var c = 0;
+        $(".tab-content div#"+$("#nom-etapa").val()+" table tbody tr").each(function(){c++;});
+        $(".nav-tabs li a[data-etp='"+$("#nom-etapa").val()+"'] small").html("("+c+")");
+        $("#crearProdHist").modal('hide');
+
+    });
+
+    function act_numcol(yo){
+        var c = 0;
+        $(".tab-content div#"+$(yo).data('preetp')+" table tbody tr").each(function(){c++;});
+        if(c===0){$(".nav-tabs li a[data-etp='"+$(yo).data('preetp')+"'] small").html("");}
+        else{$(".nav-tabs li a[data-etp='"+$(yo).data('preetp')+"'] small").html("("+c+")");}
+        //$(".tab-pane#"+id)
     }
 </script>

@@ -501,17 +501,24 @@ router.post('/save_gdd', function (req, res, next) {
                     }
                     //Creamos el Query para actualizar stock de materiales
                     let update_stock = 'UPDATE material SET material.stock = CASE ';
-                    let idmaterial = '(';
+                    var array_material = [];
+                    var array_stock = [];
                     for (var i = 0; i < despachos.length; i++) {
-                        update_stock += 'WHEN material.idmaterial=' + despachos[i][2] + ' THEN material.stock' + op2 + despachos[i][3] + ' ';
-                        idmaterial += despachos[i][2];
-                        if (i !== despachos.length - 1) {
-                            idmaterial += ',';
+                        if( array_material.indexOf(despachos[i][2]) === -1 ){
+                            array_material.push(despachos[i][2]);
+                            array_stock.push(parseInt(despachos[i][3]));
+                        }
+                        else{
+                           array_stock[array_material.indexOf(despachos[i][2])] += parseInt(despachos[i][3]);
                         }
                     }
-                    idmaterial += ')';
-                    update_stock += 'ELSE material.stock END WHERE material.idmaterial IN ' + idmaterial;
-                    //Actualizamos el stock de material
+
+                    for(var q=0; q < array_material.length; q++){
+                        update_stock += 'WHEN material.idmaterial=' + array_material[q] + ' THEN material.stock' + op2 + array_stock[q] + ' ';
+                    }
+                    update_stock += 'ELSE material.stock END WHERE material.idmaterial IN (' + array_material.join(',')+')';
+                    console.log(update_stock);
+                    //Se actualiza el stock de material
                     connection.query(update_stock, function (err, rows) {
                         if (err) {throw err;}
 
