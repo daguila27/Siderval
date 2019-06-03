@@ -131,6 +131,8 @@
             }
         }
     }
+
+
     function ajax(yo){
         $(".active").removeClass('active');
         $(yo).addClass('active');
@@ -156,5 +158,18 @@
     io.on('notif-sol-abast', function(){
 
     });
+    $.ajax({
+        type: 'GET',
+        url: "/gestionpl/create_production_history",
+        beforeSend: function(){
+            destroyDataTable();
+            $("#page-wrapper").css('display', 'none');
+            $("#page-wrapper").data('view', $(yo).data('link'));
+        },
+        success: function(data){
+            $("#page-wrapper").html(data);
+            $("#page-wrapper").fadeIn();
 
+        }
+    });
 </script>

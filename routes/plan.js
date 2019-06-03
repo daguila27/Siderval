@@ -1058,6 +1058,7 @@ router.post('/crear_odc', function(req, res, next){
         var list = [];
         var listp = [];
         var abast = [];
+        console.log(req.body);
         if(typeof req.body['idm[]'] != 'undefined'){
             req.getConnection(function(err,connection){
                 var bolfab = true;
@@ -1068,8 +1069,6 @@ router.post('/crear_odc', function(req, res, next){
                     "from pedido left join material on material.idmaterial = pedido.idmaterial " +
                     "group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0", function(err, stocks){
                     if(err) throw err;
-
-
 
                     connection.query("INSERT INTO odc SET ?",[{numoc: req.body.nroordenfabricacion, idcliente: cliente, moneda: moneda}],function(err,odc){
                         if(err)throw err;
@@ -1087,8 +1086,6 @@ router.post('/crear_odc', function(req, res, next){
                             else{
                                 bolfab = false;
                                 bolabast = true;
-                                console.log("prov[]:" + req.body['prov[]']);
-                                console.log("bolfab:" + bolfab);
                                 listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], true, 0, (1)*factor_item]);
                             }
                         } else {
@@ -1106,8 +1103,6 @@ router.post('/crear_odc', function(req, res, next){
                                 else{
                                     bolabast = true;
                                     bolfab = true;
-                                    console.log("prov[]:" + req.body['prov[]'][i]);
-                                    console.log("bolfab:" + bolfab);
                                     listp.push([odc.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['cants[]'][i], req.body['precio[]'][i], true, 0,(i+1)*factor_item]);
                                 }
                             }
@@ -1121,31 +1116,39 @@ router.post('/crear_odc', function(req, res, next){
                                         "VALUES ?",[listp],function(err,Peds){
                                         if(err)throw err;
                                         if(bolfab){
-                                            console.log(Peds);
                                             connection.query("INSERT INTO ordenfabricacion SET ?",dats,function(err,rows){
                                                 if(err)
                                                     console.log("Error Selecting : %s ",err );
 
                                                 var idof = rows.insertId;
+                                                var idm = [];
+                                                var disp = [];
+                                                for(var p=0; p < req.body['idm[]'].length; p++ ){
+                                                    if(idm.indexOf(req.body['idm[]'][p]) === -1 ){
+                                                        idm.push(req.body['idm[]'][p]);
+                                                        disp.push(parseInt(req.body['disp[]'][p]));
+                                                    }
+                                                }
                                                 if(typeof req.body['idm[]'] == 'string'){
                                                     //PEDIDO ES DE FABRICACIÓN INTERNA
                                                     if(req.body['prov[]']=='-1'){
-                                                        if(parseInt(req.body['disp[]']) - parseInt(req.body['cants[]']) < 0){
-                                                            list.push([rows.insertId,parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                        if( disp[idm.indexOf(req.body['idm[]'])] - parseInt(req.body['cants[]']) < 0){
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]']) - disp[idm.indexOf(req.body['idm[]'])],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                         else{
                                                             list.push([rows.insertId,0,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],0, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                     }
                                                     else{
-                                                        list.push([rows.insertId,parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), true, Peds.insertId, (1)*factor_item]);
+                                                        list.push([rows.insertId,parseInt(req.body['cants[]']) - disp[idm.indexOf(req.body['idm[]'])],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), true, Peds.insertId, (1)*factor_item]);
                                                     }
+                                                    disp[idm.indexOf(req.body['idm[]'])] = disp[idm.indexOf(req.body['idm[]'])] - parseInt(req.body['cants[]']);
                                                 } else {
                                                     for(var i = 0;i<req.body['idm[]'].length;i++){
                                                         //PEDIDO ES DE FABRICACIÓN INTERNA
                                                         if(req.body['prov[]'][i] == '-1'){
-                                                            if(parseInt(req.body['disp[]'][i]) - parseInt(req.body['cants[]'][i]) < 0){
-                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]),req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                            if(disp[idm.indexOf(req.body['idm[]'][i])] - parseInt(req.body['cants[]'][i]) < 0){
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - disp[idm.indexOf(req.body['idm[]'][i])],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }else{
                                                                 list.push([rows.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }
@@ -1154,10 +1157,10 @@ router.post('/crear_odc', function(req, res, next){
                                                         else{
                                                             list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) , true, Peds.insertId, (i+1)*factor_item]);
                                                         }
+                                                        disp[idm.indexOf(req.body['idm[]'][i])] = disp[idm.indexOf(req.body['idm[]'][i])] - parseInt(req.body['cants[]'][i]);
                                                         Peds.insertId++;
                                                     }
                                                 }
-                                                console.log(list);
                                                 connection.query("INSERT INTO fabricaciones (`idorden_f`,`cantidad`,`f_entrega`,`idmaterial`,`idproducto`,`restantes`, `lock`, `idpedido`, `numitem`) VALUES ?",[list],function(err,fabrs){
                                                     if(err)throw err;
 
@@ -1310,10 +1313,9 @@ router.post('/producidos_stream', function(req, res, next){
                 " LEFT JOIN subaleacion ON subaleacion.idsubaleacion = producido.idsubaleacion LEFT JOIN aleacion ON "+"CAST(substring(material.codigo,4,2) AS UNSIGNED) = aleacion.idaleacion" +
                 " LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " + wher + " GROUP BY producido.idproducto",function(err,rows)
             {
-                if(err)
-                    console.log("Error Selecting : %s ",err );
+                if(err) console.log("Error Selecting : %s ",err );
+                
                 res.render('plan/prefabrs_stream',{data:rows});
-
             });
             //console.log(query.sql);
         });

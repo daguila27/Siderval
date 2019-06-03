@@ -864,7 +864,15 @@ router.post('/save_op', function(req, res, next){
 	var arrayDBP = [];
     var query = '';
     var input = JSON.parse(JSON.stringify(req.body));
-    console.log(input);
+    var idfab = [];
+    var cant = [];
+    for(var e=0; e < req.session.arrayProduccion.length; e++){
+        if(idfab.indexOf(req.session.arrayProduccion[e][0]) === -1){
+            idfab.push(req.session.arrayProduccion[e][0])
+            cant.push(parseInt(input.list[e]));
+        }
+        else{cant[idfab.indexOf(req.session.arrayProduccion[e][0])] += parseInt(input.list[e]);}
+    }
 	req.getConnection(function(err, connection){
 		connection.query("INSERT INTO ordenproduccion (f_gen) VALUES (NOW())", function(err, oproduccion){
 			if(err){
@@ -873,24 +881,10 @@ router.post('/save_op', function(req, res, next){
 			}
 			else{
                 var idope = oproduccion.insertId;
-                /*
-                * UPDATE `table` SET `uid` = CASE
-                        WHEN id = 1 THEN 2952
-                        WHEN id = 2 THEN 4925
-                        WHEN id = 3 THEN 1592
-                        ELSE `uid`
-                        END
-                    WHERE id  in (1,2,3)
-                * */
                 var ids = [];
                 var prod_h = [];
 				for(var i=0; i<req.session.arrayProduccion.length; i++ ){
-                    if(i == 0){
-                        query += "UPDATE fabricaciones SET restantes = CASE ";
-                    }
-                    query += " WHEN idfabricaciones = "+req.session.arrayProduccion[i][0]+" THEN restantes-"+input.list[i];
 				    ids.push(req.session.arrayProduccion[i][0]);
-                    //query += "UPDATE fabricaciones SET restantes=restantes-"+input.list[i]+" WHERE idfabricaciones="+req.session.arrayProduccion[i][0]+"@";
                     if(input.dates[i] == null){
                         prod_h.push([parseInt(input.list[i]), new Date().toLocaleString(), 'i', '1']);
         				arrayDBP.push([parseInt(input.list[i]),req.session.arrayProduccion[i][0],oproduccion.insertId,parseInt(input.list[i]), new Date().toLocaleString() ]);
@@ -900,7 +894,14 @@ router.post('/save_op', function(req, res, next){
                         arrayDBP.push([parseInt(input.list[i]),req.session.arrayProduccion[i][0],oproduccion.insertId,parseInt(input.list[i]), input.dates[i] ]);
                     }
                 }
-                query += " ELSE restantes END WHERE idfabricaciones IN ("+ids.join(',')+")";
+                for(var q=0; q < idfab.length; q++){
+                    if(q == 0){
+                        query += "UPDATE fabricaciones SET restantes = CASE ";
+                    }
+                    query += " WHEN idfabricaciones = "+idfab[q]+" THEN restantes-"+cant[q];
+                }
+                query += " ELSE restantes END WHERE idfabricaciones IN ("+idfab.join(',')+")";
+                console.log(query);
                 //INSERT INTO `siderval`.`produccion` (`idfabricaciones`, `idordenproduccion`, `cantidad`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `standby`) VALUES ('12825', '14503', '1', '1', '0', '0', '0', '0', '0', '0', '0', '0');
                 var insertquery = "INSERT INTO produccion (`cantidad`, `idfabricaciones`,`idordenproduccion`,`1`) VALUES ";
                 for(var m=0; m<arrayDBP.length; m++){
