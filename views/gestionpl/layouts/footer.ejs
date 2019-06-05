@@ -164,7 +164,7 @@
         beforeSend: function(){
             destroyDataTable();
             $("#page-wrapper").css('display', 'none');
-            $("#page-wrapper").data('view', $(yo).data('link'));
+            //$("#page-wrapper").data('view', $(this).data('link'));
         },
         success: function(data){
             $("#page-wrapper").html(data);

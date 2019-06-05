@@ -91,6 +91,10 @@ function fechaEspañol(date){
         <th>Peso Pieza (kg)</th>
         <th>Peso (kg)</th>
         <th>Fecha <%= etp_f[parseInt(etapa)-1]%></th>
+        <% if(user === 'dt'){%>
+            <th></th>
+            <th></th>
+        <%}%>
     </tr>
     </thead>
     <tbody>
@@ -109,6 +113,10 @@ function fechaEspañol(date){
                piezas_totales += data[i].enviados;%>
             <td class="parsear_nro body_k" data-cs="0" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
             <td style="text-align: left" data-order="<%= new Date(data[i].mov_fecha).getTime()%>"><%= fechaEspañol(data[i].mov_fecha)%></td>
+            <% if(user === 'dt'){%>
+                <td class="nfecha"><input type="date"></td>
+                <td><button data-id="<%= data[i].idproduccion_history%>" onclick="act_fecha(this)">Act</button></td>
+            <%}%>
         </tr>
     <%}%>
     </tbody>
@@ -122,6 +130,10 @@ function fechaEspañol(date){
             <td></td>
             <td id="footer_kt" class="parsear_nro" data-cs="0" style="text-align: center"><%= kilos_totales%></td>
             <td></td>
+            <% if(user === 'dt'){%>
+                <td></td>
+                <td></td>
+            <%}%>
         </tr>
     </tfoot>
 </table>
@@ -129,6 +141,18 @@ function fechaEspañol(date){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
+    function act_fecha(yo){
+        var fecha = $(yo).parent().parent().children('.nfecha').children('input').val();
+        $.ajax({
+            type: 'POST',
+            data: {fecha: fecha, id: $(yo).data('id')},
+            url: '/jefeplanta/actualizar_fecha_produccion_history',
+            success: function(data){
+                alert(data);
+            }
+        });
+    }
+
     var total_piezas = parseFloat('<%=piezas_totales%>');
     var total_peso = parseFloat('<%=kilos_totales%>');
     setDataTableFixed("#DataTableFabs");
