@@ -483,13 +483,7 @@
                   alert("La OC fue creada exitosamente.");
                   $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
                   $(".hidden form").submit();
-                  /*$.ajax({
-                      type: 'GET',
-                      url: '/abastecimiento/abast_myself',
-                      success: function(data){
-                          $("#page-wrapper").html(data);
-                      }
-                  });*/
+
                   setTimeout(function(){
                       location.reload();
                   }, 1000);
