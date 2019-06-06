@@ -231,13 +231,10 @@ $("#send_of").submit(function(e){
         } else {
           alert("La OC fue creada exitosamente.");
           $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-          if(confirm("La OC fue creada exitosamente. ¿Desea generar archivo PDF?")){
-              $(".form-pdf form").submit();
-          }
-          alert("actualizacion");
-          /*setTimeout(function(){
+          $(".form-pdf form").submit();
+          setTimeout(function(){
               location.reload();
-          }, 500);*/
+          }, 500);
         }
       }
     });
