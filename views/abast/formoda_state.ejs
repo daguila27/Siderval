@@ -230,10 +230,8 @@ $("#send_of").submit(function(e){
           alert("La OC que esta intentando crear es inválida.");
         } else {
           alert("La OC fue creada exitosamente.");
-          //$(".hidden").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-
-          //$(".hidden form").submit();
-
+          $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+          $(".hidden form").submit();
 
           setTimeout(function(){
               location.reload();
