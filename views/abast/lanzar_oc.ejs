@@ -356,7 +356,6 @@
             }
         })
     }
-
     $('#viewProductos').DataTable({
         pageLength: 10,
         language: {
@@ -381,10 +380,10 @@
             }
         }
     });
-  function moveArrow(){
+    function moveArrow(){
     $(".desp-arrow").css('transform', 'rotate(180deg)');  
   }
-  function getPredictions(yo){
+    function getPredictions(yo){
       if($(yo).children('input').val()!=''){
              $.ajax({
                   type: 'GET',
@@ -398,7 +397,7 @@
       else{
           $(yo).children('div').html('');
       }
-  }
+    }
   function refresh(){
       var data ={};
       data.det = $("#det").val();
@@ -482,7 +481,7 @@
                   alert("La OC que esta intentando crear es inválida.");
               } else {
                   alert("La OC fue creada exitosamente.");
-                  $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+                  $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
                   $(".hidden form").submit();
                   /*$.ajax({
                       type: 'GET',

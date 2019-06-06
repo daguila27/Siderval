@@ -1742,6 +1742,68 @@ router.post('/view_ordenpdf', function(req,res,next){
     });    
 
 });
+
+router.post('/view_ordenpdf_first', function(req,res,next){
+    var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+
+        connection.query('select material.detalle, material.precio, abastecimiento.cantidad from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on material.idmaterial=abastecimiento.idmaterial where oda.idoda=?', [idoda],
+            function(err, mats){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                connection.query("SELECT * FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor WHERE oda.idoda = ?", [idoda], function(err, oda){
+                    if(err)
+                        console.log("Error Selecting : %s", err);
+
+                    var phantom = require('phantom');
+                    phantom.create().then(function(ph) {
+                        ph.createPage().then(function(page) {
+                            page.property('viewportSize',{width:612,height:792});
+                            page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
+                                page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
+                                    console.log('Page Rendered');
+                                    ph.exit();
+                                    var fs = require('fs');
+                                    var filePath = '\\pdf\\odc'+oda[0].numoda+'.pdf';
+                                    console.log(__dirname.replace('routes','public') + filePath);
+                                    fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
+                                        res.contentType("application/pdf");
+                                        console.log(data);
+                                        res.redirect('/plan/show_pdf_first/'+oda[0].numoda);
+                                        //res.send(data);
+                                    });
+                                    //res.send('/Users/dagui/Desktop/siderval/pdfs/odc'+oda[0].numoda+'-'+oda[0].idoda+'.pdf');
+                                    //res.redirect("/plan/view_ordenpdf_get/"+oda[0].idoda);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+    });
+
+});
+router.get('/show_pdf_first/:numoda', function(req,res,next){
+    var fs = require('fs');
+    var filePath = '\\pdf\\odc'+req.params.numoda+'.pdf';
+    console.log(__dirname.replace('routes','public') + filePath);
+
+    fs.readFile(__dirname.replace('routes','public') + filePath, (err, data) => {
+        if(err) {
+            console.log('error: ', err);
+            console.log("ARCHIVO INEXISTENTE");
+        }
+        console.log(data);
+        fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
+            res.contentType("application/pdf");
+            console.log(data);
+            res.send(data);
+        });
+    });
+
+});
 router.get('/show_pdf/:numoda', function(req,res,next){
     var fs = require('fs');
     var filePath = '\\pdf\\odc'+req.params.numoda+'.pdf';
