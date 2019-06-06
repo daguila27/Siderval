@@ -7,6 +7,9 @@
     cursor: pointer;
   }
 </style>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js" type="text/javascript"></script>
 <%
     function toFixed(num, fixed) {
         var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
@@ -196,14 +199,14 @@
                     <tr>
                         <td data-search="<%=eliminarDiacriticos(mats[t].detalle)%>"><%= mats[t].detalle%></td>
                         <td style="text-align: center"><%= mats[t].u_medida%></td>
-                        <td style="text-align: center"><%= mats[t].stock_i%></td>
-                        <td style="text-align: center"><%= mats[t].stock_c%></td>
-                        <td style="text-align: center"><%= mats[t].u_compra%></td>
-                        <td style="text-align: center"><%= mats[t].stock%></td>
+                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].stock_i%></td>
+                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].stock_c%></td>
+                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].u_compra%></td>
+                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].stock%></td>
                         <%if(mats[t].precio == null || mats[t].precio == 8888){%>
                             <td style="text-align: center">Sin Precio</td>
                         <%}else{%>
-                            <td style="text-align: center"><%= mats[t].precio%></td>
+                            <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].precio%></td>
                         <%}%>
                         <td style="text-align: center">
                             <div class="btn-group">
@@ -378,17 +381,6 @@
             }
         }
     });
-  $(document).ready(function(){
-     $.ajax({
-         type: 'GET',
-         url: '/abastecimiento/visualizar_ofs',
-         success: function(data){
-             $(".renderizar_ofs").html(data)
-         }
-     });
-
-
-  });
   function moveArrow(){
     $(".desp-arrow").css('transform', 'rotate(180deg)');  
   }
@@ -508,109 +500,116 @@
       }
   });
 
-     function renderInsumos(idof){
-      //alert("AJAX");
-      $.ajax({
-        type: 'GET',
-        url: '/abastecimiento/get_insumos_of/'+idof,
-        success: function(data){
-            if(data == 'err'){
-              alert("Ha ocurrido un error al obtener los insumos.");
-            }
-            else{
-              //alert(data);
-              $("#ins"+idof).html(data);
-            }
-        }
-      });
-     }
-
-     function selectCC(yo){
-        //alert($(yo).parent('td').children('input').val());
-        $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
-     }
-
-     
-    function saveState(plantilla){
-        var lista = $("#send_of").serializeArray();
-        var data = {
-            idm: [],
-            cants: [],
-            prov: [],
-            costo: [],
-            ex_iva: [],
-            centroc: []
-        }
-        
-        console.log(lista);
-        for(var i =0;i<lista.length;i++){
-            if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
-                //console.log(lista[i].name);
-                data[lista[i].name].push(lista[i].value);
-            } else{
-                //console.log(lista[i].name);
-                data[lista[i].name] = lista[i].value;
-            }
-        }
-        data.ex_iva = [];
-        $("#send_of :checkbox").each(function(){
-            if($(this).is(':checked')){
-              data.ex_iva.push('on');
-            }
-            else{
-              data.ex_iva.push('off');  
-            }
-            //console.log($(this).val());
-        });
-        console.log(data);
-        data.plantilla = plantilla;
-        data.namePlant = $("#namePlant").val();
-        $.ajax({
-            type: 'POST',
-            data: data,
-            url: '/abastecimiento/saveStateODABD',
-            beforeSend: function(xhr){
-                //alert("Guardando!!");
-
-                $(".guardado_automatico").text("Guardando estado de ODA ...");
-            },
-            success: function(data){
-                //alert("Estado de OC guardado");
-                $(".guardado_automatico").text("Guardado por ultima vez: "+ new Date().toLocaleString());
-
-            }
-        });
-
+    function renderInsumos(idof){
+     //alert("AJAX");
+     $.ajax({
+       type: 'GET',
+       url: '/abastecimiento/get_insumos_of/'+idof,
+       success: function(data){
+           if(data == 'err'){
+             alert("Ha ocurrido un error al obtener los insumos.");
+           }
+           else{
+             //alert(data);
+             $("#ins"+idof).html(data);
+           }
+       }
+     });
     }
 
-    function loadState(plantilla){
-         /*
-         * EL CONTROLADOR ACEPTA plantilla (booleano que indica si se esta cargando un plantilla o no)
-         *  Y idplant (id de plantilla en el caso de utilizar una). SI plantilla ES false ENTONCES SE CARGA
-         *  EL ULTIMO ESTADO GUARDADO.
-         * */
-        $.ajax({
-            type: 'POST',
-            data: {plantilla: plantilla, idplant: $(".select-plant").data('id')},
-            url: '/abastecimiento/loadStateODABD',
-            beforeSend: function(xhr){
-                $(".guardado_automatico").css('display', 'none');
-                $(".panel-defecto").css('display', 'none');
-                $(".cargando-panel").css('display', 'block');
-
-                setTimeout(function(){  }, 1000);
-            },
-            success: function(data){
-
-                var text = $(".guardado_automatico").text();
-                $(".panel-creacion").html(data);
-                $(".guardado_automatico").text(text);
-            }
-        });
+    function selectCC(yo){
+       //alert($(yo).parent('td').children('input').val());
+       $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
     }
-    $(document).ready(function(){
-      loadState(false);
-    });
+
+
+   function saveState(plantilla){
+       var lista = $("#send_of").serializeArray();
+       var data = {
+           idm: [],
+           cants: [],
+           prov: [],
+           costo: [],
+           ex_iva: [],
+           centroc: []
+       }
+
+       console.log(lista);
+       for(var i =0;i<lista.length;i++){
+           if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
+               //console.log(lista[i].name);
+               data[lista[i].name].push(lista[i].value);
+           } else{
+               //console.log(lista[i].name);
+               data[lista[i].name] = lista[i].value;
+           }
+       }
+       data.ex_iva = [];
+       $("#send_of :checkbox").each(function(){
+           if($(this).is(':checked')){
+             data.ex_iva.push('on');
+           }
+           else{
+             data.ex_iva.push('off');
+           }
+           //console.log($(this).val());
+       });
+       console.log(data);
+       data.plantilla = plantilla;
+       data.namePlant = $("#namePlant").val();
+       $.ajax({
+           type: 'POST',
+           data: data,
+           url: '/abastecimiento/saveStateODABD',
+           beforeSend: function(xhr){
+               //alert("Guardando!!");
+
+               $(".guardado_automatico").text("Guardando estado de ODA ...");
+           },
+           success: function(data){
+               //alert("Estado de OC guardado");
+               $(".guardado_automatico").text("Guardado por ultima vez: "+ new Date().toLocaleString());
+
+           }
+       });
+
+   }
+
+   function loadState(plantilla){
+        /*
+        * EL CONTROLADOR ACEPTA plantilla (booleano que indica si se esta cargando un plantilla o no)
+        *  Y idplant (id de plantilla en el caso de utilizar una). SI plantilla ES false ENTONCES SE CARGA
+        *  EL ULTIMO ESTADO GUARDADO.
+        * */
+       $.ajax({
+           type: 'POST',
+           data: {plantilla: plantilla, idplant: $(".select-plant").data('id')},
+           url: '/abastecimiento/loadStateODABD',
+           beforeSend: function(xhr){
+               $(".guardado_automatico").css('display', 'none');
+               $(".panel-defecto").css('display', 'none');
+               $(".cargando-panel").css('display', 'block');
+
+               setTimeout(function(){  }, 1000);
+           },
+           success: function(data){
+
+               var text = $(".guardado_automatico").text();
+               $(".panel-creacion").html(data);
+               $(".guardado_automatico").text(text);
+           }
+       });
+   }
+   $(document).ready(function(){
+     loadState(false);
+     $.ajax({
+         type: 'GET',
+         url: '/abastecimiento/visualizar_ofs',
+         success: function(data){
+             $(".renderizar_ofs").html(data)
+         }
+     });
+   });
 
   function renderPlantillasModal(){
       $.ajax({

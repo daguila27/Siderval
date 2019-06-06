@@ -538,7 +538,7 @@ router.get('/abast_myself', function(req, res, next) {
 				"select ordenfabricacion.*, sum(fabricaciones.cantidad) as cantidad, sum(fabricaciones.restantes) "
 				+"as restantes,(sum(fabricaciones.restantes)/sum(fabricaciones.cantidad))*100 as porcentaje from fabricaciones"
 				+" left join material on material.idmaterial=fabricaciones.idmaterial left join bom on bom.idmaterial_master=material.idmaterial"
-				+" left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f where fabricaciones.cantidad - fabricaciones.restantes > 0 group by fabricaciones.idorden_f",
+				+" left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f where fabricaciones.cantidad - fabricaciones.restantes > 0 group by fabricaciones.idorden_f ORDER BY ordenfabricacion.idordenfabricacion DESC",
 				function(err, ins){
 					if(err)
 						console.log("Error Selecting : %s", err);
@@ -3740,8 +3740,10 @@ router.get('/visualizar_ofs', function(req, res, next) {
 			"FROM fabricaciones " +
 			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
 			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
-			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0", function (err, ofs) {
+			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0 order by ordenfabricacion.idordenfabricacion DESC", function (err, ofs) {
             if (err) console.log('We got an error! - '+err);
+
+            console.log(ofs[0]);
             res.render('abast/visualizar_ofs', {of: ofs});
         });
     });
