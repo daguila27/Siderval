@@ -162,22 +162,22 @@ router.post("/next_step",function(req,res,next){
 
         for(var w=0; w < input.idprod.length; w++){
             cant_aux -= parseInt(input.cantprod[w]);
-        	if(cant_aux > 0){
-        		/* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION  */
+            if(cant_aux > 0){
+                /* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION  */
                 query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
                 query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
-				//history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
+                //history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
                 history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
                 ids += input.idprod[w]+",";
             }
-			else{
+            else{
                 /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA */
-				query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
+                query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
                 query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
                 //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
                 history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa]);
                 ids += input.idprod[w]+",";
-				break;
+                break;
             }
         }
         var notif =  {cant: input.sendnum, idproduccion: input.idprod};
@@ -186,25 +186,25 @@ router.post("/next_step",function(req,res,next){
 
         //SE EMITE UNA NOTIFICACION AL USUARIO FAENA
         //req.app.locals.io.emit('refreshfaena'+input.newetapa, notif);
-		req.getConnection(function(err,connection){
-			if(err) throw err;
-			//connection.query("UPDATE produccion SET `" + input.etapa_act + "` = `" + input.etapa_act  + "` - ?,`" + input.newetapa + "` = `" + input.newetapa + "` + ? WHERE idproduccion = ?",[parseInt(input.sendnum),parseInt(input.sendnum),input.idprod],function(err,prod){
-			console.log(query);
-			connection.query(query ,function(err,upProd1){
+        req.getConnection(function(err,connection){
+            if(err) throw err;
+            //connection.query("UPDATE produccion SET `" + input.etapa_act + "` = `" + input.etapa_act  + "` - ?,`" + input.newetapa + "` = `" + input.newetapa + "` + ? WHERE idproduccion = ?",[parseInt(input.sendnum),parseInt(input.sendnum),input.idprod],function(err,prod){
+            console.log(query);
+            connection.query(query ,function(err,upProd1){
                 if(err) throw err;
                 console.log(upProd1);
 
                 connection.query(query2 ,function(err,upProd2){
-					if(err) throw err;
+                    if(err) throw err;
 
-					console.log(upProd2);
-					connection.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
-						if(err) throw err;
-						res.send("si");
-					});
-				});
-	        });
-    });
+                    console.log(upProd2);
+                    connection.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
+                        if(err) throw err;
+                        res.send("si");
+                    });
+                });
+            });
+        });
 	} else res.send("no");
 });
 
@@ -219,7 +219,6 @@ router.get('/render_proceso/:proceso', function(req, res, next){
             input.etapa_act = '8';
         }
 		req.session.myValue = input.proceso;
-		console.log(input);
 		req.getConnection(function(err, connection){
 			//select * from ordenproduccion left join material on (ordenproduccion.idproducido=material.idmaterial) left join producto ON (ordenproduccion.idproducido=producto.idmaterial)
 			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.etapa_val, function(err, etapa){
@@ -253,7 +252,6 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 							rows[i].nextstep = "bodega";
 						} else rows[i].nextstep = rows[i].ruta[nextstep];
 					}
-					console.log(rows);
 					res.render('faena/render_cola', {data: rows,etapaactual:input.proceso, nombreetapa: etapa[0].nombre_etapa, user: req.session.userData});
 				});
 			});

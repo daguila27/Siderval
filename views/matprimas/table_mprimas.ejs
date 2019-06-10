@@ -29,20 +29,8 @@ function fechaLatino(string){
         var estado;
         var stock_total = 0;
     for(var j=0; j < mat.length; j++){
-        stock_total += mat[j].stock;
-    if(mat[j].stock <= mat[j].stock_c){
-        estado = "Critico";
-    %>
-    <tr class="danger">
-        <%}else if(mat[j].stock > mat[j].stock_c && mat[j].stock <= mat[j].stock_i){
-            estado = "Aviso";
-        %>
-    <tr class="warning">
-        <%}else{
-            estado = "Abastecido";
-        %>
-    <tr class="success">
-        <%}%>
+        stock_total += mat[j].stock;%>
+    <tr>
         <!--<td><%= mat[j].codigo%></td>-->
         <td><%= mat[j].descripcion%></td>
         <!--<td><%= mat[j].sigla%></td>-->
@@ -50,8 +38,17 @@ function fechaLatino(string){
         <td style="text-align: center" class="parsear_nro" data-cs="0"><%= mat[j].stock_i %></td>
         <td style="text-align: center" class="parsear_nro" data-cs="0"><%= mat[j].stock_c %></td>
         <td style="text-align: center"><%= mat[j].u_medida %></td>
-        <td style="text-align: center"><%= estado%></td>
-        <td style="text-align: center"><%= mat[j].sigla%></td>
+        <%if(mat[j].stock <= mat[j].stock_c){
+            estado = "Critico";%>
+            <td class="danger" style="text-align: center"><%= estado%></td>
+        <%}else if(mat[j].stock > mat[j].stock_c && mat[j].stock <= mat[j].stock_i){
+            estado = "Aviso";%>
+            <td class="warning" style="text-align: center"><%= estado%></td>
+        <%}else{
+            estado = "Abastecido";%>
+            <td class="success" style="text-align: center"><%= estado%></td>
+        <%}%>
+        <td style="text-align: center"><%= mat[j].sigla %></td>
     </tr>
     <%}
     }

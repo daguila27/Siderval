@@ -227,8 +227,6 @@ router.get('/get_info_ids/:tipo/:idmaterial/:token', function(req, res){
                     view = "ids_dev";
                     break;
             }
-
-
             connection.query(query, function(err, rows){
                 if(err){console.log("Error Selecting : %s", err);}
                 console.log(rows);
@@ -439,10 +437,10 @@ Variables influyentes:
 Usages:
     plan/view_fabricaciones.ejs Ajax(s) para actualizar según búsqueda
  */
-router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
+router.post('/table_fabricaciones', function(req, res, next){
   if(verificar(req.session.userData)){
-        var orden = req.params.orden;
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
         var array_fill = [
             "ordenfabricacion.idordenfabricacion",
             "odc.numoc",
@@ -462,52 +460,19 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
           "pedido.f_entrega-on": [],
           "cliente.sigla-on": []
       };
-        var clave;
-        var where;
-        var condiciones_where = [];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
+      var condiciones_where = [];
 
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
-            }
-        }
-        orden = orden.replace('-', ' ');
-        var where = " ";
-
-        condiciones_where.push("coalesce(pedido.externo, '0') = '0'");
-        if(input.pendientes == 'false'){
-            condiciones_where.push("fabricaciones.restantes>0");
-            //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
-        }
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
+      if(input.cond != '') {
+          for (var e = 0; e < input.cond.split('@').length; e++) {
+              condiciones_where.push(input.cond.split('@')[e]);
+          }
+      }
+      console.log(condiciones_where);
+      //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+      var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+      var where = result[0];
+      var limit = result[1];
+      console.log(result);
       req.getConnection(function(err, connection){
             if(err) throw err;
 
@@ -523,12 +488,12 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
                 +"left join cliente on cliente.idcliente = odc.idcliente "
                 +"left join (select fabricaciones.idfabricaciones, produccion_history.enviados as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
                 +"left join (select fabricaciones.idfabricaciones,SUM(produccion.cantidad) as enprod,SUM(produccion.standby) as enrech from produccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones group by fabricaciones.idfabricaciones) as enprod on enprod.idfabricaciones = fabricaciones.idfabricaciones "
-                +"left join material on material.idmaterial=fabricaciones.idmaterial"+where +" GROUP BY fabricaciones.idfabricaciones ORDER BY " + orden;
+                +"left join material on material.idmaterial=fabricaciones.idmaterial"+where +" GROUP BY fabricaciones.idfabricaciones "+limit;
             connection.query(consulta,
                 function(err, of){
                     if(err) throw err;
 
-                    res.render('plan/table_fabricaciones', {data: of, key: orden.replace(' ', '-'), user: req.session.userData});
+                    res.render('plan/table_fabricaciones', {data: of, key: "", user: req.session.userData});
                 
             });
         });
@@ -1064,7 +1029,7 @@ router.post('/crear_odc', function(req, res, next){
                 var bolfab = true;
                 var bolabast = true;
                 connection.query("SELECT * FROM " +
-                    "(SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, " +
+                    "(SELECT pedido.idmaterial,coalesce(material.stock - coalesce(sum(pedido.cantidad - pedido.despachados),0),0) as disponible, " +
                     "material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar " +
                     "from pedido left join material on material.idmaterial = pedido.idmaterial " +
                     "group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0", function(err, stocks){
@@ -1078,7 +1043,7 @@ router.post('/crear_odc', function(req, res, next){
                                 bolabast = false;
                                 listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
                             }
-                            //si el producto tiene STOCK SUFICIENTE , NO se crea FABRICACIÓN
+                            //si el producto tiene STOCK SUFICIENTE , DE TODAS FORMAS se crea FABRICACIÓN
                             else if(parseInt(req.body['disp[]']) - parseInt(req.body['cants[]']) >= 0){
                                 bolfab = false;
                                 listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
@@ -1115,6 +1080,7 @@ router.post('/crear_odc', function(req, res, next){
                                         "`cantidad`,`precio`, `externo`, `idproveedor`,`numitem`) " +
                                         "VALUES ?",[listp],function(err,Peds){
                                         if(err)throw err;
+                                        bolfab = true;
                                         if(bolfab){
                                             connection.query("INSERT INTO ordenfabricacion SET ?",dats,function(err,rows){
                                                 if(err)
@@ -1123,6 +1089,7 @@ router.post('/crear_odc', function(req, res, next){
                                                 var idof = rows.insertId;
                                                 var idm = [];
                                                 var disp = [];
+                                                var disp_aux;
                                                 for(var p=0; p < req.body['idm[]'].length; p++ ){
                                                     if(idm.indexOf(req.body['idm[]'][p]) === -1 ){
                                                         idm.push(req.body['idm[]'][p]);
@@ -1130,27 +1097,33 @@ router.post('/crear_odc', function(req, res, next){
                                                     }
                                                 }
                                                 if(typeof req.body['idm[]'] == 'string'){
+                                                    if(idm.indexOf(req.body['idm[]']) === -1){disp_aux = 0;}
+                                                    else{disp_aux = disp[idm.indexOf(req.body['idm[]'])];}
+                                                    console.log("disp_aux");
+                                                    console.log(disp_aux);
                                                     //PEDIDO ES DE FABRICACIÓN INTERNA
-                                                    if(req.body['prov[]']=='-1'){
-                                                        if( disp[idm.indexOf(req.body['idm[]'])] - parseInt(req.body['cants[]']) < 0){
-                                                            list.push([rows.insertId,parseInt(req.body['cants[]']) - disp[idm.indexOf(req.body['idm[]'])],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                    if(req.body['prov[]'] === '-1'){
+                                                        if( disp_aux - parseInt(req.body['cants[]']) < 0){
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]']) - disp_aux,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                         else{
                                                             list.push([rows.insertId,0,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],0, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                     }
                                                     else{
-                                                        list.push([rows.insertId,parseInt(req.body['cants[]']) - disp[idm.indexOf(req.body['idm[]'])],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), true, Peds.insertId, (1)*factor_item]);
+                                                        list.push([rows.insertId, parseInt(req.body['cants[]']) - disp_aux,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), true, Peds.insertId, (1)*factor_item]);
                                                     }
                                                     disp[idm.indexOf(req.body['idm[]'])] = disp[idm.indexOf(req.body['idm[]'])] - parseInt(req.body['cants[]']);
                                                 } else {
                                                     for(var i = 0;i<req.body['idm[]'].length;i++){
+                                                        if(idm.indexOf(req.body['idm[]'][i]) === -1){disp_aux = 0;}
+                                                        else{disp_aux = disp[idm.indexOf(req.body['idm[]'][i])];}
                                                         //PEDIDO ES DE FABRICACIÓN INTERNA
-                                                        if(req.body['prov[]'][i] == '-1'){
-                                                            if(disp[idm.indexOf(req.body['idm[]'][i])] - parseInt(req.body['cants[]'][i]) < 0){
+                                                        if(req.body['prov[]'][i] === '-1'){
+                                                            if(disp_aux - parseInt(req.body['cants[]'][i]) < 0){
                                                                 list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - disp[idm.indexOf(req.body['idm[]'][i])],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }else{
-                                                                list.push([rows.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                                list.push([rows.insertId, parseInt(req.body['cants[]'][i]),req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }
                                                         }
                                                         //SI EL PEDIDO ES EXTERNO, SE CREA LA FABRICACION DESHABILITADA. LUEGO SE HABILITARÁ CUANDO ABASTECIMIENTO RECEPCIONE EL PRODUCTO

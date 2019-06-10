@@ -111,7 +111,7 @@
                     <i class="fa fa-caret-down"></i>
                     <span class="badge badge-notificaciones"></span>
                 </a>
-                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
+                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px;z-index: 10">
 
                 </ul>
                 <!-- /.dropdown-messages -->
@@ -190,13 +190,13 @@
 
                 </ul>
                 <div class="oe_secondary_menu_section">
-                    Stock
+                    Materias Primas e Insumos
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li onclick="ajax(this)" data-link="/abastecimiento/view_stockp">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
-                                            Materias Primas
+                                            Resumen de Stock
                                         </span>
                         </a>
                     </li>
@@ -216,7 +216,7 @@
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/ops_close">
+                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/2">
 
 
                         <a class="oe_menu_leaf">

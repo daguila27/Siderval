@@ -74,7 +74,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
         where = " WHERE "+ condiciones_where.join(" AND ");
     }
 
-    return [where, limit];
+    return [where, limit,condiciones_where.join('@')];
 }
 function verificar(usr){
 	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
@@ -1617,7 +1617,7 @@ router.get('/abast_ops_page/:page', function(req, res, next){
 //Renderizar vista de INFORME DE STOCK para FABRICACIONES.
 router.get('/fabrs_ids/:idview', function(req, res, next){
     if(verificar(req.session.userData)){
-		res.render('plan/view_ids', {idview: req.params.idview});
+		res.render('plan/view_ids', {idview: req.params.idview, username: req.session.userData.nombre});
     } else res.redirect("/bad_login");
 });
 
@@ -1637,50 +1637,28 @@ router.post('/table_ids', function(req, res, next){
             "material.codigo-on": [],
             "material.detalle-on": []
         };
-        var clave;
-        var where;
+
         var condiciones_where = [];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-
-        if(input.pendientes == 'false'){
-            condiciones_where.push(['pedido.cantidad > pedido.despachados']);
-        }
-
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
-
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+        if(input.cond != ''){
+            for(var e=0; e < input.cond.split('@').length; e++){
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
-        console.log(condiciones_where);
 
-        adminModel.getdatos(input.token.split('@'),function(err,data){
+
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+
+        if(result[2] === ''){
+        	result[2] = [];
+		}else{
+            result[2] = result[2].split('@');
+		}
+        adminModel.getdatos(input.extraInfo.split('%'),function(err,data){
             if(err) console.log(err);
 
-            res.render("plan/table_ids",{prods:data, token: input.token});
-        }, condiciones_where);
+            res.render("plan/table_ids",{prods:data, token: input.extraInfo});
+        }, result[2], result[1]);
     } else res.redirect("/bad_login");
 });
 
@@ -1975,6 +1953,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
     	let fecha = new Date();
     	var nombre;
+        console.log(req.params.token);
     	console.log(req.params.token.split('@')[2]);
     	if(parseInt(req.params.token.split('@')[2]) == 1){
             nombre = "IDS-producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
@@ -2055,7 +2034,13 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Total Externalizado Mes', key: 'income', width: 14.71},
             { header: 'Stock en Siderval', key: 'income', width: 11}
         ];
-        adminModel.getdatos(req.params.token.split("@"),function(err,ops){
+        var env = [
+        	req.params.token.split("@")[0],
+			req.params.token.split("@")[1],
+			req.params.token.split("@")[2]
+		];
+        console.log(env);
+        adminModel.getdatos(env ,function(err,ops){
             if(err) console.log(err);
             sheet.getRow(1).fill = {
                 type: 'pattern',
@@ -2390,7 +2375,6 @@ router.post('/table_abastecimientos', function(req, res, next){
 	if(verificar(req.session.userData)){
 		//Obtiene la pagina de la url y obtiene el nro de registros a solicitar
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
 		var array_fill = [
             "abastecimiento.idodabast",
             "abastecimiento.factura_token",
@@ -2424,20 +2408,21 @@ router.post('/table_abastecimientos', function(req, res, next){
 
         //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
         var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
-		console.log(result);
         var where = result[0];
         var limit = result[1];
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
                 connection.query("select * from (select abastecimiento.*,oda.anulado,oda.creacion as oda_creacion,coalesce(recepciones.cantidad,0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token,recepciones.gd_token, " +
-                    "COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle from abastecimiento " +
+                    "COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as subcuenta,COALESCE(cuenta_g.cuenta, 'NO DEFINIDO') as cuenta_g,COALESCE(ccontable.cuenta, 'NO DEFINIDO') as cuenta,coalesce(sub_ccontable.idccontable, 'Indefinido') as idccontable,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle from abastecimiento " +
                     "left join (select facturacion.idabast, sum(facturacion.cantidad) as cantidad,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token from facturacion left join factura on factura.idfactura = facturacion.idfactura group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast " +
                     "left join (select recepcion_detalle.idabast,sum(recepcion_detalle.cantidad) as cantidad, group_concat(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token from recepcion_detalle left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion group by recepcion_detalle.idabast) as recepciones on recepciones.idabast = abastecimiento.idabast " +
                     "LEFT JOIN oda ON oda.idoda=abastecimiento.idoda " +
                     "LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial " +
                     "LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor " +
-                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc) as abastecimiento "+where +" ORDER BY abastecimiento.oda_creacion DESC "+limit, function(err, abs){
+                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc " +
+					"LEFT JOIN ccontable on sub_ccontable.idccontable = ccontable.idccontable " +
+					"LEFT JOIN cuenta_g ON cuenta_g.idcuenta = SUBSTRING(ccontable.idccontable, 1, 2)) as abastecimiento "+where +" ORDER BY abastecimiento.oda_creacion DESC "+limit, function(err, abs){
                     if(err) { console.log("Error Selecting : %s", err);
                     }else {
                         res.render('abast/table_abastecimientos', {data: abs,  page: parseInt(req.params.page), largoData: abs.length },function(err,html){
@@ -3691,7 +3676,6 @@ router.get('/get_guiaAbast/:idgd', function(req, res, next) {
 					+'LEFT JOIN abastecimiento ON abastecimiento.idabast=recepcion_detalle.idabast '
 					+'LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial WHERE recepcion.idrecepcion = ?', [req.params.idgd], function (err, guia) {
 	        	if (err) console.log('We got an error! - '+err);
-    	        console.log(guia);
 	        	res.render('abast/modal_gd', {guia: guia, info: [guia[0].fecha, guia[0].numgd, guia[0].razon] });
 
         });
@@ -3743,7 +3727,6 @@ router.get('/visualizar_ofs', function(req, res, next) {
 			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0 order by ordenfabricacion.idordenfabricacion DESC", function (err, ofs) {
             if (err) console.log('We got an error! - '+err);
 
-            console.log(ofs[0]);
             res.render('abast/visualizar_ofs', {of: ofs});
         });
     });

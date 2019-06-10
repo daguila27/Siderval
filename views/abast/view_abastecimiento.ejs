@@ -43,10 +43,14 @@
 		display: flex;
 	}
 </style>
+
+<!--<div style="position: absolute; top: 0px; right: 10px; z-index: 50" class="abrir-buscador">
+	<button class="btn btn-xs btn-circle btn-lg" onclick="mostrar_buscador()"><i class="fa fa-angle-down"></i></button>
+</div>-->
 <%if(username == 'abastecimiento'){%>
-	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 90%;transition:0.5s; ;z-index: 10;">
+	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 90%;transition:0.5s; ;z-index: 9;">
 <%}else{%>
-	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; ;z-index: 10;">
+	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; ;z-index: 9;">
 <%}%>
 	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
@@ -66,8 +70,8 @@
 				</ul>
 			</div>
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
-				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-DESC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-		        <!--<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
+				<!--<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-DESC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>-->
 	    		<div class="search-option-list" style="display: flex;">
 	    			<label style="margin-left: 30px; margin-top: 6px">Mostrar Todos</label>
@@ -77,17 +81,15 @@
 
 				<div class="abast-fill"></div>
 	        </div>
-	        <!-- Paginacion -->
-		  	<div id="paginacion" style="position: absolute; top: 28px; left: 17%;">
-		  		<nav aria-label="Page navigation">
-			        <ul class="pagination-sm" id="paginationup">
-			        </ul>
-			    </nav>
-		  	</div>
+
+			<!--<div style="position: absolute; bottom: 10px; right: 10px">
+				<button class="btn btn-xs btn-circle btn-lg" onclick="ocultar_buscador()"><i class="fa fa-angle-up"></i></button>
+			</div>-->
+
 		</div>
 	</div>
 </div>
-<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%; transition: 0.5s">
 	<div id="fw-body"  style="padding:0;margin: 0;">
 		<div class="content main-page">
 		</div>
@@ -104,6 +106,44 @@
 
 
 <script type="text/javascript">
+
+    var alto_buscador = $(".up-fills").height();
+    var margen_tabla = $('#fw-container').css('margin-top');
+
+	function mostrar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+	}
+    function restaurar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        busc.buscar_action(true);
+        $('.up-fills').css('transition', '0.5s');
+    }
+	function ocultar_buscador(){
+        $('.up-fills').css('z-index', '0');
+        $('.up-fills').css('top', '-'+$('.up-fills').height()+'px');
+        $('#fw-container').css('margin-top', '0px');
+        $('#fw-container').css('padding-top', '30px');
+        $("#pageView").val('1');
+        //busc.buscar_action();
+    }
+    function volver_tabla(){
+        $('.up-fills').css('z-index', '9');
+        $('.up-fills').css('top', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('#fw-container').css('padding-top', '0px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+        $("#pageView").val('0');
+    }
+
+
+
 
 
 	var cc_fill = [];
