@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
 
 var informe = {};
 
-informe.getdatos = function(fecha,callback, condiciones){
+informe.getdatos = function(fecha,callback, condiciones, limit){
     if (connection){
         /*
         prods = [{
@@ -29,6 +29,9 @@ informe.getdatos = function(fecha,callback, condiciones){
             virtuales_oda: Cantidad no reccepcionada de ODA, AS virts_oda.sum_virtual
         },(...)];
         */
+        if(!limit){
+            var limit = '';
+        }
         var where = [];
         var idview = fecha[2];
         if(parseInt(idview) == 1){
@@ -135,7 +138,7 @@ informe.getdatos = function(fecha,callback, condiciones){
             " GROUP BY abastecimiento.idmaterial) AS virts_oda ON virts_oda.idmaterial = material.idmaterial" +
             " WHERE ("+where+") AND (NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND salidas_mp.sum_sal = 0" +
             " AND necesario.necesarios = 0 AND virts.virtuales = 0 AND peds_atrasados.solicitados = 0 AND virts_oda.sum_virtual = 0 AND devs.sum_devs = 0" +
-            " AND ing_oda.sum_ing = 0) OR material.s_inicial != 0 OR material.stock != 0) GROUP BY material.idmaterial",function(err, prods){
+            " AND ing_oda.sum_ing = 0) OR material.s_inicial != 0 OR material.stock != 0) GROUP BY material.idmaterial "+limit,function(err, prods){
             if(err){
                 throw err;
             } else {
