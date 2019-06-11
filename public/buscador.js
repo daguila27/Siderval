@@ -85,6 +85,10 @@ class Buscador{
         });
     }
 
+    hidden_screen(){
+        $("#"+this.idtabla).DataTable().destroy();
+        $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+    }
 
     destroyDataTable(reload){
         $("#"+this.idtabla).DataTable().destroy();

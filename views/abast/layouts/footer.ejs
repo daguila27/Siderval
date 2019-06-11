@@ -298,6 +298,7 @@
         $("#up-fills").css('width', '90%');
         if( ($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento" || $("#page-wrapper").data('view') == "/abastecimiento/fabrs_ids/0") && $("#pageView").val() === '0' ){
             //ajax($(".oe_secondary_submenu li.active"));
+            busc.hidden_screen();
             busc.destroyDataTable(true);
             //destroyDataTable(buscar_oda);
             //setTimeout(function(){ buscar_oda(false); }, 750);
@@ -316,6 +317,7 @@
         $("#up-fills").css('width', '100%');
         if( ($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento" || $("#page-wrapper").data('view') == "/abastecimiento/fabrs_ids/0") && $("#pageView").val() === '0' ){
             //ajax($(".oe_secondary_submenu li.active"));
+            busc.hidden_screen();
             busc.destroyDataTable(true);
             //destroyDataTable(busc.buscar_action);
             //setTimeout(function(){ buscar_oda(false); }, 750);
