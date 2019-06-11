@@ -121,6 +121,7 @@ function fechaLatino(string){
                                         <table id="tablaODA" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                             <tr>
+                                                <th class="o_column_sortable" style="text-align: left;">#Item</th>
                                                 <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                 <th class="o_column_sortable">Cantidad</th>
@@ -133,6 +134,7 @@ function fechaLatino(string){
                                             <tbody class="ui-sortable" id="data_gdd">
                                                 <%for(var e=0; e < abast.length; e++){%>
                                                 <tr class="o_data_row text-info danger">
+                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].numitem%></td>
                                                     <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
                                                     <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
                                                     <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
@@ -145,6 +147,7 @@ function fechaLatino(string){
                                             </tbody>
                                             <tfoot>
                                                 <tr>
+                                                    <td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
