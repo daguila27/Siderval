@@ -181,7 +181,7 @@
               </div>
             </form>
           </div>
-          <table class="table table-responsive" id="viewProductos">
+          <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="viewProductos">
             <thead>
               <tr>
                     <th>Descripción</th>
@@ -204,7 +204,7 @@
                         <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].u_compra%></td>
                         <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].stock%></td>
                         <%if(mats[t].precio == null || mats[t].precio == 8888){%>
-                            <td style="text-align: center">Sin Precio</td>
+                            <td style="text-align: center"> - </td>
                         <%}else{%>
                             <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].precio%></td>
                         <%}%>
@@ -222,25 +222,6 @@
           <div class="panel panel-info">
             <div class="panel-heading">
               <div style="display: flex;">
-                  <!--<div style="width: 45%; margin-right: 5%;">
-                      <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
-                      <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
-                  </div>
-                  <div style="width: 50%;" class="form-group">
-                        <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
-                        <div style="display: flex;">
-                        <select style="width: 40%" class="form-control" id="filtro" onchange="refreshGDList()">
-                          <option value="odc.numoc">N° OC</option>
-                          <option value="material.detalle">Detalle</option>
-                          <option value="subaleacion.subnom">Aleación</option>
-                          <option value="pedido.cantidad - pedido.despachados">Sin Despachar</option>
-                          <option value="pedido.f_entrega" selected="selected">Fecha de Entrega</option>
-                        </select>
-                        <select style="width: 40%" class="form-control" id="orden" onchange="refreshGDList()">
-                          <option value="ASC" selected="selected">Ascendente</option>
-                          <option value="DESC">Descendente</option>
-                        </select>
-                        </div>-->
               </div>
             </div>
           </div>
@@ -356,23 +337,28 @@
             }
         })
     }
+
     $('#viewProductos').DataTable({
-        pageLength: 10,
-        language: {
+        "lengthChange": false,
+        "paging": true,
+        "language": {
             "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
             "sZeroRecords":    "No se encontraron resultados",
             "sEmptyTable":     "Ningún dato disponible en esta tabla",
             "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
             "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-
+            "sInfoPostFix":    "",
             "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst":    "Primero",
                 "sLast":     "Último",
-                "sNext":     "&raquo",
-                "sPrevious": "&laquo"
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
             },
             "oAria": {
                 "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
@@ -380,6 +366,9 @@
             }
         }
     });
+
+
+
     function moveArrow(){
     $(".desp-arrow").css('transform', 'rotate(180deg)');  
   }
