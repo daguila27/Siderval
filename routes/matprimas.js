@@ -16,11 +16,9 @@ router.use(
     },'pool')
 
 );
-
 function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;
     var limit = "";
-    console.log(input);
     if(input.ispage === 'true'){
         limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
     }
@@ -72,7 +70,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
         where = " WHERE "+ condiciones_where.join(" AND ");
     }
 
-    return [where, limit];
+    return [where, limit,condiciones_where.join('@')];
 }
 function verificar(usr){
 	if(usr.nombre == 'matprimas' || usr.nombre == 'siderval'){
@@ -207,7 +205,6 @@ router.post('/table_mprimas', function(req,res,next){
     var result = getConditionArray(object_fill,array_fill, condiciones_where, input);
     var where = result[0];
     var limit = result[1];
-    console.log(result);
     req.getConnection(function(err, connection){
         if(err) throw err;
         connection.query("select * from (select material.show_abast, material.show_mp, material.idmaterial as idmatpri, detalle"
