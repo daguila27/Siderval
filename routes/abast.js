@@ -404,7 +404,7 @@ router.post('/data_bom', function(req, res, next) {
 				});
 			}
 			else{
-				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
+				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.codigo separator '@') as cod_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
 							+"(coalesce(mat2.precio,0) separator '@') p_token, group_concat(coalesce(bom.cantidad,0) separator '@') as c_token, group_concat(coalesce(mat2.stock,0) separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
 							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
@@ -510,10 +510,19 @@ router.post('/search_bom', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var info = JSON.parse(JSON.stringify(req.body)).info;
         console.log(info);
+        var list_input = info.split(' ');
+        info = '';
+        for (var i = 0; i < list_input.length; i++){
+            info += "(material.detalle LIKE '%" + list_input[i] +"%' OR material.codigo LIKE '%"+ list_input[i] +"%')";
+            if (i !== list_input.length - 1){
+                info += ' AND ';
+            }
+        }
+        console.log(info);
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
-			connection.query("select * from material where (detalle like '%"+info+"%' or codigo like '%"+info+"%') and material.tipo='P' order by material.detalle",
+			connection.query("select * from material where ("+info+") and material.tipo='P' order by material.detalle",
 			function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);
