@@ -70,8 +70,8 @@
 
 
 				<div style="display: flex">
-					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
-					<input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="busc.buscar_action()">
+					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Bloqueados</label>
+					<input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="mostrar_todos_check(this)">
 					<select class="form-control" style="width: 85px; margin-left: 40px; margin-right: 10px;">
                         <option value="todos">Todos</option>
                         <option value="conoc">Con OC</option>
@@ -93,6 +93,11 @@
 	</div>
 </div>
 <script type="text/javascript">
+	function mostrar_todos_check(yo){
+	    if($(yo).is(':checked')){busc.add_cond = "fabricaciones.restantes>0@!pedido.externo";}
+		else{busc.add_cond = "!fabricaciones.lock@fabricaciones.restantes>0@!pedido.externo";}
+        busc.buscar_action();
+    }
     var array_fill = [
         "OF@default",
         "OC@primary",
