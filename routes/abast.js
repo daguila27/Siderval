@@ -17,8 +17,6 @@ router.use(
     },'pool')
 
 );
-
-
 function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;
     var limit = "";
@@ -390,7 +388,7 @@ router.post('/data_bom', function(req, res, next) {
 				connection.query("select material.codigo,material.idmaterial,material.detalle, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token, group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE "+/*mat2.e_abast != '3' AND */" material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
@@ -398,7 +396,6 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
-								console.log(semi);
 								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
 				});
 			}
@@ -406,7 +403,7 @@ router.post('/data_bom', function(req, res, next) {
 				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.codigo separator '@') as cod_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
 							+"(coalesce(mat2.precio,0) separator '@') p_token, group_concat(coalesce(bom.cantidad,0) separator '@') as c_token, group_concat(coalesce(mat2.stock,0) separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE"+/*mat2.e_abast != '3' AND */" material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
@@ -415,7 +412,6 @@ router.post('/data_bom', function(req, res, next) {
 									console.log("SIN BOM");
 								}
 
-    		                    console.log(semi);
 	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
 				});
 			}
@@ -425,13 +421,6 @@ router.post('/data_bom', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-/*UPDATE mat_prima SET stock = CASE
-    WHEN idmatpri = 5 THEN stock - 10
-    WHEN idmatpri = 6 THEN stock - 20
-    WHEN idmatpri = 7 THEN stock - 30
-    ELSE stock
-    END
-WHERE idmatpri  in (5,6,7);*/
 router.post('/abast_ped', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -890,7 +879,7 @@ router.post('/addsession_prepeds', function(req, res, next){
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     	else{
@@ -902,7 +891,7 @@ router.post('/addsession_prepeds', function(req, res, next){
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     }
@@ -916,7 +905,7 @@ router.post('/addsession_prepeds', function(req, res, next){
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     	else{
@@ -928,7 +917,7 @@ router.post('/addsession_prepeds', function(req, res, next){
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     }
