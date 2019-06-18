@@ -64,13 +64,13 @@ function numberFormat(numero){
 			var tip_m = [];
 			for(var n=0; n < semi[0].d_token.length; n++){
 					if(semi[0].cod_token[n].substring(0,1) === 'I'){
-						tip_i.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n]]);
+						tip_i.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
 					}
 					else if(semi[0].cod_token[n].substring(0,1) === 'S'){
-						tip_s.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n]]);
+						tip_s.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
 					}
 					else if(semi[0].cod_token[n].substring(0,1) === 'M'){
-						tip_m.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n]]);
+						tip_m.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
 					}
 			}
 			console.log(tip_i);
@@ -95,6 +95,11 @@ function numberFormat(numero){
 							<th>Cantidad</th>
 							<th>Costo</th>
 							<th>Stock</th>
+							<% if(add){%>
+								<th></th>
+							<%}else{%>
+								<th></th>
+							<%}%>
 						</tr>
 					</thead>
 					<tbody>
@@ -106,6 +111,11 @@ function numberFormat(numero){
 							<td class="parsear_nro" data-cs="2"><%= tip_i[e][3]%></td>
 							<td class="parsear_nro" data-cs="0"><%= tip_i[e][4]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_i[e][5]%></td>
+							<%if(add){%>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_i[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+							<%}else{%>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_i[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+							<%}%>
 						</tr>
 					<%}%>
 
@@ -118,6 +128,11 @@ function numberFormat(numero){
 							<td></td>
 							<td></td>
 							<td></td>
+							<%if(add){%>
+								<td></td>
+							<%}else{%>
+								<td></td>
+							<%}%>
 						</tr>
 					</tfoot>
 				</table>
@@ -132,6 +147,11 @@ function numberFormat(numero){
 						<th>Cantidad</th>
 						<th>Costo</th>
 						<th>Stock</th>
+						<%if(add){%>
+							<th></th>
+						<%}else{%>
+							<th></th>
+						<%}%>
 					</tr>
 					</thead>
 					<tbody>
@@ -143,6 +163,11 @@ function numberFormat(numero){
 							<td class="parsear_nro" data-cs="2"><%= tip_s[e][3]%></td>
 							<td class="parsear_nro" data-cs="0"><%= tip_s[e][4]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_s[e][5]%></td>
+							<%if(add){%>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_s[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+							<%}else{%>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_s[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+							<%}%>
 						</tr>
 					<%}%>
 
@@ -155,6 +180,11 @@ function numberFormat(numero){
 						<td></td>
 						<td></td>
 						<td></td>
+						<%if(add){%>
+							<td></td>
+						<%}else{%>
+							<td></td>
+						<%}%>
 					</tr>
 					</tfoot>
 				</table>
@@ -169,6 +199,11 @@ function numberFormat(numero){
 						<th>Cantidad</th>
 						<th>Costo</th>
 						<th>Stock</th>
+						<%if(add){%>
+							<th></th>
+						<%}else{%>
+							<th></th>
+						<%}%>
 					</tr>
 					</thead>
 					<tbody>
@@ -180,6 +215,11 @@ function numberFormat(numero){
 							<td class="parsear_nro" data-cs="2"><%= tip_m[e][3]%></td>
 							<td class="parsear_nro" data-cs="0"><%= tip_m[e][4]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_m[e][5]%></td>
+							<%if(add){%>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_m[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+							<%}else{%>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_m[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+							<%}%>
 						</tr>
 					<%}%>
 
@@ -192,6 +232,11 @@ function numberFormat(numero){
 						<td></td>
 						<td></td>
 						<td></td>
+						<%if(add){%>
+							<td></td>
+						<%}else{%>
+							<td></td>
+						<%}%>
 					</tr>
 					</tfoot>
 				</table>
