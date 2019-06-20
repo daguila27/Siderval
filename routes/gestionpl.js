@@ -13,6 +13,16 @@ router.use(
         insecureAuth : true
     },'pool')
 );
+
+var conn = mysql.createConnection({
+    host: 'localhost',
+    user: 'admin',
+    password : 'tempo123',
+    port : 3306,
+    database:'siderval',
+    insecureAuth : true
+});
+
 function verificar(usr){
     if(usr.nombre == 'gestionpl'){
         return true;
@@ -114,13 +124,123 @@ router.get('/create_production_history', function(req, res, next){
             connection.query(query, function(err, prods){
                 if(err){console.log("Error Selecting: %s", err);}
 
-                console.log(prods);
                 res.render('gestionpl/create_production_history', {datalen: prods});
             });
         });
     }
     else{res.redirect('bad_login');}
 });
+
+router.post('/save_production_history', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        console.log(typeof input['idmat[]']);
+        if(typeof input['idmat[]'] === 'string'){
+            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ");
+        }
+        else{
+            for(var e=0; e < input['idmat[]'].length; e++){
+                recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ");
+            }
+        }
+        res.send("¡Movimiento Diario registrado con exito!");
+
+    }
+    else{res.redirect('bad_login');}
+});
+
+function recursive_save_ph(idmat,env,from,to,obs){
+    if(conn){
+        conn.query("select " +
+            "material.detalle,material.idmaterial,group_concat(produccion.idproduccion SEPARATOR '-') as idprod, group_concat(produccion."+from+" SEPARATOR '-') as cantprod " +
+            "from produccion " +
+            "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
+            "left join material on material.idmaterial=fabricaciones.idmaterial " +
+            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial", [idmat], function(err, rows){
+            if(err) throw err;
+
+            console.log(rows);
+            console.log("QUERY FUNCION");
+            /*
+            * { idprod: '22725-22716-22717',
+                  cantprod: '400-391-300',
+                  newetapa: '2',
+                  sendnum: '91',
+                  etapa_act: '1' };
+            * */
+            var input = {
+                idprod: rows[0].idprod,
+                cantprod: rows[0].cantprod,
+                newetapa: to,
+                sendnum: env,
+                etapa_act: from
+            };
+            console.log(input);
+            /*
+            * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
+            *
+            * */
+            /*
+            * UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+            **/
+            input.idprod = input.idprod.split('-');
+            input.cantprod = input.cantprod.split('-');
+            var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
+            var query2 = "UPDATE produccion SET produccion.`"+input.newetapa+"` = CASE ";
+
+            var ids = "";
+            var cant_aux = parseInt(input.sendnum);
+            var history = [];
+
+            for(var w=0; w < input.idprod.length; w++){
+                cant_aux -= parseInt(input.cantprod[w]);
+                if(cant_aux > 0){
+                    // SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION
+                    query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
+                    query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
+                    //history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
+                    if(input.cantprod[w] > 0){
+                        history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
+                    }
+                    ids += input.idprod[w]+",";
+                }
+                else{
+                    /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA */
+                    query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
+                    query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
+                    //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
+                    history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa]);
+                    ids += input.idprod[w]+",";
+                    break;
+                }
+            }
+            var notif =  {cant: input.sendnum, idproduccion: input.idprod};
+            query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+            query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+            conn.query(query ,function(err,upProd1){
+                if(err) throw err;
+
+                conn.query(query2 ,function(err,upProd2){
+                    if(err) throw err;
+
+                    conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
+                        if(err) throw err;
+
+                    });
+                });
+            });
+            setTimeout(function(){return true;}, 250);
+        });
+    }
+}
+
 
 
 module.exports = router;

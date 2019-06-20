@@ -9,26 +9,27 @@ $(".buscador_eventos").keydown(function(event){
     }
     //ENTER
     else if(char === 13){
-        $(".fill-item-abast.o-selection-focus").click();
+        enter_buscar();
+        //$(".fill-item-abast.o-selection-focus").click();
     }
     //ARRIBA
-    else if(char === 38){
+    /*else if(char === 38){
         item = parseInt(item) - 1;
-    }
+    }*/
     //ABAJO
-    else if(char === 40){
+    /*else if(char === 40){
         item = parseInt(item) + 1;
-    }
+    }*/
 
 
     //SI SOBREPASA EL LIMITE INFERIOR
-    if(parseInt(item) >= fills){
+    /*if(parseInt(item) >= fills){
         $(".o_searchview_autocomplete").data('item', "0");
         $(".fill-item-abast").removeClass("o-selection-focus");
         $(".item0").addClass("o-selection-focus");
-    }
+    }*/
     //SI SOBREPASA EL LIMITE SUPERIOR
-    else if(parseInt(item) < 0){
+    /*else if(parseInt(item) < 0){
         $(".o_searchview_autocomplete").data('item', +fills-1);
         $(".fill-item-abast").removeClass("o-selection-focus");
         $(".item"+fills-1).addClass("o-selection-focus");
@@ -37,6 +38,14 @@ $(".buscador_eventos").keydown(function(event){
         $(".o_searchview_autocomplete").data('item', item);
         $(".fill-item-abast").removeClass("o-selection-focus");
         $(".item"+item).addClass("o-selection-focus");
+    }*/
+});
+
+
+$(".select-busc#fill-change").keydown(function(event){
+    var char = event.which || event.keyCode;
+    if(char === 13){
+        enter_buscar();
     }
 });
 
@@ -58,30 +67,58 @@ $('.fill-item-abast').on('hover', function(e){
     $('.fill-item-abast').css('cursor','pointer');
     $('.fill-item-abast').removeClass("o-selection-focus");
     $('.fill-item-abast').addClass("o-selection-focus");
-    $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    $(".o_searchview_autocomplete").data('item', $(".select-busc#fill-change").val());
 });
-//SI SE SELECCIONA ALGUN FILTRO SE ACTIVA option_fill_selected
-$(".fill-item-abast").on('click', function(e){
-    e.preventDefault();
-    var clase = busc.array_fill[parseInt($(this).data('searchcol'))].split('@');
+
+function enter_buscar(){
+    var clase = busc.array_fill[parseInt($(".select-busc#fill-change").val())].split('@');
     var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
     $(".etiqueta-filtro-div").append(
         "<label " +
         "id='label"+labels+"' " +
         "data-toggle='tooltip' " +
         "title='Buscando "+'"'+$(".buscador_eventos").val()+'"'+" ' " +
-        "data-valor='"+$(this).data('searchcol')+"@"+$(".buscador_eventos").val()+"@off' " +
+        "data-valor='"+$(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val()+"@off' " +
         "class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>" + $(".buscador_eventos").val()+
         "</strong><div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
     );
     $(".etiqueta-filtro-div").data('cant', labels+1);
     if($(".buscador_eventos-value").val() === '' || $(".buscador_eventos-value").val() === null || $(".buscador_eventos-value").val() === undefined){
-        $(".buscador_eventos-value").val($(this).data('searchcol')+"@"+$(".buscador_eventos").val()+"@off");
+        $(".buscador_eventos-value").val($(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val()+"@off");
     }
     else{
-        $(".buscador_eventos-value").val([$(".buscador_eventos-value").val(),$(this).data('searchcol')+"@"+$(".buscador_eventos").val(), 'off'].join(','));
+        $(".buscador_eventos-value").val([$(".buscador_eventos-value").val(),$(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val(), 'off'].join(','));
     }
-    busc.filtros_seleccionados.push($(this).data('searchcol')+"@"+$(".buscador_eventos").val()+"@off");
+    busc.filtros_seleccionados.push($(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val()+"@off");
+    $(".o_searchview_autocomplete").css('display', 'none');
+    $(".o_searchview_autocomplete strong").html('');
+    $(".buscador_eventos").val('');
+    $(".buscador_eventos").focus();
+    busc.page = 1;
+    busc.buscar_action();
+}
+//SI SE SELECCIONA ALGUN FILTRO SE ACTIVA option_fill_selected
+$(".fill-item-abast").on('click', function(e){
+    e.preventDefault();
+    var clase = busc.array_fill[parseInt($(".select-busc#fill-change").val())].split('@');
+    var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
+    $(".etiqueta-filtro-div").append(
+        "<label " +
+        "id='label"+labels+"' " +
+        "data-toggle='tooltip' " +
+        "title='Buscando "+'"'+$(".buscador_eventos").val()+'"'+" ' " +
+        "data-valor='"+$(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val()+"@off' " +
+        "class='etiqueta-filtro label label-primary'>"+clase[0]+": <strong>" + $(".buscador_eventos").val()+
+        "</strong><div data-state='off' onclick='cambiarEtiqueta(this)' class='fa fa-toggle-off etiqueta-filtro-cha'></div> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+    );
+    $(".etiqueta-filtro-div").data('cant', labels+1);
+    if($(".buscador_eventos-value").val() === '' || $(".buscador_eventos-value").val() === null || $(".buscador_eventos-value").val() === undefined){
+        $(".buscador_eventos-value").val($(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val()+"@off");
+    }
+    else{
+        $(".buscador_eventos-value").val([$(".buscador_eventos-value").val(),$(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val(), 'off'].join(','));
+    }
+    busc.filtros_seleccionados.push($(".select-busc#fill-change").val()+"@"+$(".buscador_eventos").val()+"@off");
     $(".o_searchview_autocomplete").css('display', 'none');
     $(".o_searchview_autocomplete strong").html('');
     $(".buscador_eventos").val('');

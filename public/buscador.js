@@ -17,19 +17,18 @@ class Buscador{
         // Pagina actual
         this.limit = ( ( (this.page-1)*100) + 1 )+","+((this.page-1)*100 + 100);
         this.lastpage = false;
-        this.columnaRango = columnaRango;
         this.html =
             "<div class='form-control etiqueta-input' style='display:flex; vertical-align: center'>" +
             "<div class='etiqueta-filtro-div' style='height: 100%;' data-cant='0'>" +
             "</div>" +
             "<input class='buscador_eventos' id='"+idinput+"' style='border: none;' placeholder='Buscar…' type='text' data-cfiltros='"+this.array_fill.length+"' autocomplete='off'>" +
             "<input id='"+idinput+"-value' style='display: none' type='text'>" +
-            "</div>" +
-            "<ul class='dropdown-menu o_searchview_autocomplete' data-item='0' role='menu' style='display: none;'>";
+            "<select style='margin: 0; padding: 0; width: 20%' class='btn btn-default select-busc' id='fill-change'>" ;
+        this.columnaRango = columnaRango;
         for(var e=0; e < array_fill.length; e++){
-            this.html += "<li data-searchcol='"+e+"' class='item"+e+" fill-item-abast o-selection-focus'><a class='o-expand' href='#'></a><a href='#'>Buscar <em>"+array_fill[e].split('@')[0]+"</em> para: <strong></strong></a></li>";
+            this.html += "<option value='"+e+"' class='item"+e+" fill-item-abast o-selection-focus'>"+array_fill[e].split('@')[0]+"</option>";
         }
-        this.html += "</ul>";
+        this.html += "</select></div>";
         if(this.datefill){
             $(this.iddate).html("<div class='dropdown' style='margin-left: 15px'>" +
                 "<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>Acotar Fecha " +
@@ -61,7 +60,7 @@ class Buscador{
 
     //add_cond es un string con la concatenación en sql de cualquier filtro adicional que se desea incluir
     //Ejemplo: "material.detalle>0@gd.tipo='Blanco'";
-    buscar_action(){
+    buscar_action(forpageoc){
         var t = this.idtabla;
         var ispage = this.ispage;
         $.ajax({
@@ -69,8 +68,11 @@ class Buscador{
             data: {clave: this.filtros_seleccionados.join(','),cond: this.add_cond, ispage: ispage, rango: this.rango.join('@'), page: this.page, isRango: this.datefill, columnaRango: this.columnaRango, extraInfo: this.extraInfo.join('%')  },
             url: this.url,
             beforeSend: function(){
-                $("#"+t).DataTable().destroy();
+                if(!forpageoc){
+                    $("#"+t).DataTable().destroy();
+                }
                 $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+
             },
             success: function(data){
 
@@ -83,6 +85,10 @@ class Buscador{
         });
     }
 
+    hidden_screen(){
+        $("#"+this.idtabla).DataTable().destroy();
+        $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+    }
 
     destroyDataTable(reload){
         $("#"+this.idtabla).DataTable().destroy();
@@ -90,7 +96,7 @@ class Buscador{
         var i = this;
         $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
         if(reload){
-            setTimeout(function(){ i.buscar_action(); }, 750);
+            setTimeout(function(){ i.buscar_action(); }, 100);
         }
     }
 

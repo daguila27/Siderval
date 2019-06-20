@@ -149,20 +149,26 @@
                 </div>
             </form>
         </div>
+        <div id="prefabrs">
+            <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" id="sessionPeds">
+                <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Stock</th>
+                    <th>Por Despachar</th>
+                    <th>En Producción</th>
+                    <th>Disponible</th>
+                    <!--<th>Caracteristica</th>-->
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
 
-        <table class="table table-responsive">
-            <thead>
-            <tr>
-                <th>Descripción</th>
-                <th>Stock Disponible</th>
-                <!--<th>Caracteristica</th>-->
-                <th></th>
-            </tr>
-            </thead>
-            <tbody id="prefabrs">
-            </tbody>
-        </table>
 
+
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 </div>
@@ -182,6 +188,10 @@
         var data ={};
         data.caract = $("#caract").val();
         data.det = $("#det").val();
+        $("#prefabrs").html("<div style='width: 100%;text-align: center;'>\n" +
+            "<img style='width: 25%' src='/loading.gif'>" +
+            "</div>")
+        $("#sessionPeds").DataTable().destroy();
         $.ajax({
             type: 'POST',
             data: data,

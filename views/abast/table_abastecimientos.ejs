@@ -73,7 +73,7 @@
 			<th>Total</th>
 			<th>CC</th>
 			<th>Unidad</th>
-			<th> </th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody class="ui-sortable">
@@ -161,7 +161,23 @@
 				<td class="o_data_cell parsear_nro" data-cs="1" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= data[i].facturados %></td>
 				<td class="o_data_cell parsear_nro" data-cs="2" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= data[i].costo %></td>
 				<td class="o_data_cell parsear_nro" data-cs="2" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>"   data-toggle="tooltip" title="<%= textFormat(data[i].cuenta)%>" style="text-align: center; white-space: nowrap"><%=truncateWord( textFormat(data[i].cuenta),7)%></td>
+				<td class="o_data_cell cc_data_cell" data-idoda="<%= data[i].idoda%>"   data-toggle="tooltip" title="<%= textFormat(data[i].cuenta)%>" style="text-align: center; white-space: nowrap" onclick="verCCdetalle(this)" data-cuentag="<%=data[i].cuenta_g%>" data-cuenta="<%=data[i].cuenta%>" data-subcuenta="<%=data[i].subcuenta%>"><%= data[i].idccontable %></td>
+				<style>
+					.cc_data_cell:hover{
+						text-decoration-line: underline;
+						color: blue;
+					}
+				</style>
+
+				<script>
+					function verCCdetalle(yo){
+                        $("#cuenta-modal").html($(yo).data('cuentag'));
+                        $("#subcuenta-modal").html($(yo).data('cuenta'));
+                        $("#especificacion-modal").html("<b>Especificación: </b>"+$(yo).data('subcuenta'));
+                        $("#ccModalInfo").modal('show');
+					}
+
+				</script>
 				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%=data[i].u_medida%></td>
 				<td class="o_data_cell">
 					<div style="display: flex;">
@@ -172,7 +188,7 @@
 			</tr>
 		<%}%>
 	</tbody>
-	<tfoot>
+	<!--<tfoot>
 		<tr>
 			<td></td>
 			<td></td>
@@ -189,7 +205,7 @@
 			<td></td>
 			<td></td>
 		</tr>
-	</tfoot>
+	</tfoot>-->
 </table>
 
 
@@ -261,6 +277,7 @@
                 destroyDataTable();
             },
 			success: function(data){
+                ocultar_buscador();
 				$(".main-page").html(data);	
 			}
 		});

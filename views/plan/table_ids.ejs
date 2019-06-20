@@ -73,7 +73,7 @@
         background-color: rgb(124,123,173);
     }
 </style>
-<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: 0px !important;">
     <thead>
     <tr>
         <th>Código</th>
@@ -145,7 +145,6 @@
 
     $(".info_number").on('click', function(e){
         e.preventDefault();
-
         $.ajax({
             type: 'GET',
             url: '/plan/get_info_ids/'+$(this).data('tipo')+"/"+$(this).parent().data('idmat')+"/"+$("#dateSelect").val(),
@@ -194,7 +193,7 @@
         }
     }
     setDataTableFixed("#DataTableFabs");
-
+    busc.setIndicadorPaginas(parseInt('<%= prods.length %>'), "#indicador_paginas");
 
     var mouseDown = 0;
     document.body.onmousedown = function() {
@@ -237,13 +236,4 @@
         refreshSumas();
         showReg();
     });
-    /*var down = false;
-    $(document).mousedown(function() {
-        down = true;
-    }).mouseup(function() {
-        down = false;
-    });*/
-
-
-
 </script>

@@ -146,7 +146,7 @@
                 <div class="oe_secondary_menu_section">
                 </div>
                 <div class="oe_secondary_menu_section">
-                    Orden de Compra
+                    Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li class="active" onclick="ajax(this)" data-link="/gestionpl/create_production_history">
@@ -156,7 +156,72 @@
                              </span>
                         </a>
                     </li>
+                </ul>
 
+
+                <div class="oe_secondary_menu_section">
+                    Despachos
+                </div>
+                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li onclick="ajax(this)" data-link="/bodega/crear_gdd" id="view_movimientos">
+                        <a class="oe_menu_leaf active">
+                                            <span class="oe_menu_text">
+                                                Crear Guía de Despacho
+                                            </span>
+                        </a>
+                    </li>
+                    <li  onclick="ajax(this)" data-link="/bodega/view_despachos">
+                        <a class="oe_menu_leaf">
+                                            <span class="oe_menu_text">
+                                                Ver Guías
+                                            </span>
+                        </a>
+                    </li>
+
+                </ul>
+
+
+
+                <div class="oe_secondary_menu_section">
+                    Stock
+                </div>
+
+                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li onclick="ajax(this)" data-link="/bodega/view_bodega">
+                        <a class="oe_menu_leaf">
+                                            <span class="oe_menu_text">
+                                                Productos
+                                            </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-link="/bodega/view_pendientes">
+                        <a class="oe_menu_leaf">
+                                            <span class="oe_menu_text">
+                                                Packing List
+                                            </span>
+                        </a>
+                    </li>
+
+                </ul>
+
+                <div class="oe_secondary_menu_section">
+                    Orden de Producción
+                </div>
+                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li onclick="ajax(this)" data-link="/jefeprod/crear_op">
+                        <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                             Crear OP
+                                        </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-link="/jefeprod/view_producciones">
+                        <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Ver Todas
+                                        </span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -165,4 +230,4 @@
 
     <script src="/buscador.js"></script>
 
-    <div id="page-wrapper" style="width: 90%;margin-left:10%; transition: 0.5s;">
+    <div id="page-wrapper"  data-view="/gestionpl/create_production_history" style="width: 90%;margin-left:10%; transition: 0.5s;">

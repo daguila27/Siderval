@@ -10,7 +10,7 @@
       <div class="panel panel-primary panel-defecto" style="display: block;">
         <div class="panel-heading" style="display: flex">
           <div style="width: 45%">
-            <h3>Lanzar Orden de Compra: #<%=last%></h3>
+            <h3>Orden de Compra: #<%=last%></h3>
             <div style="display: flex">
               <button class="btn btn-primary" onclick="saveState(false)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
               <button class="btn btn-primary" onclick="loadState(false)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
@@ -230,21 +230,11 @@ $("#send_of").submit(function(e){
           alert("La OC que esta intentando crear es inválida.");
         } else {
           alert("La OC fue creada exitosamente.");
-          $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-
-          $(".hidden form").submit();
-          /*$.ajax({
-            type: 'GET',
-            url: '/abastecimiento/abast_myself',
-            success: function(data){
-              $("#page-wrapper").html(data);
-            }
-          });*/
-
+          $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+          $(".form-pdf form").submit();
           setTimeout(function(){
               location.reload();
-          }, 1000);
-
+          }, 500);
         }
       }
     });

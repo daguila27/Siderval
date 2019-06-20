@@ -3,7 +3,23 @@ function fechaLatino(string){
     return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
 }
 %>
+<style>
+    .volver-tabla:hover{
+        background-color: rgb(124,123,173);
+        color: white;
+        cursor: pointer;
+    }
+    .volver-tabla{
+        position: relative;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        border-radius: 25%;
+    }
+</style>
 <div class="o_view_manager_content">
+    <i class="fa fa-arrow-left volver-tabla" onclick="volver_tabla()"></i>
+
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
             <div class="o_form_sheet_bg">
@@ -48,12 +64,6 @@ function fechaLatino(string){
                                 </a>-->
                                 <%}%>
                             </h1>
-                        </div>
-                        <div class="col-md-1" style="padding: 0; width: 32px">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-danger" onclick="mostrar_tabla()" type="button" style="align-content: center;"><i class="fa fa-close"></i>
-                                </button>
-                            </div>
                         </div>
                     </div>
                     <div class="o_group">

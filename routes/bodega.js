@@ -77,7 +77,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
 }
 
 function verificar(usr){
-	if(usr.nombre == 'bodega' || usr.nombre == 'plan' || usr.nombre == 'siderval'|| usr.nombre == 'jefeplanta' || usr.nombre == 'test' || usr.nombre == 'matprimas'){
+	if(usr.nombre === 'gestionpl' || usr.nombre === 'bodega' || usr.nombre === 'plan' || usr.nombre === 'siderval'|| usr.nombre === 'jefeplanta' || usr.nombre === 'test' || usr.nombre === 'matprimas'){
 		return true;
 	}else{
 		return false;
@@ -169,7 +169,7 @@ router.get('/view_despachos', function(req, res, next){
         else{
             tipo = 'true';
         }
-        res.render('bodega/view_despachos', {view_tipo: tipo});
+        res.render('bodega/view_despachos', {view_tipo: tipo, username:req.session.userData.nombre });
     }
     else{res.redirect('bad_login');}
 
@@ -614,7 +614,7 @@ router.get('/page_gdd/:idgd', function(req, res, next){
                     " LEFT JOIN cliente ON cliente.idcliente = gd.idcliente" +
                     " WHERE gd.idgd = ? GROUP BY gd.idgd",[idgd], function(err, gd){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT despachos.*,odc.numoc, fabricaciones.idorden_f,material.detalle,material.u_medida FROM despachos" +
+                    connection.query("SELECT despachos.*,pedido.numitem, odc.numoc, fabricaciones.idorden_f,material.detalle,material.u_medida FROM despachos" +
                         " LEFT JOIN material ON material.idmaterial = despachos.idmaterial" +
                         " LEFT JOIN pedido ON pedido.idpedido = despachos.idpedido" +
                         " LEFT JOIN odc ON odc.idodc = pedido.idodc" +
@@ -1606,7 +1606,7 @@ router.get('/view_pendientes', function(req, res, next){
         else{
             tipo = 'true';
         }
-        res.render('bodega/view_pendientes', {view_tipo: tipo});
+        res.render('bodega/view_pendientes', {view_tipo: tipo, username: req.session.userData.nombre});
     }
     else{res.redirect('bad_login');}
 });
@@ -1614,7 +1614,7 @@ router.get('/view_pendientes', function(req, res, next){
 
 router.get('/view_bodega', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('bodega/view_bodega');
+        res.render('bodega/view_bodega', {username: req.session.userData.nombre});
     }
     else{res.redirect('bad_login');}
 });

@@ -80,7 +80,29 @@
 
     </div>
 </div>
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+<style>
+    .busc-din-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 90%;
+        transition:0.5s;
+        z-index: 9;
+    }
+    .busc-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 100%;
+        transition:0.5s;
+        z-index: 9;
+    }
+</style>
+<%
+var clase;
+if(username == 'gestionpl'){clase='busc-din-menu';}
+else{clase='busc-menu';}%>
+<div id="up-fills" class="row up-fills <%=clase%>">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
             <li class="active change-inv-title">Bodega Productos Terminados</li>
@@ -99,7 +121,7 @@
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
                     <li><a href="#" class="getcsvof" data-tipo="stock"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
-                    <li class="option_inventario"><a><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Realizar Inventario</a></li>
+                    <!--<li class="option_inventario"><a><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Realizar Inventario</a></li>-->
                 </ul>
             </div>
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">

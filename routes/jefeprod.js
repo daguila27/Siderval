@@ -76,7 +76,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
 
 
 function verificar(usr){
-	if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta'){
+	if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'gestionpl'){
 		return true;
 	}else{
 		return false;
@@ -135,7 +135,7 @@ router.get('/stats', function(req, res, next){
 * */
 router.get('/view_producciones', function(req, res, next){
     if(verificar(req.session.userData)) {
-        res.render('jefeprod/view_producciones');
+        res.render('jefeprod/view_producciones' ,{username: req.session.userData.nombre});
     }
     else{res.redirect('bad_login');}
 });

@@ -227,8 +227,6 @@ router.get('/get_info_ids/:tipo/:idmaterial/:token', function(req, res){
                     view = "ids_dev";
                     break;
             }
-
-
             connection.query(query, function(err, rows){
                 if(err){console.log("Error Selecting : %s", err);}
                 console.log(rows);
@@ -439,10 +437,10 @@ Variables influyentes:
 Usages:
     plan/view_fabricaciones.ejs Ajax(s) para actualizar según búsqueda
  */
-router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
+router.post('/table_fabricaciones', function(req, res, next){
   if(verificar(req.session.userData)){
-        var orden = req.params.orden;
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
         var array_fill = [
             "ordenfabricacion.idordenfabricacion",
             "odc.numoc",
@@ -462,58 +460,25 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
           "pedido.f_entrega-on": [],
           "cliente.sigla-on": []
       };
-        var clave;
-        var where;
-        var condiciones_where = [];
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
+      var condiciones_where = [];
 
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
-            }
-        }
-        orden = orden.replace('-', ' ');
-        var where = " ";
-
-        condiciones_where.push("coalesce(pedido.externo, '0') = '0'");
-        if(input.pendientes == 'false'){
-            condiciones_where.push("fabricaciones.restantes>0");
-            //where = " WHERE pedido.externo = '0' AND fabricaciones.restantes>0 ";
-        }
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
+      if(input.cond != '') {
+          for (var e = 0; e < input.cond.split('@').length; e++) {
+              condiciones_where.push(input.cond.split('@')[e]);
+          }
+      }
+      console.log(condiciones_where);
+      //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+      var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+      var where = result[0];
+      var limit = result[1];
+      console.log(result);
       req.getConnection(function(err, connection){
             if(err) throw err;
 
             var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados," +
                 "COALESCE(cliente.sigla,'SIDERVAL S.A') AS cliente,COALESCE(cliente.razon,'SIDERVAL S.A') AS razon,ordenfabricacion.*,pedido.despachados," +
-                "coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
+                "coalesce(pedido.externo,false) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
                 " coalesce(odc.numoc, 'Sin OC') as numoc,COALESCE(pedido.despachados) AS despachados,COALESCE(pedido.cantidad) AS solicitados," +
                 "COALESCE(enprod.enprod,0) AS enprod,COALESCE(enprod.enrech,0) AS enrech"
                 +" from fabricaciones "
@@ -523,12 +488,12 @@ router.post('/table_fabricaciones/:orden/:showPend', function(req, res, next){
                 +"left join cliente on cliente.idcliente = odc.idcliente "
                 +"left join (select fabricaciones.idfabricaciones, produccion_history.enviados as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
                 +"left join (select fabricaciones.idfabricaciones,SUM(produccion.cantidad) as enprod,SUM(produccion.standby) as enrech from produccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones group by fabricaciones.idfabricaciones) as enprod on enprod.idfabricaciones = fabricaciones.idfabricaciones "
-                +"left join material on material.idmaterial=fabricaciones.idmaterial"+where +" GROUP BY fabricaciones.idfabricaciones ORDER BY " + orden;
+                +"left join material on material.idmaterial=fabricaciones.idmaterial"+where +" GROUP BY fabricaciones.idfabricaciones "+limit;
             connection.query(consulta,
                 function(err, of){
                     if(err) throw err;
 
-                    res.render('plan/table_fabricaciones', {data: of, key: orden.replace(' ', '-'), user: req.session.userData});
+                    res.render('plan/table_fabricaciones', {data: of, key: "", user: req.session.userData});
                 
             });
         });
@@ -1064,10 +1029,19 @@ router.post('/crear_odc', function(req, res, next){
                 var bolfab = true;
                 var bolabast = true;
                 connection.query("SELECT * FROM " +
-                    "(SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, " +
+                    "(SELECT pedido.idmaterial, coalesce(enp_query.enproduccion, 0) as enproduccion, coalesce(material.stock + coalesce(enp_query.enproduccion, 0) - coalesce(sum(pedido.cantidad - pedido.despachados),0),0) as disponible, " +
                     "material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar " +
                     "from pedido left join material on material.idmaterial = pedido.idmaterial " +
-                    "group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0", function(err, stocks){
+                    " LEFT JOIN (select " +
+                    "  fabricaciones.idmaterial," +
+                    "  sum(produccion.1 + produccion.2 + produccion.3 + " +
+                    "  produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion" +
+                    "   from produccion " +
+                    "  left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                    "  where produccion.1 + produccion.2 + produccion.3 + produccion.4 " +
+                    "  + produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as enp_query ON enp_query.idmaterial = material.idmaterial "+
+                    " group by pedido.idmaterial) as ped_xdesp "+
+                    " where ped_xdesp.disponible > 0", function(err, stocks){
                     if(err) throw err;
 
                     connection.query("INSERT INTO odc SET ?",[{numoc: req.body.nroordenfabricacion, idcliente: cliente, moneda: moneda}],function(err,odc){
@@ -1078,7 +1052,7 @@ router.post('/crear_odc', function(req, res, next){
                                 bolabast = false;
                                 listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
                             }
-                            //si el producto tiene STOCK SUFICIENTE , NO se crea FABRICACIÓN
+                            //si el producto tiene STOCK SUFICIENTE , DE TODAS FORMAS se crea FABRICACIÓN
                             else if(parseInt(req.body['disp[]']) - parseInt(req.body['cants[]']) >= 0){
                                 bolfab = false;
                                 listp.push([odc.insertId,0,req.body['fechas[]'],parseInt(req.body['idm[]']),parseInt(req.body['cants[]']), req.body['precio[]'], false, 0, (1)*factor_item]);
@@ -1115,6 +1089,7 @@ router.post('/crear_odc', function(req, res, next){
                                         "`cantidad`,`precio`, `externo`, `idproveedor`,`numitem`) " +
                                         "VALUES ?",[listp],function(err,Peds){
                                         if(err)throw err;
+                                        bolfab = true;
                                         if(bolfab){
                                             connection.query("INSERT INTO ordenfabricacion SET ?",dats,function(err,rows){
                                                 if(err)
@@ -1123,39 +1098,75 @@ router.post('/crear_odc', function(req, res, next){
                                                 var idof = rows.insertId;
                                                 var idm = [];
                                                 var disp = [];
-                                                for(var p=0; p < req.body['idm[]'].length; p++ ){
-                                                    if(idm.indexOf(req.body['idm[]'][p]) === -1 ){
-                                                        idm.push(req.body['idm[]'][p]);
-                                                        disp.push(parseInt(req.body['disp[]'][p]));
+                                                var disp_aux;
+
+                                                if(typeof req.body['idm[]'] == 'string'){
+                                                    idm.push(req.body['idm[]']);
+                                                    disp.push(parseInt(req.body['disp[]']));
+                                                }
+                                                else{
+                                                    for(var p=0; p < req.body['idm[]'].length; p++ ){
+                                                        if(idm.indexOf(req.body['idm[]'][p]) === -1 ){
+                                                            idm.push(req.body['idm[]'][p]);
+                                                            disp.push(parseInt(req.body['disp[]'][p]));
+                                                        }
                                                     }
                                                 }
+
                                                 if(typeof req.body['idm[]'] == 'string'){
+                                                    if(idm.indexOf(req.body['idm[]']) === -1){disp_aux = 0;}
+                                                    else{
+                                                        if(disp[idm.indexOf(req.body['idm[]'])] < 0){
+                                                            disp_aux = 0;
+                                                        }else{
+                                                            disp_aux = disp[idm.indexOf(req.body['idm[]'])];
+                                                        }
+                                                    }
+                                                    console.log("disp_aux");
+                                                    console.log(disp_aux);
                                                     //PEDIDO ES DE FABRICACIÓN INTERNA
-                                                    if(req.body['prov[]']=='-1'){
-                                                        if( disp[idm.indexOf(req.body['idm[]'])] - parseInt(req.body['cants[]']) < 0){
-                                                            list.push([rows.insertId,parseInt(req.body['cants[]']) - disp[idm.indexOf(req.body['idm[]'])],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                    if(req.body['prov[]'] === '-1'){
+                                                        if( disp_aux - parseInt(req.body['cants[]']) < 0){
+                                                            //list.push([rows.insertId,parseInt(req.body['cants[]']) - disp_aux,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - disp_aux, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - disp_aux, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                         else{
-                                                            list.push([rows.insertId,0,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],0, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],0, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                     }
                                                     else{
-                                                        list.push([rows.insertId,parseInt(req.body['cants[]']) - disp[idm.indexOf(req.body['idm[]'])],req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), true, Peds.insertId, (1)*factor_item]);
+                                                        list.push([rows.insertId, parseInt(req.body['cants[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]'])  - disp_aux, true, Peds.insertId, (1)*factor_item]);
                                                     }
                                                     disp[idm.indexOf(req.body['idm[]'])] = disp[idm.indexOf(req.body['idm[]'])] - parseInt(req.body['cants[]']);
                                                 } else {
                                                     for(var i = 0;i<req.body['idm[]'].length;i++){
-                                                        //PEDIDO ES DE FABRICACIÓN INTERNA
-                                                        if(req.body['prov[]'][i] == '-1'){
-                                                            if(disp[idm.indexOf(req.body['idm[]'][i])] - parseInt(req.body['cants[]'][i]) < 0){
-                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - disp[idm.indexOf(req.body['idm[]'][i])],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                        if(idm.indexOf(req.body['idm[]'][i]) === -1){disp_aux = 0;}
+                                                        else{
+                                                            if(disp[idm.indexOf(req.body['idm[]'][i])] < 0){
+                                                                disp_aux = 0;
                                                             }else{
-                                                                list.push([rows.insertId,0,req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                                disp_aux = disp[idm.indexOf(req.body['idm[]'][i])];
+                                                            }
+                                                        }
+                                                        console.log("disp_aux");
+                                                        console.log(disp_aux);
+                                                        //PEDIDO ES DE FABRICACIÓN INTERNA
+                                                        if(req.body['prov[]'][i] === '-1'){
+                                                            if(disp_aux - parseInt(req.body['cants[]'][i]) < 0){
+                                                                //list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - disp[idm.indexOf(req.body['idm[]'][i])],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - disp_aux , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                            }else{
+                                                                list.push([rows.insertId, parseInt(req.body['cants[]'][i]),req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }
                                                         }
                                                         //SI EL PEDIDO ES EXTERNO, SE CREA LA FABRICACION DESHABILITADA. LUEGO SE HABILITARÁ CUANDO ABASTECIMIENTO RECEPCIONE EL PRODUCTO
                                                         else{
-                                                            list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) , true, Peds.insertId, (i+1)*factor_item]);
+                                                            if(disp_aux - parseInt(req.body['cants[]'][i]) < 0){
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - disp_aux , true, Peds.insertId, (i+1)*factor_item]);
+                                                            }else{
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , true, Peds.insertId, (i+1)*factor_item]);
+
+                                                            }
                                                         }
                                                         disp[idm.indexOf(req.body['idm[]'][i])] = disp[idm.indexOf(req.body['idm[]'][i])] - parseInt(req.body['cants[]'][i]);
                                                         Peds.insertId++;
@@ -1406,12 +1417,23 @@ router.post('/addsession_prepeds', function(req,res,next){
     var fabricacion;
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("SELECT material.detalle, coalesce(disp.disponible, 0) as stock,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial WHERE material.idmaterial = ?",
+            connection.query("SELECT material.detalle, coalesce(enp_query.enproduccion, 0) as enproduccion, coalesce(disp.disponible, 0) as stock,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp"/* where ped_xdesp.disponible > 0*/+") as disp on disp.idmaterial = material.idmaterial " +
+                " LEFT JOIN (select " +
+                "  fabricaciones.idmaterial," +
+                "  sum(produccion.1 + produccion.2 + produccion.3 + " +
+                "  produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion" +
+                "   from produccion " +
+                "  left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "  where produccion.1 + produccion.2 + produccion.3 + produccion.4 " +
+                "  + produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as enp_query ON enp_query.idmaterial = material.idmaterial " +
+                " WHERE material.idmaterial = ?",
                 [req.body.idm],function(err, details){
                     if(err){console.log("Error Selecting : %s", err);}
                     if(req.body.tipo == 'producido'){fabricacion='Interna'}
                     else{fabricacion='Externa'}
-                    fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'><input type='hidden' name='disp' value='" + details[0].stock +"'></td><td><strong>" + fabricacion + "</strong></td>";
+                    var stock_d = details[0].stock + details[0].enproduccion;
+                    if(stock_d < 0){stock_d = 0;}
+                    fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'><input type='hidden' name='disp' value='" + stock_d +"'></td><td><strong>" + fabricacion + "</strong></td>";
                     var inputprov = false;
                     switch(req.body.tipo){
                         case "producido":
@@ -1435,12 +1457,12 @@ router.post('/addsession_prepeds', function(req,res,next){
                         if(err)throw err;
 
 
-                        console.log(auxs);
+
                         if(inputprov){fila = fila + "<td>" + auxs[0].aux1 +"<input type='text' value='1' name='prov' style='display:none;'></td>";}
                         else{ fila = fila + "<td><input type='text' value='-1' name='prov' style='display:none;'>" + auxs[0].aux2 +"</td>";}
                         fila = fila + "<td style='padding: 3px'><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" 
                         +"<td style='padding: 3px'><input class='form-control' type='number' name='cants' min='1' required></td>"
-                        +"<td>"+ parsear_crl(details[0].stock) +"</td>"
+                        +"<td style='text-align: center'>"+ parsear_crl(stock_d) +"</td>"
                         +"<td style='padding: 3px'><input type='number' class='form-control' placeholder='Precio' name='precio'></td>"
                         +"<td style='text-align: center; padding: 5px'><input class='form-control' style='margin-left: 30%; width: 20px; height: 20px;' type='checkbox' name='lock'></td>"
                         +"<td><a onclick='drop(this)' class='btn btn-danger btn-xs'><i class='fa fa-remove'></i></a></td></tr>";
@@ -1483,10 +1505,21 @@ router.post('/buscar_mat', function(req, res, next){
             dats.push(parseInt(input.caract));
         }
         req.getConnection(function(err,connection){
-            connection.query("SELECT material.*, coalesce(disp.disponible,0) as disponible,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
+            connection.query("SELECT material.*, coalesce(disp.xdespachar,0) as xdespachar, coalesce(disp.disponible,0) as disponible, coalesce(enp_query.enproduccion,0) as enproduccion,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
-                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial " + wher + " GROUP BY material.idmaterial",function(err,rows)
+                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion" +
+                " LEFT JOIN (" +
+                "SELECT * FROM (SELECT pedido.idmaterial,sum(pedido.cantidad - pedido.despachados) as xdespachar, material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp"+/* where ped_xdesp.disponible > 0*/") " +
+                "as disp on disp.idmaterial = material.idmaterial" +
+                " LEFT JOIN (select " +
+                "fabricaciones.idmaterial," +
+                "sum(produccion.1 + produccion.2 + produccion.3 + " +
+                "produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion" +
+                " from produccion " +
+                "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "where produccion.1 + produccion.2 + produccion.3 + produccion.4 " +
+                "+ produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as enp_query on enp_query.idmaterial = material.idmaterial " + wher + " GROUP BY material.idmaterial",function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
@@ -1740,6 +1773,68 @@ router.post('/view_ordenpdf', function(req,res,next){
             });
          });
     });    
+
+});
+
+router.post('/view_ordenpdf_first', function(req,res,next){
+    var idoda = JSON.parse(JSON.stringify(req.body)).idoda;
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+
+        connection.query('select material.detalle, material.precio, abastecimiento.cantidad from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on material.idmaterial=abastecimiento.idmaterial where oda.idoda=?', [idoda],
+            function(err, mats){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                connection.query("SELECT * FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor WHERE oda.idoda = ?", [idoda], function(err, oda){
+                    if(err)
+                        console.log("Error Selecting : %s", err);
+
+                    var phantom = require('phantom');
+                    phantom.create().then(function(ph) {
+                        ph.createPage().then(function(page) {
+                            page.property('viewportSize',{width:612,height:792});
+                            page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
+                                page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
+                                    console.log('Page Rendered');
+                                    ph.exit();
+                                    var fs = require('fs');
+                                    var filePath = '\\pdf\\odc'+oda[0].numoda+'.pdf';
+                                    console.log(__dirname.replace('routes','public') + filePath);
+                                    fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
+                                        res.contentType("application/pdf");
+                                        console.log(data);
+                                        res.redirect('/plan/show_pdf_first/'+oda[0].numoda);
+                                        //res.send(data);
+                                    });
+                                    //res.send('/Users/dagui/Desktop/siderval/pdfs/odc'+oda[0].numoda+'-'+oda[0].idoda+'.pdf');
+                                    //res.redirect("/plan/view_ordenpdf_get/"+oda[0].idoda);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+    });
+
+});
+router.get('/show_pdf_first/:numoda', function(req,res,next){
+    var fs = require('fs');
+    var filePath = '\\pdf\\odc'+req.params.numoda+'.pdf';
+    console.log(__dirname.replace('routes','public') + filePath);
+
+    fs.readFile(__dirname.replace('routes','public') + filePath, (err, data) => {
+        if(err) {
+            console.log('error: ', err);
+            console.log("ARCHIVO INEXISTENTE");
+        }
+        console.log(data);
+        fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
+            res.contentType("application/pdf");
+            console.log(data);
+            res.send(data);
+        });
+    });
 
 });
 router.get('/show_pdf/:numoda', function(req,res,next){
@@ -2624,14 +2719,185 @@ router.get('/xlsx_of', function(req,res){
             { header: 'Finalizados', key: 'finalizados', width: 15},
             { header: 'Fecha de Entrega', key: 'fecha', width: 15}
         ];
+
+        sheet.getRow(1).font = {
+            name: 'Calibri',
+            family: 4,
+            size: 11,
+            underline: false,
+            bold: true
+        };
+        sheet.getRow(2).font = {
+            name: 'Calibri',
+            family: 4,
+            size: 11,
+            underline: false,
+            bold: true
+        };
+        sheet.getCell('A1').value = "Referencia";
+        sheet.getCell('A1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'D8E4BC'}
+        };
+        sheet.getCell('A2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'D8E4BC'}
+        };
+        sheet.getRow(1).border = {
+            right: {style:'thin', color: {argb:'00000000'}},
+            left: {style:'thin', color: {argb:'00000000'}},
+            top: {style:'thin', color: {argb:'00000000'}},
+            bottom: {style:'thin', color: {argb:'00000000'}}
+        };
+        sheet.getRow(2).border = {
+            right: {style:'thin', color: {argb:'00000000'}},
+            left: {style:'thin', color: {argb:'00000000'}},
+            top: {style:'thin', color: {argb:'00000000'}},
+            bottom: {style:'thin', color: {argb:'00000000'}}
+        };
+        sheet.getCell('A2').value = "Código";
+        sheet.mergeCells('B1:I1');
+        sheet.getCell('B1').value = "Área de Ventas";
+        sheet.getCell('B1').alignment = {horizontal: 'center'};
+        sheet.getCell('B1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('B2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('C2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('D2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('E2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('F2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('G2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('H2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('I2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+
+        sheet.mergeCells('J1:P1');
+        sheet.getCell('J1').value = "Área de Procesos";
+        sheet.getCell('J1').alignment = {horizontal: 'center'};
+        sheet.getCell('J1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('J2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('K2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('L2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('M2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('N2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('O2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('P2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+
+
+        sheet.mergeCells('Q1:V1');
+        sheet.getCell('Q1').value = "Gestión y Control de Compañía";
+        sheet.getCell('Q1').alignment = {horizontal: 'center'};
+        sheet.getCell('Q1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('Q2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('R2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('S2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('T2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('U2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('V2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
         req.getConnection(function(err, connection) {
             if(err)
                 console.log("Error connection : %s", err);
 
             console.log("¿No será mucha molestia?");
-            connection.query("select material.codigo,COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,fabricaciones.idorden_f,fabricaciones.restantes,coalesce(prod_query.pt,0) as pt,coalesce(odc.numoc, 'SIDERVAL') as numoc,"
+            connection.query("select material.stock,material.u_medida,material.codigo,COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,fabricaciones.idorden_f,fabricaciones.restantes,coalesce(prod_query.pt,0) as pt,coalesce(odc.numoc, 'SIDERVAL') as numoc,"
                 +"material.detalle,subaleacion.subnom as aleacion, coalesce(pedido.despachados,"
-                +"concat(fabricaciones.cantidad-fabricaciones.restantes, ' sin producción')) as despachados,"
+                +"concat(fabricaciones.cantidad-fabricaciones.restantes, ' sin producción')) as despachados,coalesce(pedido.despachados,fabricaciones.cantidad-fabricaciones.restantes) as desp2,"
                 +"coalesce(pedido.cantidad, fabricaciones.cantidad) as solicitados, coalesce(material.peso,0) as peso_u,"
                 +"coalesce(material.peso*pedido.cantidad,0) as peso_t, coalesce(material.peso*(pedido.cantidad - pedido.despachados),0)"
                 +"as peso_d, coalesce(pedido.f_entrega, fabricaciones.f_entrega) as f_entrega,coalesce(group_concat(despachos.idgd),"
@@ -2647,61 +2913,71 @@ router.get('/xlsx_of', function(req,res){
                     //console.log(rows);
                     if(rows.length>0){
                         var nombre = 'csvs/master_of_' + ident + '.xlsx';
-                        sheet.getCell('A1').value = 'Código';
-                        sheet.getCell('B1').value = 'OF';
-                        sheet.getCell('C1').value = 'Estado';
-                        sheet.getCell('D1').value = 'OC';
-                        sheet.getCell('E1').value = 'Item';
-                        sheet.getCell('F1').value = 'Solicitados';
-                        sheet.getCell('G1').value = 'Despachados';
-                        sheet.getCell('H1').value = 'Detalle';
-                        sheet.getCell('I1').value = 'Aleación';
-                        sheet.getCell('J1').value = 'Peso Unitario';
-                        sheet.getCell('K1').value = 'Peso por Despachar';
-                        sheet.getCell('L1').value = 'Peso Total';
-                        sheet.getCell('M1').value = 'GD';
-                        sheet.getCell('N1').value = 'Días de Atraso';
-                        sheet.getCell('O1').value = 'Sin Producir';
-                        sheet.getCell('P1').value = 'Planta';
-                        sheet.getCell('Q1').value = 'Finalizados';
-                        sheet.getCell('R1').value = 'Fecha de Entrega';
+                        sheet.getCell('B2').value = 'Estado';
+                        sheet.getCell('C2').value = 'OF';
+                        sheet.getCell('D2').value = 'OC';
+                        sheet.getCell('E2').value = 'Cliente';
+                        sheet.getCell('F2').value = 'Item';
+                        sheet.getCell('G2').value = 'Detalle';
+                        sheet.getCell('H2').value = 'Solicitados';
+                        sheet.getCell('I2').value = 'Unidad';
+                        sheet.getCell('J2').value = 'Aleación';
+                        sheet.getCell('K2').value = 'Peso Unitario';
+                        sheet.getCell('L2').value = 'Peso Total';
+                        sheet.getCell('M2').value = 'Fundidos';
+                        sheet.getCell('N2').value = 'En Producción';
+                        sheet.getCell('O2').value = 'A Programar';
+                        sheet.getCell('P2').value = 'Bodega Stock';
+                        sheet.getCell('Q2').value = 'Despachados';
+                        sheet.getCell('R2').value = 'Por Despachar';
+                        sheet.getCell('S2').value = 'Peso por Despachar';
+                        sheet.getCell('T2').value = 'Guía Despachos Asociadas';
+                        sheet.getCell('U2').value = 'Fecha de Entrega';
+                        sheet.getCell('V2').value = 'Fecha de Entrega por Guía (último producto por guía)';
+
+
                         var numitem = 0;
                         var fechaInicio;
                         var fechaFin;
                         var diff = 0;
                         for(var j=0; j<rows.length; j++){
                             numitem++;
-                            auxrow = 2 + j;
+                            auxrow = 3 + j;
                             sheet.getCell('A' + auxrow.toString()).value = rows[j].codigo;
-                            sheet.getCell('B' + auxrow.toString()).value = rows[j].idorden_f;
                             fechaEntrega = (new Date(rows[j].f_entrega).getTime())/(1000*60*60*24);
                             Hoy    = (new Date().getTime())/(1000*60*60*24);
                             diff = parseInt(Hoy - fechaEntrega);
                             if(rows[j].solicitados == rows[j].despachados){
                                 diff = 0;
-                                sheet.getCell('C' + auxrow.toString()).value = "Finalizado";
+                                sheet.getCell('B' + auxrow.toString()).value = "Finalizado";
                             }
                             else if(diff > 0){
-                                sheet.getCell('C' + auxrow.toString()).value = "Atrasado";
+                                sheet.getCell('B' + auxrow.toString()).value = "Atrasado";
                             }
                             else{
-                                sheet.getCell('C' + auxrow.toString()).value = "Por Entregar";
+                                sheet.getCell('B' + auxrow.toString()).value = "Por Entregar";
                             }
+                            sheet.getCell('C' + auxrow.toString()).value = rows[j].idorden_f;
                             sheet.getCell('D' + auxrow.toString()).value = rows[j].numoc;
-                            sheet.getCell('E' + auxrow.toString()).value = numitem;
-                            sheet.getCell('F' + auxrow.toString()).value = rows[j].solicitados;
-                            sheet.getCell('G' + auxrow.toString()).value = rows[j].despachados;
-                            sheet.getCell('H' + auxrow.toString()).value = rows[j].detalle;
-                            sheet.getCell('I' + auxrow.toString()).value = rows[j].aleacion;
-                            sheet.getCell('J' + auxrow.toString()).value = rows[j].peso_u;
-                            sheet.getCell('K' + auxrow.toString()).value = rows[j].peso_d;
+                            sheet.getCell('E' + auxrow.toString()).value = rows[j].cliente;
+                            sheet.getCell('F' + auxrow.toString()).value = numitem;
+                            sheet.getCell('G' + auxrow.toString()).value = rows[j].detalle;
+                            sheet.getCell('H' + auxrow.toString()).value = rows[j].solicitados;
+                            sheet.getCell('I' + auxrow.toString()).value = rows[j].u_medida;
+                            sheet.getCell('J' + auxrow.toString()).value = rows[j].aleacion;
+                            sheet.getCell('K' + auxrow.toString()).value = rows[j].peso_u;
                             sheet.getCell('L' + auxrow.toString()).value = rows[j].peso_t;
-                            sheet.getCell('M' + auxrow.toString()).value = rows[j].gd;
-                            sheet.getCell('N' + auxrow.toString()).value = diff;
-                            sheet.getCell('O' + auxrow.toString()).value = rows[j].restantes;
-                            sheet.getCell('P' + auxrow.toString()).value = rows[j].solicitados - rows[j].restantes;
-                            sheet.getCell('Q' + auxrow.toString()).value = rows[j].pt;
-                            sheet.getCell('R' + auxrow.toString()).value = new Date(rows[j].f_entrega);
+                            sheet.getCell('M' + auxrow.toString()).value = "Fundidos";
+                            sheet.getCell('N' + auxrow.toString()).value = "En produccion";
+                            sheet.getCell('O' + auxrow.toString()).value = "A programar";
+                            sheet.getCell('P' + auxrow.toString()).value = rows[j].stock;
+                            sheet.getCell('Q' + auxrow.toString()).value = rows[j].despachados;
+                            sheet.getCell('R' + auxrow.toString()).value = rows[j].solicitados-rows[j].desp2;
+                            sheet.getCell('S' + auxrow.toString()).value = (rows[j].solicitados-rows[j].desp2)*rows[j].peso_u;
+                            sheet.getCell('T' + auxrow.toString()).value = "GDD";
+                            sheet.getCell('U' + auxrow.toString()).value = new Date(rows[j].f_entrega);
+                            sheet.getCell('V' + auxrow.toString()).value = " ";
+
                             if(rows[j+1]){
                                 if(rows[j+1].idorden_f != rows[j].idorden_f ){
                                     numitem = 0;
@@ -2723,6 +2999,7 @@ router.get('/xlsx_of', function(req,res){
     }
     else res.redirect('/bad_login');
 });
+
 
 router.get('/xlsx_desp', function(req,res){
     if(verificar(req.session.userData)){

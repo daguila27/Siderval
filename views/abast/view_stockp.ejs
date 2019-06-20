@@ -44,7 +44,7 @@
 <%}%>
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
-            <li class="active">Stock de Materias Primas</li>
+            <li class="active">Resumen de Stock</li>
             <div style="display: flex;">
                 <div id="indicador_paginas" data-total="0" style="margin-right: 3px"></div>
             </div>
@@ -93,7 +93,7 @@
         "Unidad@warning",
         "Proveedor@info"
     ];
-    var busc = new Buscador("buscar_stockp", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", false, false);
+    var busc = new Buscador("buscar_stockp", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", true, false);
 
     busc.add_cond = "table_query.show_abast is true";
     $(document).ready(function(){
@@ -115,16 +115,7 @@
         e.preventDefault();
         $('.view-option').removeClass('active');
         $(this).addClass('active');
-        if($(this).data('view') == 'table_movimientos'){
-            $.ajax({
-                type: 'POST',
-                data: {orden: 'movimiento_detalle.idmovimiento-DESC', clave: $("#buscar_movimiento").val()},
-                url: '/matprimas/table_movimientos',
-                success: function(data){
-                    $(".main-page").html(data);
-                }
-            });
-        }
+        busc.buscar_action();
 
     });
 

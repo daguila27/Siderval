@@ -51,6 +51,35 @@
         to {bottom: 0; opacity: 0;}
     }
 </style>
+
+
+<!-- Modal detalle Centro de Costo-->
+<div id="ccModalInfo" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-footer">
+                <div class="col-md-offset-1 col-md-4 panel panel-primary" style="padding: 0px;">
+                    <div class="panel-heading"><b>Cuenta: </b></div>
+                    <div class="panel-body" id="cuenta-modal"></div>
+                </div>
+                <div class="col-md-offset-2 col-md-4 panel panel-primary" style="padding: 0px;">
+                    <div class="panel-heading"><b>Subcuenta: </b></div>
+                    <div class="panel-body" id="subcuenta-modal"></div>
+                </div>
+                <p class="col-md-offset-1 col-md-10" id="especificacion-modal">
+                    <b>Especificación: </b>
+                </p>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Modal crear Factura -->
 <div id="facturaModal" class="modal fade bs-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -180,7 +209,7 @@
                 <div class="modal-body">
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
-                        <input id="rutForm" type="text" class="form-control" placeholder="Rut Cliente">
+                        <input id="rutForm" type="text" class="form-control" placeholder="Rut Cliente" onkeyup="rutFormat(this)">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
                         <input id="siglaForm" type="text" class="form-control" placeholder="Sigla">
                     </div>
@@ -256,7 +285,7 @@
 <!-- The actual snackbar -->
 <div id="snackbar" data-newid="0" onclick="clickSnackbar(this)" style="cursor: pointer;">Se ha creado una nueva OF. <button class="btn btn-success">RECARGAR</button></div>
 
-
+<input type="hidden" id="pageView" value="0">
 </body>
 </html>
 <script>
@@ -267,8 +296,9 @@
         $("#page-wrapper").css('width', '90%');
         $("#page-wrapper").css('margin-left', '10%');
         $("#up-fills").css('width', '90%');
-        if($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento"){
+        if( ($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento" || $("#page-wrapper").data('view') == "/abastecimiento/fabrs_ids/0") && $("#pageView").val() === '0' ){
             //ajax($(".oe_secondary_submenu li.active"));
+            busc.hidden_screen();
             busc.destroyDataTable(true);
             //destroyDataTable(buscar_oda);
             //setTimeout(function(){ buscar_oda(false); }, 750);
@@ -285,8 +315,9 @@
         $("#page-wrapper").css('width', '100%');
         $("#page-wrapper").css('margin-left', '0%');
         $("#up-fills").css('width', '100%');
-        if($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento"){
+        if( ($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento" || $("#page-wrapper").data('view') == "/abastecimiento/fabrs_ids/0") && $("#pageView").val() === '0' ){
             //ajax($(".oe_secondary_submenu li.active"));
+            busc.hidden_screen();
             busc.destroyDataTable(true);
             //destroyDataTable(busc.buscar_action);
             //setTimeout(function(){ buscar_oda(false); }, 750);
@@ -299,7 +330,7 @@
 
 
     function  setDataTableFixed(str){
-        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight()-2;
+        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 2;
         return $(str).DataTable({
             fixedHeader: {
                 header: true,
@@ -526,31 +557,64 @@
             }
         }
     }
-
+    function rutFormat(yo){
+        var v = $(yo).val();
+        v = v.replace('-','');
+        if(v===''){
+            $(yo).val("")
+        }
+        else{
+            $(yo).val(v.substring(0, v.length-1)+"-"+v.substring(v.length-1, v.length))
+        }
+    }
+    function validarRut(rut){
+        rut = rut.split('-');
+        var c = 0;
+        var m = 2;
+        for(var e=rut[0].length-1; e >= 0; e--){
+            c += m*parseInt(rut[0][e]);
+            m++;
+            if(m === 8){
+                m = 2;
+            }
+        }
+        c = c%11;
+        c = 11 - c;
+        if(c===10){
+            c='k';
+        }
+        if(c.toString() === rut[1]){
+            return true;
+        }else{
+            alert("Rut inválido.")
+            return false;
+        }
+    }
 
     // Ajax para insertar clientes nuevos
     $("#clienteForm").submit(function (event) {
         event.preventDefault();
-        console.log("Llaman a submit")
-        if (confirm("¿Seguro que desea agregar este cliente?")){
-            $.ajax({
-                type: 'POST',
-                url: '/abastecimiento/new_cliente/',
-                data: {
-                    rut: $("#rutForm").val(),
-                    sigla: $("#siglaForm").val(),
-                    razon: $("#razonForm").val(),
-                    direccion: $("#direccionForm").val(),
-                    ciudad: $("#ciudadForm").val(),
-                    giro: $("#giroForm").val(),
-                    telefono: $("#telefonoForm").val(),
-                    contacto: $("#contactoForm").val(),
-                },
-                success: function (data) {
-                    alert(data);
-                    $('#crearProv').modal('hide');
-                }
-            });
+        if(validarRut($("#rutForm").val())){
+            if (confirm("¿Seguro que desea agregar este cliente?")){
+                $.ajax({
+                    type: 'POST',
+                    url: '/abastecimiento/new_cliente/',
+                    data: {
+                        rut: $("#rutForm").val(),
+                        sigla: $("#siglaForm").val(),
+                        razon: $("#razonForm").val(),
+                        direccion: $("#direccionForm").val(),
+                        ciudad: $("#ciudadForm").val(),
+                        giro: $("#giroForm").val(),
+                        telefono: $("#telefonoForm").val(),
+                        contacto: $("#contactoForm").val(),
+                    },
+                    success: function (data) {
+                        alert(data);
+                        $('#crearProv').modal('hide');
+                    }
+                });
+            }
         }
     });
     $('#crearProv').on('hidden.bs.modal', function(){

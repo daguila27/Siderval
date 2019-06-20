@@ -103,7 +103,20 @@
         $("#page-wrapper").css('width', '90%');
         $("#page-wrapper").css('margin-left', '10%');
         $("#up-fills").css('width', '90%');
-
+        if((
+            $("#page-wrapper").data('view') === "/bodega/view_despachos" ||
+            $("#page-wrapper").data('view') === "/bodega/view_bodega"||
+            $("#page-wrapper").data('view') === "/bodega/view_pendientes"||
+            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"
+        )){
+            //ajax($(".oe_secondary_submenu li.active"));
+            busc.hidden_screen();
+            setTimeout(function(){
+                busc.destroyDataTable(true);
+                }, 500);
+            //destroyDataTable(buscar_oda);
+            //setTimeout(function(){ buscar_oda(false); }, 750);
+        }
         $(".menu-icon").removeClass('fa-bars');
         $(".menu-icon").addClass('fa-times');
         $(".menu-icon").parent().parent().parent().attr('onclick', 'close_menu()');
@@ -116,7 +129,21 @@
         $("#page-wrapper").css('width', '100%');
         $("#page-wrapper").css('margin-left', '0%');
         $("#up-fills").css('width', '100%');
+        if( (
+            $("#page-wrapper").data('view') === "/bodega/view_despachos" ||
+            $("#page-wrapper").data('view') === "/bodega/view_bodega"||
+            $("#page-wrapper").data('view') === "/bodega/view_pendientes"||
+            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"
+        )){
+            //ajax($(".oe_secondary_submenu li.active"));
+            busc.hidden_screen();
+            setTimeout(function(){
+                busc.destroyDataTable(true);
+            }, 500);
+            //destroyDataTable(busc.buscar_action);
+            //setTimeout(function(){ buscar_oda(false); }, 750);
 
+        }
         $(".menu-icon").removeClass('fa-times');
         $(".menu-icon").addClass('fa-bars');
         $(".menu-icon").parent().parent().parent().attr('onclick', 'show_menu()');
@@ -164,7 +191,7 @@
         beforeSend: function(){
             destroyDataTable();
             $("#page-wrapper").css('display', 'none');
-            $("#page-wrapper").data('view', $(yo).data('link'));
+            //$("#page-wrapper").data('view', $(this).data('link'));
         },
         success: function(data){
             $("#page-wrapper").html(data);
@@ -172,4 +199,43 @@
 
         }
     });
+
+
+    function  setDataTableFixed(str){
+        var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 2;
+        return $(str).DataTable({
+            fixedHeader: {
+                header: true,
+                footer: true,
+                headerOffset: tope
+            },
+            paging: false,
+            fixedColumns: true,
+            lengthChange: false,
+            bFilter: false,
+            bInfo: false,
+            order: [],
+            language: {
+                "sProcessing":     "Procesando...",
+                "sZeroRecords":    "No se encontraron resultados",
+                "sEmptyTable":     "Ningún dato disponible en esta tabla",
+                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+                "sSearch":         "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":     "Último",
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+            }
+        });
+    }
 </script>

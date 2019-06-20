@@ -28,7 +28,7 @@
 				</td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idgd="<%= desp[i].idgd%>"><%=desp[i].cliente%></td>
 				<td id="item<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].n_items%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" data-idgd="<%=desp[i].idgd%>"><%= desp[i].obs %></td>
 				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;" data-idgd="<%= desp[i].idgd%>" data-order="<%= new Date(desp[i].fecha).getTime()%>"><%=fechaLatino(new Date(desp[i].fecha).toLocaleDateString())%></td>
 				<td id="est<%=desp[i].idgd%>" class="o_data_cell o_readonly_modifier o_required_modifier" data-idgd="<%= desp[i].idgd%>" style="text-align: center;"><%=desp[i].estado%></td>
 				<%if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){%>

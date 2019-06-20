@@ -74,7 +74,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
     return [where, limit];
 }
 function verificar(usr){
-    if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta'){
+    if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'dt'){
         return true;
     }else{
         return false;
@@ -344,8 +344,31 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
                     function(err, fund){
                         if(err) throw err;
 
-                        res.render('jefeplanta/table_fusion', {data: fund, etapa: idetapa});
+                        res.render('jefeplanta/table_fusion', {data: fund, etapa: idetapa, user: req.session.userData.nombre});
 
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+router.post('/actualizar_fecha_produccion_history', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            //UPDATE produccion_history SET fecha = '2019-06-94 17:22:24' WHERE (idproduccion_history = ?);
+            connection.query("UPDATE produccion_history SET fecha = '"+input.fecha+"' WHERE (idproduccion_history = ?)",
+                [input.id],function(err, resp){
+                    var send;
+                    if(err) {
+                        console.log("Error Updating: %s", err);
+                    }
+                    else{
+                        send = 'ok';
+                        console.log(resp);
+                        res.send(send);
+                    }
                 });
         });
     }
