@@ -1029,10 +1029,19 @@ router.post('/crear_odc', function(req, res, next){
                 var bolfab = true;
                 var bolabast = true;
                 connection.query("SELECT * FROM " +
-                    "(SELECT pedido.idmaterial,coalesce(material.stock - coalesce(sum(pedido.cantidad - pedido.despachados),0),0) as disponible, " +
+                    "(SELECT pedido.idmaterial, coalesce(enp_query.enproduccion, 0) as enproduccion, coalesce(material.stock + coalesce(enp_query.enproduccion, 0) - coalesce(sum(pedido.cantidad - pedido.despachados),0),0) as disponible, " +
                     "material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar " +
                     "from pedido left join material on material.idmaterial = pedido.idmaterial " +
-                    "group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0", function(err, stocks){
+                    " LEFT JOIN (select " +
+                    "  fabricaciones.idmaterial," +
+                    "  sum(produccion.1 + produccion.2 + produccion.3 + " +
+                    "  produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion" +
+                    "   from produccion " +
+                    "  left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                    "  where produccion.1 + produccion.2 + produccion.3 + produccion.4 " +
+                    "  + produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as enp_query ON enp_query.idmaterial = material.idmaterial "+
+                    " group by pedido.idmaterial) as ped_xdesp "+
+                    " where ped_xdesp.disponible > 0", function(err, stocks){
                     if(err) throw err;
 
                     connection.query("INSERT INTO odc SET ?",[{numoc: req.body.nroordenfabricacion, idcliente: cliente, moneda: moneda}],function(err,odc){
@@ -1090,45 +1099,74 @@ router.post('/crear_odc', function(req, res, next){
                                                 var idm = [];
                                                 var disp = [];
                                                 var disp_aux;
-                                                for(var p=0; p < req.body['idm[]'].length; p++ ){
-                                                    if(idm.indexOf(req.body['idm[]'][p]) === -1 ){
-                                                        idm.push(req.body['idm[]'][p]);
-                                                        disp.push(parseInt(req.body['disp[]'][p]));
+
+                                                if(typeof req.body['idm[]'] == 'string'){
+                                                    idm.push(req.body['idm[]']);
+                                                    disp.push(parseInt(req.body['disp[]']));
+                                                }
+                                                else{
+                                                    for(var p=0; p < req.body['idm[]'].length; p++ ){
+                                                        if(idm.indexOf(req.body['idm[]'][p]) === -1 ){
+                                                            idm.push(req.body['idm[]'][p]);
+                                                            disp.push(parseInt(req.body['disp[]'][p]));
+                                                        }
                                                     }
                                                 }
+
                                                 if(typeof req.body['idm[]'] == 'string'){
                                                     if(idm.indexOf(req.body['idm[]']) === -1){disp_aux = 0;}
-                                                    else{disp_aux = disp[idm.indexOf(req.body['idm[]'])];}
+                                                    else{
+                                                        if(disp[idm.indexOf(req.body['idm[]'])] < 0){
+                                                            disp_aux = 0;
+                                                        }else{
+                                                            disp_aux = disp[idm.indexOf(req.body['idm[]'])];
+                                                        }
+                                                    }
                                                     console.log("disp_aux");
                                                     console.log(disp_aux);
                                                     //PEDIDO ES DE FABRICACIÓN INTERNA
                                                     if(req.body['prov[]'] === '-1'){
                                                         if( disp_aux - parseInt(req.body['cants[]']) < 0){
-                                                            list.push([rows.insertId,parseInt(req.body['cants[]']) - disp_aux,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                            //list.push([rows.insertId,parseInt(req.body['cants[]']) - disp_aux,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - disp_aux, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - disp_aux, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                         else{
-                                                            list.push([rows.insertId,0,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],0, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
+                                                            list.push([rows.insertId,parseInt(req.body['cants[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],0, req.body['lock[]'], Peds.insertId, (1)*factor_item]);
                                                         }
                                                     }
                                                     else{
-                                                        list.push([rows.insertId, parseInt(req.body['cants[]']) - disp_aux,req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]']) - parseInt(req.body['disp[]']), true, Peds.insertId, (1)*factor_item]);
+                                                        list.push([rows.insertId, parseInt(req.body['cants[]']),req.body['fechas[]'],req.body['idm[]'],req.body['idp[]'],parseInt(req.body['cants[]'])  - disp_aux, true, Peds.insertId, (1)*factor_item]);
                                                     }
                                                     disp[idm.indexOf(req.body['idm[]'])] = disp[idm.indexOf(req.body['idm[]'])] - parseInt(req.body['cants[]']);
                                                 } else {
                                                     for(var i = 0;i<req.body['idm[]'].length;i++){
                                                         if(idm.indexOf(req.body['idm[]'][i]) === -1){disp_aux = 0;}
-                                                        else{disp_aux = disp[idm.indexOf(req.body['idm[]'][i])];}
+                                                        else{
+                                                            if(disp[idm.indexOf(req.body['idm[]'][i])] < 0){
+                                                                disp_aux = 0;
+                                                            }else{
+                                                                disp_aux = disp[idm.indexOf(req.body['idm[]'][i])];
+                                                            }
+                                                        }
+                                                        console.log("disp_aux");
+                                                        console.log(disp_aux);
                                                         //PEDIDO ES DE FABRICACIÓN INTERNA
                                                         if(req.body['prov[]'][i] === '-1'){
                                                             if(disp_aux - parseInt(req.body['cants[]'][i]) < 0){
-                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - disp[idm.indexOf(req.body['idm[]'][i])],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                                //list.push([rows.insertId,parseInt(req.body['cants[]'][i]) - disp[idm.indexOf(req.body['idm[]'][i])],req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - parseInt(req.body['disp[]'][i]) , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - disp_aux , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }else{
                                                                 list.push([rows.insertId, parseInt(req.body['cants[]'][i]),req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , req.body['lock[]'][i], Peds.insertId, (i+1)*factor_item]);
                                                             }
                                                         }
                                                         //SI EL PEDIDO ES EXTERNO, SE CREA LA FABRICACION DESHABILITADA. LUEGO SE HABILITARÁ CUANDO ABASTECIMIENTO RECEPCIONE EL PRODUCTO
                                                         else{
-                                                            list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) , true, Peds.insertId, (i+1)*factor_item]);
+                                                            if(disp_aux - parseInt(req.body['cants[]'][i]) < 0){
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], parseInt(req.body['cants[]'][i]) - disp_aux , true, Peds.insertId, (i+1)*factor_item]);
+                                                            }else{
+                                                                list.push([rows.insertId,parseInt(req.body['cants[]'][i]), req.body['fechas[]'][i],req.body['idm[]'][i],req.body['idp[]'][i], 0 , true, Peds.insertId, (i+1)*factor_item]);
+
+                                                            }
                                                         }
                                                         disp[idm.indexOf(req.body['idm[]'][i])] = disp[idm.indexOf(req.body['idm[]'][i])] - parseInt(req.body['cants[]'][i]);
                                                         Peds.insertId++;
@@ -1379,12 +1417,23 @@ router.post('/addsession_prepeds', function(req,res,next){
     var fabricacion;
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("SELECT material.detalle, coalesce(disp.disponible, 0) as stock,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial WHERE material.idmaterial = ?",
+            connection.query("SELECT material.detalle, coalesce(enp_query.enproduccion, 0) as enproduccion, coalesce(disp.disponible, 0) as stock,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp"/* where ped_xdesp.disponible > 0*/+") as disp on disp.idmaterial = material.idmaterial " +
+                " LEFT JOIN (select " +
+                "  fabricaciones.idmaterial," +
+                "  sum(produccion.1 + produccion.2 + produccion.3 + " +
+                "  produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion" +
+                "   from produccion " +
+                "  left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "  where produccion.1 + produccion.2 + produccion.3 + produccion.4 " +
+                "  + produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as enp_query ON enp_query.idmaterial = material.idmaterial " +
+                " WHERE material.idmaterial = ?",
                 [req.body.idm],function(err, details){
                     if(err){console.log("Error Selecting : %s", err);}
                     if(req.body.tipo == 'producido'){fabricacion='Interna'}
                     else{fabricacion='Externa'}
-                    fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'><input type='hidden' name='disp' value='" + details[0].stock +"'></td><td><strong>" + fabricacion + "</strong></td>";
+                    var stock_d = details[0].stock + details[0].enproduccion;
+                    if(stock_d < 0){stock_d = 0;}
+                    fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'><input type='hidden' name='disp' value='" + stock_d +"'></td><td><strong>" + fabricacion + "</strong></td>";
                     var inputprov = false;
                     switch(req.body.tipo){
                         case "producido":
@@ -1408,12 +1457,12 @@ router.post('/addsession_prepeds', function(req,res,next){
                         if(err)throw err;
 
 
-                        console.log(auxs);
+
                         if(inputprov){fila = fila + "<td>" + auxs[0].aux1 +"<input type='text' value='1' name='prov' style='display:none;'></td>";}
                         else{ fila = fila + "<td><input type='text' value='-1' name='prov' style='display:none;'>" + auxs[0].aux2 +"</td>";}
                         fila = fila + "<td style='padding: 3px'><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" 
                         +"<td style='padding: 3px'><input class='form-control' type='number' name='cants' min='1' required></td>"
-                        +"<td>"+ parsear_crl(details[0].stock) +"</td>"
+                        +"<td style='text-align: center'>"+ parsear_crl(stock_d) +"</td>"
                         +"<td style='padding: 3px'><input type='number' class='form-control' placeholder='Precio' name='precio'></td>"
                         +"<td style='text-align: center; padding: 5px'><input class='form-control' style='margin-left: 30%; width: 20px; height: 20px;' type='checkbox' name='lock'></td>"
                         +"<td><a onclick='drop(this)' class='btn btn-danger btn-xs'><i class='fa fa-remove'></i></a></td></tr>";
@@ -1456,10 +1505,21 @@ router.post('/buscar_mat', function(req, res, next){
             dats.push(parseInt(input.caract));
         }
         req.getConnection(function(err,connection){
-            connection.query("SELECT material.*, coalesce(disp.disponible,0) as disponible,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
+            connection.query("SELECT material.*, coalesce(disp.xdespachar,0) as xdespachar, coalesce(disp.disponible,0) as disponible, coalesce(enp_query.enproduccion,0) as enproduccion,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
-                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp where ped_xdesp.disponible > 0) as disp on disp.idmaterial = material.idmaterial " + wher + " GROUP BY material.idmaterial",function(err,rows)
+                " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion" +
+                " LEFT JOIN (" +
+                "SELECT * FROM (SELECT pedido.idmaterial,sum(pedido.cantidad - pedido.despachados) as xdespachar, material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp"+/* where ped_xdesp.disponible > 0*/") " +
+                "as disp on disp.idmaterial = material.idmaterial" +
+                " LEFT JOIN (select " +
+                "fabricaciones.idmaterial," +
+                "sum(produccion.1 + produccion.2 + produccion.3 + " +
+                "produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion" +
+                " from produccion " +
+                "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "where produccion.1 + produccion.2 + produccion.3 + produccion.4 " +
+                "+ produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as enp_query on enp_query.idmaterial = material.idmaterial " + wher + " GROUP BY material.idmaterial",function(err,rows)
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
