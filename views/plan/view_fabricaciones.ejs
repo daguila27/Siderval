@@ -71,11 +71,11 @@
 
 				<div style="display: flex">
 					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Bloqueados</label>
-					<input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="mostrar_todos_check(this)">
-					<select class="form-control" style="width: 85px; margin-left: 40px; margin-right: 10px;">
-                        <option value="todos">Todos</option>
-                        <option value="conoc">Con OC</option>
-                        <option value="sinoc">Sin OC</option>
+					<input type="checkbox" id="fabsBloq" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="change_tipo_of()">
+					<select class="form-control" id="fabsSel" style="width: 85px; margin-left: 40px; margin-right: 10px;" onchange="change_tipo_of()">
+                        <option value="true">Todos</option>
+                        <option value="pedido.idpedido IS NOT null">OF/OC</option>
+                        <option value="pedido.idpedido is null">OF/ODV</option>
                     </select>
 
 					<div class="filters"></div>
@@ -93,11 +93,16 @@
 	</div>
 </div>
 <script type="text/javascript">
-	function mostrar_todos_check(yo){
-	    if($(yo).is(':checked')){busc.add_cond = "fabricaciones.restantes>0@!pedido.externo";}
-		else{busc.add_cond = "!fabricaciones.lock@fabricaciones.restantes>0@!pedido.externo";}
-        busc.buscar_action();
-    }
+    function change_tipo_of(){
+
+        if($("#fabsBloq").is(':checked')){
+            busc.add_cond = "fabricaciones.restantes>0@!coalesce(pedido.externo,false)@"+$("#fabsSel").val();
+        }
+        else{
+            busc.add_cond = "!fabricaciones.lock@fabricaciones.restantes>0@!coalesce(pedido.externo,false)@"+$("#fabsSel").val();
+        }
+		busc.buscar_action();
+	}
     var array_fill = [
         "OF@default",
         "OC@primary",
@@ -106,7 +111,7 @@
         "Cliente@warning"
     ];
     var busc = new Buscador("buscar_fabricaciones", ".o_searchview", array_fill, "/plan/table_fabricaciones", "DataTableFabs", false, true, ".filters","fabricaciones.f_entrega");
-    busc.add_cond = "!fabricaciones.lock@fabricaciones.restantes>0@!pedido.externo";
+    busc.add_cond = "!fabricaciones.lock@fabricaciones.restantes>0@!coalesce(pedido.externo,false)";
 
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());

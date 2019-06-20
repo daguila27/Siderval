@@ -478,7 +478,7 @@ router.post('/table_fabricaciones', function(req, res, next){
 
             var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados," +
                 "COALESCE(cliente.sigla,'SIDERVAL S.A') AS cliente,COALESCE(cliente.razon,'SIDERVAL S.A') AS razon,ordenfabricacion.*,pedido.despachados," +
-                "coalesce(pedido.externo,0) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
+                "coalesce(pedido.externo,false) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
                 " coalesce(odc.numoc, 'Sin OC') as numoc,COALESCE(pedido.despachados) AS despachados,COALESCE(pedido.cantidad) AS solicitados," +
                 "COALESCE(enprod.enprod,0) AS enprod,COALESCE(enprod.enrech,0) AS enrech"
                 +" from fabricaciones "
@@ -2659,14 +2659,185 @@ router.get('/xlsx_of', function(req,res){
             { header: 'Finalizados', key: 'finalizados', width: 15},
             { header: 'Fecha de Entrega', key: 'fecha', width: 15}
         ];
+
+        sheet.getRow(1).font = {
+            name: 'Calibri',
+            family: 4,
+            size: 11,
+            underline: false,
+            bold: true
+        };
+        sheet.getRow(2).font = {
+            name: 'Calibri',
+            family: 4,
+            size: 11,
+            underline: false,
+            bold: true
+        };
+        sheet.getCell('A1').value = "Referencia";
+        sheet.getCell('A1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'D8E4BC'}
+        };
+        sheet.getCell('A2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'D8E4BC'}
+        };
+        sheet.getRow(1).border = {
+            right: {style:'thin', color: {argb:'00000000'}},
+            left: {style:'thin', color: {argb:'00000000'}},
+            top: {style:'thin', color: {argb:'00000000'}},
+            bottom: {style:'thin', color: {argb:'00000000'}}
+        };
+        sheet.getRow(2).border = {
+            right: {style:'thin', color: {argb:'00000000'}},
+            left: {style:'thin', color: {argb:'00000000'}},
+            top: {style:'thin', color: {argb:'00000000'}},
+            bottom: {style:'thin', color: {argb:'00000000'}}
+        };
+        sheet.getCell('A2').value = "Código";
+        sheet.mergeCells('B1:I1');
+        sheet.getCell('B1').value = "Área de Ventas";
+        sheet.getCell('B1').alignment = {horizontal: 'center'};
+        sheet.getCell('B1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('B2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('C2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('D2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('E2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('F2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('G2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('H2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+        sheet.getCell('I2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FABF8F'}
+        };
+
+        sheet.mergeCells('J1:P1');
+        sheet.getCell('J1').value = "Área de Procesos";
+        sheet.getCell('J1').alignment = {horizontal: 'center'};
+        sheet.getCell('J1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('J2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('K2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('L2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('M2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('N2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('O2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+        sheet.getCell('P2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'FFFF00'}
+        };
+
+
+        sheet.mergeCells('Q1:V1');
+        sheet.getCell('Q1').value = "Gestión y Control de Compañía";
+        sheet.getCell('Q1').alignment = {horizontal: 'center'};
+        sheet.getCell('Q1').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('Q2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('R2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('S2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('T2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('U2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
+        sheet.getCell('V2').fill = {
+            type: 'pattern',
+            pattern:'solid',
+            fgColor:{argb:'CCC0DA'}
+        };
         req.getConnection(function(err, connection) {
             if(err)
                 console.log("Error connection : %s", err);
 
             console.log("¿No será mucha molestia?");
-            connection.query("select material.codigo,COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,fabricaciones.idorden_f,fabricaciones.restantes,coalesce(prod_query.pt,0) as pt,coalesce(odc.numoc, 'SIDERVAL') as numoc,"
+            connection.query("select material.stock,material.u_medida,material.codigo,COALESCE(cliente.razon,'SIDERVAL S.A') AS cliente,fabricaciones.idorden_f,fabricaciones.restantes,coalesce(prod_query.pt,0) as pt,coalesce(odc.numoc, 'SIDERVAL') as numoc,"
                 +"material.detalle,subaleacion.subnom as aleacion, coalesce(pedido.despachados,"
-                +"concat(fabricaciones.cantidad-fabricaciones.restantes, ' sin producción')) as despachados,"
+                +"concat(fabricaciones.cantidad-fabricaciones.restantes, ' sin producción')) as despachados,coalesce(pedido.despachados,fabricaciones.cantidad-fabricaciones.restantes) as desp2,"
                 +"coalesce(pedido.cantidad, fabricaciones.cantidad) as solicitados, coalesce(material.peso,0) as peso_u,"
                 +"coalesce(material.peso*pedido.cantidad,0) as peso_t, coalesce(material.peso*(pedido.cantidad - pedido.despachados),0)"
                 +"as peso_d, coalesce(pedido.f_entrega, fabricaciones.f_entrega) as f_entrega,coalesce(group_concat(despachos.idgd),"
@@ -2682,61 +2853,71 @@ router.get('/xlsx_of', function(req,res){
                     //console.log(rows);
                     if(rows.length>0){
                         var nombre = 'csvs/master_of_' + ident + '.xlsx';
-                        sheet.getCell('A1').value = 'Código';
-                        sheet.getCell('B1').value = 'OF';
-                        sheet.getCell('C1').value = 'Estado';
-                        sheet.getCell('D1').value = 'OC';
-                        sheet.getCell('E1').value = 'Item';
-                        sheet.getCell('F1').value = 'Solicitados';
-                        sheet.getCell('G1').value = 'Despachados';
-                        sheet.getCell('H1').value = 'Detalle';
-                        sheet.getCell('I1').value = 'Aleación';
-                        sheet.getCell('J1').value = 'Peso Unitario';
-                        sheet.getCell('K1').value = 'Peso por Despachar';
-                        sheet.getCell('L1').value = 'Peso Total';
-                        sheet.getCell('M1').value = 'GD';
-                        sheet.getCell('N1').value = 'Días de Atraso';
-                        sheet.getCell('O1').value = 'Sin Producir';
-                        sheet.getCell('P1').value = 'Planta';
-                        sheet.getCell('Q1').value = 'Finalizados';
-                        sheet.getCell('R1').value = 'Fecha de Entrega';
+                        sheet.getCell('B2').value = 'Estado';
+                        sheet.getCell('C2').value = 'OF';
+                        sheet.getCell('D2').value = 'OC';
+                        sheet.getCell('E2').value = 'Cliente';
+                        sheet.getCell('F2').value = 'Item';
+                        sheet.getCell('G2').value = 'Detalle';
+                        sheet.getCell('H2').value = 'Solicitados';
+                        sheet.getCell('I2').value = 'Unidad';
+                        sheet.getCell('J2').value = 'Aleación';
+                        sheet.getCell('K2').value = 'Peso Unitario';
+                        sheet.getCell('L2').value = 'Peso Total';
+                        sheet.getCell('M2').value = 'Fundidos';
+                        sheet.getCell('N2').value = 'En Producción';
+                        sheet.getCell('O2').value = 'A Programar';
+                        sheet.getCell('P2').value = 'Bodega Stock';
+                        sheet.getCell('Q2').value = 'Despachados';
+                        sheet.getCell('R2').value = 'Por Despachar';
+                        sheet.getCell('S2').value = 'Peso por Despachar';
+                        sheet.getCell('T2').value = 'Guía Despachos Asociadas';
+                        sheet.getCell('U2').value = 'Fecha de Entrega';
+                        sheet.getCell('V2').value = 'Fecha de Entrega por Guía (último producto por guía)';
+
+
                         var numitem = 0;
                         var fechaInicio;
                         var fechaFin;
                         var diff = 0;
                         for(var j=0; j<rows.length; j++){
                             numitem++;
-                            auxrow = 2 + j;
+                            auxrow = 3 + j;
                             sheet.getCell('A' + auxrow.toString()).value = rows[j].codigo;
-                            sheet.getCell('B' + auxrow.toString()).value = rows[j].idorden_f;
                             fechaEntrega = (new Date(rows[j].f_entrega).getTime())/(1000*60*60*24);
                             Hoy    = (new Date().getTime())/(1000*60*60*24);
                             diff = parseInt(Hoy - fechaEntrega);
                             if(rows[j].solicitados == rows[j].despachados){
                                 diff = 0;
-                                sheet.getCell('C' + auxrow.toString()).value = "Finalizado";
+                                sheet.getCell('B' + auxrow.toString()).value = "Finalizado";
                             }
                             else if(diff > 0){
-                                sheet.getCell('C' + auxrow.toString()).value = "Atrasado";
+                                sheet.getCell('B' + auxrow.toString()).value = "Atrasado";
                             }
                             else{
-                                sheet.getCell('C' + auxrow.toString()).value = "Por Entregar";
+                                sheet.getCell('B' + auxrow.toString()).value = "Por Entregar";
                             }
+                            sheet.getCell('C' + auxrow.toString()).value = rows[j].idorden_f;
                             sheet.getCell('D' + auxrow.toString()).value = rows[j].numoc;
-                            sheet.getCell('E' + auxrow.toString()).value = numitem;
-                            sheet.getCell('F' + auxrow.toString()).value = rows[j].solicitados;
-                            sheet.getCell('G' + auxrow.toString()).value = rows[j].despachados;
-                            sheet.getCell('H' + auxrow.toString()).value = rows[j].detalle;
-                            sheet.getCell('I' + auxrow.toString()).value = rows[j].aleacion;
-                            sheet.getCell('J' + auxrow.toString()).value = rows[j].peso_u;
-                            sheet.getCell('K' + auxrow.toString()).value = rows[j].peso_d;
+                            sheet.getCell('E' + auxrow.toString()).value = rows[j].cliente;
+                            sheet.getCell('F' + auxrow.toString()).value = numitem;
+                            sheet.getCell('G' + auxrow.toString()).value = rows[j].detalle;
+                            sheet.getCell('H' + auxrow.toString()).value = rows[j].solicitados;
+                            sheet.getCell('I' + auxrow.toString()).value = rows[j].u_medida;
+                            sheet.getCell('J' + auxrow.toString()).value = rows[j].aleacion;
+                            sheet.getCell('K' + auxrow.toString()).value = rows[j].peso_u;
                             sheet.getCell('L' + auxrow.toString()).value = rows[j].peso_t;
-                            sheet.getCell('M' + auxrow.toString()).value = rows[j].gd;
-                            sheet.getCell('N' + auxrow.toString()).value = diff;
-                            sheet.getCell('O' + auxrow.toString()).value = rows[j].restantes;
-                            sheet.getCell('P' + auxrow.toString()).value = rows[j].solicitados - rows[j].restantes;
-                            sheet.getCell('Q' + auxrow.toString()).value = rows[j].pt;
-                            sheet.getCell('R' + auxrow.toString()).value = new Date(rows[j].f_entrega);
+                            sheet.getCell('M' + auxrow.toString()).value = "Fundidos";
+                            sheet.getCell('N' + auxrow.toString()).value = "En produccion";
+                            sheet.getCell('O' + auxrow.toString()).value = "A programar";
+                            sheet.getCell('P' + auxrow.toString()).value = rows[j].stock;
+                            sheet.getCell('Q' + auxrow.toString()).value = rows[j].despachados;
+                            sheet.getCell('R' + auxrow.toString()).value = rows[j].solicitados-rows[j].desp2;
+                            sheet.getCell('S' + auxrow.toString()).value = (rows[j].solicitados-rows[j].desp2)*rows[j].peso_u;
+                            sheet.getCell('T' + auxrow.toString()).value = "GDD";
+                            sheet.getCell('U' + auxrow.toString()).value = new Date(rows[j].f_entrega);
+                            sheet.getCell('V' + auxrow.toString()).value = " ";
+
                             if(rows[j+1]){
                                 if(rows[j+1].idorden_f != rows[j].idorden_f ){
                                     numitem = 0;
@@ -2758,6 +2939,7 @@ router.get('/xlsx_of', function(req,res){
     }
     else res.redirect('/bad_login');
 });
+
 
 router.get('/xlsx_desp', function(req,res){
     if(verificar(req.session.userData)){
