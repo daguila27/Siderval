@@ -99,6 +99,15 @@ router.get('/', function(req, res, next){
     }
 	else{res.redirect('bad_login');}	
 });
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/stats', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
@@ -114,15 +123,43 @@ router.get('/stats', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-
+/*
+*  Resumen:
+*       Ruta que renderiza la vista para er todas las producciones
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*       jefeprod/layouts/header.ejs Botón en panel de control
+*       siderval/layouts/header.ejs Botón en panel de control
+* */
 router.get('/view_producciones', function(req, res, next){
     if(verificar(req.session.userData)) {
         res.render('jefeprod/view_producciones' ,{username: req.session.userData.nombre});
     }
     else{res.redirect('bad_login');}
 });
-
-
+/*
+*  Resumen:
+*       Ruta que se comunica con el objeto Buscador para flitrar entre las producciones
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {
+            ispage: ,
+            page: ,
+            clave: ,
+            isRango: ,
+            rango: ,
+            columnaRango: ,
+            cond: ,
+            extraInfo:
+        }
+*  Usages:
+*       jefeprod/view_producciones.ejs
+*           - Al inicializar objeto buscador
+*           - Para cambiar el url del objeto buscador
+*
+* */
 router.post('/table_producciones', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -186,7 +223,27 @@ router.post('/table_producciones', function(req, res, next){
         });
     }
     else{res.redirect('bad_login');}
-});
+}); //reSearch() pa la purga
+/*
+*  Resumen:
+*       Ruta que se comunica con el objeto Buscador para flitrar entre las producciones según han avanzado en las etapas.
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {
+            ispage: ,
+            page: ,
+            clave: ,
+            isRango: ,
+            rango: ,
+            columnaRango: ,
+            cond: ,
+            extraInfo:
+        }
+*  Usages:
+*       jefeprod/view_producciones.ejs
+*           - Para cambiar el url del objeto buscador
+*
+* */
 router.post('/table_producciones_progreso', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -233,8 +290,15 @@ router.post('/table_producciones_progreso', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/serchprods', function(req, res, next) {
     if(verificar(req.session.userData)){
         req.getConnection(function(err,connection){
@@ -256,8 +320,16 @@ router.post('/serchprods', function(req, res, next) {
         });
     }
     else{res.redirect('bad_login');}
-});
-
+}); //posiblemente deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/serchprogress', function(req, res, next) {
     if(verificar(req.session.userData)){
         req.getConnection(function(err,connection){
@@ -285,8 +357,16 @@ router.post('/serchprogress', function(req, res, next) {
         });
     }
     else{res.redirect('bad_login');}
-});
-
+}); //posiblemente deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/cerrar_op', function(req, res, next) {
     if(verificar(req.session.userData)){
         var idop = JSON.parse(JSON.stringify(req.body)).idop;
@@ -323,8 +403,16 @@ router.post('/cerrar_op', function(req, res, next) {
         });
     }
     else{res.redirect('bad_login');}
-});
-
+}); //posiblemente deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/anular_op', function(req, res, next) {
     if(verificar(req.session.userData)){
         var idop = JSON.parse(JSON.stringify(req.body)).idop;
@@ -390,8 +478,16 @@ router.post('/anular_op', function(req, res, next) {
         });
     }
     else{res.redirect('bad_login');}
-});
-
+});//posiblemente deprecado
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/render_anular_op', function(req, res, next) {
     if(verificar(req.session.userData)){
         var idop = JSON.parse(JSON.stringify(req.body)).idop;
@@ -423,8 +519,16 @@ router.post('/render_anular_op', function(req, res, next) {
         });
     }
     else{res.redirect('bad_login');}
-});
-
+});//posiblemente deprecado
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/itemprod/:val', function(req, res, next) {
     if(verificar(req.session.userData)){
         var valor = req.params.val;
@@ -463,8 +567,16 @@ router.get('/itemprod/:val', function(req, res, next) {
         });
     }
     else{res.redirect('bad_login');}
-});
-
+});//posiblemente deprecado
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/itemprod_progreso/:val', function(req, res, next) {
     if(verificar(req.session.userData)){
         var valor = req.params.val;
@@ -503,8 +615,16 @@ router.get('/itemprod_progreso/:val', function(req, res, next) {
         });
     }
     else{res.redirect('bad_login');}
-});
-
+});//posiblemente deprecado
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/crear_op', function(req, res, next){
 	if(verificar(req.session.userData)){
 		req.session.arrayProduccion = [];
@@ -533,7 +653,15 @@ router.get('/crear_op', function(req, res, next){
 	else{res.redirect('bad_login');}	
 	
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/lanzar_op_fill', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -563,7 +691,15 @@ router.post('/lanzar_op_fill', function(req, res, next){
     else{res.redirect('bad_login');}    
     
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/ordenes_fabricacion', function(req, res, next){
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
@@ -579,7 +715,15 @@ router.get('/ordenes_fabricacion', function(req, res, next){
 	}
 	else{res.redirect('bad_login');}		
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/list_ops', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
@@ -671,7 +815,15 @@ router.get('/list_ops', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/list_prod', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
@@ -698,7 +850,15 @@ router.get('/list_prod', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/search_op', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
@@ -742,14 +902,30 @@ router.post('/search_op', function(req, res, next){
     else{res.redirect('bad_login');}
 
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/add_produccion', function(req, res, next){
 	var input = JSON.parse(JSON.stringify(req.body));
 	req.session.arrayProduccion.push([input.idfabricaciones,input.detalle,input.restantes,input.ruta]);
 	input.cantidades[input.cantidades.length] = 0;
 	res.render('jefeprod/session_stream',{data:req.session.arrayProduccion, cants: input.cantidades});
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/lista_materiales', function(req, res, next){
     if(verificar(req.session.userData)){
         var cantidades = JSON.parse(JSON.stringify(req.body)).list;
@@ -806,7 +982,15 @@ router.post('/lista_materiales', function(req, res, next){
         });
     }
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/del_produccion', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     var idf = input.idf;
@@ -820,12 +1004,27 @@ router.post('/del_produccion', function(req, res, next){
     //req.session.arrayProduccion.push([input.idfabricaciones,input.detalle,input.restantes,input.ruta]);
     res.render('jefeprod/session_stream',{data:req.session.arrayProduccion, cants: cants});
 });
-
-router.post('/view_produccion', function(req, res, next){
-    console.log(req.session.arrayProduccion);
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
+router.post('/view_produccion', function(req, res, next){ //deprecada
     res.send(req.session.arrayProduccion);
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/restore_fab', function(req, res, next){
     var idf = JSON.parse(JSON.stringify(req.body)).idf;
     req.getConnection(function(err, connection){
@@ -858,8 +1057,16 @@ router.post('/restore_fab', function(req, res, next){
             res.send(html);
         });
     });
-});
-
+}); //deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/save_op', function(req, res, next){
 	var arrayDBP = [];
     var query = '';
@@ -947,7 +1154,15 @@ router.post('/save_op', function(req, res, next){
 		});
 	});
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/ordenes_produccion', function(req, res, next){
 	req.getConnection(function(err, connection){
 		connection.query('SELECT * FROM produccion LEFT JOIN ordenproduccion ON produccion.idordenproduccion=ordenproduccion.idordenproduccion', function(err, ops){
@@ -955,8 +1170,16 @@ router.get('/ordenes_produccion', function(req, res, next){
 			res.render('jefeprod/op_list', {data: ops});
 		});
 	});
-});
-
+}); //deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/csv_op', function(req,res){
     if(verificar(req.session.userData)){
         var csvWriter = require('csv-write-stream');
@@ -1003,11 +1226,16 @@ router.get('/csv_op', function(req,res){
         });
     }
     else res.redirect('/bad_login');
-});
-
-
-
-
+}); //deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/xlsx_op', function(req,res){
     if(verificar(req.session.userData)){
         //var csvWriter = require('csv-write-stream');
@@ -1103,9 +1331,15 @@ router.get('/xlsx_op', function(req,res){
     }
     else res.redirect('/bad_login');
 });
-
-
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/csv_opdetalle', function(req,res){
     if(verificar(req.session.userData)){
         var csvWriter = require('csv-write-stream');
@@ -1152,11 +1386,16 @@ router.get('/csv_opdetalle', function(req,res){
         });
     }
     else res.redirect('/bad_login');
-});
-
-
-
-
+}); //deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/xlsx_opdetalle', function(req,res){
     if(verificar(req.session.userData)){
         var fs = require('fs');
@@ -1251,8 +1490,15 @@ router.get('/xlsx_opdetalle', function(req,res){
     }
     else res.redirect('/bad_login');
 });
-
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/ficha_abastecimiento', function(req,res){
     var idop = JSON.parse(JSON.stringify(req.body)).idop;
     //var idop = req.params.idop;
@@ -1292,9 +1538,17 @@ router.post('/ficha_abastecimiento', function(req,res){
                         });
     });
 });
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/lista_abastecimiento_get/:idop', function(req,res){
     var idop = req.params.idop;
-    //var idop = req.params.idop;
     req.getConnection(function(err, connection){
         connection.query("select  material.detalle, material.codigo,produccion.cantidad, group_concat(billof.codigo separator '@') as code_token,group_concat(billof.detalle separator '@') as componentes, group_concat(billof.cantidad) as cant_bom, group_concat(billof.u_medida) as u_bom from produccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join ("+                
             "select bom.idmaterial_master, material.detalle,material.codigo,bom.cantidad,material.u_medida from bom left join material on material.idmaterial=bom.idmaterial_slave where material.notbom=true order by bom.idmaterial_master)"+
@@ -1311,6 +1565,15 @@ router.get('/lista_abastecimiento_get/:idop', function(req,res){
         });
     });
 });
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/show_pdf_bom/:idop', function(req,res){
     var idop = req.params.idop;
     var fs = require('fs');
@@ -1320,7 +1583,16 @@ router.get('/show_pdf_bom/:idop', function(req,res){
         res.contentType("application/pdf");
         res.send(data);
     });
-});
+}); //posblemente deprecada
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/render_notificaciones', function(req, res, next){
     req.getConnection(function(err,connection){
         connection.query("select notificacion.*,material.detalle,etapafaena.nombre_etapa from notificacion LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value WHERE SUBSTRING(notificacion.descripcion,1,3) = 'jfp' AND notificacion.active = true", function(err, notif){
@@ -1329,7 +1601,15 @@ router.get('/render_notificaciones', function(req, res, next){
         });
     });
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/predict_newop', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input);
@@ -1347,7 +1627,15 @@ router.post('/predict_newop', function(req, res, next){
         });
     });
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/new_prod_prima', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input);
@@ -1360,7 +1648,7 @@ router.post('/new_prod_prima', function(req, res, next){
                 
                 prod[0]['1'] = 0;
                 prod[0]['2'] = 0;
-                prod[0]['3'] = 0;
+            prod[0]['3'] = 0;
                 prod[0]['4'] = 0;
                 prod[0]['5'] = 0;
                 prod[0]['6'] = 0;
@@ -1391,7 +1679,15 @@ router.post('/new_prod_prima', function(req, res, next){
         });
     });
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/modif_op', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input);
@@ -1410,14 +1706,32 @@ router.post('/modif_op', function(req, res, next){
                 });
         });
     });
-});
+}); //deprecada
 //Cargar Vista Historial de produccion.
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get("/phistory_view",function(req,res){
    if(verificar(req.session.userData)){
        res.render("jefeprod/view_phistory");
    } else res.redirect("/bad_login");
 });
 //Conseguir filas historial de produccion.
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get("/phistory_data",function(req,res){
    if(verificar(req.session.userData)){
        req.getConnection(function(err,connection){
@@ -1435,9 +1749,16 @@ router.get("/phistory_data",function(req,res){
        });
    } else res.redirect('/bad_login');
 });
-
-
 //Cierre de mes producciones.
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get("/cierre_producciones",function(req,res){
     if(verificar(req.session.userData)){
         req.getConnection(function(err,connection){
@@ -1569,6 +1890,6 @@ router.get("/cierre_producciones",function(req,res){
             });
         });
     } else res.redirect('/bad_login');
-});
+}); // no usages
 
 module.exports = router;

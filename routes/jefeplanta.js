@@ -95,7 +95,15 @@ router.get('/', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-/* GET users listing. */
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/stats', function(req, res, next){
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
@@ -142,11 +150,19 @@ router.get('/stats', function(req, res, next){
         });
     }
     else{res.redirect('bad_login');}
-});
-
-
-
-
+}); //deprecado
+/*
+*  Resumen:
+*       Ruta que carga stadísticas de una etapa
+*  Variables Influyentes:
+*       req.params = {
+*           fill: of || producto || cliente,
+*           valetapa: número de etapa a buscar estadísitcas
+*       }
+*       req.body = {}
+*  Usages:
+*       jefeplanta/view_fusion.ejs Para cambiar el url de búsqueda para el objeto Buscador.
+* */
 router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -176,15 +192,14 @@ router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
         var where = result[0];
         var limit = result[1];
 
-
         var dataget;
         var group;
         var orderby;
-        if(fill=='of'){
+        if(fill === 'of'){
             dataget = "fabricaciones.idorden_f as token,max(produccion_history.fecha) as last_fusion";
             group = "fabricaciones.idorden_f";
         }
-        else if(fill== 'producto'){
+        else if(fill === 'producto'){
             dataget = "material.detalle as token,max(produccion_history.fecha) as last_fusion";
             group = "material.idmaterial";
         }
@@ -207,8 +222,6 @@ router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
         req.getConnection(function(err, connection){
             if(err)
                 console.log("Error Connection : %s", err);
-            var fecha = new Date().getFullYear() + "-" + (new Date().getUTCMonth() + 1) + "-";
-            //fecha = '2019-1-';
             connection.query("select " +
                 dataget +
                 " from produccion_history " +
@@ -227,31 +240,60 @@ router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-
-
-/* GET users listing. */
+/*
+*  Resumen:
+*       Ruta que renderiza la vista de ver la planta
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/view_planta', function(req, res, next){
     if(verificar(req.session.userData)){
         res.render('jefeplanta/view_planta');
     }
     else{res.redirect('bad_login');}
 });
+/*
+*  Resumen:
+*       Ruta que renderiza la vista de ver la planta
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/view_despachositem/:tab', function(req, res, next){
     if(verificar(req.session.userData)){
         res.render('jefeplanta/view_despachositem', {tab: req.params.tab});
     }
     else{res.redirect('bad_login');}
 });
-
+/*
+*  Resumen:
+*       Ruta que renderiza la vista de ver la planta
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.get('/view_fusion', function(req, res, next){
     if(verificar(req.session.userData)){
         res.render('jefeplanta/view_fusion');
     }
     else{res.redirect('bad_login');}
 });
-
-
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/table_fusion/:idetapa', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -309,7 +351,6 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-
 router.post('/actualizar_fecha_produccion_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -333,7 +374,15 @@ router.post('/actualizar_fecha_produccion_history', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/table_planta', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -398,9 +447,15 @@ router.post('/table_planta', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
-
-
-
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
 router.post('/table_despachositem', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
