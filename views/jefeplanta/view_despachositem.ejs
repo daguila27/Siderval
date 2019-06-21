@@ -92,10 +92,10 @@
     var busc = new Buscador("buscar_despachositem", ".o_searchview", array_fill, "/jefeplanta/table_despachositem", "DataTableDesp", false, true, ".date-fill","gd.fecha");
 
     if('<%= tab%>' == 'funds'){
-        busc.add_cond = '(material.codigo LIKE "P%" AND material.detalle NOT LIKE "%ceramico%")';
+        busc.add_cond = "(material.codigo LIKE 'P%' AND material.detalle NOT LIKE '%ceramico%')@gd.estado!='Anulado'";
     }
     else{
-        busc.add_cond = '(material.codigo NOT LIKE "P%" OR material.detalle LIKE "%ceramico%")';
+        busc.add_cond = "(material.codigo NOT LIKE 'P%' OR material.detalle LIKE '%ceramico%')@gd.estado!='Anulado'";
     }
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
