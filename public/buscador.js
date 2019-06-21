@@ -1,6 +1,6 @@
 
 class Buscador{
-    constructor(idinput, tag, array_fill, url, idtabla, ispage, dateFilter, iddate_section, columnaRango){
+    constructor(idinput, tag, array_fill, url, idtabla, ispage, dateFilter, iddate_section, columnaRango, mensPag){
         this.filtros_seleccionados = [];
         this.idinput = idinput;
         this.iddate = iddate_section;
@@ -17,6 +17,11 @@ class Buscador{
         // Pagina actual
         this.limit = ( ( (this.page-1)*100) + 1 )+","+((this.page-1)*100 + 100);
         this.lastpage = false;
+        if(mensPag){
+            this.mensPag = mensPag;
+        }else{
+            this.mensPag = "Mostrando%Spedido";
+        }
         this.html =
             "<div class='form-control etiqueta-input' style='display:flex; vertical-align: center'>" +
             "<div class='etiqueta-filtro-div' style='height: 100%;' data-cant='0'>" +
@@ -102,23 +107,25 @@ class Buscador{
 
 
     renderPagesIndicator(idtag){
+        var msj = this.mensPag.split('%S');
         if(this.ispage){
             //Muestra la cantidad de pedidos
             if(this.page === 1 && this.lastpage){
-                $(idtag).html("<h5><small>Mostrando de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" pedido(s).</small></h5>");
+
+                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
             }
             else if(this.page === 1){
-                $(idtag).html("<h5><small>Mostrando de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
             }
             else if(this.lastpage){
-                $(idtag).html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  pedido(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
             }
             else{
-                $(idtag).html("<h5><small>Mostrando de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> pedido(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
             }
         }
         else{
-            $(idtag).html("<h5><small>Mostrando "+$(idtag).data('total')+" pedido(s).</small></h5>");
+            $(idtag).html("<h5><small>"+msj[0]+" "+$(idtag).data('total')+" "+msj[1]+"(s).</small></h5>");
         }
 
     }

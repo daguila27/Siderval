@@ -16,7 +16,7 @@ function fechaLatino(string){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px; width: 100%;">
+<table id="DataTableDesp" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 0px !important; width: 100%;">
     <thead>
     <tr>
         <th id="cab-gd">GD</th>
@@ -70,7 +70,8 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableFixed("#DataTableFabs");
+    setDataTableFixed("#DataTableDesp");
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), ".indicador_paginas");
 
 
     function refreshSumas(){
@@ -104,7 +105,6 @@ function fechaLatino(string){
     });
 
     function submit_form(yo){
-        //$("#form"+$(yo).data('idodc')).submit();
         $.ajax({
             type: 'GET',
             url: '/plan/page_of/'+$(yo).data('idodc'),
@@ -114,7 +114,6 @@ function fechaLatino(string){
         });
     }
     function ver_gdd(yo){
-        //$("#form"+$(yo).data('idodc')).submit();
         $.ajax({
             type: 'GET',
             url: '/bodega/page_gdd/'+$(yo).data('idgd'),
@@ -123,13 +122,5 @@ function fechaLatino(string){
             }
         });
     }
-   /*$("#encabezadotabla").affix({
-        offset: {
-            bottom: function () {
-                console.log($('#view_header').outerHeight(true));
-                return (this.top = $('#view_header').outerHeight(true))
-            }
-        }
-    });*/
 
 </script>
