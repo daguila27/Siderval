@@ -42,7 +42,7 @@
                 <%}else{%>
                     <td style="text-align: center">Interna</td>
                 <%}%>
-                <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" onclick="renderBOM(this)"><i class="fa fa-eye"></i></button></td>
+                <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" data-cant="<%= of[e].restantes%>" onclick="renderBOM(this)"><i class="fa fa-eye"></i></button></td>
                 <td style="text-align: center" class="btn-group">
                     <button class="btn btn-xs btn-success" onclick="obtener_pdf(<%= of[e].idordenfabricacion%>, this)"><i class="fa fa-file-pdf-o"></i></button>
                     <!--<button class="btn btn-xs btn-danger" data-idmat="<%= of[e].idmaterial%>"><i class="fa fa-remove"></i></button>-->
@@ -130,7 +130,7 @@
     function renderBOM(yo){
        $.ajax({
            type: 'POST',
-           data: {idmaterial: $(yo).data('idmat'), addOCA: true},
+           data: {idmaterial: $(yo).data('idmat'), addOCA: true, cant: $(yo).data('cant')},
            url: 'abastecimiento/data_bom',
            success: function(data){
                $("#modalbody-bom").html(data);

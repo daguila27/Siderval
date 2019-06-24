@@ -179,10 +179,96 @@ router.get("/view_mprimas",function(req,res,next){
     } else res.redirect("/bad_login");
 });
 
+router.get("/view_registros",function(req,res,next){
+    if(req.session.userData){
+        res.render('matprimas/view_registros');
+    } else res.redirect("/bad_login");
+});
+
+router.post('/table_registros', function(req,res,next){
+    var input = JSON.parse(JSON.stringify(req.body));
+    var array_fill = [
+        "table_query.idregistro",
+        "table_query.detalle",
+        "table_query.responsable"
+    ];
+    var object_fill = {
+        "table_query.idregistro-on": [],
+        "table_query.detalle-on": [],
+        "table_query.responsable-on": [],
+        "table_query.idregistro-off": [],
+        "table_query.detalle-off": [],
+        "table_query.responsable-off": []
+    };
+    var condiciones_where = [];
+    if(input.cond != ''){
+        for(var e=0; e < input.cond.split('@').length; e++){
+            condiciones_where.push(input.cond.split('@')[e]);
+        }
+    }
+    var result = getConditionArray(object_fill,array_fill, condiciones_where, input);
+    var where = result[0];
+    var limit = result[1];
+    req.getConnection(function(err, connection){
+        if(err) throw err;
+        connection.query(
+            "SELECT * FROM (SELECT " +
+            "movimiento.idmovimiento as idregistro,movimiento.etapa," +
+            "movimiento.f_gen as fecha, movimiento.tipo, movimiento.receptor as responsable," +
+            "material.detalle, " +
+            "material.u_medida, " +
+            "movimiento_detalle.cantidad " +
+            "from movimiento_detalle " +
+            "left join movimiento on movimiento.idmovimiento = movimiento_detalle.idmovimiento " +
+            "left join material on material.idmaterial = movimiento_detalle.idmaterial ORDER BY movimiento.f_gen DESC) as table_query " +
+            where +" "+limit ,
+            function(err, mov){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+
+                connection.query("SELECT * FROM (select " +
+                    "recepcion.numgd as idregistro, " +
+                    "recepcion_detalle.cantidad, " +
+                    "recepcion.fecha," +
+                    "material.detalle, " +
+                    "material.u_medida, " +
+                    "cliente.sigla as responsable " +
+                    "from recepcion_detalle " +
+                    "left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion " +
+                    "left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast " +
+                    "left join material on material.idmaterial = abastecimiento.idmaterial " +
+                    "left join oda on oda.idoda = abastecimiento.idoda " +
+                    "left join cliente on cliente.idcliente = oda.idproveedor ORDER BY recepcion.fecha DESC) as table_query " +
+                    where +" "+limit, function(err, recep){
+                    if(err)
+                        console.log("Error Selecting : %s", err);
+
+                    var obj;
+                    for(var e=0; e < recep.length; e++){
+                        obj = {
+                            "idregistro": recep[e].idregistro,
+                            "fecha": recep[e].fecha,
+                            "tipo": '2',
+                            "responsable": recep[e].responsable,
+                            "detalle": recep[e].detalle,
+                            "u_medida": recep[e].u_medida,
+                            "cantidad": recep[e].cantidad,
+                            "etapa": 11
+                        };
+                        mov.push(obj);
+                    }
+                    console.log(mov[0]);
+                    res.render('matprimas/table_registros', {data: mov});
+                });
+            });
+    });
+});
+
+
+
 
 router.post('/table_mprimas', function(req,res,next){
     var input = JSON.parse(JSON.stringify(req.body));
-
     var array_fill = [
         "table_query.descripcion",
         "table_query.u_medida",
@@ -205,10 +291,11 @@ router.post('/table_mprimas', function(req,res,next){
     var result = getConditionArray(object_fill,array_fill, condiciones_where, input);
     var where = result[0];
     var limit = result[1];
+    console.log(result);
     req.getConnection(function(err, connection){
         if(err) throw err;
-        connection.query("select * from (select material.show_abast, material.show_mp, material.idmaterial as idmatpri, detalle"
-            +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, coalesce(cliente.sigla, 'No Definido') as sigla"
+        connection.query("select * from (select material.show_abast, material.show_mp, material.codigo, material.idmaterial as idmatpri, detalle"
+            +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, coalesce(cliente.sigla, 'No Definido') as sigla"
             +" from material left join recurso on recurso.idmaterial=material.idmaterial left join abastecimiento on abastecimiento.idmaterial = material.idmaterial left join oda on oda.idoda = abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor " +
             "GROUP BY material.idmaterial) as table_query " +
             where +" "+limit ,

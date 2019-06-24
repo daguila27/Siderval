@@ -381,6 +381,14 @@ router.post('/data_bom', function(req, res, next) {
 		else{
 			adjuntar = false;
 		}
+        var cmsj;
+		if(input.cant){
+		   cmsj = " para "+input.cant+" piezas solicitados";
+        }
+        else{
+            input.cant = 0;
+            cmsj = "";
+        }
         req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
@@ -411,8 +419,8 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
-
-	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
+                                console.log(input);
+	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar, cmsj:cmsj, csol: parseInt(input.cant)});
 				});
 			}
 
@@ -1448,11 +1456,11 @@ router.get('/get_dataodc/:idodc', function(req, res, next){
 	        		if(err)
 	        			console.log("Error Selecting : %s", err);
 	        		connection.query("SELECT odc.numoc,concat(cliente.sigla, ' - ',cliente.razon) as client ,"
-	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(pedido.cantidad) as cant_token, group_concat(pedido.f_entrega) as date_token,"
+	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(coalesce(fabricaciones.restantes,0)) as cant_token, group_concat(pedido.f_entrega) as date_token,"
 	        			+" group_concat(material.u_medida) as uni_token,group_concat(material.u_compra) as ucompra_token,group_concat(coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.')) as cc,"
 	        			+"group_concat(material.detalle separator '@') as mat_token FROM notificacion left join odc"
 	        			+" on odc.idodc = substring_index(substring_index(notificacion.descripcion, '@', 2),'@',-1) left"
-	        			+" join pedido on pedido.idodc = odc.idodc LEFT JOIN material ON material.idmaterial = pedido.idmaterial"
+	        			+" join pedido on pedido.idodc = odc.idodc LEFT JOIN fabricaciones ON fabricaciones.idpedido=pedido.idpedido LEFT JOIN material ON material.idmaterial = pedido.idmaterial"
 	        			+" left join cliente on odc.idcliente = cliente.idcliente LEFT JOIN subcuenta ON subcuenta.subcuenta = material.subcuenta LEFT JOIN cuenta ON cuenta.subcuenta = concat(substring(material.subcuenta, 1,2),'000') WHERE notificacion.descripcion LIKE 'aoc@%' AND"
 	        			+" pedido.externo=true AND pedido.idproveedor = 0 AND pedido.idodc=?",
 		        		[idodc],function(err, oda){
@@ -1645,6 +1653,7 @@ router.post('/table_ids', function(req, res, next){
 
         //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
         var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+		console.log(result);
 
         if(result[2] === ''){
         	result[2] = [];

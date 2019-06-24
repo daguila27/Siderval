@@ -16,15 +16,19 @@
 
                 </div>
             </div>
-            <div class="form-group pull-right filtro_estado" style="margin-top: 10px;">
-                <select class="form-control" id="filtro_estado">
+            <div class="form-group pull-right filtro_estado" style="width: 100%; margin-top: 10px; display: flex; padding-left: 30%">
+                <div style="display: flex; width: 70%;">
+                    <label class="checkbox-inline checkmaterial"><input onchange="changeTipoProducto();busc.buscar_action()" checked="true" type="checkbox" value="table_query.codigo LIKE 'I%'">Insumos</label>
+                    <label class="checkbox-inline checkmaterial"><input onchange="changeTipoProducto();busc.buscar_action()" checked="true" type="checkbox" value="table_query.codigo LIKE 'M%'">Materiales</label>
+                    <label class="checkbox-inline checkmaterial"><input onchange="changeTipoProducto();busc.buscar_action()" checked="true" type="checkbox" value="table_query.codigo LIKE 'O%'">Otros</label>
+                </div>
+                <select class="form-control" id="filtro_estado" style="width: 30%">
                     <option value="true" selected>Todos</option>
                     <option value="(table_query.stock<=table_query.stock_c)">Crítico</option>
                     <option value="(table_query.stock<=table_query.stock_i and table_query.stock>table_query.stock_c)">Aviso</option>
                     <option value="(table_query.stock>table_query.stock_i)">Abastecido</option>
 
                 </select>
-
             </div>
         </div>
 
@@ -45,14 +49,30 @@
     }
 </style>
 <script type="text/javascript">
+
+    function changeTipoProducto(){
+        var t = [];
+        $(".checkmaterial input").each(function(){
+            if($(this).prop('checked') === true){
+                t.push($(this).val());
+            }
+        });
+        if(t.length>0){
+            t = "("+t.join(' OR ')+")";
+        }else{t="true ";}
+        busc.add_cond = "((table_query.show_mp is true) and "+$("#filtro_estado").val()+") AND "+t;
+    }
+
+
     var array_fill = [
         "Detalle@success",
         "Unidad@warning",
         "Proveedor@info"
     ];
-    var busc = new Buscador("buscar_mprimas", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", false, false);
+    var busc = new Buscador("buscar_mprimas", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", false, false, '', '', 'Mostrando%Sitem');
 
-    busc.add_cond = "(table_query.show_mp is true)";
+    //busc.add_cond = "(table_query.show_mp is true)";
+    changeTipoProducto();
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         busc.buscar_action();
@@ -64,7 +84,8 @@
 
     $("#filtro_estado").on('change', function(e){
         e.preventDefault();
-        busc.add_cond = "((table_query.show_mp is true) and "+$(this).val()+")";
+        changeTipoProducto();
+        //busc.add_cond = "((table_query.show_mp is true) and "+$(this).val()+")";
         busc.buscar_action();
     });
 

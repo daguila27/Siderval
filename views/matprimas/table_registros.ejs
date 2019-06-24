@@ -1,0 +1,147 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+
+
+function fechaEspañol(date){
+    date = new Date(date);
+    var meses = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+    ];
+    var dias = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miercoles",
+        "Jueves",
+        "Viernes",
+        "Sabado"
+    ];
+    return dias[date.getDay()] +" "+date.getDate()+" de "+meses[date.getMonth()]+" de "+date.getFullYear();
+}
+
+var etapas = [
+    "Jefe de Producción",
+    "Moldeo",
+    "Fusión",
+    "Quiebre",
+    "Terminación",
+    "Tratamiento Térmico",
+    "Maestranza",
+    "Control de Calidad",
+    "Mantención",
+    "Externo",
+    "Otros",
+    "Abastecimiento"
+];
+%>
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="tablaRegistros" style="width: 100%;margin-top: 0px !important;">
+    <thead>
+    <tr>
+        <th>N° Registro</th>
+        <th>Descripción</th>
+        <th>Tipo</th>
+        <th>Entrada</th>
+        <th>Salida</th>
+        <th>Unidad</th>
+        <th>Proveedor / Responsable</th>
+        <th>Área</th>
+        <th>Fecha</th>
+    </tr>
+    </thead>
+    <tbody class="ui-sortable">
+    <%for(var i=0; i < data.length; i++){%>
+        <tr class="o_data_row">
+            <td style="text-align: center"><%= data[i].idregistro%></td>
+            <td><%= data[i].detalle%></td>
+            <% if(data[i].tipo === '1'){%>
+                <td style="text-align: center">Devolución</td>
+            <%}else if(data[i].tipo === '2'){%>
+                <td style="text-align: center">Recepción OCA</td>
+            <%}else{%>
+                <td style="text-align: center">Retiro</td>
+            <%} if(data[i].tipo === '1' || data[i].tipo === '2'){%>
+                <td style="color: blue; text-align: center"><%= data[i].cantidad%></td>
+                <td style="color: red; text-align: center">-</td>
+            <%}else{%>
+                <td style="color: blue; text-align: center">-</td>
+                <td style="color: red; text-align: center"><%= data[i].cantidad%></td>
+            <%}%>
+            <td style="text-align: center"><%= data[i].u_medida%></td>
+            <td><%= data[i].responsable%></td>
+            <td style="text-align: center"> <%= etapas[data[i].etapa]%> </td>
+            <td style="text-align: center" data-order="<%= new Date(data[i].fecha).getTime()%>"><%= fechaEspañol(data[i].fecha)%></td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    </tfoot>
+</table>
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+<script type="text/javascript">
+    $("#tablaRegistros").DataTable({
+        fixedHeader: {
+            header: true,
+            footer: true,
+            headerOffset: $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 2
+        },
+        paging: false,
+        fixedColumns: true,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [[8, 'desc']],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+    $("#indicador_paginas").data('total', parseInt('<%= data.length%>'));
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), "#indicador_paginas");
+</script>
