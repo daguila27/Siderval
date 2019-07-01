@@ -1,0 +1,182 @@
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
+    <div class="col-md-12 panel-creacion" style="margin-top: 20px">
+        <div class="panel panel-primary cargando-panel" style="display: none;">
+            <div class="panel-heading">
+                <div style="width: 100%;text-align: center;">
+                    <img style="width: 25%" src="/loading.gif">
+                </div>
+            </div>
+        </div>
+        <div class="guardado_automatico" style="width: 100%;height: 20px" style="display: none;"></div>
+        <form id="pedsExtform">
+            <div class="panel panel-primary panel-defecto">
+                <div class="panel-heading" style="display: flex">
+                    <div style="width: 100%">
+                        <label for="numgd" class="pull-right" style="width: 9%">
+                            N° GDD:
+                            <input id="numgd" name="numgd" type="text" class="form-control">
+                        </label>
+                        <h3>Recepcionar Producto Externalizados:</h3>
+                    </div>
+                </div>
+                    <div class="panel-body" style="overflow-y: scroll; max-height: 300px;padding: 0">
+                        <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
+                            <thead>
+                            <tr>
+                                <th>OCA</th>
+                                <th>OC</th>
+                                <th>OF</th>
+                                <th>Descripción</th>
+                                <th>Solicitados</th>
+                                <th>Recepcionar</th>
+                                <th>Eliminar</th>
+                            </tr>
+                            </thead>
+                                <tbody id="pedExbody">
+
+                                </tbody>
+                        </table>
+                    </div>
+                    <div class="panel-footer">
+                        <input type="submit" class="btn btn-primary">
+                    </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3>Añadir Productos</h3>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+                <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" id="sessionPedsEx">
+                    <thead>
+                    <tr>
+                        <th>OCA</th>
+                        <th>OC</th>
+                        <th>OF</th>
+                        <th>Descripción</th>
+                        <th>Solicitados</th>
+                        <th>Recibidos</th>
+                        <th>Adjuntar</th>
+                    </tr>
+                    </thead>
+                    <tbody id="preExbody">
+                    <%for(var e=0; e < data.length; e++){%>
+                        <tr data-idabast="<%= data[e].idabast%>" data-idfab="<%= data[e].idfabricaciones%>">
+                            <input type="hidden" name="idabast" value="<%= data[e].idabast%>">
+                            <input type="hidden" name="idfab" value="<%= data[e].idfabricaciones%>">
+                            <td style="text-align: center"><%= data[e].idoda%></td>
+                            <td style="text-align: center"><%= data[e].idodc%></td>
+                            <td style="text-align: center"><%= data[e].idorden_f%></td>
+                            <td><%= data[e].detalle%></td>
+                            <td style="text-align: center"><%= data[e].cantidad%></td>
+                            <td data-name="enviar" style="text-align: center">
+                                <div><%= data[e].recibidos%></div>
+                                <input type="number" name="env" max="<%= data[e].cantidad - data[e].recibidos%>" min="1" class="hidden form-control" style="width: 50%;margin-left: 25%" required>
+                            </td>
+                            <td style="text-align: center">
+                                <button onclick="addPedEx(this); return false;" class="btn btn-xs btn-success" style="display: flex;">
+                                    <i class="fa fa-arrow-up" style="margin-right: 2px"></i>
+                                    <i class="fa fa-plus"></i>
+                                </button>
+
+                                <button onclick="remPedEx(this); return false;" class="btn btn-xs btn-danger hidden" style="display: flex;">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("form#pedsExtform").submit(function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        console.log(array);
+        //idabast idfab env
+        var data = [];
+        var d = 3;
+        var numgd;
+        d=d-1;
+        for(var e = 0; e < array.length; e++){
+            if(e===0){numgd = array[e].value;}
+            else{
+                data.push([array[e].value,array[e+1].value,array[e+2].value]);
+                e += d;
+            }
+        }
+        console.log(JSON.stringify(data));
+        $.ajax({
+            type: 'POST',
+            data: {data: JSON.stringify(data), numgd: numgd},
+            url: '/bodega/save_recepcion_externo',
+            success: function(data){
+                alert("¡Recepción Registrada con Exito!");
+                $("#page-wrapper").html(data);
+            }
+        })
+    });
+</script>
+<script>
+    function remPedEx(yo){
+        //SE UTILIZA idfabricacion PARA IDENTIFICAR LA FILA EN LA TABLA INFERIOR, QUE ESTA OCULTA
+        //SE INTERCAMBIA EL BOTON DE ELIMINAR
+        $("#preExbody tr[data-idabast="+$(yo).parent().parent().data('idabast')+"] .btn-danger").toggleClass('hidden');
+        //POR ADJUNTAR
+        $("#preExbody tr[data-idabast="+$(yo).parent().parent().data('idabast')+"] .btn-success").toggleClass('hidden');
+        //SE OCULTA CAMPO PARA MOSTRAR NUMERO
+        $("#preExbody tr[data-idabast="+$(yo).parent().parent().data('idabast')+"] td[data-name='enviar'] div").toggleClass('hidden');
+        $("#preExbody tr[data-idabast="+$(yo).parent().parent().data('idabast')+"] td[data-name='enviar'] input").toggleClass('hidden');
+        //REAPARECE LA FILA EN LA TABLA INFERIOR
+        $("#preExbody tr[data-idabast="+$(yo).parent().parent().data('idabast')+"]").toggleClass('hidden');
+        $(yo).parent().parent().remove();
+
+    }
+    function addPedEx(yo){
+        //SE INTERCAMBIA EL BOTON DE ADJUNTAR POR ELIMINAR
+        $(yo).toggleClass('hidden');
+        $(yo).parent().children('.btn-danger').toggleClass('hidden');
+        //SE OCULTA NUMERO PARA MOSTRAR CAMPO
+        $(yo).parent().parent().children("td[data-name='enviar']").children('div').toggleClass('hidden');
+        $(yo).parent().parent().children("td[data-name='enviar']").children('input').toggleClass('hidden');
+        $("#pedExbody").append("<tr data-idabast='"+$(yo).parent().parent().data('idabast')+"' data-idfab='"+$(yo).parent().parent().data('idfab')+"'>"+$(yo).parent().parent().html()+"</tr>");
+        $(yo).parent().parent().toggleClass('hidden');
+    }
+    $('#sessionPedsEx').DataTable({
+        "lengthChange": false,
+        "paging": false,
+        "bInfo": false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+    $("#sessionPedsEx_wrapper").css('margin-top', '-41px');
+</script>

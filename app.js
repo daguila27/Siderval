@@ -113,7 +113,7 @@ server.listen(app.get('port'), function(){
 const io = require('socket.io')(server);
 
 
-var mysql      = require('mysql');
+var mysql = require('mysql');
 var connection = mysql.createConnection({
       host: '127.0.0.1',
       user: 'admin',
@@ -127,8 +127,10 @@ var connection = mysql.createConnection({
 connection.connect();
 io.on('connection', function (socket) {
       console.log("Conectado");
+      //FUNCION QUE SE REGISTRA LAS NOTIFICACIONES DE RECHAZO EN JEFE DE PRODUCCIÓN
       socket.on('addError',function(input){
-         connection.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion) {
+         console.log("INGRESANDO NOTIFICACIÓN DE RECHAZO");
+         connection.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion in ("+input.idproduccion.split('-').join(',')+")", function(err, produccion) {
              if (err) {
                  console.log("Error Selecting : %s", err);
              }
@@ -145,8 +147,9 @@ io.on('connection', function (socket) {
              });
          });
      });
-      socket.on('addNotificacion', function(input){ 
-          var userf = input.key.substring(2,3);
+      socket.on('addNotificacion', function(input){
+          console.log(input);
+          var userf = input.key.substring(2,input.key.length);
           connection.query("SELECT fabricaciones.idmaterial, produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion){
               if(err){console.log("Error Selecting : %s", err);}
                 var idmaterial = produccion[0].idmaterial;
@@ -161,7 +164,7 @@ io.on('connection', function (socket) {
                           [d.getHours(),
                            d.getMinutes(),
                            d.getSeconds()].join(':');*/
-                if(userf == '8'){
+                if(userf === '8'){
                   dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                   connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                       if(err){console.log("Error Selecting : %s", err);}                    
@@ -170,7 +173,7 @@ io.on('connection', function (socket) {
 
 
                 }
-                else if(userf == "9"){
+                else if(userf === "9"){
                     dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                     console.log(dataInsert);
                     connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
@@ -200,12 +203,10 @@ io.on('connection', function (socket) {
             io.sockets.emit('showToastnewOF', {newOF: input});
             
       });
-
       socket.on('showToastCount', function(){
             console.log("HELLO WORLD");  
             io.sockets.emit('showToastnewFab');
       });
-
       socket.on('showToastnotif', function(input){ 
           console.log(input);
           var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
@@ -249,13 +250,20 @@ io.on('connection', function (socket) {
             }
           });
       });
-
-
       socket.on('refreshJefeprod', function(id){ 
           console.log('refreshJefeprod');
           console.log(id);
           io.sockets.emit("refreshProduccion", {info : id});
       });
+      app.locals.socket = socket;
 });
+
+
+/*app.use(function(req, res, next){
+    console.log("socket");
+    res.locals['socketio'] = io;
+    next();
+});*/
+//app.locals['socketio'] = io;
 app.locals.io = io;
 

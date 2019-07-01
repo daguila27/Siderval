@@ -46,6 +46,7 @@
           <table class="table table-striped" style="margin: 0">
             <thead>
               <tr>
+                <th class="hidden">F. Directa</th>
                 <th>Exento</th>
                 <th>Descripción</th>
                 <th style="text-align: center">U.C.</th>
@@ -61,20 +62,20 @@
               if(data['idm[]']){
                 for(var t=0; t < data['idm[]'].length; t++){%>
                   <tr>
-                    <td style="align-content: center;" class="td-ex">
+                    <td style='text-align: center' class='td-fd hidden'><input type='checkbox' name='set_fd' class='set_fd'></td>
+                    <td style="text-align: center;" class="td-ex">
                       <%if(data['ex_iva[]'][t] == 'on'){%>
-                          <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="ex_iva" class="ex_iva" onchange="refreshAllCost()" checked>
+                          <input type="checkbox" name="ex_iva" class="ex_iva" onchange="refreshAllCost()" checked>
                       <%}else{%>
-                          <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="ex_iva" class="ex_iva" onchange="refreshAllCost()">
+                          <input type="checkbox" name="ex_iva" class="ex_iva" onchange="refreshAllCost()">
                       <%}%>
                     </td>
                     <td><%= data['dets[]'][t]%><input type="hidden" name="idm" value="<%=data['idm[]'][t]%>"></td>
-                    <td style="align-content: center;"><%= data['u_compra[]'][t]%></td>
-                    <td style="display: flex; padding: 0; padding-top: 2px" class="td-cant">
-                      <input class="form-control cant_compra" type="float" name="cants" min="0" onkeyup="refreshAllCost()" onchange="refreshAllCost()" step="1" value="<%= data['cants[]'][t]%>">
-                      <b style="margin-left: 2%"><%= data['u_med[]'][t]%></b>
+                    <td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'><%= data['u_compra[]'][t]+" "+data['u_med[]'][t]%></span></h6></td>
+                    <td style="display: flex;" class="td-cant">
+                      <input class="form-control cant_compra" type="float" name="cants" onkeyup="refreshAllCost()" onchange="refreshAllCost()" step="<%=data['u_compra[]'][t]%>"  min='<%=data['u_compra[]'][t]%>' value="<%= data['cants[]'][t]%>" required>
                     </td>
-                    <td class="td-money" style="padding: 0; padding-top: 3px">
+                    <td class="td-money">
                       <input class="form-control moneda key_money" type="float" name="costo" onkeyup="refreshAllCost()" onchange="refreshAllCost()" min="0" value="<%= data['costo[]'][t]%>">
                     </td>
                     <td class="costo-total">0</td>
@@ -199,6 +200,7 @@ $("#send_of").submit(function(e){
     prov: [],
     costo: [],
     ex_iva: [],
+    set_fd: [],
     centroc: []
   }
    

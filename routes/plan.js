@@ -337,7 +337,7 @@ router.post('/table_pedidos', function(req, res, next){
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " LEFT JOIN (SELECT pedido.idpedido, EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado FROM pedido) AS estado ON estado.idpedido=pedido.idpedido"
-                + where + " GROUP BY pedido.idpedido ORDER BY pedido.idpedido DESC) as peds "+limit,
+                + where + " GROUP BY pedido.idpedido ORDER BY pedido.idpedido DESC) as peds " + limit,
                 function(err, odc){
                     if(err) throw err;
 

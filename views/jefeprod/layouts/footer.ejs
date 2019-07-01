@@ -228,6 +228,8 @@
                 $("#comentarioRechazo").val(null);
                 $("#cantidadRechazo").val(null);
 
+
+                //jfp@109603@120@2019-6-25 16:19:58@22901-22864-22866@283@RECHAZARTODO@4
                 //ENVIAR NOTIFICACIÓN
                 var input = {
                     idproduccion: form[0].value,
@@ -301,9 +303,6 @@
             }
         });
     }
-
-
-
     function  setDataTableFixed(str){
         var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight();
         return $(str).DataTable({
@@ -359,8 +358,6 @@
             }
         });
     }
-
-
     function upScreen(yo){
         alert($(yo).innerHeight());
         alert($(yo).children('div').height());

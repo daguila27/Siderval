@@ -291,7 +291,6 @@ router.post('/table_mprimas', function(req,res,next){
     var result = getConditionArray(object_fill,array_fill, condiciones_where, input);
     var where = result[0];
     var limit = result[1];
-    console.log(result);
     req.getConnection(function(err, connection){
         if(err) throw err;
         connection.query("select * from (select material.show_abast, material.show_mp, material.codigo, material.idmaterial as idmatpri, detalle"
@@ -324,7 +323,7 @@ router.get("/busq_oda",function(req,res,next){
            if (err) {console.log('We got a problem dude');}
            else {
                connection.query('SELECT abastecimiento.*, material.detalle, material.stock FROM abastecimiento '+
-                   'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE cantidad != recibidos',
+                   'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE abastecimiento.cantidad > abastecimiento.recibidos AND !abastecimiento.fd',
                    function(err, abast) {
                    //console.log(abast);
                    res.render("matprimas/search_oda", {abast: abast});
