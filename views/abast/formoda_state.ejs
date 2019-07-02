@@ -213,7 +213,7 @@ $("#send_of").submit(function(e){
      }
   }
   data.ex_iva = [];
-  $("#send_of :checkbox").each(function(){
+  $("#send_of .ex_iva").each(function(){
     if($(this).is(':checked')){
       data.ex_iva.push('on');
     } else{

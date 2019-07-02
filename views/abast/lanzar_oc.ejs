@@ -70,7 +70,7 @@
           <table class="table table-striped">
             <thead>
               <tr>
-                <th>F. Directa</th>
+                <th class="hidden">F. Directa</th>
                 <th>Exento</th>
                 <th>Descripción</th>
                 <th style="text-align: center">U.C.</th>
@@ -369,8 +369,8 @@
 
 
     function moveArrow(){
-    $(".desp-arrow").css('transform', 'rotate(180deg)');  
-  }
+        $(".desp-arrow").css('transform', 'rotate(180deg)');
+    }
     function getPredictions(yo){
       if($(yo).children('input').val()!=''){
              $.ajax({
@@ -481,27 +481,27 @@
       }
   });*/
 
-    function renderInsumos(idof){
-     //alert("AJAX");
-     $.ajax({
-       type: 'GET',
-       url: '/abastecimiento/get_insumos_of/'+idof,
-       success: function(data){
-           if(data == 'err'){
-             alert("Ha ocurrido un error al obtener los insumos.");
-           }
-           else{
-             //alert(data);
-             $("#ins"+idof).html(data);
-           }
-       }
-     });
-    }
+  function renderInsumos(idof){
+   //alert("AJAX");
+   $.ajax({
+     type: 'GET',
+     url: '/abastecimiento/get_insumos_of/'+idof,
+     success: function(data){
+         if(data == 'err'){
+           alert("Ha ocurrido un error al obtener los insumos.");
+         }
+         else{
+           //alert(data);
+           $("#ins"+idof).html(data);
+         }
+     }
+   });
+  }
 
-    function selectCC(yo){
-       //alert($(yo).parent('td').children('input').val());
-       $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
-    }
+   function selectCC(yo){
+      //alert($(yo).parent('td').children('input').val());
+      $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
+   }
 
 
    function saveState(plantilla){
@@ -526,7 +526,7 @@
            }
        }
        data.ex_iva = [];
-       $("#send_of :checkbox").each(function(){
+       $("#send_of .ex_iva").each(function(){
            if($(this).is(':checked')){
              data.ex_iva.push('on');
            }
@@ -581,6 +581,8 @@
            }
        });
    }
+
+
    $(document).ready(function(){
      loadState(false);
      $.ajax({
@@ -592,7 +594,7 @@
      });
    });
 
-  function renderPlantillasModal(){
+   function renderPlantillasModal(){
       $.ajax({
           type: 'GET',
           url: '/abastecimiento/show_plantillas',
