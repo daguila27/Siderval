@@ -81,6 +81,10 @@ function verificar(usr){
 	}
 }
 /* GET users listing. */
+
+var updOcaRouter = require('./modelos/ocaRouter');
+router.use('/updOca',updOcaRouter);
+
 router.get('/', function(req, res, next) {
 	if(req.session.userData.nombre == 'abastecimiento'){
 		req.getConnection(function(err, connection){
@@ -610,8 +614,6 @@ router.get('/stock_matp', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
-
-
 
 /*router.get('/set_recursos', function(req, res, next) {
 	if(verificar(req.session.userData)){
