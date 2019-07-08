@@ -99,6 +99,7 @@
         <li><a data-toggle="tab" data-etp="mae" href="#mae">Maestranza <small></small></a></li>
         <li><a data-toggle="tab" data-etp="con" href="#con">Control de Calidad <small></small></a></li>
         <li><a data-toggle="tab" data-etp="rec" href="#rec">Rechazo <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ext" href="#ext">Externalizado <small></small></a></li>
     </ul>
     <div class="etapas-content tab-content">
         <div id="mol" class="tab-pane fade in active">
@@ -381,6 +382,41 @@
                 </div>
             </div>
         </div>
+        <div id="ext" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Rechazado Desde</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
     </div>
 
     <button class="btn btn-primary" onclick="submit_action()" style="margin-left: 80%; margin-right: 10%; margin-bottom: 10px; width: 10%;">Enviar</button>
@@ -410,8 +446,9 @@
                         <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
                         <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
                         <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Externalizado" style="text-align: center">EXT</th>
                         <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">RCH</th>
-                        <th data-toggle="tooltip" data-placement="bottom" title="ruta" style="text-align: center">Ruta</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Ruta" style="text-align: center">Ruta</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -427,6 +464,7 @@
                             <td data-valor="" data-netapa="tra" data-etapa="5" data-cs="0" onclick="col_movh(this)" class="col-proceso col-tra parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5"><%= datalen[i]['5'] %></td>
                             <td data-valor="" data-netapa="mae" data-etapa="6" data-cs="0" onclick="col_movh(this)" class="col-proceso col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6"><%= datalen[i]['6'] %></td>
                             <td data-valor="" data-netapa="con" data-etapa="7" data-cs="0" onclick="col_movh(this)" class="col-proceso col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7"><%= datalen[i]['7'] %></td>
+                            <td data-valor="" data-netapa="ext" data-etapa="e" data-cs="0" onclick="col_movh(this)" style="text-align: center;" class="col-proceso col-ext parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Externalizados" id="prod<%=datalen[i].idproduccion%>-e"><%= datalen[i]['e'] %></td>
                             <td data-valor="" data-netapa="rec" data-etapa="s" data-cs="0" style="text-align: center;" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-s"><%= datalen[i].standby %></td>
                             <td data-cs="0" style="text-align: center;" class="col-proceso col-rut" data-cant="<%= %>" data-ruta="<%= datalen[i].ruta%>" data-toggle="tooltip" data-placement="bottom" title="Ruta de Producción" onclick="verRuta(this)"><button class="btn btn-xs btn-primary">Ver Ruta</button></td>
                         </tr>
@@ -439,6 +477,7 @@
                     }else{%>
                         <tr>
                             <td>No hay nada por producir</td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -469,7 +508,8 @@
         "Tratamiento Térmico",
         "Maestranza",
         "Control de Calidad",
-        "Producto Terminado"
+        "Producto Terminado",
+        "Externalizado"
     ];
 
    $('#prodTable').DataTable({
@@ -554,7 +594,11 @@
             //SI ETAPA ACTUAL ES CONTROL DE CALIDAD ENTONCES POR DEFECTO ENVIA A PRODUCTO TERMINADO
             if($(yo).data('etapa') === 7){next = 8;}
             //EN CASO CONTRARIO SE OBTIENE SIGUIENTE ETAPA TOMANDO EL INDICE SIGUIENTE AL DE LA ETAPA ACTUAL
-            else{next = r[r.indexOf($(yo).data('etapa').toString()) + 1];}
+            else{
+                if(r[r.indexOf($(yo).data('etapa').toString()) + 1] === 'e'){
+                    next = 9;
+                }else{next = r[r.indexOf($(yo).data('etapa').toString()) + 1];}
+            }
 
             $('#prod_info').children('strong').html($(yo).parent().data('nombre'));
             $('#prod_info').children('strong').data('idmat', $(yo).parent().data('idmat'));
@@ -586,7 +630,7 @@
                 "<td style='text-align: center' data-name='to' data-valor='s'>" +
                  etapas[parseInt($("#etapa-previus").val())] +
                 "</td>" +
-                "<td data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
                 "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
                 "</td></tr>";
@@ -604,7 +648,7 @@
                 "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
                 $('#prod_info > small > label > select > option:selected').html()
                 +"</td>" +
-                "<td data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
                 "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
                 "</td></tr>";
@@ -631,7 +675,8 @@
             idmat: [],
             env: [],
             to: [],
-            from: []
+            from: [],
+            coment: []
         };
         $(".tab-content td").each(function(){
             data[$(this).data('name')].push($(this).data('valor'));
@@ -645,7 +690,6 @@
                 $(".oe_secondary_submenu li.active").click();
             }
         });
-        console.log(data);
     }
 
 

@@ -23,7 +23,6 @@ router.use(
 router.get('/', function(req, res, next) {
   res.render('login');
 });
-
 router.post('/handler', function(req,res){
     var input = JSON.parse(JSON.stringify(req.body));
 
@@ -61,8 +60,6 @@ router.post('/handler', function(req,res){
 
         //console.log(query.sql);
     });
-
-
 });
 router.post('/handler_faena', function(req,res){
     var input = JSON.parse(JSON.stringify(req.body));

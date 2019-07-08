@@ -279,7 +279,11 @@ function fechaLatino(string){
                                         <tr>
                                             <td class="o_td_label">
                                                 <a href="#" onclick="modal_fact(this)" data-idfactura="<%=lista_aux[1]%>">
-                                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">N° <%= lista_aux[0]%></label>
+                                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">N° <%= lista_aux[0]%>
+                                                        <% if(lista_aux[4] === '1'){%>
+                                                            (Anulado)
+                                                        <%}%>
+                                                    </label>
                                                     <span class="label label-primary pull-right"><%= new Date(lista_aux[2]).toLocaleDateString()%></span>
                                                 </a>
                                             </td>
@@ -363,9 +367,6 @@ function fechaLatino(string){
         $('[data-toggle="tooltip"]').tooltip();
         setDataTable2('#tablaODA');
     });
-
-
-
     function receiveAll(self) {
         if (confirm("¿Esta seguro que desea recepcionar todo lo que falte por recepcionar?")){
             $.ajax({

@@ -67,7 +67,7 @@
           </div>
         </div>
         <div style="overflow-y: scroll; max-height: 300px;">
-          <table class="table table-striped">
+          <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
             <thead>
               <tr>
                 <th class="hidden">F. Directa</th>
@@ -514,14 +514,10 @@
            ex_iva: [],
            centroc: []
        }
-
-       console.log(lista);
        for(var i =0;i<lista.length;i++){
            if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
-               //console.log(lista[i].name);
                data[lista[i].name].push(lista[i].value);
            } else{
-               //console.log(lista[i].name);
                data[lista[i].name] = lista[i].value;
            }
        }
@@ -533,9 +529,7 @@
            else{
              data.ex_iva.push('off');
            }
-           //console.log($(this).val());
        });
-       console.log(data);
        data.plantilla = plantilla;
        data.namePlant = $("#namePlant").val();
        $.ajax({

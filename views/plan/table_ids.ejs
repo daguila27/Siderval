@@ -1,6 +1,4 @@
 <script>
-
-
     $("#DataTableFabs tbody").attr('unselectable','on')
         .css({'-moz-user-select':'-moz-none',
             '-moz-user-select':'none',
@@ -30,8 +28,6 @@
             return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
         }
       }
-
-
     function letraMayus(string) {
         return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
@@ -40,7 +36,6 @@
         else if(string=='LT'){return 'litros';}
         else{return 'kilos'}
     }
-
     function numberFormat(numero){
         var resultado = "";
         if(numero[0]=="-")
@@ -64,7 +59,6 @@
         }
     }
 %>
-
 <style>
     .parsear_nro{
         text-align: center;
@@ -78,7 +72,7 @@
     <tr>
         <th>Código</th>
         <th>Detalle</th>
-        <th>Stock inicial</th>
+        <th>Stock Inicial Mes</th>
         <th>Solicitados por OC</th>
         <th>Atrasados</th>
         <th>Necesarios según fabricados</th>
@@ -89,7 +83,7 @@
         <th>Salidas con GDD</th>
         <th>Devoluciones BMI</th>
         <th>Retiros BMI</th>
-        <th>Stock final</th>
+        <th>Stock Final Mes</th>
     </tr>
     </thead>
     <%if(prods.length){total_fabricados = 0;

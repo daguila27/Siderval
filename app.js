@@ -3,6 +3,7 @@ var path = require('path');
 var connect = require('connect');
 var http = require('http');
 
+//se crea server
 var app = express();
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -51,7 +52,6 @@ app.use(cookieSession({
 
 app.use('/', index);
 app.use('/user', users);
-
 app.use('/siderval', siderval);
 app.use('/plan', plan);
 app.use('/gerencia', admin);
@@ -106,6 +106,8 @@ svc.install();*/
 
 var server  = http.createServer(app);
 
+
+//EJECUTA EL SERVER
 server.listen(app.get('port'), function(){
     console.log('The game starts on port ' + app.get('port'));
 });
@@ -126,7 +128,6 @@ var connection = mysql.createConnection({
 
 connection.connect();
 io.on('connection', function (socket) {
-      console.log("Conectado");
       //FUNCION QUE SE REGISTRA LAS NOTIFICACIONES DE RECHAZO EN JEFE DE PRODUCCIÓN
       socket.on('addError',function(input){
          console.log("INGRESANDO NOTIFICACIÓN DE RECHAZO");
@@ -257,13 +258,5 @@ io.on('connection', function (socket) {
       });
       app.locals.socket = socket;
 });
-
-
-/*app.use(function(req, res, next){
-    console.log("socket");
-    res.locals['socketio'] = io;
-    next();
-});*/
-//app.locals['socketio'] = io;
 app.locals.io = io;
 

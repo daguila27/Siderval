@@ -109,7 +109,6 @@
 
     var alto_buscador = $(".up-fills").height();
     var margen_tabla = $('#fw-container').css('margin-top');
-
 	function mostrar_buscador(){
         $('.up-fills').css('top', alto_buscador);
         $('.up-fills').css('height', alto_buscador);
@@ -134,7 +133,7 @@
     }
     function volver_tabla(){
         $('.up-fills').css('z-index', '9');
-        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('top', 0);
         $('#fw-container').css('margin-top', margen_tabla+'px');
         $('#fw-container').css('padding-top', '0px');
         $('.up-fills').removeClass('hidden');

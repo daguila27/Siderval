@@ -286,8 +286,10 @@
 <div id="snackbar" data-newid="0" onclick="clickSnackbar(this)" style="cursor: pointer;">Se ha creado una nueva OF. <button class="btn btn-success">RECARGAR</button></div>
 
 <input type="hidden" id="pageView" value="0">
+<form action="/abastecimiento/indx" method="post" class="hidden render-form">
+    <input type="hidden" name="route" id="route" value="abast_myself">
+</form>
 </body>
-</html>
 <script>
     function show_menu(){
         $('.o_sub_menu').css('left', '0%');
@@ -296,7 +298,7 @@
         $("#page-wrapper").css('width', '90%');
         $("#page-wrapper").css('margin-left', '10%');
         $("#up-fills").css('width', '90%');
-        if( ($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento" || $("#page-wrapper").data('view') == "/abastecimiento/fabrs_ids/0") && $("#pageView").val() === '0' ){
+        if($("#pageView").val() === '1' ){
             //ajax($(".oe_secondary_submenu li.active"));
             busc.hidden_screen();
             busc.destroyDataTable(true);
@@ -315,7 +317,7 @@
         $("#page-wrapper").css('width', '100%');
         $("#page-wrapper").css('margin-left', '0%');
         $("#up-fills").css('width', '100%');
-        if( ($("#page-wrapper").data('view') == "/abastecimiento/view_abastecimiento" || $("#page-wrapper").data('view') == "/abastecimiento/fabrs_ids/0") && $("#pageView").val() === '0' ){
+        if($("#pageView").val() === '1'){
             //ajax($(".oe_secondary_submenu li.active"));
             busc.hidden_screen();
             busc.destroyDataTable(true);
@@ -748,13 +750,6 @@
     }
 
 
-    $.ajax({
-        type: 'GET',
-        url: '/abastecimiento/notif_abast',
-        success: function(data){
-            $(".notificaciones").html(data);
-        }
-    });
 
     function selectCCModal(yo){
         //alert($(yo).parent('td').children('input').val());
@@ -794,7 +789,7 @@
             }
         });
     }
-    $.ajax({
+    /*$.ajax({
         type: 'GET',
         url: '/abastecimiento/abast_myself',
         beforeSend: function(){
@@ -804,13 +799,38 @@
             $("#page-wrapper").html(data);
             $("#page-wrapper").fadeIn();
         }
+    });*/
+   /* $.ajax({
+        type: 'GET',
+        url: '/abastecimiento/indx/abast_myself',
+        beforeSend: function(){
+            $("#page-wrapper").css('display', 'none');
+        },
+        success: function(data){
+            $("#page-wrapper").html(data);
+            $("#page-wrapper").fadeIn();
+        }
+    });*/
+    $.ajax({
+        type: 'GET',
+        url: '/abastecimiento/notif_abast',
+        success: function(data){
+            $(".notificaciones").html(data);
+        }
     });
     function ajax(yo){
         $(".active").removeClass('active');
         $(yo).addClass('active');
-        $.ajax({
+        var l = $(yo).data('link').split('/').join('%');
+        //var l = "/abastecimiento/indx/";
+
+        $(".render-form input#route").val(l);
+        $(".render-form input#tipo").val($(yo).data('tipo'));
+
+        $(".render-form").submit();
+        /*$.ajax({
             type: 'GET',
-            url: $(yo).data('link'),
+            url: "/abastecimiento/indx/"+l,
             beforeSend: function(){
                 destroyDataTable();
                 $("#page-wrapper").css('display', 'none');
@@ -819,21 +839,29 @@
             success: function(data){
                 $("#page-wrapper").html(data);
                 $("#page-wrapper").fadeIn();
+                alert("hh");
+                $(html).html(data);
 
             }
-        });
+        });*/
     }
     function showForm(){
         var array = $("#odcForm").serializeArray();
         console.log(array);
         var data = {};
         var idp = '';
+        var idf = '';
         var cost = '';
         var boolNull = false;
         for(var i=0; i < array.length; i++){
             if(array[i].name == 'idpedido'){
                 idp += array[i].value + '@';
                 boolNull = true;
+                //data.push(array[i].value);
+            }
+            else if(array[i].name == 'idfabricaciones'){
+                idf += array[i].value + '@';
+                //boolNull = true;
                 //data.push(array[i].value);
             }
             else if(array[i].name == 'costo'){
@@ -847,8 +875,10 @@
             }
         }
         idp = idp.substring(0, idp.length-1);
+        idf = idf.substring(0, idf.length-1);
         cost = cost.substring(0, cost.length-1);
         data['idped'] = idp;
+        data['idfab'] = idf;
         data['costo'] = cost;
         console.log(data);
     }
@@ -858,6 +888,7 @@
         console.log(array);
         var data = {};
         var idp = '';
+        var idf = '';
         var cost = '';
         var cc = '';
         var boolNull = false;
@@ -865,6 +896,11 @@
             if(array[i].name == 'idpedido'){
                 idp += array[i].value + '@';
                 boolNull = true;
+                //data.push(array[i].value);
+            }
+            else if(array[i].name == 'idfabricaciones'){
+                idf += array[i].value + '@';
+                //boolNull = true;
                 //data.push(array[i].value);
             }
             else if(array[i].name == 'costo'){
@@ -893,9 +929,11 @@
         data['prov'] = data['prov'].split('@')[0];
         data.ex_iva = data.ex_iva.substring(0, data.ex_iva.length-1);
         idp = idp.substring(0, idp.length-1);
+        idf = idf.substring(0, idf.length-1);
         cost = cost.substring(0, cost.length-1);
         cc = cc.substring(0, cc.length-1);
         data['idped'] = idp;
+        data['idfab'] = idf;
         data['costo'] = cost;
         data['centroc'] = cc;
         console.log(data);
@@ -1095,4 +1133,16 @@
     }
 
     act_contable();
+
+
+
+
+
+    $(".oe_secondary_submenu li").removeClass('active');
+    $(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").addClass('active');
+    $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
+    $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
 </script>
+
+
+</html>

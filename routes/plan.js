@@ -1505,7 +1505,7 @@ router.post('/buscar_mat', function(req, res, next){
             dats.push(parseInt(input.caract));
         }
         req.getConnection(function(err,connection){
-            connection.query("SELECT material.*, coalesce(disp.xdespachar,0) as xdespachar, coalesce(disp.disponible,0) as disponible, coalesce(enp_query.enproduccion,0) as enproduccion,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
+            connection.query("SELECT coalesce(producido.ruta, '') as ruta,material.*, coalesce(disp.xdespachar,0) as xdespachar, coalesce(disp.disponible,0) as disponible, coalesce(enp_query.enproduccion,0) as enproduccion,caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro,GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN producido ON producido.idmaterial = material.idmaterial" +
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
                 " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion" +
@@ -1546,10 +1546,12 @@ router.post('/buscar_prod', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     var where = "WHERE material.detalle LIKE '%"+ input.detalle +"%' OR alias.numordenfabricacion LIKE '%"+input.detalle+"%'";
     req.getConnection(function(err, connection){
-            connection.query("SELECT material.idmaterial,material.detalle, GROUP_CONCAT(alias.numordenfabricacion,'@', alias.cantidad, '@', alias.restantes, '@', alias.f_entrega, '@', alias.pt,'@',alias.despachados)" +
+            connection.query("SELECT producido.ruta,material.idmaterial,material.detalle, GROUP_CONCAT(alias.numordenfabricacion,'@', alias.cantidad, '@', alias.restantes, '@', alias.f_entrega, '@', alias.pt,'@',alias.despachados)" +
                 "  as content FROM (SELECT ordenfabricacion.numordenfabricacion ,fabricaciones.idorden_f, fabricaciones.idfabricaciones,fabricaciones.cantidad," +
                 " fabricaciones.restantes,fabricaciones.idmaterial,fabricaciones.f_entrega,pedido.despachados,COALESCE(SUM(produccion.8),0) as pt FROM fabricaciones LEFT JOIN produccion ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-                " LEFT JOIN ordenfabricacion ON ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join odc on odc.numoc = ordenfabricacion.numordenfabricacion left join pedido ON (pedido.idodc = odc.idodc AND pedido.f_entrega = fabricaciones.f_entrega AND fabricaciones.idmaterial = pedido.idmaterial) GROUP BY fabricaciones.idfabricaciones) alias LEFT JOIN material ON alias.idmaterial=material.idmaterial "+where+" GROUP BY material.idmaterial",
+                " LEFT JOIN ordenfabricacion ON ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f left join odc on odc.numoc = ordenfabricacion.numordenfabricacion left join pedido ON (pedido.idodc = odc.idodc AND pedido.f_entrega = fabricaciones.f_entrega AND fabricaciones.idmaterial = pedido.idmaterial) GROUP BY fabricaciones.idfabricaciones) alias " +
+                " LEFT JOIN material ON alias.idmaterial=material.idmaterial" +
+                " LEFT JOIN producido ON producido.idmaterial=material.idmaterial "+where+" GROUP BY material.idmaterial",
                 function(err, productos){
                     if(err){console.log("Error Selecting : %s", err);}
                     res.render('plan/show_prod', {productos: productos, paginas: 1, thispag: 0});

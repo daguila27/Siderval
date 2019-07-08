@@ -97,7 +97,7 @@ router.get('/crear_recepcion', function(req, res, next){
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connecting : %s", err);}
             connection.query("SELECT " +
-                "abastecimiento.idoda,abastecimiento.idabast,fabricaciones.idfabricaciones," +
+                "abastecimiento.idoda,abastecimiento.idabast,fabricaciones.idfabricaciones,produccion.idproduccion," +
                 "abastecimiento.cantidad," +
                 "abastecimiento.recibidos," +
                 "material.detalle," +
@@ -105,7 +105,8 @@ router.get('/crear_recepcion', function(req, res, next){
                 "fabricaciones.idorden_f " +
                 "FROM abastecimiento " +
                 "LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial " +
-                "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = abastecimiento.idfabricacion " +
+                "LEFT JOIN produccion ON abastecimiento.idproduccion = produccion.idproduccion " +
+                "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
                 "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
                 "WHERE pedido.externo AND abastecimiento.cantidad > abastecimiento.recibidos", function(err, abast){
                 if(err){console.log("Error Selecting : %s", err);}
@@ -126,6 +127,8 @@ router.post('/save_recepcion_externo', function(req, res, next){
         var data = JSON.parse(input.data);
         var recep = [input.numgd, 0];
         var recep_d = [];
+        console.log("DATA");
+        console.log(data);
         for(var e=0; e < data.length; e++){recep_d.push([data[e][0], data[e][2]]);}
         var query = "";
         var ids = [];
@@ -176,9 +179,20 @@ router.post('/save_recepcion_externo', function(req, res, next){
                                 }
                                 var prod = [];
                                 var prod_h = [];
+                                var idprods = [];
                                 var query_f = "";
                                 var aux;
+                                var query_ext = "";
+                                var query_cc = "";
+
                                 for(var q=0; q < data.length; q++ ){
+                                    if(q===0){
+                                        query_ext = "UPDATE produccion SET produccion.e = CASE ";
+                                        query_cc = "UPDATE produccion SET produccion.7 = CASE ";
+                                    }
+                                    idprods.push(data[q][3]);
+                                    query_ext += "WHEN produccion.idproduccion = '"+data[q][3]+"' THEN produccion.e - "+data[q][2]+" ";
+                                    query_cc += "WHEN produccion.idproduccion = '"+data[q][3]+"' THEN produccion.7 + "+data[q][2]+" ";
                                     //LA CANTIDAD TOTAL A PRODUCIR SE INICIA DESDE LA SEGUNDA ETAPA
                                     //idfabricaciones  cantidad_recibida etapa2
                                     aux = {
@@ -191,34 +205,26 @@ router.post('/save_recepcion_externo', function(req, res, next){
                                     prod.push([data[q][1], data[q][2], data[q][2]]);
                                     //SE CREA EL MOVIMIENTO
                                     //enviado from to
-                                    prod_h.push([data[q][2], 'e', '7']);
+                                    prod_h.push([data[q][2], 'e', '7', data[q][3]]);
                                     //prod_h.push([data[q][2], fabs[idfabs.indexOf( parseInt(data[q][1]) )].ruta.split(',')[0], fabs[idfabs.indexOf( parseInt(data[q][1]) )].ruta.split(',')[1]]);
 
                                     if(q===0){query_f = "UPDATE fabricaciones SET restantes = CASE ";}
                                     query_f += " WHEN idfabricaciones = "+data[q][1]+" THEN restantes - "+data[q][2];
                                     if(q===data.length-1){query_f += " ELSE recibidos END WHERE idfabricaciones IN ("+idfabs.join(',')+")";}
                                 }
-                                connection.query("INSERT INTO ordenproduccion() VALUES ()", function(err, inOp){
+                                query_ext += " ELSE produccion.e END WHERE idproduccion IN ("+idprods.join(',')+")";
+                                query_cc += " ELSE produccion.7 END WHERE idproduccion IN ("+idprods.join(',')+")";
+                                console.log(query_ext);
+                                console.log(query_cc);
+                                //SE ASUME QUE LA SIGUIENTE ETAPA A EXTERNALIZADO EN Cc
+                                connection.query(query_ext, function(err, queExt){
                                     if(err){console.log("Error Inserting : %s", err);}
-                                    console.log(inOp);
-                                    for(var p=0; p < prod.length; p++){
-                                        prod[p].push(inOp.insertId);
-                                    }
-                                    console.log("PROD");
-                                    console.log(prod);
-                                    //SE ASUME QUE LA SIGUIENTE ETAPA A EXTERNALIZADO EN Cc
-                                    connection.query("INSERT INTO produccion(idfabricaciones, cantidad, `7`, idordenproduccion) VALUES ?", [prod], function(err, inProd){
+                                    connection.query(query_cc, function(err, queCc){
                                         if(err){console.log("Error Inserting : %s", err);}
-                                        console.log(inProd);
-                                        //SE INGRESA EL idproduccion A produccion_history
-                                        for(var u=0; u < prod_h.length; u++){
-                                            prod_h[u][3] = inProd.insertId + u;
-                                        }
-                                        console.log(prod_h);
-                                        connection.query("INSERT INTO produccion_history(enviados, `from`, `to`, idproduccion) VALUES ?", [prod_h], function(err, inProdH){
-                                            if(err){console.log("Error Inserting : %s", err);}
 
-                                            console.log(inProdH);
+                                        connection.query("INSERT INTO produccion_history(enviados, `from`, `to`, idproduccion) VALUES ?", [prod_h], function(err, inProdH){
+                                        if(err){console.log("Error Inserting : %s", err);}
+
                                             res.redirect('/bodega/crear_recepcion');
                                         });
                                     });

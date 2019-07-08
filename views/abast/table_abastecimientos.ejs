@@ -79,24 +79,25 @@
 	<tbody class="ui-sortable">
 		<%
 		var lista = [];
+		var anulados = [];
 		var gd_lista = [];
 		var lista2 = [];
 		var lista3 = [];
 		for(var i=0; i < data.length; i++){
 		    if(data[i].factura_token != null){
 				lista = data[i].factura_token.split(",");
+				anulados = data[i].fanulado_token.split(",");
 				if(lista.length > 1){
 					for(var e=0; e < lista.length; e++){
 					    lista[e] = lista[e].split('@');
 					}
-				    /*lista.map(function(e){
-					    lista2.push(e.split("@"));
-					    return e;
-					});*/
-					//lista = lista2;
-				} else lista[0] = lista[0].split("@");
+				} else{
+				    lista[0] = lista[0].split("@");
+					anulados[0] = anulados[0];
+				}
 			} else {
 		        lista = [];
+				anulados = [];
 			}
 			if(data[i].gd_token != null){
 				gd_lista = data[i].gd_token.split(",");
@@ -115,21 +116,31 @@
 				</td>
 				<td class="o_data_cell" style="text-align: center; width: 13%">
 					<%if(lista.length>3){
-						for(var j=0; j<3; j++){%>
-							<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
-						<%}%>
+						for(var j=0; j<3; j++){
+							if(anulados[j] === '1'){%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-danger" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}else{%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+						<%}}%>
 					    <a class="label label-primary pull-right" type="button"  onclick="changeIcon(this)" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>" data-state="close">
 							<i class="fa fa-arrow-down"></i>
 						</a>
 					    <div class="collapse collapseLabel" id="collapseFactura<%=i%>">
 							<%
 							for(var j=3; j<lista.length; j++){%>
-								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1] %>" ><%= textoCorto(lista[j][0])%></a>
-							<%}%>
+								<%if(anulados[j] === '1'){%>
+									<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-danger" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+								<%}else{%>
+									<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}}%>
 						</div>
 					<%}else{
-					    for(var j=0; j<lista.length; j++){%>
-							<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+					    for(var j=0; j<lista.length; j++){
+					        if(anulados[j] === '1'){%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-danger" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}else{%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}%>
 						<%}
 					}%>
 				</td>
@@ -186,7 +197,7 @@
 					</div>
 				</td>
 			</tr>
-		<%}%>
+		<%} %>
 	</tbody>
 	<!--<tfoot>
 		<tr>
@@ -209,9 +220,8 @@
 </table>
 
 
-
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js" type="text/javascript"></script>
+<script src="/assets/parsear_nro.js" type="text/javascript"></script>
 
 <script type="text/javascript">
     setDataTableFixed("#dataTableOdoo");

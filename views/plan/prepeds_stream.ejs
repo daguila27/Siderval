@@ -11,7 +11,6 @@ function letraMayus(string) {
             <th>Por Despachar</th>
             <th>En Producción</th>
             <th>Disponible</th>
-            <!--<th>Caracteristica</th>-->
             <th></th>
         </tr>
         </thead>
@@ -32,10 +31,12 @@ function letraMayus(string) {
         <%}%>
         <td>
             <div class="btn-group" style="display:flex;margin: 0 auto;">
-                <% if(data[i].idproducido != null){%>
+                <%
+                console.log(data[i].ruta);
+                if(data[i].idproducido != null){%>
                 <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducido%>" data-tipo="producido" class="btn btn-xs btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Fabricar</a>
                 <%}%>
-                <% if(data[i].idproducto != null){%>
+                <% if(data[i].idproducto != null && data[i].ruta.substring(0,1) === 'e'){%>
                 <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducto%>" data-tipo="producto" class="btn btn-xs btn-info" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Externo</a>
                 <%}%>
                 <% if(typeof data[i].idotro != 'object'){%>

@@ -163,13 +163,10 @@ router.get('/load_production_history_state', function(req, res, next){
                                 etp[e][c].splice(1, 0, dets[mats.indexOf(parseInt(etp[e][c][0]))]);
                             }
                         }
-                        console.log(etp);
                         res.render('gestionpl/table_production_history', {etp: etp});
                     });
                 }else{
                     etp = [];
-
-                    console.log(etp);
                     res.render('gestionpl/table_production_history', {etp: etp});
                 }
             });
@@ -181,7 +178,7 @@ router.get('/load_production_history_state', function(req, res, next){
 router.get('/create_production_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var query = "SELECT * FROM (SELECT producido.ruta,ordenproduccion.f_gen as creacion ,material.idmaterial,SUM(produccion.standby) as standby, SUM(produccion.`1`) as `1`,SUM(produccion.`2`) as `2`,SUM(produccion.`3`) as `3`,SUM(produccion.`4`) as `4`,SUM(produccion.`5`) as `5`,"
-            + "SUM(produccion.`6`) as `6`,SUM(produccion.`7`) as `7`,SUM(produccion.`8`) as `8`, GROUP_CONCAT(produccion.idproduccion separator ' - ') as idproduccion, '-' as trats,"
+            + "SUM(produccion.`6`) as `6`,SUM(produccion.`7`) as `7`,SUM(produccion.`8`) as `8`,SUM(produccion.`e`) as `e`, GROUP_CONCAT(produccion.idproduccion separator ' - ') as idproduccion, '-' as trats,"
             + " '-' as numordenfabricacion, '-' as idfabricaciones, '-' as idordenproduccion, sum(produccion.cantidad) as cantidad, material.detalle,  opQuery.tok ,opQuery.idordenfabricacion"
             + " FROM produccion LEFT JOIN ordenproduccion ON ordenproduccion.idordenproduccion = produccion.idordenproduccion LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones LEFT JOIN ordenfabricacion ON fabricaciones.idorden_f=ordenfabricacion.idordenfabricacion"
             +" LEFT JOIN (select ordenfabricacion.idordenfabricacion, coalesce(group_concat(DISTINCT produccion.idordenproduccion separator ' - '), 'Sin OP') as tok from ordenfabricacion left join fabricaciones on"
@@ -204,7 +201,6 @@ router.get('/create_production_history', function(req, res, next){
 router.post('/save_production_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         if(typeof input['idmat[]'] === 'string'){
             recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ", req);
         }
@@ -235,6 +231,8 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                   sendnum: '91',
                   etapa_act: '1' };
             * */
+            //EXT === 9
+            if(to === '9'){to = 'e';}
             var input = {
                 idprod: rows[0].idprod,
                 cantprod: rows[0].cantprod,
@@ -260,6 +258,13 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                     key: 'fa8'
                 };
                 enviarNotificacionBodega(req, notif);
+            }else if(to === 'e'){
+                notif = {
+                    idproduccion: rows[0].idprod,
+                    cantidad: env,
+                    key: 'fae'
+                };
+                enviarNotificacionExternalizacion(req, notif);
             }
             /*
             * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
@@ -322,7 +327,6 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
             }
             conn.query(query ,function(err,upProd1){
                 if(err) throw err;
-
                 conn.query(query2 ,function(err,upProd2){
                     if(err) throw err;
 
@@ -354,7 +358,7 @@ function enviarNotificacionBodega(req, input){
                   [d.getHours(),
                    d.getMinutes(),
                    d.getSeconds()].join(':');*/
-        if(userf == '8'){
+        if(userf === '8'){
             dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
             conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                 if(err){console.log("Error Selecting : %s", err);}
@@ -363,9 +367,8 @@ function enviarNotificacionBodega(req, input){
 
 
         }
-        else if(userf == "9"){
+        else if(userf === "9"){
             dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-            console.log(dataInsert);
             conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                 if(err){console.log("Error Selecting : %s", err);}
                 req.app.locals.io.emit("refreshfaena"+userf);
@@ -390,7 +393,6 @@ function enviarNotificacionBodega(req, input){
 
 function enviarNotificacionRechazo(req, input){
     if(conn){
-        console.log("INGRESANDO NOTIFICACIÓN DE RECHAZO");
         conn.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion in ("+input.idproduccion.split('-').join(',')+")", function(err, produccion) {
             if(err){console.log("Error Selecting : %s", err);}
             var idmaterial = produccion[0].idmaterial;
@@ -401,12 +403,23 @@ function enviarNotificacionRechazo(req, input){
             dataInsert.descripcion = "jfp@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop+"@"+input.razon+"@"+input.etapa;
             conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                 if(err){console.log("Error Selecting : %s", err);}
-                console.log(req.app.locals);
                 req.app.locals.io.sockets.emit("notif");
             });
         });
     }
 }
+
+
+
+function enviarNotificacionExternalizacion(req, input){
+    if(conn){
+        console.log("INGRESANDO NOTIFICACIÓN DE EXTERNALIZACION");
+        console.log(input);
+        //
+    }
+}
+
+
 
 router.get('/ver_ruta_modal/:idmaterial', function(req, res, next){
     if(verificar(req.session.userData)){

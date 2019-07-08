@@ -76,6 +76,8 @@
                                 <div><%= data[e].recibidos%></div>
                                 <input type="number" name="env" max="<%= data[e].cantidad - data[e].recibidos%>" min="1" class="hidden form-control" style="width: 50%;margin-left: 25%" required>
                             </td>
+                            <input type="hidden" name="idprod" value="<%= data[e].idproduccion%>">
+
                             <td style="text-align: center">
                                 <button onclick="addPedEx(this); return false;" class="btn btn-xs btn-success" style="display: flex;">
                                     <i class="fa fa-arrow-up" style="margin-right: 2px"></i>
@@ -102,13 +104,13 @@
         console.log(array);
         //idabast idfab env
         var data = [];
-        var d = 3;
+        var d = 4;
         var numgd;
         d=d-1;
         for(var e = 0; e < array.length; e++){
             if(e===0){numgd = array[e].value;}
             else{
-                data.push([array[e].value,array[e+1].value,array[e+2].value]);
+                data.push([array[e].value,array[e+1].value,array[e+2].value, array[e+3].value]);
                 e += d;
             }
         }

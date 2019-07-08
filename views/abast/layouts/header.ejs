@@ -4,6 +4,7 @@
 <html>
 
 <head>
+
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
     <title><%=page_title%></title>
@@ -154,10 +155,9 @@
                 <div class="oe_secondary_menu_section">
                     Orden de Compra
                 </div>
-
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
 
-                    <li class="active" onclick="ajax(this)" data-link="/abastecimiento/abast_myself">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Abastecimiento - Crear OCA" data-link="/abastecimiento/abast_myself">
 
 
                         <a class="oe_menu_leaf">
@@ -171,7 +171,7 @@
 
                     </li>
 
-                    <li onclick="ajax(this)" data-link="/abastecimiento/view_abastecimiento">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Abastecimiento - Ver OCA" data-link="/abastecimiento/view_abastecimiento">
 
 
                         <a class="oe_menu_leaf">
@@ -193,30 +193,21 @@
                     Materias Primas e Insumos
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/view_stockp">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Abastecimiento - Stock de Productos" data-link="/abastecimiento/view_stockp">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Resumen de Stock
                                         </span>
                         </a>
                     </li>
-                    <!--<li  onclick="ajax(this)" data-link="/abastecimiento/abast_ops">
-
-
-                        <a class="oe_menu_leaf">
-                            <span class="oe_menu_text">
-                                Abastecer OP
-                            </span>
-                        </a>
-                    </li>-->
-                    <li onclick="ajax(this)" data-link="/abastecimiento/bom_mat_uni">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Abastecimiento - B.O.M. de Productos" data-link="/abastecimiento/bom_mat_uni">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             BOM de Productos
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/2">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Abastecimiento - Informe de Stock Mensual" data-link="/abastecimiento/fabrs_ids/2">
 
 
                         <a class="oe_menu_leaf">
@@ -234,20 +225,13 @@
                 </div>
 
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/all_proveedores">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Abastecimiento - Todos los Proveedores" data-link="/abastecimiento/all_proveedores">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Ver Todos
                                         </span>
                         </a>
                     </li>
-                    <!--<li onclick="ajax(this)" data-link="/abastecimiento/visualizar_ofs">
-                        <a class="oe_menu_leaf">
-                            <span class="oe_menu_text">
-                                Visualizar OFs
-                            </span>
-                        </a>
-                    </li>-->
                 </ul>
             </div>
 
@@ -302,6 +286,7 @@
             </div>
         </div>
     </div>
+
     <script src="/buscador.js"></script>
 
-    <div id="page-wrapper" style="width: 90%;margin-left:10%; transition: 0.5s;" data-view="/abastecimiento/abast_myself">
+    <div id="page-wrapper" style="width: 90%;margin-left:10%; transition: 0.5s;" data-tipo="0" data-view="/abastecimiento/abast_myself">
