@@ -4,18 +4,11 @@ var connection  = require('express-myconnection');
 var mysql = require('mysql');
 var adminModel = require('./xlsx');
 
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
+
 router.use(
-    connection(mysql,{
-
-        host: 'localhost',
-        user: 'admin',
-        password : 'tempo123',
-        port : 3306,
-        database:'siderval',
-  		insecureAuth : true
-
-    },'pool')
-
+    connection(mysql,dbCredentials,'pool')
 );
 function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;

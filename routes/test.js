@@ -2,16 +2,10 @@ var express = require('express');
 var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
-
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
 router.use(
-    connection(mysql,{
-        host: 'localhost',
-        user: 'user',
-        password : '1234',
-        port : 3306,
-        database:'siderval',
-        insecureAuth : true
-    },'pool')
+    connection(mysql,dbCredentials,'pool')
 );
 function verificar(usr){
     if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento' || usr.nombre == 'siderval'){

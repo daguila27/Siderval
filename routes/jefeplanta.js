@@ -2,17 +2,10 @@ var express = require('express');
 var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
-
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
 router.use(
-    connection(mysql,{
-        host: '192.168.1.25',
-        user: 'admin',
-        password : 'tempo123',
-        port : 3306,
-        database:'siderval',
-        insecureAuth : true
-
-    },'pool')
+    connection(mysql,dbCredentials,'pool')
 );
 
 
