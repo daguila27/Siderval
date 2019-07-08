@@ -4,18 +4,11 @@ var connection  = require('express-myconnection');
 var mysql = require('mysql');
 var adminModel = require('./xlsx');
 
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
+
 router.use(
-    connection(mysql,{
-
-        host: 'localhost',
-        user: 'admin',
-        password : 'tempo123',
-        port : 3306,
-        database:'siderval',
-  		insecureAuth : true
-
-    },'pool')
-
+    connection(mysql,dbCredentials,'pool')
 );
 function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;
@@ -81,6 +74,10 @@ function verificar(usr){
 	}
 }
 /* GET users listing. */
+
+var updOcaRouter = require('./modelos/ocaRouter');
+router.use('/updOca',updOcaRouter);
+
 router.get('/', function(req, res, next) {
 	if(req.session.userData.nombre == 'abastecimiento'){
 		req.getConnection(function(err, connection){
@@ -634,8 +631,6 @@ router.get('/stock_matp', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
-
-
 
 /*router.get('/set_recursos', function(req, res, next) {
 	if(verificar(req.session.userData)){

@@ -2,19 +2,11 @@ var express = require('express');
 var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
-
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
 router.use(
 
-    connection(mysql,{
-
-        host: '127.0.0.1',
-        user: 'admin',
-        password : 'tempo123',
-        port : 3306,
-        database:'siderval',
-  		insecureAuth : true
-
-    },'pool')
+    connection(mysql,dbCredentials,'pool')
 
 );
 
@@ -33,7 +25,7 @@ router.get('/', function(req, res, next){
 });
 
 
-router.get('/render_registro',function(req, res, next){
+router.get('/render_registro',function(req, res){
 	if(verificar(req.session.userData)){
 		req.getConnection(function(err, connection){
 		connection.query("SELECT producto.idproducto,material.idmaterial,material.detalle FROM producto LEFT JOIN material ON (producto.idmaterial = material.idmaterial) WHERE material.estado = 'fin'", function(err, rows){
@@ -53,15 +45,15 @@ router.get('/render_registro',function(req, res, next){
 
 });
 
-
-router.get('/create_producto',function(req, res, next){
+router.get('/create_producto',function(req, res){
     if(verificar(req.session.userData)){
     	res.render('dt/create_producto');
     }
     else{res.redirect('bad_login');}
 
 });
-router.get('/check_code_version/:codigo',function(req, res, next){
+
+router.get('/check_code_version/:codigo',function(req, res){
     if(verificar(req.session.userData)){
     	var codigo = req.params.codigo;
     	var v;
@@ -69,9 +61,7 @@ router.get('/check_code_version/:codigo',function(req, res, next){
     		if(err){console.log("Error Connection: %s", err);}
     		connection.query("select max(codigo) as codigo from material where codigo like '"+codigo+"%'", function(err, rows){
                 if(err){console.log("Error Selecting: %s", err);}
-
-                console.log(rows);
-                if(rows[0].codigo == null){
+				if(rows[0].codigo == null){
                     res.send(codigo+"@1");
                 }
 				else{
@@ -87,11 +77,10 @@ router.get('/check_code_version/:codigo',function(req, res, next){
 
 });
 
-router.post('/save_producto',function(req, res, next){
+router.post('/save_producto',function(req, res){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         var data = [];
-        console.log(input);
         if(typeof input['cod[]'] === 'string'){
         	if(input["peso[]"] === ''){
         		input["peso[]"] = 0;
@@ -107,11 +96,9 @@ router.post('/save_producto',function(req, res, next){
             }
 		}
 
-		console.log(data);
         req.getConnection(function(err, connection){
             connection.query("INSERT INTO material (codigo, detalle, u_medida, peso, tipo) VALUES ?", [data], function(err, rows){
                 if(err){console.log("Error Selecting : %s", err);}
-
                 res.redirect('/dt/create_producto');
             });
         });
@@ -121,15 +108,12 @@ router.post('/save_producto',function(req, res, next){
 
 });
 
-
-
-router.post('/registrar_material', function(req, res, next){
+router.post('/registrar_material', function(req, res){
 	var input = JSON.parse(JSON.stringify(req.body));
 	var idproducto = input.idproducto;
 	var idmaterial = input.idmaterial;
 	var ruta = input.ruta;
 	var pdf = input.pdf;
-	console.log(ruta);
 	req.getConnection(function(err, connection){
 		connection.query("UPDATE producido SET ruta = '"+ruta+"' WHERE idproducto="+idproducto +" AND idmaterial = "+idmaterial, function(err, rows){
 			if(err){console.log("Error Selecting : %s", err);}
@@ -140,22 +124,6 @@ router.post('/registrar_material', function(req, res, next){
 		});
 	});
 });
-/*router.post('/find_proccess', function(req, res, next){
-	if(verificar(req.session.userData)){
-			var input = JSON.parse(JSON.stringify(req.body));
-			req.getConnection(function(err, connection){
-				connection.query('SELECT * FROM EtapaFaena WHERE nombre_etapa LIKE "'+'%' + input.proccess + '%"', function(err, rows){
-					if(err){
-						console.log("Error Selecting : %s", err);
-					}
-					console.log(rows);
-					res.render('dt/grid_proccess', {data: rows});
-				});
-			});
-	}
-	else{res.redirect('bad_login');}	
-	
-});
-*/
+
 
 module.exports = router;
