@@ -33,13 +33,38 @@ function parsear_crl(nro){
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     if(req.session.userData.nombre == 'test'){
-        res.render('test/index',{page_title:"Prueba DataTable",username: req.session.userData.nombre});}
+        res.render('test/index');
+    }
     else{res.redirect('bad_login');}
 });
 
-router.get('/table_test', function(req, res, next) {
-    if(req.session.userData.nombre == 'test'){
-        res.render('test/table_test', {view_tipo: 'false'});}
+
+/* GET users listing. */
+router.get('/get_data', function(req, res, next) {
+    if(req.session.userData.nombre === 'test'){
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection : %s", err);}
+            connection.query("select codigo, detalle, precio as unidad from material LIMIT 50", function(err, data){
+                if(err){console.log("Error Selecting : %s", err);}
+                res.render('test/example', {datos: data});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+/* GET users listing. */
+router.get('/get_data_material/:detalle', function(req, res, next) {
+    if(req.session.userData.nombre === 'test'){
+        var d = req.params.detalle;
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection : %s", err);}
+            connection.query("SELECT codigo, detalle, precio as unidad FROM material WHERE material.detalle LIKE '%"+d+"%' LIMIT 50", function(err, data){
+                if(err){console.log("Error Selecting : %s", err);}
+                res.render('test/example_table', {datos: data});
+            });
+        });
+    }
     else{res.redirect('bad_login');}
 });
 
