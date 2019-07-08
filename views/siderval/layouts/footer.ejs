@@ -239,7 +239,23 @@
             $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height);
         }
     });*/
+    function verPdf(yo){
+        window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
+    }
 
+    function gen_pdf(id){
+        $("#vpdf_btn").attr('disabled',true);
+        //$('body').loading('toggle');
+        $.ajax({
+            type: 'get',
+            url: '/abastecimiento/view_facturapdf/' + id,
+            success: function(data){
+                $("#vpdf_btn").attr('disabled',false);
+                //$("body").loading('toggle');
+                window.open(data,'_blank')
+            }
+        })
+    }
     $(document).ready(function(){
         $.ajax({
             type: 'GET',
@@ -386,9 +402,6 @@
     };
     function setDataTable2(str){
         return $(str).DataTable({
-            responsive: true,
-            scrollX: true,
-            fixedColumns: true,
             language: {
                 "sProcessing":     "Procesando...",
                 "sLengthMenu":     "Mostrar _MENU_ registros",

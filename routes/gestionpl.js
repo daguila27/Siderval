@@ -24,9 +24,6 @@ function verificar(usr){
         return false;
     }
 }
-
-
-
 function getConditionArray(object_fill,array_fill, condiciones_where, input){
     var clave;
     var limit = "";
@@ -85,7 +82,6 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
 
     return [where, limit];
 }
-
 function parsear_crl(nro){
     x = nro.toString();
     var parts = x.toString().split(".");
@@ -101,7 +97,79 @@ router.get('/', function(req, res, next) {
         res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre});}
     else{res.redirect('bad_login');}
 });
+router.post('/save_production_history_state', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection : %s", err);}
 
+            connection.query("INSERT INTO save SET ?",{llave: 'prodhist', token: input.token}, function (err, ids) {
+                    if (err) {
+                        console.log("Error Selecting : %s", err);
+                    }
+                    console.log(ids);
+                    res.send("¡Guardado con Exito!");
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+router.get('/load_production_history_state', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection : %s", err);}
+
+            connection.query("SELECT * FROM save WHERE llave = 'prodhist' ORDER BY idsave DESC", function(err, save){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                var etp = save[0].token.split('//');
+                var mats = [];
+                for(var e=0; e < etp.length; e++){
+                    etp[e] = etp[e].split('%');
+                    for(var w=0; w < etp[e].length; w++){
+                        etp[e][w] = etp[e][w].split('@');
+                        if(etp[e][w].length === 1 || etp[e][w] === ''){
+                            etp[e] = [];
+                        }else{
+                            if(mats.indexOf(etp[e][w][0]) === -1){
+                                mats.push(etp[e][w][0]);
+                            }
+                        }
+                    }
+                }
+
+                if(mats.length > 0) {
+                    connection.query("SELECT idmaterial,detalle FROM material WHERE idmaterial IN (" + mats.join(',') + ")", function (err, ids) {
+                        if (err) {
+                            console.log("Error Selecting : %s", err);
+                        }
+                        var mats = [];
+                        var dets = [];
+                        for (var q = 0; q < ids.length; q++) {
+                            mats.push(ids[q].idmaterial);
+                            dets.push(ids[q].detalle);
+                        }
+                        for (var e = 0; e < etp.length; e++) {
+                            for (var c = 0; c < etp[e].length; c++) {
+                                etp[e][c].splice(1, 0, dets[mats.indexOf(parseInt(etp[e][c][0]))]);
+                            }
+                        }
+                        console.log(etp);
+                        res.render('gestionpl/table_production_history', {etp: etp});
+                    });
+                }else{
+                    etp = [];
+
+                    console.log(etp);
+                    res.render('gestionpl/table_production_history', {etp: etp});
+                }
+            });
+
+        });
+    }
+    else{res.redirect('bad_login');}
+});
 router.get('/create_production_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var query = "SELECT * FROM (SELECT producido.ruta,ordenproduccion.f_gen as creacion ,material.idmaterial,SUM(produccion.standby) as standby, SUM(produccion.`1`) as `1`,SUM(produccion.`2`) as `2`,SUM(produccion.`3`) as `3`,SUM(produccion.`4`) as `4`,SUM(produccion.`5`) as `5`,"
@@ -129,22 +197,20 @@ router.post('/save_production_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
-        console.log(typeof input['idmat[]']);
         if(typeof input['idmat[]'] === 'string'){
-            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ");
+            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ", req);
         }
         else{
             for(var e=0; e < input['idmat[]'].length; e++){
-                recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ");
+                recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", req);
             }
         }
         res.send("¡Movimiento Diario registrado con exito!");
-
     }
     else{res.redirect('bad_login');}
 });
 
-function recursive_save_ph(idmat,env,from,to,obs){
+function recursive_save_ph(idmat,env,from,to,obs, req){
     if(conn){
         conn.query("select " +
             "material.detalle,material.idmaterial,group_concat(produccion.idproduccion SEPARATOR '-') as idprod, group_concat(produccion."+from+" SEPARATOR '-') as cantprod " +
@@ -154,8 +220,6 @@ function recursive_save_ph(idmat,env,from,to,obs){
             "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial", [idmat], function(err, rows){
             if(err) throw err;
 
-            console.log(rows);
-            console.log("QUERY FUNCION");
             /*
             * { idprod: '22725-22716-22717',
                   cantprod: '400-391-300',
@@ -170,7 +234,25 @@ function recursive_save_ph(idmat,env,from,to,obs){
                 sendnum: env,
                 etapa_act: from
             };
-            console.log(input);
+            //jfp@109603@120@2019-6-25 16:19:58@22901-22864-22866@283@COMENTARIO@4
+            //ENVIAR NOTIFICACIÓN
+           var notif;
+            if(to === 's'){
+                notif = {
+                    idproduccion: rows[0].idprod,
+                    cantidad: env,
+                    razon: obs,
+                    etapa: from
+                };
+                enviarNotificacionRechazo(req, notif);
+            }else if(to === '8'){
+                notif = {
+                    idproduccion: rows[0].idprod,
+                    cantidad: env,
+                    key: 'fa8'
+                };
+                enviarNotificacionBodega(req, notif);
+            }
             /*
             * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
             *
@@ -187,8 +269,12 @@ function recursive_save_ph(idmat,env,from,to,obs){
             input.idprod = input.idprod.split('-');
             input.cantprod = input.cantprod.split('-');
             var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
-            var query2 = "UPDATE produccion SET produccion.`"+input.newetapa+"` = CASE ";
-
+            var query2;
+            if(to === 's'){
+                query2 = "UPDATE produccion SET produccion.`standby` = CASE ";
+            }else{
+                query2 = "UPDATE produccion SET produccion.`"+input.newetapa+"` = CASE ";
+            }
             var ids = "";
             var cant_aux = parseInt(input.sendnum);
             var history = [];
@@ -208,16 +294,24 @@ function recursive_save_ph(idmat,env,from,to,obs){
                 else{
                     /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA */
                     query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
-                    query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
+                    if(input.newetapa === 's'){
+                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+(cant_aux+parseInt(input.cantprod[w]));
+                    }else{
+                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
+                    }
                     //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
                     history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa]);
                     ids += input.idprod[w]+",";
                     break;
                 }
             }
-            var notif =  {cant: input.sendnum, idproduccion: input.idprod};
+            //var notif =  {cant: input.sendnum, idproduccion: input.idprod};
             query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
-            query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+            if(input.newetapa === 's'){
+                query2 += " ELSE produccion.`standby` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+            }else{
+                query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+            }
             conn.query(query ,function(err,upProd1){
                 if(err) throw err;
 
@@ -235,6 +329,84 @@ function recursive_save_ph(idmat,env,from,to,obs){
     }
 }
 
+
+function enviarNotificacionBodega(req, input){
+    var userf = input.key.substring(2,3);
+    conn.query("SELECT fabricaciones.idmaterial, produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion){
+        if(err){console.log("Error Selecting : %s", err);}
+        var idmaterial = produccion[0].idmaterial;
+        var idop = produccion[0].idop;
+        var dataInsert = {};
+        var d = new Date();
+
+        var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+        /*date = [d.getMonth()+1,
+                   d.getDate(),
+                   d.getFullYear()].join('/')+' '+
+                  [d.getHours(),
+                   d.getMinutes(),
+                   d.getSeconds()].join(':');*/
+        if(userf == '8'){
+            dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("notif");
+            });
+
+
+        }
+        else if(userf == "9"){
+            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            console.log(dataInsert);
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("refreshfaena"+userf);
+
+                //connection.end();
+            });
+        }
+        else{
+            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            console.log(dataInsert);
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("refreshfaena"+userf);
+
+                //connection.end();
+            });
+        }
+
+
+    });
+}
+
+function enviarNotificacionRechazo(req, input){
+    if(conn){
+        console.log("INGRESANDO NOTIFICACIÓN DE RECHAZO");
+        conn.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion in ("+input.idproduccion.split('-').join(',')+")", function(err, produccion) {
+            if(err){console.log("Error Selecting : %s", err);}
+            var idmaterial = produccion[0].idmaterial;
+            var idop = produccion[0].idop;
+            var dataInsert = {};
+            var d = new Date();
+            var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+            dataInsert.descripcion = "jfp@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop+"@"+input.razon+"@"+input.etapa;
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                console.log(req.app.locals);
+                req.app.locals.io.sockets.emit("notif");
+            });
+        });
+    }
+}
+
+router.get('/ver_ruta_modal/:idmaterial', function(req, res, next){
+    if(verificar(req.session.userData)){
+        console.log(req.params.idmaterial);
+
+    }
+    else{res.redirect('bad_login');}
+});
 
 
 module.exports = router;

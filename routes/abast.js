@@ -378,6 +378,14 @@ router.post('/data_bom', function(req, res, next) {
 		else{
 			adjuntar = false;
 		}
+        var cmsj;
+		if(input.cant){
+		   cmsj = " para "+input.cant+" piezas solicitados";
+        }
+        else{
+            input.cant = 0;
+            cmsj = "";
+        }
         req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
@@ -408,8 +416,8 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
-
-	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
+                                console.log(input);
+	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar, cmsj:cmsj, csol: parseInt(input.cant)});
 				});
 			}
 
@@ -747,7 +755,8 @@ router.post('/loadStateODABD', function(req,res,next){
                     'idm[]': [],
                     'cants[]': [],
                     'costo[]': [],
-                    'ex_iva[]': []
+                    'ex_iva[]': [],
+                    'set_fd[]': []
                 };
                 for(var r=8; r < token.length; r++){
                     datos['idm[]'].push(token[r].split(',')[0]);
@@ -867,7 +876,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     if(req.body.cant){
                     	if(details[0].idccontable == null || details[0].idccontable == ''){
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                	"<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
 									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
 									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='"+details[0].u_compra+"' required></td>" +
@@ -879,7 +889,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     	}
                     	else{
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                    "<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
 									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
 									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='"+details[0].u_compra+"' required></td>" +
@@ -893,7 +904,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     else{
                     	if(details[0].idccontable == null || details[0].idccontable == ''){
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                    "<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
 									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
 									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='"+details[0].u_compra+"' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
@@ -905,7 +917,8 @@ router.post('/addsession_prepeds', function(req, res, next){
                     	}
                     	else{
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                    "<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
 									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
 									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='"+details[0].u_compra+"' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
@@ -1223,7 +1236,7 @@ router.post('/get_table_fact', function(req, res, next){
         	if(err)
         		console.log("Error Connection : %s", err);
         	// Se consigue cada fila de la OCA, acompaada del nombre del material de cada fila y la cantidad ya facturada por fila, además de la razón
-        	connection.query("select abastecimiento.idabast,oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
+        	connection.query("select abastecimiento.idabast,abastecimiento.fd, oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
         		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*(abastecimiento.cantidad - SUM(COALESCE(facturacion.cantidad,0))) as odacosto,"
         		+" oda.tokenoda,SUM(COALESCE(facturacion.cantidad,0)) AS facturados from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
         		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor" +
@@ -1266,31 +1279,29 @@ router.post('/save_factura', function(req, res, next){
         var fact = [];
         var items = [];
         var receps = [];
-        console.log(input);
         if(typeof input['idabast[]'] == 'string' && input['costo_unid[]'] != '0' && input['costo_unid[]'] != '' && input['cantidad[]'] != '0'){
             items.push([input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
-            if(input['recepcion[]'] == 'true' && input['maxrec[]'] != '0'){
-            	receps.push([input['idabast[]'], Math.min(parseInt(input['cantidad[]']),parseInt(input['maxrec[]']))]);
+            if(input['recepcion[]'] === 'true'/* && input['maxrec[]'] != '0'*/){
+            	receps.push([input['idabast[]'], parseInt(input['cantidad[]'])]);
 			}
         } else{
             for (var i = 0; i < input['idabast[]'].length; i++){
+            	console.log(input['recepcion[]'][i]);
                 if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
                     items.push([input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
-                    if(input['recepcion[]'][i] == 'true' && input['maxrec[]'][i] != '0'){
-                        receps.push([input['idabast[]'][i], Math.min(parseInt(input['cantidad[]'][i]),parseInt(input['maxrec[]'][i]))]);
+                    if(input['recepcion[]'][i] === 'true'/* && input['maxrec[]'][i] != '0'*/){
+                        receps.push([input['idabast[]'][i], parseInt(input['cantidad[]'][i])]);
                     }
                 }
             }
         }
-        console.log(receps);
         fact.push([input['fecha-facturacion'], input['numeroFactura'], input['idoda'], input['comentario']]);
         if(items.length){
 			req.getConnection(function(err, connection){
 				if(err)
 					console.log("Error Connection : %s", err);
 				connection.query("INSERT INTO factura (fecha, numfac, idoda, coment) VALUES ?", [fact], function(err, inFact){
-					if(err)
-						console.log("Error Insert : %s", err);
+					if(err){console.log("Error Insert : %s", err);}
 					if(typeof input['idabast[]'] == 'string'){
 						items[0].unshift(inFact.insertId);
 					} else {
@@ -1299,78 +1310,55 @@ router.post('/save_factura', function(req, res, next){
 							return items
 						});
 					}
-					//console.log(items);
 					connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
 						if(err) console.log("Error Insert : %s", err);
-	/*					UPDATE `table` SET `uid` = CASE
-							WHEN id = 1 THEN 2952
-							WHEN id = 2 THEN 4925
-							WHEN id = 3 THEN 1592
-							ELSE `uid`
-							END
-						WHERE id  in (1,2,3)*/
 						/* Actualizar precio de cada material facturado */
-						var where_idabast = " WHERE abastecimiento.idabast IN (";
+                        var where_idabast = [];
 						for(var i=0; i<items.length; i++){
-							where_idabast += items[i][3];
-							if(i+1 != items.length){
-								where_idabast += ", ";
-							}
+							where_idabast.push(items[i][3]);
 						}
-						where_idabast += ")";
+                        where_idabast = " WHERE abastecimiento.idabast IN ("+where_idabast.join(',')+")";
 						// Query para obtener los idmaterial
 						connection.query("SELECT abastecimiento.* FROM abastecimiento" + where_idabast, function(err,row){
 							if(err) console.log("Error Select : %s", err);
-							update_material = "UPDATE material SET precio = CASE";
-							where_material = " ELSE precio END WHERE idmaterial in (";
-							for(var i=0; i<row.length; i++){
+							var update_material = "UPDATE material SET precio = CASE";
+                            var where_material = [];
+                            for(var i=0; i<row.length; i++){
 								for(var j=0; j<items.length; j++){
 									if(items[j][3] == row[i].idabast){
 										update_material += " WHEN idmaterial = " + row[i].idmaterial + " THEN " + items[j][1];
 									}
 								}
-								where_material += row[i].idmaterial;
-								if(i+1 != row.length){
-									where_material += " ,";
-								}
+								where_material.push(row[i].idmaterial);
 							}
-							where_material += ")";
-							update_material += where_material;
+                            where_material = " ELSE precio END WHERE idmaterial in ("+where_material.join(',')+")";
+                            update_material += where_material;
 							connection.query(update_material, function(err,row){
 								if(err) console.log("Error Update : %s", err);
+								//SI EXISTEN PEDIDOS QUE SON F.D
 								if(receps.length){
-									connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura']}],function(err,row){
-		                                if(err)
-		                                    console.log("Error Inserting : %s", err);
+									console.log("RECEPCIONAR");
+									connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura'], visible: 0}],function(err,row){
+		                                if(err){console.log("Error Inserting : %s", err);}
 		                                var update = "UPDATE abastecimiento SET recibidos = CASE";
-		                                var where = "(";
+		                                var where = [];
 		                                for (var i = 0; i < receps.length; i++){
 											update += " WHEN idabast = " + receps[i][0] + " THEN recibidos + " + parseInt(receps[i][1]);
-											where += receps[i][0] + ",";
+											where.push(receps[i][0]);
 											receps[i].push(row.insertId);
 		                                }
-		                                where = where.substring(0, where.length-1);
-		                                where += ")";
-		                                update += ' ELSE recibidos END WHERE idabast in '+where;
-
-
+		                                update += ' ELSE recibidos END WHERE idabast in ('+where.join(',')+')';
 		                                connection.query(update, function(err, upAbast){
-                                            if(err) console.log("Error Updating : %s", err);
-											let matselect = "";
+                                            if(err){console.log("Error Updating : %s", err);}
+											let matselect = [];
 		                                	if (receps.length){
-		                                		matselect += "SELECT idmaterial FROM abastecimiento WHERE idabast IN (";
 		                                		for (let i = 0; i < receps.length; i++){
-													matselect+= receps[i][0];
-													if (i === receps.length-1){
-														matselect += ")";
-													} else{
-														matselect += ",";
-													}
+													matselect.push(receps[i][0]);
 		                                		}
+											matselect = "SELECT idmaterial FROM abastecimiento WHERE idabast IN ("+matselect.join(',')+")";
 											}
-											console.log(matselect);
 											connection.query(matselect, function (err, recepMats) {
-												console.log(recepMats);
+												if(err){console.log("Error Selecting : %s", err);}
 												let stockupdate = "";
 												if (recepMats.length){
 													stockupdate += "UPDATE material SET stock = CASE ";
@@ -1388,14 +1376,15 @@ router.post('/save_factura', function(req, res, next){
 													stockupdate += " ELSE stock END WHERE idmaterial IN ("+where+")";
 												}
                                                 console.log(stockupdate);
-												connection.query(stockupdate, function (err, updresults) {
-
+												//NO SE EJECUTA PARA NO STOCKEAR EL PRODUCTO
+												//connection.query(stockupdate, function (err, updresults) {
+	                                                //if(err){console.log("Error updating stock: %s", err);}
 													connection.query("INSERT INTO recepcion_detalle (idabast,cantidad,idrecepcion) VALUES ?",[receps],function(err,rows){
 														if(err)
 															console.log("Error inserting r_detalle : %s", err);
 														res.send({err:false,msg:'¡Factura registrada con exito!'});
 													});
-                                                });
+                                                //});
                                             });
 		                                });
 									});
@@ -1443,11 +1432,11 @@ router.get('/get_dataodc/:idodc', function(req, res, next){
 	        		if(err)
 	        			console.log("Error Selecting : %s", err);
 	        		connection.query("SELECT odc.numoc,concat(cliente.sigla, ' - ',cliente.razon) as client ,"
-	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(pedido.cantidad) as cant_token, group_concat(pedido.f_entrega) as date_token,"
+	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(coalesce(fabricaciones.restantes,0)) as cant_token, group_concat(pedido.f_entrega) as date_token,"
 	        			+" group_concat(material.u_medida) as uni_token,group_concat(material.u_compra) as ucompra_token,group_concat(coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.')) as cc,"
 	        			+"group_concat(material.detalle separator '@') as mat_token FROM notificacion left join odc"
 	        			+" on odc.idodc = substring_index(substring_index(notificacion.descripcion, '@', 2),'@',-1) left"
-	        			+" join pedido on pedido.idodc = odc.idodc LEFT JOIN material ON material.idmaterial = pedido.idmaterial"
+	        			+" join pedido on pedido.idodc = odc.idodc LEFT JOIN fabricaciones ON fabricaciones.idpedido=pedido.idpedido LEFT JOIN material ON material.idmaterial = pedido.idmaterial"
 	        			+" left join cliente on odc.idcliente = cliente.idcliente LEFT JOIN subcuenta ON subcuenta.subcuenta = material.subcuenta LEFT JOIN cuenta ON cuenta.subcuenta = concat(substring(material.subcuenta, 1,2),'000') WHERE notificacion.descripcion LIKE 'aoc@%' AND"
 	        			+" pedido.externo=true AND pedido.idproveedor = 0 AND pedido.idodc=?",
 		        		[idodc],function(err, oda){
@@ -1640,6 +1629,7 @@ router.post('/table_ids', function(req, res, next){
 
         //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
         var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+		console.log(result);
 
         if(result[2] === ''){
         	result[2] = [];

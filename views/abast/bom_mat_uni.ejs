@@ -12,8 +12,6 @@ function trunc (x, posiciones = 0) {
 	  	}
 	  	
 	}
-
-
 function numberFormat(numero){
         var resultado = "";
         if(numero[0]=="-")
@@ -42,14 +40,15 @@ function numberFormat(numero){
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js" type="text/javascript"></script>
 <div class="ventana" style="margin: 0; padding: 0; overflow: hidden;">
-<%if(semi.length>0){%>
-
-
-
-		<%
-			var clase;
-		if(semi.length>0){
-			console.log("here");
+<%
+console.log("csol");
+console.log(csol);
+if(semi.length>0){
+		var clase;
+		var tip_i = [];
+		var tip_s = [];
+		var tip_m = [];
+		if(semi[0].idm_token){
 			semi[0].cod_token = semi[0].cod_token.split('@');
 			semi[0].d_token = semi[0].d_token.split('@');
 			semi[0].c_token = semi[0].c_token.split('@');
@@ -59,9 +58,6 @@ function numberFormat(numero){
 			semi[0].p_token = semi[0].p_token.split('@');
 			semi[0].u_token = semi[0].u_token.split('@');
 			semi[0].idm_token = semi[0].idm_token.split('@');
-			var tip_i = [];
-			var tip_s = [];
-			var tip_m = [];
 			for(var n=0; n < semi[0].d_token.length; n++){
 					if(semi[0].cod_token[n].substring(0,1) === 'I'){
 						tip_i.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
@@ -73,11 +69,11 @@ function numberFormat(numero){
 						tip_m.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
 					}
 			}
-			console.log(tip_i);
-			console.log(tip_s);
-			console.log(tip_m);
 		}%>
-		<h3 style="margin-bottom: 35px; margin-left: 5%;"><%= semi[0].detalle.substring(0,1).toUpperCase() + semi[0].detalle.substring(1,semi[0].detalle.length).toLowerCase()%> <small><%=semi[0].codigo%></small></h3>
+		<h3 style="margin-bottom: 35px; margin-left: 5%;">
+			<%= semi[0].detalle.substring(0,1).toUpperCase() + semi[0].detalle.substring(1,semi[0].detalle.length).toLowerCase()%>
+			<small><%= cmsj%></small>
+		</h3>
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#ins">Insumos</a></li>
 			<li><a data-toggle="tab" href="#sem">Semi Elaborados</a></li>
@@ -93,11 +89,12 @@ function numberFormat(numero){
 							<th>Descripcion</th>
 							<th>Unidad</th>
 							<th>Cantidad</th>
+							<% if(add){%>
+								<th>Total</th>
+							<%}%>
 							<th>Costo</th>
 							<th>Stock</th>
 							<% if(add){%>
-								<th></th>
-							<%}else{%>
 								<th></th>
 							<%}%>
 						</tr>
@@ -109,12 +106,14 @@ function numberFormat(numero){
 							<td><%= tip_i[e][1]%></td>
 							<td><%= tip_i[e][2]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_i[e][3]%></td>
+							<%if(add){
+								console.log(tip_i[e][3]*csol);%>
+								<td class="parsear_nro" data-cs="2"><%= tip_i[e][3]*csol%></td>
+							<%}%>
 							<td class="parsear_nro" data-cs="0"><%= tip_i[e][4]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_i[e][5]%></td>
 							<%if(add){%>
-								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_i[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
-							<%}else{%>
-								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_i[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-cant="<%= tip_i[e][3]*csol%>" data-idm="<%= tip_i[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
 							<%}%>
 						</tr>
 					<%}%>
@@ -126,11 +125,12 @@ function numberFormat(numero){
 							<td></td>
 							<td></td>
 							<td></td>
+							<%if(add){%>
+								<td></td>
+							<%}%>
 							<td></td>
 							<td></td>
 							<%if(add){%>
-								<td></td>
-							<%}else{%>
 								<td></td>
 							<%}%>
 						</tr>
@@ -145,11 +145,12 @@ function numberFormat(numero){
 						<th>Descripcion</th>
 						<th>Unidad</th>
 						<th>Cantidad</th>
+						<% if(add){%>
+							<th>Total</th>
+						<%}%>
 						<th>Costo</th>
 						<th>Stock</th>
 						<%if(add){%>
-							<th></th>
-						<%}else{%>
 							<th></th>
 						<%}%>
 					</tr>
@@ -161,12 +162,13 @@ function numberFormat(numero){
 							<td><%= tip_s[e][1]%></td>
 							<td><%= tip_s[e][2]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_s[e][3]%></td>
+							<%if(add){%>
+								<td class="parsear_nro" data-cs="2"><%= tip_s[e][3]*csol%></td>
+							<%}%>
 							<td class="parsear_nro" data-cs="0"><%= tip_s[e][4]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_s[e][5]%></td>
 							<%if(add){%>
-								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_s[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
-							<%}else{%>
-								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_s[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-cant="<%= tip_s[e][3]*csol%>" data-idm="<%= tip_s[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
 							<%}%>
 						</tr>
 					<%}%>
@@ -178,11 +180,12 @@ function numberFormat(numero){
 						<td></td>
 						<td></td>
 						<td></td>
+						<%if(add){%>
+							<td></td>
+						<%}%>
 						<td></td>
 						<td></td>
 						<%if(add){%>
-							<td></td>
-						<%}else{%>
 							<td></td>
 						<%}%>
 					</tr>
@@ -197,11 +200,12 @@ function numberFormat(numero){
 						<th>Descripcion</th>
 						<th>Unidad</th>
 						<th>Cantidad</th>
+						<% if(add){%>
+							<th>Total</th>
+						<%}%>
 						<th>Costo</th>
 						<th>Stock</th>
 						<%if(add){%>
-							<th></th>
-						<%}else{%>
 							<th></th>
 						<%}%>
 					</tr>
@@ -213,12 +217,13 @@ function numberFormat(numero){
 							<td><%= tip_m[e][1]%></td>
 							<td><%= tip_m[e][2]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_m[e][3]%></td>
+							<%if(add){%>
+								<td class="parsear_nro" data-cs="2"><%= tip_m[e][3]*csol%></td>
+							<%}%>
 							<td class="parsear_nro" data-cs="0"><%= tip_m[e][4]%></td>
 							<td class="parsear_nro" data-cs="2"><%= tip_m[e][5]%></td>
 							<%if(add){%>
-								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_m[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
-							<%}else{%>
-								<td style="text-align: center"><button class="btn btn-xs btn-success" data-idm="<%= tip_m[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+								<td style="text-align: center"><button class="btn btn-xs btn-success" data-cant="<%= tip_m[e][3]*csol%>" data-idm="<%= tip_m[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
 							<%}%>
 						</tr>
 					<%}%>
@@ -230,11 +235,12 @@ function numberFormat(numero){
 						<td></td>
 						<td></td>
 						<td></td>
+						<%if(add){%>
+							<td></td>
+						<%}%>
 						<td></td>
 						<td></td>
 						<%if(add){%>
-							<td></td>
-						<%}else{%>
 							<td></td>
 						<%}%>
 					</tr>
@@ -242,8 +248,6 @@ function numberFormat(numero){
 				</table>
 			</div>
 		</div>
-
-
 <%}
 else{%>
 	<h2 style="text-align: center;">No existe B.O.M.</h2>

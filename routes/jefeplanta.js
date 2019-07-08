@@ -469,68 +469,22 @@ router.post('/table_despachositem', function(req, res, next){
             "material.detalle-on": [],
             "cliente.sigla-on": []
         };
-        var clave;
-        var where;
+
+
         var condiciones_where = ['despachos.cantidad > 0'];
 
-        if(input.tab == 'funds'){
-            condiciones_where.push('(material.codigo LIKE "P%" AND material.detalle NOT LIKE "%ceramico%")');
-        }
-        else{
-            condiciones_where.push('(material.codigo NOT LIKE "P%" OR material.detalle LIKE "%ceramico%")');
-        }
-        if(input.rango == undefined || input.rango == null || input.rango == ''){
-            condiciones_where.push("gd.fecha > '2019-01-01 00:00:00'");
-        }
-        else{
-            console.log(input.rango);
-            condiciones_where.push("gd.fecha BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59'");
-        }
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-            clave = input.clave.split(',');
-        }
-        if(clave.length>0){
-            for(var e=0; e < clave.length; e++){
-                if(clave[e].split('@')[2] == 'off') {
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                else{
-                    object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
-                }
-                //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-            }
 
-        }
-        for(var w=0; w < Object.keys(object_fill).length; w++){
-            if(object_fill[Object.keys(object_fill)[w]].length > 0){
-                //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
-                if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
-                }
-                else{
-                    condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
-                }
+
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
             }
         }
-
-
-
-        var where = " ";
-
-
-        if(condiciones_where.length==0){
-            where = "";
-        }
-        else{
-            where = " WHERE "+ condiciones_where.join(" AND ");
-        }
-
-        console.log("WHERE");
-        console.log(where);
-
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        console.log(result);
+        var where = result[0];
+        var limit = result[1];
         req.getConnection(function(err, connection){
             if(err) throw err;
 
@@ -543,7 +497,7 @@ router.post('/table_despachositem', function(req, res, next){
                 "left join cliente on cliente.idcliente = gd.idcliente " +
                 "left join material on material.idmaterial = despachos.idmaterial " +
                 "left join pedido on pedido.idpedido = despachos.idpedido " +
-                "left join odc on odc.idodc = pedido.idodc "+where ;
+                "left join odc on odc.idodc = pedido.idodc "+where +" "+limit;
             connection.query(consulta,
                 function(err, desp){
                     if(err) throw err;

@@ -180,15 +180,22 @@
 
 
                 <div class="oe_secondary_menu_section">
-                    Movimientos de Planta
+                    Movimientos de Bodega
                 </div>
 
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li  onclick="ajax(this)" data-link="/matprimas/view_registros" id="view_registros">
+                        <a class="oe_menu_leaf">
+                            <span class="oe_menu_text">
+                                Resumen de Registros
+                            </span>
+                        </a>
+                    </li>
                     <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
                         <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Movimientos
-                                        </span>
+                            <span class="oe_menu_text">
+                                Resumen de Movimientos
+                            </span>
                         </a>
                     </li>
                     <li  onclick="ajax(this)" data-link="/matprimas/crear_movimiento" id="create_retiro">

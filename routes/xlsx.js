@@ -46,7 +46,7 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
             where.push("material.codigo NOT LIKE 'X%'");
         }
         if(condiciones){
-            condiciones.push(where.join(' OR '));
+            condiciones.push("("+where.join(' OR ')+")");
             where = condiciones.join(' AND ');
         }
         else{
@@ -54,6 +54,7 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
         }
         var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct', 'nov', 'dic'];
         var mes = meses[parseInt(fecha[0].split('-')[1]) - 1];
+        console.log(where);
         connection.query("select material.codigo,material.stock,coalesce(stock_mes."+mes+"_si, 0) as s_inicial,coalesce(stock_mes."+mes+"_sp, 0) as p_inicial,material.detalle, material.precio,material.u_medida, material.peso , coalesce(facturados.facturados, 0) as sum_fact," +
             "COALESCE(fabrs.fabricados,0) as fabricados, coalesce(peds_totales.totales, 0) as pendientes,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
             ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales,COALESCE(virts_oda.sum_virtual,0) as virtuales_oda" +

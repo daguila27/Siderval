@@ -654,13 +654,13 @@
 
     function gen_pdf(id){
         $("#vpdf_btn").attr('disabled',true);
-        $('body').loading('toggle');
+        //$('body').loading('toggle');
         $.ajax({
             type: 'get',
             url: '/abastecimiento/view_facturapdf/' + id,
             success: function(data){
                 $("#vpdf_btn").attr('disabled',false);
-                $("body").loading('toggle');
+                //$("body").loading('toggle');
                 window.open(data,'_blank')
             }
         })
@@ -772,7 +772,6 @@
         }
     }
     function finSelectCC(){
-
         /*if( $(".SCModal").css('display') != 'none'  ){
             $("#"+$("#auxCC").val()).val($("#subcuentasModal").val().split('-')[0]+"-"+$("#SCModal").val().split('-')[1]);
             $("#"+$("#auxCC").val()).parent('td').children('a').html($("#SCModal").val());
@@ -784,7 +783,6 @@
 
         $("#"+$("#auxCC").val()).val($("#subcontableSelect").val().split('@')[0]);
         $("#"+$("#auxCC").val()).parent('td').children('a').html($("#subcontableSelect").val().split('@')[1]+" "+$("#subcontableSelect").val().split('@')[2]);
-
     }
     function inNumero(){
         $.ajax({
@@ -796,8 +794,6 @@
             }
         });
     }
-
-
     $.ajax({
         type: 'GET',
         url: '/abastecimiento/abast_myself',
@@ -809,7 +805,6 @@
             $("#page-wrapper").fadeIn();
         }
     });
-
     function ajax(yo){
         $(".active").removeClass('active');
         $(yo).addClass('active');
@@ -938,8 +933,6 @@
 
     var io = io();
 
-
-
     io.on('notif-sol-abast', function(){
 
     });
@@ -955,6 +948,7 @@
         });
 
     });
+
     function conversor(yo){
         if($(yo).val() == 'clp'){
             $(".moneda").prop('type', 'number');
@@ -1030,7 +1024,6 @@
 
 
     io.on('showToastnewOF', function(num){
-
         // Get the snackbar DIV
         var x = document.getElementById("snackbar");
 
@@ -1070,8 +1063,6 @@
         io.emit('showToastnotif', []);
     }
 
-
-
     function setFactuNum(yo){
         $(".numFac").html($(yo).data('numoda'));
         $("#modalIdOda").val($(yo).data('idoda'));
@@ -1096,10 +1087,12 @@
         $('#contableSelect option:not(.hidden):first').prop('selected', true);
         act_subcontable();
     }
+
     function act_subcontable(){
         $(".option_subc").addClass('hidden');
         $("#subcontableSelect .option"+$("#contableSelect option:selected").data('contable')).removeClass('hidden');
         $('#subcontableSelect option:not(.hidden):first').prop('selected', true);
     }
+
     act_contable();
 </script>

@@ -331,7 +331,7 @@ router.post('/table_pedidos', function(req, res, next){
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " LEFT JOIN (SELECT pedido.idpedido, EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado FROM pedido) AS estado ON estado.idpedido=pedido.idpedido"
-                + where + " GROUP BY pedido.idpedido) as peds "+limit,
+                + where + " GROUP BY pedido.idpedido ORDER BY pedido.idpedido DESC) as peds " + limit,
                 function(err, odc){
                     if(err) throw err;
 
@@ -480,7 +480,7 @@ router.post('/table_fabricaciones', function(req, res, next){
                 +"left join odc on odc.idodc=ordenfabricacion.idodc "
                 +"left join pedido on pedido.idpedido=fabricaciones.idpedido "
                 +"left join cliente on cliente.idcliente = odc.idcliente "
-                +"left join (select fabricaciones.idfabricaciones, produccion_history.enviados as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
+                +"left join (select fabricaciones.idfabricaciones, sum(coalesce(produccion_history.enviados,0)) as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
                 +"left join (select fabricaciones.idfabricaciones,SUM(produccion.cantidad) as enprod,SUM(produccion.standby) as enrech from produccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones group by fabricaciones.idfabricaciones) as enprod on enprod.idfabricaciones = fabricaciones.idfabricaciones "
                 +"left join material on material.idmaterial=fabricaciones.idmaterial"+where +" GROUP BY fabricaciones.idfabricaciones "+limit;
             connection.query(consulta,
