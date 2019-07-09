@@ -208,15 +208,13 @@ router.get('/page_oda/:idoda', function(req, res, next){
                     " WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados, GROUP_CONCAT(facturacion.cantidad,facturacion.costo,factura.numfac) as fact_detalle" +
-						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
+						" FROM abastecimiento" +
+						" LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
 						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast" +
-                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura " +
-                        " WHERE abastecimiento.idoda = ? AND !factura.anulado" +
+                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura AND !factura.anulado" +
+                        " WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
-                        //res.redirect('/plan');
-						//console.log(abast);
-                        //console.log(oda);
                         var isFacturable = false;
                         var isRecepcionable = true;
 						for(var w=0; w < abast.length; w++){
