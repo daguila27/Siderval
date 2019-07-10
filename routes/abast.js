@@ -405,7 +405,7 @@ router.post('/data_bom', function(req, res, next) {
         req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
-			if(input.cantidad){
+			if(false){
 				connection.query("select material.codigo,material.idmaterial,material.detalle, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token, group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
@@ -417,7 +417,9 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
-								res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
+	        	                console.log("if");
+
+    		                    res.render('abast/bom_mat', {data: [], cantidad: input.cantidad, semi: semi, idfab: input.idfab, add: adjuntar});
 				});
 			}
 			else{
@@ -432,7 +434,7 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
-                                console.log(input);
+								console.log("else");
 	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar, cmsj:cmsj, csol: parseInt(input.cant)});
 				});
 			}
@@ -527,7 +529,6 @@ router.post('/search_bom', function(req, res, next) {
                 info += ' AND ';
             }
         }
-        console.log(info);
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
@@ -536,8 +537,6 @@ router.post('/search_bom', function(req, res, next) {
 				if(err)
 					console.log("Error Selecting : %s", err);
 
-
-				console.log(mat);
 				res.render('abast/bom_all_list', {data: mat});
 			});
  
