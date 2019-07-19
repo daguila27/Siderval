@@ -1,0 +1,34 @@
+<thead>
+<tr>
+    <th>Descripción</th>
+    <th>Unidad de Medida</th>
+    <th>Stock Aviso</th>
+    <th>Stock Crítico</th>
+    <th>Unidad Mínima de Compra</th>
+    <th>Stock Actual</th>
+    <th>Precio</th>
+    <th></th>
+</tr>
+</thead>
+<tbody id="prefabrs">
+<% for(var t=0; t < mats.length; t++){%>
+    <tr>
+        <td><%= mats[t].detalle%></td>
+        <td style="text-align: center"><%= mats[t].u_medida%></td>
+        <td style="text-align: center"><%= mats[t].stock_i%></td>
+        <td style="text-align: center"><%= mats[t].stock_c%></td>
+        <td style="text-align: center"><%= mats[t].u_compra%></td>
+        <td style="text-align: center"><%= mats[t].stock%></td>
+        <%if(mats[t].precio == null){%>
+            <td style="text-align: center">Sin Precio</td>
+        <%}else{%>
+            <td style="text-align: center"><%= mats[t].precio%></td>
+        <%}%>
+        <td style="text-align: center">
+            <div class="btn-group">
+                <a data-idm="<%= mats[t].idmaterial%>" class="btn btn-success btn-xs" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></a>
+            </div>
+        </td>
+    </tr>
+<%}%>
+</tbody>

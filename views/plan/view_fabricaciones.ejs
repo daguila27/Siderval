@@ -35,29 +35,22 @@
 	.etiqueta-filtro-div{
 		display: flex;
 	}
+	.etiqueta-filtro-cha:hover{
+		cursor: pointer;
+	}
 </style>
-<div class="row" style="margin: 0; padding: 0;">
-	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%">
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
-			<li class="active">Orden de Fabricacion</li>
+			<li class="active">Listado de Fabricaciones</li>
+			<!-- Mostrar cantidad de datos -->
+			<div class="indicador_paginas" style="margin-top: 8px"></div>
 		    <!-- Mostrar cantidad de datos -->
 			<div id="pedidos" style="margin-top: 8px"></div>
 		</ol>
 		<div style="width: 50%; margin-right: 4%">
 			<div class="form-group o_searchview" style="margin: 0;padding: 0;">
-				<div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
-					<div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
-					</div>
-					<input id="buscar_fabricaciones" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
-					<input id="buscar_fabricaciones-value" style="display: none" type="text">
-				</div>
-				<ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
-					<li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OF</em> para: <strong></strong></a></li>
-					<li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OC</em> para: <strong></strong></a></li>
-					<li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripción</em> para: <strong></strong></a></li>
-					<li data-searchcol="3" class="item3 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Fecha de Entrega</em> para: <strong></strong></a></li>
-					<li data-searchcol="4" class="item4 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Fecha de Creación</em> para: <strong></strong></a></li>
-				</ul>
+
 			</div>
 
 			<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
@@ -74,202 +67,56 @@
 				<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_ofs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 
 				<button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
+
+
 				<div style="display: flex">
-					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Pendientes Solamente</label>
-					<input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_of()" checked>
-					<select class="form-control" style="width: 85px; margin-left: 40px; margin-right: 10px;">
-                        <option value="todos">Todos</option>
-                        <option value="conoc">Con OC</option>
-                        <option value="sinoc">Sin OC</option>
+					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Bloqueados</label>
+					<input type="checkbox" id="fabsBloq" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="change_tipo_of()">
+					<select class="form-control" id="fabsSel" style="width: 85px; margin-left: 40px; margin-right: 10px;" onchange="change_tipo_of()">
+                        <option value="true">Todos</option>
+                        <option value="pedido.idpedido IS NOT null">OF/OC</option>
+                        <option value="pedido.idpedido is null">OF/ODV</option>
                     </select>
+
+					<div class="filters"></div>
 				</div>
 
-					<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
 
-                 <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
 			</div>
 		</div>
 	</div>
 </div>
-<div class="row row-main" style=" margin: 0; padding: 0;">
-	<div class="col-sm-12 main-page" style="margin: 0; padding-left: 0; padding-right: 0; z-index: 5; top:-7px">		
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+	<div id="fw-body"  style="padding:0;margin: 0;">
+		<div class="content main-page">
+		</div>
+	</div>
 </div>
-
 <script type="text/javascript">
+    function change_tipo_of(){
+
+        if($("#fabsBloq").is(':checked')){
+            busc.add_cond = "fabricaciones.restantes>0@!coalesce(pedido.externo,false)@"+$("#fabsSel").val();
+        }
+        else{
+            busc.add_cond = "!fabricaciones.lock@fabricaciones.restantes>0@!coalesce(pedido.externo,false)@"+$("#fabsSel").val();
+        }
+		busc.buscar_action();
+	}
     var array_fill = [
         "OF@default",
         "OC@primary",
         "Detalle@success",
         "Entrega@info",
-        "Creacion@warning"
+        "Cliente@warning"
     ];
-    var filtros_seleccionados = [];
-	$(document).ready(function(){
-		$.ajax({
-			type: 'POST',
-			data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked")},
-			url: '/plan/table_fabricaciones/fabricaciones.f_entrega-ASC/true',
-            beforeSend: function(){
-                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-            },
-			success: function(data){
-				$(".main-page").html(data);
-				//Muestra la cantidad de pedidos
-				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-			}
-		});
-		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+    var busc = new Buscador("buscar_fabricaciones", ".o_searchview", array_fill, "/plan/table_fabricaciones", "DataTableFabs", false, true, ".filters","fabricaciones.f_entrega");
+    busc.add_cond = "!fabricaciones.lock@fabricaciones.restantes>0@!coalesce(pedido.externo,false)";
+
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+		busc.buscar_action();
 	});
-
-	/*
-	$("#buscar_fabricaciones").on('keyup', function(e){
-		e.preventDefault();
-		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
-			$.ajax({
-				type: 'POST',
-				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
-				url: '/plan/buscar_fabricaciones_list',
-				success: function(data){
-					$(".main-page").html(data);
-					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-				}
-			});
-		}
-		else{
-			$.ajax({
-				type: 'POST',
-				data: {clave: $(this).val(),  showPend: $("#pend").is(':checked')},
-				url: '/plan/buscar_fabricaciones_item',
-				success: function(data){
-					$(".main-page").html(data);
-					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-				}
-			});		
-		}
-	});
-	*/
-
-
-	function buscar_of(){
-        $.ajax({
-            type: 'POST',
-			data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend').is(":checked")},
-            url: '/plan/table_fabricaciones/fabricaciones.f_entrega-ASC/true',
-            beforeSend: function(){
-                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-            },
-            success: function(data){
-                $(".main-page").html(data);
-                //Muestra la cantidad de pedidos
-                $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-            }
-        });
-	}
-
-
-
-    $('.fill-item-abast').hover(function() {
-        $(this).css('cursor','pointer');
-        $('.fill-item-abast').removeClass("o-selection-focus");
-        $(this).addClass("o-selection-focus");
-        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
-    });
-
-    $("#buscar_fabricaciones").on('keyup', function(e){
-        e.preventDefault();
-        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
-            $(".o_searchview_autocomplete").css('display', 'none');
-            $(".o_searchview_autocomplete strong").html('');
-        }
-        else{
-            $(".o_searchview_autocomplete").css('display', 'block');
-            $(".o_searchview_autocomplete strong").html($(this).val());
-        }
-    });
-
-    $(".fill-item-abast").on('click', function(e){
-        e.preventDefault();
-        var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
-        var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
-        $(".etiqueta-filtro-div").append(
-            "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_fabricaciones").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
-            +$("#buscar_fabricaciones").val()+
-            "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
-        );
-        $(".etiqueta-filtro-div").data('cant', labels+1);
-        if($("#buscar_fabricaciones-value").val() == '' || $("#buscar_fabricaciones-value").val() == null || $("#buscar_fabricaciones-value").val() == undefined){
-            $("#buscar_fabricaciones-value").val($(this).data('searchcol')+"@"+$("#buscar_fabricaciones").val());
-        }
-        else{
-            $("#buscar_fabricaciones-value").val([$("#buscar_fabricaciones-value").val(),$(this).data('searchcol')+"@"+$("#buscar_fabricaciones").val()].join(','));
-        }
-        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_fabricaciones").val());
-        $(".o_searchview_autocomplete").css('display', 'none');
-        $(".o_searchview_autocomplete strong").html('');
-        $("#buscar_fabricaciones").val('');
-        $("#buscar_fabricaciones").focus();
-        buscar_of();
-    });
-
-
-    function eliminarEtiqueta(yo){
-        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
-        $(yo).parent().remove();
-        $(".etiqueta-filtro").removeAttr('id');
-        var count = 0;
-        $(".etiqueta-filtro").each(function(){
-            $(this).attr("id","label"+count);
-            count++;
-        });
-        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
-        buscar_of();
-    }
-
-
-    function despInput(event){
-        var char = event.which || event.keyCode;
-        var item = $(".o_searchview_autocomplete").data('item');
-        //BORRAR LABEL
-        if(char == 8 && ($("#buscar_fabricaciones").val()==null || $("#buscar_fabricaciones").val()=='' || $("#buscar_fabricaciones").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
-            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
-            eliminarEtiqueta($("#label"+labels).children('div'));
-        }
-        //ENTER
-        else if(char == 13){
-            $(".fill-item-abast.o-selection-focus").click();
-        }
-        //ARRIBA
-        else if(char == 38){
-            item = parseInt(item) - 1;
-        }
-        //ABAJO
-        else if(char == 40){
-            item = parseInt(item) + 1;
-        }
-
-
-        //SI SOBREPASA EL LIMITE INFERIOR
-        if(parseInt(item) >= 5){
-            $(".o_searchview_autocomplete").data('item', "0");
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item0").addClass("o-selection-focus");
-        }
-        //SI SOBREPASA EL LIMITE SUPERIOR
-        else if(parseInt(item) < 0){
-			$(".o_searchview_autocomplete").data('item', "4");
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item4").addClass("o-selection-focus");
-        }
-        else{
-            $(".o_searchview_autocomplete").data('item', item);
-            $(".fill-item-abast").removeClass("o-selection-focus");
-            $(".item"+item).addClass("o-selection-focus");
-        }
-
-    }
-
 	$('.view-option').on('click', function(e){
 		e.preventDefault();
 		$('.view-option').removeClass('active');
@@ -281,21 +128,7 @@
 		}
 		$(this).addClass('active');
 		if($(this).data('view') == 'table_fabricaciones/fabricaciones.f_entrega-ASC'){
-            $.ajax({
-                type: 'POST',
-                data: {clave: filtros_seleccionados.join(',')},
-                url: "/plan/table_fabricaciones/fabricaciones.f_entrega-ASC/"+$("#pend").is(':checked'),
-                beforeSend: function(){
-                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                },
-                success: function(data){
-                    $(".main-page").html(data);
-                    if($(this).data('view') == 'table_fabricaciones/fabricaciones.f_entrega-ASC' || $(this).data('view')=='item_ofs') {
-                        //Muestra la cantidad de pedidos
-                        $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-                    }
-                }
-            });
+            busc.buscar_action();
 		}
 		else{
             $.ajax({
@@ -313,55 +146,6 @@
 
 
 	});
-	
-	// Muestra la tabla antes de ver una OF
-    function mostrar_tabla(){
-        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
-        	if($("#buscar_fabricaciones").val() == "" || $("#buscar_fabricaciones").val() == null) {
-        		$.ajax({
-					type: 'POST',
-					data: {clave: filtros_seleccionados.join(',')},
-					url: '/plan/table_fabricaciones/fabricaciones.f_entrega-ASC/true',
-                    beforeSend: function(){
-                        $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                    },
-					success: function(data){
-						$(".main-page").html(data);
-						//Muestra la cantidad de pedidos
-						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-					}
-				});
-				$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
-        	}
-        	else{
-        		$.ajax({
-					type: 'POST',
-					data: {clave: $("#buscar_fabricaciones").val(), orden: $(".o_cp_switch_buttons .active").data('view'), showPend: $("#pend").is(':checked')},
-					url: '/plan/buscar_fabricaciones_list',
-					success: function(data){
-						$(".main-page").html(data);
-						//Muestra la cantidad de pedidos
-						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-					}
-				});
-        	}
-        }
-        else {
-        	$.ajax({
-				type: 'POST',
-				data: {clave: $("#buscar_fabricaciones").val(),  showPend: $("#pend").is(':checked')},
-				url: '/plan/buscar_fabricaciones_item',
-				success: function(data){
-					$(".main-page").html(data);
-					//Muestra la cantidad de pedidos
-					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
-				}
-			});
-        }
-    };
-
-
-
     $(".getcsvof").click(function(e){
         var yo = $(this);
         $.ajax({
@@ -374,5 +158,13 @@
         });
 
     });
-
+    function getRidOffAutocomplete(){
+        var timer = window.setTimeout( function(){
+            $('#buscar_fabricaciones-value, #buscar_fabricaciones').prop('disabled',false);
+            clearTimeout(timer);
+        }, 800);
+    }
+    // Invoke the function
+    getRidOffAutocomplete();
 </script>
+<script src="/buscador_funciones.js"></script>

@@ -256,6 +256,13 @@
                                 Recepción de Externos
                             </div>
                             <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                                <li  onclick="ajax(this)" data-link="/matprimas/busq_oda" id="view_movimientos">
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Registrar Recepción
+                                        </span>
+                                    </a>
+                                </li>
                                <li  onclick="ajax(this)" data-link="/matprimas/view_recep" id="view_movimientos">
                                     <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
@@ -263,14 +270,21 @@
                                         </span>
                                     </a>
                                 </li>
-                                <li  onclick="ajax(this)" data-link="/matprimas/busq_oda" id="view_movimientos">
+
+                            </ul>
+
+                            <div class="oe_secondary_menu_section">
+                                Inventarios
+                            </div>
+
+                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                                <li  onclick="ajax(this)" data-link="/matprimas/inventarios" id="inventarios">
                                     <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
-                                            Registrar recepción
+                                            Inventarios Rotativos
                                         </span>
                                     </a>
                                 </li>
-
                             </ul>
 
                                         
@@ -331,6 +345,6 @@
             </div>
           </div>
         </div>
-                        <div id="page-wrapper"  style="padding:0;margin: 0;">
+        <div id="page-wrapper"  style="padding:0;margin: 0;">
                           
 

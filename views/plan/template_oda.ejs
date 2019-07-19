@@ -114,7 +114,7 @@
 					Factura<br> <b>N° <%=oda[0].numfactura%> </b>
 				<% break;
 					default:%>
-					JEJEJE
+					Documento
 				<%}%>
 				</p>
 
@@ -181,10 +181,19 @@
                 var nototal = 0;
                 var total = 0;
                 var ex = false;
+                var combustible = false;
+                var suma_combustible = 0;
+                var utm = 48353;
                 for(var t=0; t < 13; t++){%>
 		                <tr>
 							<%if(mats[t]){
-							%>
+								if(mats[t].idcombustible == 0){
+									combustible = false;
+								}
+								else{
+									combustible = true;
+									suma_combustible += mats[t].cantidad;
+								}%>
 			                    <td><%= t+1%></td>
 								<%if(mats[t].cantidad.toLocaleString().split('.').length > 1){%>
 									<td><%= mats[t].cantidad.toLocaleString().split('.')[0].split(',').join('.')+','+mats[t].cantidad.toLocaleString().split('.')[1] %></td>
@@ -285,23 +294,68 @@
                  		<td></td>
                  		<td style="text-align: left;">MONEDA <%=oda[0].tokenoda[6].toUpperCase()%></td>
                  		<td class='fund'>IVA </td>
-                 		<%if(oda[0].tokenoda[7] == 'off'){
-                 		    if(oda[0].tokenoda[6] == 'clp'){%>
+						<%
+						var iva;
+						if(oda[0].tokenoda[7] == 'off'){
+                 		    if(oda[0].tokenoda[6] == 'clp'){
+								if(combustible){
+									console.log("SUMA");
+									console.log(suma_combustible);
+									console.log("utm");
+									console.log(utm);
+									console.log("MONTO");
+									console.log(total-monto_descontado);
+									iva  = (0.19 + (6*utm*suma_combustible/(1000*(total-monto_descontado))))
+									console.log("IVA");
+									console.log(iva);
+								}else{
+									console.log("SUMA");
+									console.log(suma_combustible);
+									console.log("utm");
+									console.log(utm);
+									console.log("MONTO");
+									console.log(total-monto_descontado);
+									iva = 0.19;
+									console.log("IVA");
+									console.log(iva);
+								}%>
 								<td class='fund' style="text-align: right;">
-									<%= ((total-monto_descontado)*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
+									<%= ((total-monto_descontado)*iva).toLocaleString().split('.')[0].split(',').join('.')%>
 								</td>
-								<%total += ((total-monto_descontado)*0.19);
-                 		    }else{%>
-								<%if((total*0.19).toLocaleString().split('.').length > 1){%>
+								<%total += ((total-monto_descontado)*iva);
+                 		    }else{
+								if(combustible){
+									console.log("SUMA");
+									console.log(suma_combustible);
+									console.log("utm");
+									console.log(utm);
+									console.log("MONTO");
+									console.log(total-monto_descontado);
+									iva  = (0.19 + (6*utm*suma_combustible/(1000*(total-monto_descontado))));
+									console.log("IVA");
+									console.log(iva);
+
+								}else{
+									console.log("SUMA");
+									console.log(suma_combustible);
+									console.log("utm");
+									console.log(utm);
+									console.log("MONTO");
+									console.log(total-monto_descontado);
+									iva = 0.19;
+									console.log("IVA");
+									console.log(iva);
+								}%>
+								<%if((total*iva).toLocaleString().split('.').length > 1){%>
 	                 				<td class='fund' style="text-align: right;">
-	                 					<%= ((total-monto_descontado)*0.19).toLocaleString().split('.')[0].split(',').join('.')+','+(total*0.19).toLocaleString().split('.')[1] %>
+	                 					<%= ((total-monto_descontado)*iva).toLocaleString().split('.')[0].split(',').join('.')+','+(total*iva).toLocaleString().split('.')[1] %>
                  					</td>
 		                 		<%}else{%>
 		                 			<td class='fund' style="text-align: right;">
-		                 				<%= ((total-monto_descontado)*0.19).toLocaleString().split('.')[0].split(',').join('.')%>
+		                 				<%= ((total-monto_descontado)*iva).toLocaleString().split('.')[0].split(',').join('.')%>
 	                 				</td>
 		                 		<%}%>
-	                 			<%total += ((total-monto_descontado)*0.19);%>
+	                 			<%total += ((total-monto_descontado)*iva);%>
 							<%}%>
                  		<%}else{%>
                  			<td class="fund" style="text-align: right;">0</td>

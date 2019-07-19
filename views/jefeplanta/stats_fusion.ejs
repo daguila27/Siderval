@@ -1,0 +1,46 @@
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+<div style="margin: 30px; margin-top: 15%">
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Fundidos</div>
+                <div class="panel-body" id="bar_fusion" style="height: 400px">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+    <script type="text/javascript">
+        function parseNumero(x){
+            var parts = x.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            if(parts.length > 1){
+                if(parts[1].length > 2){
+                    parts[1] = parts[1].substring(0,2);
+                }
+            }
+            var num =  parts.join(",");
+            return num;
+        }
+        new Morris.Bar({
+            element: 'bar_fusion',
+            data: [
+                <% if(data.length){
+                for(var i = 0;i<data.length;i++){%>
+                {
+                    token:'<%=data[i].token%>',
+                    fundidos: parseInt('<%=data[i].fundidos%>')
+                }
+                <% if(i != data.length -1){%>
+                ,
+                <%}%>
+                <%  }
+                }%>
+            ],
+            xkey: 'token',
+            ykeys: ['fundidos'],
+            labels: ['Fundidos','Detalle']
+        });
+    </script>

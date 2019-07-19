@@ -22,20 +22,20 @@
         "Otros"
     ];
 %>
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="receps_table" style="width: 100%; top: -7px">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="receps_table" style="width: 100%; margin-top: 0px !important;">
     <thead>
     <tr>
-        <th id="numof" class="cabecera o_column_sortable order-column" data-order="recepcion_detalle.idrecepcion-ASC">N° GDD</th>
-        <th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
-        <th id="solicitados" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="recepcion_detalle.cantidad*1-ASC">Cantidad</th>
-        <th id="sin_produccion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
-        <th id="f_entrega" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="recepcion.fecha-DESC">Fecha de Registro</th>
+        <th id="numof" class="cabecera o_column_sortable" data-order="recepcion_detalle.idrecepcion-ASC">GDD</th>
+        <th id="descrip" class="cabecera o_column_sortable" data-order="material.detalle-ASC">Descripción</th>
+        <th id="solicitados" class="cabecera o_column_sortable" style="text-align: center;" data-order="recepcion_detalle.cantidad*1-ASC">Cantidad</th>
+        <th id="sin_produccion" class="cabecera o_column_sortable" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
+        <th id="f_entrega" class="cabecera o_column_sortable" style="text-align: center;" data-order="recepcion.fecha-DESC">Fecha de Registro</th>
     </tr>
     </thead>
     <tbody class="ui-sortable">
     <%for(var i=0; i < data.length; i++){%>
         <tr class="o_data_row">
-            <td class="o_data_cell o_readonly_modifier o_required_modifier"  style="text-align: center"><%=data[i].numgd%></td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numgd%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad%></td>
             <td class="o_data_cell" style="text-align: center;"><%=data[i].u_medida%></td>
@@ -60,5 +60,10 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#receps_table");
+
+    setDataTableFixed("#receps_table");
+
+
+    $("#indicador_paginas").data('total', parseInt('<%= data.length%>'));
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), "#indicador_paginas");
 </script>

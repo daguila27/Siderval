@@ -1,13 +1,77 @@
-<div class="row" style="margin: 0; padding: 0;">
-	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%;">
+<style>
+	.o_searchview_autocomplete {
+		position: absolute;
+		top: 100%;
+		left: auto;
+		bottom: auto;
+		right: auto;
+		width: 100%;
+	}
+	.o_searchview {
+		background-color: white;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		padding: 1px 25px 3px 5px;
+	}
+	.etiqueta-filtro{
+		padding: 5px;
+		margin: 3px;
+		display: flex;
+	}
+
+	.etiqueta-filtro div{
+		padding: 0px;
+		margin: 0px 0px 0px 7px;
+		color: white;
+	}
+	.etiqueta-filtro strong{
+		padding: 0px;
+		margin: 0px 0px 0px 7px;
+		color: white;
+	}
+	.etiqueta-input{
+		padding: 2px 6px;
+	}
+	.etiqueta-filtro-div{
+		display: flex;
+	}
+</style>
+<style>
+	.busc-din-menu{
+		margin: 0;
+		padding: 0;
+		position: fixed;
+		width: 90%;
+		transition:0.5s;
+		z-index: 9;
+	}
+	.busc-menu{
+		margin: 0;
+		padding: 0;
+		position: fixed;
+		width: 100%;
+		transition:0.5s;
+		z-index: 9;
+	}
+</style>
+<%
+var clase;
+if(username == 'gestionpl'){clase='busc-din-menu';}
+else{clase='busc-menu';}%>
+<div id="up-fills" class="row up-fills <%=clase%>">
+	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; z-index: 10; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
 			<li class="active">Guía de Despacho</li>
 
 			<!-- Mostrar cantidad de datos -->
-			<div id="despachos" style="margin-top: 8px"></div>
+			<div class="indicador_paginas" id="despachos" style="margin-top: 8px" data-total="0"></div>
 		</ol>
-		<div style="width: 50%;">			
-			<input type="text" id="buscar_despacho" class="form-control pull-right" placeholder="Buscar...">
+		<div style="width: 50%;">
+
+			<div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+			</div>
+
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
 				<div style="display: flex;">
 					
@@ -20,7 +84,7 @@
 		       		<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
 		    	
 		        	<button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
-					<select class="form-control" id="select_tipo_despacho" style="margin-left: 30px " onchange="refreshTablaDespachos(this)">
+					<select class="form-control" id="select_tipo_despacho" style="margin-left: 30px ">
 					    <option value="">Todos</option>
 					    <option value="Venta">Venta</option>
 					    <option value="Traslado">Traslado</option>
@@ -29,6 +93,10 @@
 					    <option value="Otro">Otro</option>
 					    <option value="Blanco">Blanco</option>
 					</select>
+
+					<div class="filters">
+
+					</div>
 				</div>
 	        </div>
 			<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
@@ -40,51 +108,50 @@
 		</div>
 	</div>
 </div>
-<div class="row row-main" style=" margin: 0; padding: 0; width: 100%">
-	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5;top: -7px;"></div>
+
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+	<div id="fw-body"  style="padding:0;margin: 0;">
+		<div class="content main-page">
+		</div>
+	</div>
 </div>
+<!--<div class="row row-main" style=" margin: 0; padding: 0; width: 100%">
+	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5;top: -7px;"></div>
+</div>-->
+
+<style>
+	.ch_page:hover{
+		cursor:pointer;
+		color: black;
+		font-size: 15px;
+	}
+</style>
 
 <script type="text/javascript">
-	function refreshTable(){
-        $.ajax({
-            type: 'POST',
-            data: {clave: $("#buscar_despacho").val(), orden: $(".o_cp_switch_buttons .active").data('view').split('/')[1], tipo: $("#select_tipo_despacho").val()},
-            url: '/bodega/table_despachos',
-            beforeSend: function(){
-                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-            },
-            success: function(data){
-                $(".main-page").html(data);
-                //Muestra la cantidad de despachos
-				$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
-            }
-        });
-	}
-	$(document).ready(function(){
-        $.ajax({
-            type: 'POST',
-            data: {clave: $("#buscar_despacho").val(), orden: 'despacho.fecha-DESC', tipo: $("#select_tipo_despacho").val()},
-            url: '/bodega/table_despachos',
-			beforeSend: function(){
-                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-			},
-            success: function(data){
-                $(".main-page").html(data);
-                //Muestra la cantidad de despachos
-				$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
-            }
-        });
-	    /*$.ajax({
-			type: 'GET',
-			url: '/bodega/table_despachos/despacho.iddespacho-DESC',
-			success: function(data){
-				$(".main-page").html(data);
-			}
-		});*/
-		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+    var array_fill = [
+        "GD@default",
+        "Cliente@primary",
+        "Detalle@success",
+        "Observación@info"
+    ];
+
+	var busc = new Buscador("buscar_despacho", ".o_searchview", array_fill, "/bodega/table_despachos", "gdTable", true, true, ".filters","gd.fecha");
+
+    busc.add_cond = "gd.estado LIKE '%"+$("#select_tipo_despacho").val()+"%'";
+
+
+	$("#select_tipo_despacho").on('change',function(e){
+	    e.preventDefault();
+		busc.add_cond = "gd.estado LIKE '%"+$(this).val()+"%'";
+		busc.buscar_action();
+	});
+    $(document).ready(function(){
+
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        busc.buscar_action();
 	});
 
-	function refreshTablaDespachos(yo){
+    function refreshTablaDespachos(yo){
 		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
 			$.ajax({
 				type: 'POST',
@@ -113,36 +180,7 @@
 			});
 		}
 	}
-	$("#buscar_despacho").on('keyup', function(e){
-		e.preventDefault();
-		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
-			$.ajax({
-				type: 'POST',
-				data: {clave: $(this).val(), orden: 'despacho.fecha', tipo: $("#select_tipo_despacho").val()},
-				url: '/bodega/table_despachos',
-                beforeSend: function(){
-                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                },
-				success: function(data){
-					$(".main-page").html(data);
-					//Muestra la cantidad de despachos
-					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
-				}
-			});
-		}
-		else{
-			$.ajax({
-				type: 'POST',
-				data: {clave: $(this).val(), tipo: $("#select_tipo_despacho").val()},
-				url: '/bodega/item_gd',
-				success: function(data){
-					$(".main-page").html(data);
-					//Muestra la cantidad de despachos
-					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text() + " despacho(s)</small></h5>");
-				}
-			});		
-		}
-	});
+
 
 
 	$('.view-option').on('click', function(e){
@@ -150,19 +188,7 @@
 		$('.view-option').removeClass('active');
 		$(this).addClass('active');
 		if($(this).data('view') == 'table_despachos'){
-            $.ajax({
-                type: 'POST',
-                data: {clave: $("#buscar_despacho").val(), orden: 'despacho.fecha-DESC', tipo: $("#select_tipo_despacho").val()},
-                url: '/bodega/table_despachos',
-                beforeSend: function(){
-                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-                },
-                success: function(data){
-                    $(".main-page").html(data);
-                    //Muestra la cantidad de despachos
-					$("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
-                }
-            });
+            busc.buscar_action();
 		}
 		else if($(this).data('view') == 'item_gd'){
             $.ajax({
@@ -192,4 +218,13 @@
         });
 
     });
+
+
+
+
 </script>
+
+
+
+
+<script src="/buscador_funciones.js"></script>

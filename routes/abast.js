@@ -4,24 +4,68 @@ var connection  = require('express-myconnection');
 var mysql = require('mysql');
 var adminModel = require('./xlsx');
 
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
+
 router.use(
-    connection(mysql,{
-
-        host: '127.0.0.1',
-        user: 'admin',
-        password : 'tempo123',
-        port : 3306,
-        database:'siderval',
-  		insecureAuth : true
-
-    },'pool')
-
+    connection(mysql,dbCredentials,'pool')
 );
+function getConditionArray(object_fill,array_fill, condiciones_where, input){
+    var clave;
+    var limit = "";
+    if(input.ispage === 'true'){
+        limit = " limit " + ( ( (parseInt(input.page)-1)*100) )+",100";
+    }
+
+    if(input.clave == '' || input.clave == null || input.clave == undefined){
+        clave = [];
+    }
+    else{
+        clave = input.clave.split(',');
+    }
+    if(clave.length>0){
+        for(var e=0; e < clave.length; e++){
+            if(clave[e].split('@')[2] == 'off') {
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            else{
+                object_fill[array_fill[parseInt(clave[e].split('@')[0])]+ "-on"].push(array_fill[parseInt(clave[e].split('@')[0])] + " NOT LIKE '%" + clave[e].split('@')[1] + "%'");
+            }
+            //condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
+        }
+
+    }
+    for(var w=0; w < Object.keys(object_fill).length; w++){
+        if(object_fill[Object.keys(object_fill)[w]].length > 0){
+            //LAS CONDICIONES not like DEBEN CONCATENARSE CON and Y LAS like CON or
+            if(Object.keys(object_fill)[w].split('-')[1] == 'off'){
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' OR ')+")");
+            }
+            else{
+                condiciones_where.push("("+object_fill[Object.keys(object_fill)[w]].join(' AND ')+")");
+            }
+        }
+    }
+
+    var where = " ";
+    if(input.rango.length > 0){
+        if(input.isRango === 'true'){
+            console.log(input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+            condiciones_where.push( input.columnaRango + " BETWEEN '"+input.rango.split('@')[0]+" 00:00:00' AND '"+input.rango.split('@')[1]+" 23:59:59' ");
+        }
+    }
 
 
 
+    if(condiciones_where.length==0){
+        where = "";
+    }
+    else{
+        where = " WHERE "+ condiciones_where.join(" AND ");
+    }
 
-
+    return [where, limit,condiciones_where.join('@')];
+}
 function verificar(usr){
 	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
 		return true;
@@ -30,21 +74,40 @@ function verificar(usr){
 	}
 }
 /* GET users listing. */
+
+var updOcaRouter = require('./modelos/ocaRouter');
+router.use('/updOca',updOcaRouter);
+
 router.get('/', function(req, res, next) {
-	if(verificar(req.session.userData)){
+	if(req.session.userData.nombre == 'abastecimiento'){
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s",err);
-			console.log("hola" + new Date().toTimeString() + "");
-			connection.query("SELECT * FROM cuenta WHERE detalle != ''", function(err, subc){
+			connection.query("select cuenta_g.idcuenta, cuenta_g.cuenta, ccontable.idccontable, ccontable.cuenta as ccontable, sub_ccontable.idsub, sub_ccontable.nombre from sub_ccontable left join ccontable on ccontable.idccontable = sub_ccontable.idccontable left join cuenta_g on substring(ccontable.idccontable,1,2) = cuenta_g.idcuenta", function(err, subc){
 				if(err)
 					console.log("Error Selecting : %s", err);
 
-		    	res.render('abast/indx_new', {page_title: "Abastecimiento", username: req.session.userData.nombre, subc: subc});		
+		    	res.render('abast/indx_new', {page_title: "Abastecimiento", username: req.session.userData.nombre, subc: subc, route: '/abastecimiento/abast_myself'});
 			});
 		});
 	}
 	else{res.redirect('bad_login');}	
+});
+router.post('/indx', function(req, res, next) {
+	var r = req.body.route.split('%').join('/');
+    if(req.session.userData.nombre === 'abastecimiento'){
+        req.getConnection(function(err, connection){
+            if(err)
+                console.log("Error Connection : %s",err);
+            connection.query("select cuenta_g.idcuenta, cuenta_g.cuenta, ccontable.idccontable, ccontable.cuenta as ccontable, sub_ccontable.idsub, sub_ccontable.nombre from sub_ccontable left join ccontable on ccontable.idccontable = sub_ccontable.idccontable left join cuenta_g on substring(ccontable.idccontable,1,2) = cuenta_g.idcuenta", function(err, subc){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+
+                res.render('abast/indx_new', {page_title: "Abastecimiento", username: req.session.userData.nombre, subc: subc, route: r});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
 });
 //RENDERIZA LO QUE VA A APARECER EN EL PDF
 router.get('/view_facturapdf_get/:idfactura', function(req,res){
@@ -136,7 +199,7 @@ router.get('/page_oda/:idoda', function(req, res, next){
             var idoda = req.params.idoda;
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura,'@',factura.fecha,'@',factura.coment)) AS facturas_token, GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion,'@', recepcion.fecha )) as gd_token FROM oda" +
+                connection.query("SELECT oda.*,cliente.razon,cliente.sigla,GROUP_CONCAT(DISTINCT CONCAT(factura.numfac,'@',factura.idfactura,'@',factura.fecha,'@',coalesce(factura.coment, 'Sin Comentarios.'),'@',factura.anulado)) AS facturas_token, GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion,'@', recepcion.fecha )) as gd_token FROM oda" +
                     " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor" +
                     " LEFT JOIN factura ON oda.idoda = factura.idoda "+
                     " LEFT JOIN abastecimiento ON abastecimiento.idoda=oda.idoda "+
@@ -145,15 +208,13 @@ router.get('/page_oda/:idoda', function(req, res, next){
                     " WHERE oda.idoda = ? GROUP BY oda.idoda",[idoda], function(err, oda){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT abastecimiento.*,material.detalle,SUM(COALESCE(facturacion.cantidad,0)) as facturados, GROUP_CONCAT(facturacion.cantidad,facturacion.costo,factura.numfac) as fact_detalle" +
-						" FROM abastecimiento LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
+						" FROM abastecimiento" +
+						" LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial" +
 						" LEFT JOIN facturacion ON facturacion.idabast = abastecimiento.idabast" +
-                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura " +
+                        " LEFT JOIN factura ON facturacion.idfactura = factura.idfactura AND !factura.anulado" +
                         " WHERE abastecimiento.idoda = ?" +
 						" GROUP BY abastecimiento.idabast",[idoda], function(err ,abast){
                         if(err) console.log("Select Error: %s",err);
-                        //res.redirect('/plan');
-						//console.log(abast);
-                        //console.log(oda);
                         var isFacturable = false;
                         var isRecepcionable = true;
 						for(var w=0; w < abast.length; w++){
@@ -331,6 +392,14 @@ router.post('/data_bom', function(req, res, next) {
 		else{
 			adjuntar = false;
 		}
+        var cmsj;
+		if(input.cant){
+		   cmsj = " para "+input.cant+" piezas solicitados";
+        }
+        else{
+            input.cant = 0;
+            cmsj = "";
+        }
         req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
@@ -338,7 +407,7 @@ router.post('/data_bom', function(req, res, next) {
 				connection.query("select material.codigo,material.idmaterial,material.detalle, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token, group_concat"
 							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE "+/*mat2.e_abast != '3' AND */" material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
@@ -350,10 +419,10 @@ router.post('/data_bom', function(req, res, next) {
 				});
 			}
 			else{
-				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
-							+"(mat2.precio separator '@') p_token, group_concat(bom.cantidad separator '@') as c_token, group_concat(mat2.stock separator '@') as s_token from material"
+				connection.query("select material.codigo, material.idmaterial,material.detalle,group_concat(mat2.idmaterial separator '@') as idm_token,group_concat(mat2.stock_i separator '@') si_token,group_concat(mat2.stock_c separator '@') sc_token, group_concat(mat2.codigo separator '@') as cod_token, group_concat(mat2.detalle separator '@') as d_token, group_concat(mat2.u_medida separator '@') as u_token,  group_concat"
+							+"(coalesce(mat2.precio,0) separator '@') p_token, group_concat(coalesce(bom.cantidad,0) separator '@') as c_token, group_concat(coalesce(mat2.stock,0) separator '@') as s_token from material"
 							+" left join bom on bom.idmaterial_master=material.idmaterial left join (SELECT * FROM material) as "
-							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE mat2.e_abast != '3' AND material.idmaterial = ? group by material.idmaterial",
+							+"mat2 on mat2.idmaterial=bom.idmaterial_slave WHERE"+/*mat2.e_abast != '3' AND */" material.idmaterial = ? group by material.idmaterial",
 							[input.idmaterial], function(err, semi){
 								if(err)
 									console.log("Error Selecting : %s", err);
@@ -361,7 +430,8 @@ router.post('/data_bom', function(req, res, next) {
 								if(semi.length == 0){
 									console.log("SIN BOM");
 								}
-								res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar});
+                                console.log(input);
+	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar, cmsj:cmsj, csol: parseInt(input.cant)});
 				});
 			}
 
@@ -370,13 +440,6 @@ router.post('/data_bom', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
-/*UPDATE mat_prima SET stock = CASE
-    WHEN idmatpri = 5 THEN stock - 10
-    WHEN idmatpri = 6 THEN stock - 20
-    WHEN idmatpri = 7 THEN stock - 30
-    ELSE stock
-    END
-WHERE idmatpri  in (5,6,7);*/
 router.post('/abast_ped', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -454,10 +517,19 @@ router.post('/search_bom', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var info = JSON.parse(JSON.stringify(req.body)).info;
         console.log(info);
+        var list_input = info.split(' ');
+        info = '';
+        for (var i = 0; i < list_input.length; i++){
+            info += "(material.detalle LIKE '%" + list_input[i] +"%' OR material.codigo LIKE '%"+ list_input[i] +"%')";
+            if (i !== list_input.length - 1){
+                info += ' AND ';
+            }
+        }
+        console.log(info);
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s", err);
-			connection.query("select * from material where (detalle like '%"+info+"%' or codigo like '%"+info+"%') and material.tipo='P' order by material.detalle",
+			connection.query("select * from material where ("+info+") and material.tipo='P' order by material.detalle",
 			function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);
@@ -482,7 +554,7 @@ router.get('/abast_myself', function(req, res, next) {
 				"select ordenfabricacion.*, sum(fabricaciones.cantidad) as cantidad, sum(fabricaciones.restantes) "
 				+"as restantes,(sum(fabricaciones.restantes)/sum(fabricaciones.cantidad))*100 as porcentaje from fabricaciones"
 				+" left join material on material.idmaterial=fabricaciones.idmaterial left join bom on bom.idmaterial_master=material.idmaterial"
-				+" left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f where fabricaciones.cantidad - fabricaciones.restantes > 0 group by fabricaciones.idorden_f",
+				+" left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f where fabricaciones.cantidad - fabricaciones.restantes > 0 group by fabricaciones.idorden_f ORDER BY ordenfabricacion.idordenfabricacion DESC",
 				function(err, ins){
 					if(err)
 						console.log("Error Selecting : %s", err);
@@ -490,18 +562,25 @@ router.get('/abast_myself', function(req, res, next) {
 					connection.query("select subcuenta from material where subcuenta!=null or subcuenta!='' group by subcuenta", function(err, subc){
 						if(err)
 							console.log("Error Selecting : %s", err);					
+						connection.query("select " +
+							"material.*,coalesce(caracteristica.cnom,'Sin Característica') as cnom from material " +
+							"left join caracteristica on caracteristica.idcaracteristica = SUBSTRING(material.codigo, 4, 2) " +
+							"where codigo like 'C%' or codigo like 'M%' or codigo like 'I%' or codigo like 'O%'", function(err, mats){
+                            if(err)
+                                console.log("Error Selecting : %s", err);
+							connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, id){
+								if(err)
+									console.log("Error Selecting : %s", err);
+								if(id.length){
+									id[0].numoda = id[0].numoda+1;
+									res.render('abast/lanzar_oc', {last: id[0].numoda, ofs: ins, subc: subc, mats: mats});
+								}
+								else{
+									res.render('abast/lanzar_oc', {last: 1, ofs: ins, subc: subc, mats: mats});
+								}
+							});
+                        });
 
-						connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, id){
-							if(err)
-								console.log("Error Selecting : %s", err);
-							if(id.length){
-								id[0].numoda = id[0].numoda+1;
-								res.render('abast/lanzar_oc', {last: id[0].numoda, ofs: ins, subc: subc});
-							}
-							else{
-								res.render('abast/lanzar_oc', {last: 1, ofs: ins, subc: subc});
-							}
-						});
 					});
 			});
 		});
@@ -538,7 +617,8 @@ router.get('/stock_matp', function(req, res, next) {
 		req.getConnection(function(err, connection){
 			connection.query("select material.idmaterial as idmatpri, detalle"
 				+" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, codigo, cliente.sigla"
-				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor where tipo = 'I' or tipo= 'M' or tipo= 'O' or tipo= 'C'",
+				+" from material left join recurso on recurso.idmaterial=material.idmaterial left join cliente on cliente.idcliente=recurso.cod_proveedor " +
+				"where codigo like 'I%' or codigo like 'M%' or codigo like 'O%' or codigo like 'C%' or codigo like 'S%' or material.show_abast",
 				 function(err, mat){
 				if(err)
 					console.log("Error Selecting : %s", err);
@@ -689,7 +769,8 @@ router.post('/loadStateODABD', function(req,res,next){
                     'idm[]': [],
                     'cants[]': [],
                     'costo[]': [],
-                    'ex_iva[]': []
+                    'ex_iva[]': [],
+                    'set_fd[]': []
                 };
                 for(var r=8; r < token.length; r++){
                     datos['idm[]'].push(token[r].split(',')[0]);
@@ -799,63 +880,66 @@ router.get('/show_plantillas', function(req,res,next){
 
 router.post('/addsession_prepeds', function(req, res, next){
     if(verificar(req.session.userData)){
-    	console.log(req.body)
+    	console.log(req.body);
         req.getConnection(function(err, connection){
-            connection.query("SELECT material.detalle, material.u_medida,caracteristica.cnom,material.u_compra,material.subcuenta,cuenta.cuenta, cuenta.detalle as cuentadetalle,subcuenta.detalle as subc,coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.') as cc FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN subcuenta ON subcuenta.subcuenta = material.subcuenta LEFT JOIN cuenta ON cuenta.subcuenta = concat(substring(material.subcuenta, 1,2),'000') WHERE material.idmaterial = ?",
+            connection.query("SELECT material.detalle, material.u_medida,caracteristica.cnom,material.u_compra,sub_ccontable.idsub as idsub ,material.ccontable,sub_ccontable.idccontable, sub_ccontable.nombre as cuentadetalle,sub_ccontable.nombre as subc,coalesce(concat(sub_ccontable.idccontable,' ',sub_ccontable.nombre),'N.D.') as cc FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN sub_ccontable ON sub_ccontable.idccontable = material.ccontable WHERE material.idmaterial = ?",
                 [req.body.idm],function(err, details){
                     if(err){
                     	console.log("Error Selecting : %s", err);
                     }
-                    console.log(details);
                     if(req.body.cant){
-                    	if(details[0].subcuenta == null || details[0].subcuenta == ''){
+                    	if(details[0].idccontable == null || details[0].idccontable == ''){
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                	"<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='"+details[0].u_compra+"' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     	else{
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                    "<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='0' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' onkeyup='refreshAllCost()' step='"+details[0].u_compra+"' onchange='refreshAllCost()' value='"+req.body.cant+"' min='"+details[0].u_compra+"' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()'  onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
-									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     }
                     else{
-                    	if(details[0].subcuenta == null || details[0].subcuenta == ''){
+                    	if(details[0].idccontable == null || details[0].idccontable == ''){
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                    "<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='"+details[0].u_compra+"' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
 									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>N.D.</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     	else{
                     		res.send("<tr>" +
-									"<td style='aling-content: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
+                                    "<td style='text-align: center' class='hidden td-fd'><input type='checkbox' name='set_fd' class='set_fd'></td>" +
+									"<td style='text-align: center' class='td-ex'><input type='checkbox' name='ex_iva' class='ex_iva' onchange='refreshAllCost()'></td>" +
 									"<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'></td>" +
-									"<td style='text-aling: center;'>"+details[0].u_compra+"</td>" +
-									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='0' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required><b style='margin-left: 2%'>" + details[0].u_medida + "</b></td>" +
+									"<td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'>"+details[0].u_compra+" "+ details[0].u_medida + "</span></h6></td>" +
+									"<td style='display: flex' class='td-cant'><input class='form-control cant_compra' type='float' name='cants' min='"+details[0].u_compra+"' onkeyup='refreshAllCost()' onchange='refreshAllCost()' step='"+details[0].u_compra+"' required></td>" +
 									"<td class='td-money'><input class='form-control moneda key_money' type='float' name='costo' onkeyup='refreshAllCost()' onchange='refreshAllCost()' min='0'></td>" +
 									"<td class='costo-total'></td>" +
-									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].cuenta+"-"+details[0].subcuenta+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
-									"<td><a onclick='drop(this)' class='btn btn-danger'><i class='fa fa-remove'></i></a></td>" +
+									"<td><input type='hidden' name='centroc' id='centroc"+req.body.items+"' value='"+details[0].idsub+"'><a class='setCC' onclick='selectCC(this)' data-toggle='modal' data-target='#ccModal'>"+details[0].cc+"</a></td>" +
+									"<td><a onclick='drop(this)' class='btn btn-xs btn-danger'><i class='fa fa-remove'></i></a></td>" +
 								"</tr>");
                     	}
                     }
@@ -913,19 +997,19 @@ router.post('/crear_oda', function(req, res, next){
         			if(Array.isArray(input['idm[]']) ){
 	        			for(var e=0; e < input['idm[]'].length; e++){
 	        				if(input['ex_iva[]'][e] == 'off'){
-	        					array.push([odc.insertId,input['idm[]'][e],input['cants[]'][e], input['costo[]'][e].replace(',','.'),false, input['centroc[]'][e]]);
+	        					array.push([odc.insertId,input['idm[]'][e],parseFloat(input['cants[]'][e]), parseFloat(input['costo[]'][e].replace(',','.')),false, input['centroc[]'][e]]);
 	        				}
 	        				else{
-	        					array.push([odc.insertId,input['idm[]'][e],input['cants[]'][e], input['costo[]'][e].replace(',','.'),true, input['centroc[]'][e]]);	
+	        					array.push([odc.insertId,input['idm[]'][e],parseFloat(input['cants[]'][e]), parseFloat(input['costo[]'][e].replace(',','.')),true, input['centroc[]'][e]]);
 	        				}
 	        			}
         			}
         			else{
         				if(input['ex_iva[]'] == 'off'){
-		        			array.push([odc.insertId,input['idm[]'],input['cants[]'],input['costo[]'].replace(',','.'), false, input['centroc[]']]);
+		        			array.push([odc.insertId,input['idm[]'],parseFloat(input['cants[]']),parseFloat(input['costo[]'].replace(',','.')), false, input['centroc[]']]);
         				}
         				else{
-	        				array.push([odc.insertId,input['idm[]'],input['cants[]'],input['costo[]'].replace(',','.'), true, input['centroc[]']]);
+	        				array.push([odc.insertId,input['idm[]'],parseFloat(input['cants[]']),parseFloat(input['costo[]'].replace(',','.')), true, input['centroc[]']]);
         				}
         			}
         			console.log(array);
@@ -978,7 +1062,10 @@ router.get('/notif_abast', function(req, res, next){
         	if(err){
         		console.log("Error Connection : %s", err);
         	}
-        	connection.query("SELECT notificacion.*, odc.numoc FROM notificacion left join odc on odc.idodc = substring_index(substring_index(descripcion, '@', 2),'@',-1) WHERE (descripcion LIKE 'aoc@%' AND active = true) OR (descripcion LIKE 'aof@%' AND active = true)", 
+        	connection.query("SELECT notificacion.*, odc.numoc, material.detalle as material FROM notificacion " +
+				"left join odc on odc.idodc = substring_index(substring_index(descripcion, '@', 2),'@',-1) " +
+				"left join material on material.idmaterial= substring_index(substring_index(descripcion, '@', 4),'@',-1) " +
+				"WHERE (descripcion LIKE 'aoc@%' AND active = true) OR (descripcion LIKE 'aof@%' AND active = true) OR (descripcion LIKE 'odaext@%' AND active = true)",
         					function(err, notif){
         			if(err){
         				console.log("Error Selecting : %s", err);
@@ -1166,8 +1253,8 @@ router.post('/get_table_fact', function(req, res, next){
         	if(err)
         		console.log("Error Connection : %s", err);
         	// Se consigue cada fila de la OCA, acompaada del nombre del material de cada fila y la cantidad ya facturada por fila, además de la razón
-        	connection.query("select abastecimiento.idabast,oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
-        		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*abastecimiento.cantidad as odacosto,"
+        	connection.query("select abastecimiento.idabast,abastecimiento.fd, oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
+        		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*(abastecimiento.cantidad - SUM(COALESCE(facturacion.cantidad,0))) as odacosto,"
         		+" oda.tokenoda,SUM(COALESCE(facturacion.cantidad,0)) AS facturados from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
         		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor" +
 				" LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast WHERE abastecimiento.idoda = ? GROUP BY abastecimiento.idabast",[idoda],
@@ -1209,31 +1296,29 @@ router.post('/save_factura', function(req, res, next){
         var fact = [];
         var items = [];
         var receps = [];
-        console.log(input);
         if(typeof input['idabast[]'] == 'string' && input['costo_unid[]'] != '0' && input['costo_unid[]'] != '' && input['cantidad[]'] != '0'){
             items.push([input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
-            if(input['recepcion[]'] == 'true' && input['maxrec[]'] != '0'){
-            	receps.push([input['idabast[]'], Math.min(parseInt(input['cantidad[]']),parseInt(input['maxrec[]']))]);
+            if(input['recepcion[]'] === 'true'/* && input['maxrec[]'] != '0'*/){
+            	receps.push([input['idabast[]'], parseInt(input['cantidad[]'])]);
 			}
         } else{
             for (var i = 0; i < input['idabast[]'].length; i++){
+            	console.log(input['recepcion[]'][i]);
                 if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
                     items.push([input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
-                    if(input['recepcion[]'][i] == 'true' && input['maxrec[]'][i] != '0'){
-                        receps.push([input['idabast[]'][i], Math.min(parseInt(input['cantidad[]'][i]),parseInt(input['maxrec[]'][i]))]);
+                    if(input['recepcion[]'][i] === 'true'/* && input['maxrec[]'][i] != '0'*/){
+                        receps.push([input['idabast[]'][i], parseInt(input['cantidad[]'][i])]);
                     }
                 }
             }
         }
-        console.log(receps);
         fact.push([input['fecha-facturacion'], input['numeroFactura'], input['idoda'], input['comentario']]);
         if(items.length){
 			req.getConnection(function(err, connection){
 				if(err)
 					console.log("Error Connection : %s", err);
 				connection.query("INSERT INTO factura (fecha, numfac, idoda, coment) VALUES ?", [fact], function(err, inFact){
-					if(err)
-						console.log("Error Insert : %s", err);
+					if(err){console.log("Error Insert : %s", err);}
 					if(typeof input['idabast[]'] == 'string'){
 						items[0].unshift(inFact.insertId);
 					} else {
@@ -1242,78 +1327,55 @@ router.post('/save_factura', function(req, res, next){
 							return items
 						});
 					}
-					//console.log(items);
 					connection.query("INSERT INTO facturacion (idfactura, costo, moneda, idabast, cantidad) VALUES ?", [items], function(err, fact){
 						if(err) console.log("Error Insert : %s", err);
-	/*					UPDATE `table` SET `uid` = CASE
-							WHEN id = 1 THEN 2952
-							WHEN id = 2 THEN 4925
-							WHEN id = 3 THEN 1592
-							ELSE `uid`
-							END
-						WHERE id  in (1,2,3)*/
 						/* Actualizar precio de cada material facturado */
-						var where_idabast = " WHERE abastecimiento.idabast IN (";
+                        var where_idabast = [];
 						for(var i=0; i<items.length; i++){
-							where_idabast += items[i][3];
-							if(i+1 != items.length){
-								where_idabast += ", ";
-							}
+							where_idabast.push(items[i][3]);
 						}
-						where_idabast += ")";
+                        where_idabast = " WHERE abastecimiento.idabast IN ("+where_idabast.join(',')+")";
 						// Query para obtener los idmaterial
 						connection.query("SELECT abastecimiento.* FROM abastecimiento" + where_idabast, function(err,row){
 							if(err) console.log("Error Select : %s", err);
-							update_material = "UPDATE material SET precio = CASE";
-							where_material = " ELSE precio END WHERE idmaterial in (";
-							for(var i=0; i<row.length; i++){
+							var update_material = "UPDATE material SET precio = CASE";
+                            var where_material = [];
+                            for(var i=0; i<row.length; i++){
 								for(var j=0; j<items.length; j++){
 									if(items[j][3] == row[i].idabast){
 										update_material += " WHEN idmaterial = " + row[i].idmaterial + " THEN " + items[j][1];
 									}
 								}
-								where_material += row[i].idmaterial;
-								if(i+1 != row.length){
-									where_material += " ,";
-								}
+								where_material.push(row[i].idmaterial);
 							}
-							where_material += ")";
-							update_material += where_material;
+                            where_material = " ELSE precio END WHERE idmaterial in ("+where_material.join(',')+")";
+                            update_material += where_material;
 							connection.query(update_material, function(err,row){
 								if(err) console.log("Error Update : %s", err);
+								//SI EXISTEN PEDIDOS QUE SON F.D
 								if(receps.length){
-									connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura']}],function(err,row){
-		                                if(err)
-		                                    console.log("Error Inserting : %s", err);
+									console.log("RECEPCIONAR");
+									connection.query("INSERT INTO recepcion SET ?",[{numgd: "f" + input['numeroFactura'], visible: 0}],function(err,row){
+		                                if(err){console.log("Error Inserting : %s", err);}
 		                                var update = "UPDATE abastecimiento SET recibidos = CASE";
-		                                var where = "(";
+		                                var where = [];
 		                                for (var i = 0; i < receps.length; i++){
 											update += " WHEN idabast = " + receps[i][0] + " THEN recibidos + " + parseInt(receps[i][1]);
-											where += receps[i][0] + ",";
+											where.push(receps[i][0]);
 											receps[i].push(row.insertId);
 		                                }
-		                                where = where.substring(0, where.length-1);
-		                                where += ")";
-		                                update += ' ELSE recibidos END WHERE idabast in '+where;
-
-
+		                                update += ' ELSE recibidos END WHERE idabast in ('+where.join(',')+')';
 		                                connection.query(update, function(err, upAbast){
-                                            if(err) console.log("Error Updating : %s", err);
-											let matselect = "";
+                                            if(err){console.log("Error Updating : %s", err);}
+											let matselect = [];
 		                                	if (receps.length){
-		                                		matselect += "SELECT idmaterial FROM abastecimiento WHERE idabast IN (";
 		                                		for (let i = 0; i < receps.length; i++){
-													matselect+= receps[i][0];
-													if (i === receps.length-1){
-														matselect += ")";
-													} else{
-														matselect += ",";
-													}
+													matselect.push(receps[i][0]);
 		                                		}
+											matselect = "SELECT idmaterial FROM abastecimiento WHERE idabast IN ("+matselect.join(',')+")";
 											}
-											console.log(matselect);
 											connection.query(matselect, function (err, recepMats) {
-												console.log(recepMats);
+												if(err){console.log("Error Selecting : %s", err);}
 												let stockupdate = "";
 												if (recepMats.length){
 													stockupdate += "UPDATE material SET stock = CASE ";
@@ -1331,14 +1393,15 @@ router.post('/save_factura', function(req, res, next){
 													stockupdate += " ELSE stock END WHERE idmaterial IN ("+where+")";
 												}
                                                 console.log(stockupdate);
-												connection.query(stockupdate, function (err, updresults) {
-
+												//NO SE EJECUTA PARA NO STOCKEAR EL PRODUCTO
+												//connection.query(stockupdate, function (err, updresults) {
+	                                                //if(err){console.log("Error updating stock: %s", err);}
 													connection.query("INSERT INTO recepcion_detalle (idabast,cantidad,idrecepcion) VALUES ?",[receps],function(err,rows){
 														if(err)
 															console.log("Error inserting r_detalle : %s", err);
 														res.send({err:false,msg:'¡Factura registrada con exito!'});
 													});
-                                                });
+                                                //});
                                             });
 		                                });
 									});
@@ -1383,14 +1446,13 @@ router.get('/get_dataodc/:idodc', function(req, res, next){
         		if(err)
         			console.log("Error Selecting : %s", err);
         		connection.query("select idcliente, sigla,pago, razon from cliente", function(err, proveedor){
-	        		if(err)
-	        			console.log("Error Selecting : %s", err);
+	        		if(err){console.log("Error Selecting : %s", err);}
 	        		connection.query("SELECT odc.numoc,concat(cliente.sigla, ' - ',cliente.razon) as client ,"
-	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(pedido.cantidad) as cant_token, group_concat(pedido.f_entrega) as date_token,"
+	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(fabricaciones.idfabricaciones) as idf_token, group_concat(coalesce(fabricaciones.restantes,0)) as cant_token, group_concat(pedido.f_entrega) as date_token,"
 	        			+" group_concat(material.u_medida) as uni_token,group_concat(material.u_compra) as ucompra_token,group_concat(coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.')) as cc,"
 	        			+"group_concat(material.detalle separator '@') as mat_token FROM notificacion left join odc"
 	        			+" on odc.idodc = substring_index(substring_index(notificacion.descripcion, '@', 2),'@',-1) left"
-	        			+" join pedido on pedido.idodc = odc.idodc LEFT JOIN material ON material.idmaterial = pedido.idmaterial"
+	        			+" join pedido on pedido.idodc = odc.idodc LEFT JOIN fabricaciones ON fabricaciones.idpedido=pedido.idpedido LEFT JOIN material ON material.idmaterial = pedido.idmaterial"
 	        			+" left join cliente on odc.idcliente = cliente.idcliente LEFT JOIN subcuenta ON subcuenta.subcuenta = material.subcuenta LEFT JOIN cuenta ON cuenta.subcuenta = concat(substring(material.subcuenta, 1,2),'000') WHERE notificacion.descripcion LIKE 'aoc@%' AND"
 	        			+" pedido.externo=true AND pedido.idproveedor = 0 AND pedido.idodc=?",
 		        		[idodc],function(err, oda){
@@ -1405,6 +1467,56 @@ router.get('/get_dataodc/:idodc', function(req, res, next){
         	});
         	
         	
+        });
+    } else res.redirect("/bad_login");
+});
+
+
+router.get('/get_dataodcext/:idprod/:cant', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var idprod = req.params.idprod;
+        var cant = req.params.cant;
+		idprod = idprod.split('-');
+        req.getConnection(function(err, connection){
+            if(err)
+                console.log("Error Connection : %s", err);
+            connection.query("select MAX(numoda) as num from oda", function(err, last){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+
+                connection.query("select idcliente, sigla,pago, razon from cliente", function(err, proveedor){
+                    if(err){console.log("Error Selecting : %s", err);}
+                    /*
+                    * odc.numoc,concat(cliente.sigla, ' - ',cliente.razon) as client ,"
+	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(fabricaciones.idfabricaciones) as idf_token, group_concat(coalesce(fabricaciones.restantes,0)) as cant_token, group_concat(pedido.f_entrega) as date_token,"
+	        			+" group_concat(material.u_medida) as uni_token,group_concat(material.u_compra) as ucompra_token,group_concat(coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.')) as cc,"
+	        			+"group_concat(material.detalle separator '@') as mat_token
+                    * */
+                    connection.query("SELECT " +
+						"pedido.idpedido, " +
+						"produccion.idproduccion, " +
+						"fabricaciones.idfabricaciones, " +
+						"material.idmaterial as idmaterial_master, " +
+						"material.detalle as detalle_master, " +
+						"material_h.idmaterial as idmaterial_ext, " +
+						"material_h.detalle as detalle_ext, " +
+						"material_h.u_medida as medida_ext," +
+						"material_h.u_compra as compra_ext " +
+						"FROM produccion " +
+						"LEFT JOIN fabricaciones ON produccion.idfabricaciones=fabricaciones.idfabricaciones " +
+						"LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
+						"LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
+						"LEFT JOIN producto ON producto.idmaterial = material.idmaterial " +
+						"LEFT JOIN (SELECT idmaterial,detalle,u_medida, u_compra FROM material) AS material_h ON material_h.idmaterial = producto.idmaterial_ext " +
+						"WHERE produccion.idproduccion IN ("+idprod.join(',')+") ORDER BY produccion.idproduccion ASC", function(err, dets){
+						if(err)
+							console.log("Error Selecting : %s", err);
+
+						console.log(dets);
+						res.render('abast/modal_odcext_creation', {data: dets, cant: cant, provs: proveedor, last: last[0].num + 1});
+					});
+                });
+            });
         });
     } else res.redirect("/bad_login");
 });
@@ -1550,11 +1662,58 @@ router.get('/abast_ops_page/:page', function(req, res, next){
     } else res.redirect("/bad_login");
 });
 //Renderizar vista de INFORME DE STOCK para FABRICACIONES.
-router.get('/fabrs_ids', function(req, res, next){
+router.get('/fabrs_ids/:idview', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('plan/fabrs_ids');
+		res.render('plan/view_ids', {idview: req.params.idview, username: req.session.userData.nombre});
     } else res.redirect("/bad_login");
 });
+
+
+router.post('/table_ids', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var array_fill = [
+            "material.codigo",
+            "material.detalle"
+        ];
+
+        var object_fill = {
+            "material.codigo-off": [],
+            "material.detalle-off": [],
+            "material.codigo-on": [],
+            "material.detalle-on": []
+        };
+
+        var condiciones_where = [];
+        if(input.cond != ''){
+            for(var e=0; e < input.cond.split('@').length; e++){
+                condiciones_where.push(input.cond.split('@')[e]);
+            }
+        }
+
+
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+		console.log(result);
+
+        if(result[2] === ''){
+        	result[2] = [];
+		}else{
+            result[2] = result[2].split('@');
+		}
+        adminModel.getdatos(input.extraInfo.split('%'),function(err,data){
+            if(err) console.log(err);
+
+            res.render("plan/table_ids",{prods:data, token: input.extraInfo});
+        }, result[2], result[1]);
+    } else res.redirect("/bad_login");
+});
+
+
+
+
+
 //Renderizar vista de INFORME DE STOCK para INSUMOS.
 router.get('/ops_close', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -1565,10 +1724,10 @@ router.get('/ops_close', function(req, res, next){
 //Cargar Datos de INFORME DE STOCK para FABRICACIONES
 router.get("/fabrs_list/:token",function(req,res){
     if(verificar(req.session.userData)){
-        console.log(req.params.token);
-		adminModel.getdatos(req.params.token.split("@"),function(err,data){
+		adminModel.getdatos(req.params.token.split('@'),function(err,data){
 			if(err) console.log(err);
-            res.render("plan/insumos_table",{prods:data});
+			console.log(req.params.token);
+            res.render("plan/insumos_table",{prods:data, token: req.params.token});
 		});
     } else res.redirect("/bad_login");
 });
@@ -1628,6 +1787,125 @@ router.get('/insumos_list/:token', function(req, res, next){
         });
     } else res.redirect("/bad_login");
 });
+
+
+
+
+
+router.get('/xlsx_oda', function(req,res){
+    if(verificar(req.session.userData)){
+        let fecha = new Date();
+        var nombre = "master-oda-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        var Excel = require('exceljs');
+        var workbook = new Excel.Workbook();
+        var sheet1 = workbook.addWorksheet('Pedidos');
+        var sheet2 = workbook.addWorksheet('Facturas');
+        sheet1.columns = [
+            { header: 'N° OCA', key: 'id', width: 15 },
+            { header: 'Código', key: 'name', width: 50 },
+            { header: 'Detalle', key: 'unit', width: 10},
+            { header: 'Cantidad', key: 'asked', width: 15},
+            { header: 'Costo Unitario', key: 'virtual', width: 10},
+            { header: 'Centro de Costo', key: 'virtual', width: 10},
+            { header: 'Fecha Creación', key: 'income', width: 10},
+            { header: 'Proveedor', key: 'income', width: 10}
+		];
+        sheet2.columns = [
+            { header: 'Factura', key: 'id', width: 15 },
+            { header: 'Código', key: 'name', width: 50 },
+            { header: 'Detalle', key: 'unit', width: 10},
+            { header: 'Facturado', key: 'virtual', width: 10},
+            { header: 'Costo', key: 'virtual', width: 10},
+            { header: 'N° OCA', key: 'income', width: 10},
+            { header: 'Fecha de Facturación', key: 'income', width: 10}
+        ];
+
+
+        adminModel.getdatosODA(null,function(err,ops){
+            if(err) console.log(err);
+            sheet1.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet1.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
+            /*
+            sheet1.columns = [
+                { header: 'N° OCA', key: 'id', width: 15 },
+                { header: 'Código', key: 'name', width: 50 },
+                { header: 'Detalle', key: 'unit', width: 10},
+                { header: 'Cantidad', key: 'asked', width: 15},
+                { header: 'Costo Unitario', key: 'virtual', width: 10},
+                { header: 'Centro de Costo', key: 'virtual', width: 10},
+                { header: 'Fecha Creación', key: 'income', width: 10},
+                { header: 'Proveedor', key: 'income', width: 10}
+            ];
+            * */
+            for(var i = 2; i < ops.length+2; i++){
+                sheet1.getCell('A'+i.toString()).value = ops[i-2].idoda;
+                sheet1.getCell('B'+i.toString()).value = ops[i-2].codigo;
+                sheet1.getCell('C'+i.toString()).value = ops[i-2].detalle;
+                sheet1.getCell('D'+i.toString()).value = ops[i-2].cantidad;
+                sheet1.getCell('E'+i.toString()).value = ops[i-2].costo;
+                sheet1.getCell('F'+i.toString()).value = ops[i-2].cc;
+                sheet1.getCell('G'+i.toString()).value = ops[i-2].fecha;
+                sheet1.getCell('H'+i.toString()).value = ops[i-2].sigla;
+            }
+            sheet1.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet1.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: 'FDFEFE'},
+                underline: false, //subrayado
+                bold: false //negrita
+            };
+            sheet1.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            adminModel.getDatosFacturas(null,function(err,prods){
+                if(err) throw err;
+                /*
+                sheet2.columns = [
+                    { header: 'Factura', key: 'id', width: 15 },
+                    { header: 'Código', key: 'name', width: 50 },
+                    { header: 'Detalle', key: 'unit', width: 10},
+                    { header: 'Facturado', key: 'virtual', width: 10},
+                    { header: 'Costo', key: 'virtual', width: 10},
+                    { header: 'N° OCA', key: 'income', width: 10},
+                    { header: 'Fecha de Facturación', key: 'income', width: 10}
+                ];
+                * */
+                for(let i=0;i<prods.length;i++){
+                    sheet2.addRow([prods[i].numfac,prods[i].codigo,prods[i].detalle,prods[i].cantidad,prods[i].costo,prods[i].idoda,prods[i].fecha]);
+                }
+                workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                    console.log(nombre);
+                    res.send('/csvs/'+nombre);
+                });
+            });
+
+        });
+    }
+    else res.redirect('/bad_login');
+});
+
+
+
 // Descargar xlsx de insumos
 router.get('/xlsx_ids_ins/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
@@ -1722,20 +2000,37 @@ router.get('/xlsx_ids_ins/:token', function (req, res, next) {
 router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
     if(verificar(req.session.userData)){
     	let fecha = new Date();
-        var nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+    	var nombre;
+        console.log(req.params.token);
+    	console.log(req.params.token.split('@')[2]);
+    	if(parseInt(req.params.token.split('@')[2]) == 1){
+            nombre = "IDS-producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+        else if(parseInt(req.params.token.split('@')[2]) == 2){
+            nombre = "IDS-matp&insumos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+        else{
+            nombre = "IDS-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+        }
+
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
+        var sheet4 = workbook.addWorksheet('Informe de Stock Resumen');
         var sheet = workbook.addWorksheet('InformeTotal');
+        var sheet2 = workbook.addWorksheet('Produccion');
+        var sheet3 = workbook.addWorksheet('Salidas');
         sheet.columns = [
-            { header: 'Código', key: 'id', width: 15 },
+            { header: 'Código', key: 'id', width: 15, style: 'text-aling: center' },
             { header: 'Detalle', key: 'name', width: 50 },
             { header: 'Unidad Med.', key: 'unit', width: 10},
             { header: 'Stock Inicio Mes', key: 'initial', width: 15},
-            { header: 'Solicitado en OC', key: 'asked', width: 15},
+            { header: 'Pendientes Totales en OC', key: 'asked', width: 15},
+            { header: 'Solicitado en OC (Mensual)', key: 'asked', width: 15},
             { header: 'Solicitado en OC atrasado', key: 'asked', width: 20},
             { header: 'Solicitada según OP', key: 'asked', width: 20},
 			{ header: 'Solicitada según entradas a BPT', key: 'asked', width: 28},
             { header: 'Stock en producción', key: 'virtual', width: 15},
+            { header: 'Rechazados', key: 'virtual', width: 15},
             { header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 25},
             { header: 'Aceptados por CC', key: 'income', width: 15},
             { header: 'Devolución a BMI', key: 'income', width: 15},
@@ -1744,9 +2039,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Salidas en GDD', key: 'departures', width: 15},
             { header: 'Facturados', key: 'departures', width: 15},
             { header: 'Por Facturar', key: 'departures', width: 15},
-            { header: 'Stock actual', key: 'final', width: 15}
+            { header: 'Stock Final', key: 'final', width: 15}
         ];
-        var sheet2 = workbook.addWorksheet('Produccion');
         sheet2.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1762,7 +2056,6 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'Rechazado', key: 'final', width: 15},
             { header: 'Ingresado a BPT', key: 'final', width: 15}
         ];
-        var sheet3 = workbook.addWorksheet('Salidas');
         sheet3.columns = [
             { header: 'Código', key: 'id', width: 15 },
             { header: 'Detalle', key: 'name', width: 50 },
@@ -1773,7 +2066,29 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
             { header: 'GDD Devolucion', key: 'departures', width: 10},
             { header: 'GDD Anulada', key: 'income', width: 15}
         ];
-        adminModel.getdatos(req.params.token.split("@"),function(err,ops){
+
+        sheet4.columns = [
+            { header: 'Código', key: 'id', width: 13, height: 13.43},
+            { header: 'Detalle', key: 'name', width: 42.14 },
+            { header: 'Unidad', key: 'unit', width: 7.86},
+            { header: 'Peso Unitario (KG)', key: 'virtual', width: 14.71},
+            { header: 'Inicial BPT', key: 'virtual', width: 14.71},
+            { header: 'Inicial Planta', key: 'income', width: 14.71},
+            { header: 'Total Fusión Mes', key: 'income', width: 13.57},
+            { header: 'Entradas a Producción', key: 'income', width: 13.57},
+            { header: 'Actual en Planta', key: 'income', width: 13.57},
+            { header: 'Total Despachado GDD', key: 'departures', width: 14.71},
+            { header: 'Total Rechazos Mes', key: 'income', width: 14.71},
+            { header: 'Total Externalizado Mes', key: 'income', width: 14.71},
+            { header: 'Stock en Siderval', key: 'income', width: 11}
+        ];
+        var env = [
+        	req.params.token.split("@")[0],
+			req.params.token.split("@")[1],
+			req.params.token.split("@")[2]
+		];
+        console.log(env);
+        adminModel.getdatos(env ,function(err,ops){
             if(err) console.log(err);
             sheet.getRow(1).fill = {
                 type: 'pattern',
@@ -1787,6 +2102,24 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 underline: false,
                 bold: true
             };
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Comic Sans MS',
+                family: 4,
+                size: 11,
+                underline: false,
+                bold: true
+            };
+
+
+            sheet.getRow(1).height = 42.75;
+            sheet2.getRow(1).height = 42.75;
+            sheet3.getRow(1).height = 42.75;
+            sheet4.getRow(1).height = 42.75;
             for(var i = 2; i < ops.length+2; i++){
 				sheet.getCell('A'+i.toString()).value = ops[i-2].codigo;
 				sheet.getCell('B'+i.toString()).value = ops[i-2].detalle;
@@ -1815,39 +2148,87 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 				sheet.getCell('D'+i.toString()).border = {
                     right: {style:'double', color: {argb:'00000000'}}
 				};
-				sheet.getCell('E'+i.toString()).value = ops[i-2].solicitados;
+
+
+
+                sheet.getCell('E'+i.toString()).value = ops[i-2].pendientes;
+
+
+                sheet.getCell('F'+i.toString()).value = ops[i-2].solicitados;
 				//Cantidad Solicitada
-				sheet.getCell('F'+i.toString()).value = ops[i-2].sol_atr;
-				sheet.getCell('G'+i.toString()).value = ops[i-2].necesarios;
-				sheet.getCell('H'+i.toString()).value = ops[i-2].necesario_neto;
-				sheet.getCell('H'+i.toString()).border = {
+				sheet.getCell('G'+i.toString()).value = ops[i-2].sol_atr;
+				sheet.getCell('H'+i.toString()).value = ops[i-2].necesarios;
+				sheet.getCell('I'+i.toString()).value = ops[i-2].necesario_neto;
+				sheet.getCell('I'+i.toString()).border = {
                     right: {style:'double', color: {argb:'00000000'}}
 				};
 
-				sheet.getCell('I'+i.toString()).value = ops[i-2].virtuales;
-                sheet.getCell('J'+i.toString()).value = ops[i-2].virtuales_oda;
+				sheet.getCell('J'+i.toString()).value = ops[i-2].virtuales;
 
-				sheet.getCell('J'+i.toString()).border = {
+                sheet.getCell('K'+i.toString()).value = ops[i-2].rechazados;
+
+                sheet.getCell('L'+i.toString()).value = ops[i-2].virtuales_oda;
+
+				sheet.getCell('L'+i.toString()).border = {
                     right: {style:'double', color: {argb:'00000000'}}
 				};
 
-                sheet.getCell('K'+i.toString()).value = ops[i-2].fabricados;
-                sheet.getCell('L'+i.toString()).value = ops[i-2].sum_dev;
-                sheet.getCell('M'+i.toString()).value = ops[i-2].ing_oda;
-				sheet.getCell('M'+i.toString()).border = {
+                sheet.getCell('M'+i.toString()).value = ops[i-2].fabricados;
+                sheet.getCell('N'+i.toString()).value = ops[i-2].sum_dev;
+                sheet.getCell('O'+i.toString()).value = ops[i-2].ing_oda;
+				sheet.getCell('O'+i.toString()).border = {
                     right: {style:'double', color: {argb:'00000000'}}
 				};
-	            sheet.getCell('N'+i.toString()).value = ops[i-2].sum_sal;
-                sheet.getCell('O'+i.toString()).value = ops[i-2].despachados;
-                sheet.getCell('P'+i.toString()).value = ops[i-2].sum_fact;
-                sheet.getCell('Q'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
+	            sheet.getCell('P'+i.toString()).value = ops[i-2].sum_sal;
+                sheet.getCell('Q'+i.toString()).value = ops[i-2].despachados;
+                sheet.getCell('R'+i.toString()).value = ops[i-2].sum_fact;
+                sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_fact);
                 //sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) - parseInt(ops[i-2].despachados);
-                sheet.getCell('R'+i.toString()).value = parseInt(ops[i-2].s_inicial) + parseInt(ops[i-2].fabricados) + parseInt(ops[i-2].sum_dev) + parseInt(ops[i-2].ing_oda) - parseInt(ops[i-2].despachados) - parseInt(ops[i-2].sum_sal);
-                sheet.getCell('R'+i.toString()).border = {
+                sheet.getCell('T'+i.toString()).value =
+					parseInt(ops[i-2].s_inicial) +
+					parseInt(ops[i-2].fabricados) +
+					parseInt(ops[i-2].sum_dev) +
+					parseInt(ops[i-2].ing_oda) -
+					parseInt(ops[i-2].despachados) -
+					parseInt(ops[i-2].sum_sal);
+                /*sheet.getCell('S'+i.toString()).value = parseInt(ops[i-2].stock);
+                sheet.getCell('S'+i.toString()).border = {
                     left: {style:'double', color: {argb:'00000000'}},
-                };
+                };*/
+
+
+
+
+
+                sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
+                sheet4.getCell('B'+i.toString()).value = ops[i-2].detalle;
+                sheet4.getCell('C'+i.toString()).value = ops[i-2].u_medida;
+                sheet4.getCell('D'+i.toString()).value = ops[i-2].peso;
+                sheet4.getCell('E'+i.toString()).value = ops[i-2].s_inicial;
+                sheet4.getCell('F'+i.toString()).value = ops[i-2].p_inicial;
+                sheet4.getCell('G'+i.toString()).value = ops[i-2].fundidos;
+
+                sheet4.getCell('H'+i.toString()).value = ops[i-2].virtuales + (ops[i-2].fabricados+ops[i-2].rechazados)-ops[i-2].p_inicial;
+                sheet4.getCell('I'+i.toString()).value = ops[i-2].virtuales;
+
+
+                sheet4.getCell('J'+i.toString()).value = ops[i-2].despachados;
+                sheet4.getCell('K'+i.toString()).value = ops[i-2].rechazados;
+                sheet4.getCell('L'+i.toString()).value = ops[i-2].ing_oda;
+                sheet4.getCell('M'+i.toString()).value =
+                    ops[i-2].s_inicial +
+                    ops[i-2].p_inicial +
+                    ops[i-2].ing_oda +
+                    ops[i-2].fundidos -
+                    ops[i-2].despachados -
+                    ops[i-2].rechazados -
+					(ops[i-2].sum_sal - ops[i-2].sum_dev);
+                //STOCK_SIDERVAL_FINAL = STOCK_I + PROD_I + RECEP_GDD + FUND - DESP_GDD - RECH - (RET_BMP - DEV_BMP)
+				//STOCK_BPT_FINAL = STOCK_I + RECEP_GDD + ACEP_CC - DESP_GDD - (RET_BMP - DEV_BMP)
+				//STOCK_PRODUCCION_FINAL = PROD_I + FUND - ACEP_CC - RECH
+				//STOCK_SIDERVAL_FINAL = STOCK_BPT_FINAL + STOCK_PRODUCCION_FINAL
             }
-            sheet.getRow(1).fill = {
+           /* sheet.getRow(1).fill = {
                 type: 'pattern',
                 pattern:'solid',
                 fgColor:{argb:'F4D03F'}
@@ -1865,9 +2246,119 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                 left: {style:'thin', color: {argb:'00000000'}},
                 top: {style:'thin', color: {argb:'00000000'}},
                 bottom: {style:'thin', color: {argb:'00000000'}}
+            };*/
+
+            sheet.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: '00000000'},
+                underline: false, //subrayado
+                bold: true //negrita
+            };
+            sheet.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
             };
 
-			adminModel.produccion(req.params.token.split("@"),function(err,prods){
+            sheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet.autoFilter = {
+                from: 'A1',
+                to: 'T1',
+            };
+
+
+
+
+            sheet2.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet2.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: '00000000'},
+                underline: false, //subrayado
+                bold: true //negrita
+            };
+            sheet2.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            sheet2.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet2.autoFilter = {
+                from: 'A1',
+                to: 'M1',
+            };
+
+
+
+
+            sheet3.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet3.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: '00000000'},
+                underline: false, //subrayado
+                bold: true //negrita
+            };
+            sheet3.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            sheet3.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet3.autoFilter = {
+                from: 'A1',
+                to: 'H1',
+            };
+
+
+            sheet4.getRow(1).fill = {
+                type: 'pattern',
+                pattern:'solid',
+                fgColor:{argb:'F4D03F'}
+            };
+            sheet4.getRow(1).font = {
+                name: 'Arial',
+                family: 4,
+                size: 11,
+                color: {argb: '00000000'},
+                underline: false, //subrayado
+                bold: true //negrita
+            };
+            sheet4.getRow(1).border = {
+                right: {style:'thin', color: {argb:'00000000'}},
+                left: {style:'thin', color: {argb:'00000000'}},
+                top: {style:'thin', color: {argb:'00000000'}},
+                bottom: {style:'thin', color: {argb:'00000000'}}
+            };
+
+            sheet4.getRow(1).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true  };
+            sheet4.autoFilter = {
+                from: 'A1',
+                to: 'M1',
+            };
+            adminModel.produccion(req.params.token.split("@"),function(err,prods){
 				if(err) throw err;
 				for(let i=0;i<prods.length;i++){
 					sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
@@ -1879,6 +2370,7 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
                         sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion, salidas[i].anulado]);
                     }
                     workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+                    	console.log(nombre);
                         res.send(nombre);
                     });
 				});
@@ -1887,6 +2379,8 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
         });
     }
 });
+
+
 
 /*  Funcion que renderiza la cabecera que posee un buscador de abastecimientos*/
 router.get('/view_abastecimiento', function(req, res, next) {
@@ -1902,7 +2396,7 @@ router.get('/view_abastecimiento', function(req, res, next) {
 			        		"join material on abastecimiento.idmaterial=material.idmaterial left join cuenta on cuenta.cuenta = substring_index(abastecimiento.cc,'-',1) WHERE  abastecimiento.cantidad > abastecimiento.recibidos", function(err, abs){
 			        		if(err) { console.log("Error Selecting : %s", err);
 			        		}else {
-				        		res.render('abast/view_abastecimiento', {cc: cc, largo: abs.length});
+				        		res.render('abast/view_abastecimiento', {cc: cc, largo: abs.length, username: req.session.userData.nombre});
 				        	}
 			        	});
 			        }
@@ -1913,16 +2407,23 @@ router.get('/view_abastecimiento', function(req, res, next) {
 	else{res.redirect('bad_login');}	
 });
 
+
+
+router.get('/view_stockp', function(req, res, next) {
+    if(verificar(req.session.userData)){
+        res.render('abast/view_stockp', {username: req.session.userData.nombre});
+    }
+    else{res.redirect('bad_login');}
+});
+
 /*  Funcion que busca los abastecimientos y los ordena segun paramentro orden en la url, muestra solo pendiente si showPend es true
 	Renderiza una tabla con los abastecimientos solicitados
 */
-router.post('/table_abastecimientos/:page', function(req, res, next){
+router.post('/table_abastecimientos', function(req, res, next){
 	if(verificar(req.session.userData)){
 		//Obtiene la pagina de la url y obtiene el nro de registros a solicitar
-		var page = req.params.page - 1;
-        var page_now = page*50;
         var input = JSON.parse(JSON.stringify(req.body));
-        var array_fill = [
+		var array_fill = [
             "abastecimiento.idodabast",
             "abastecimiento.factura_token",
             "abastecimiento.gd_token",
@@ -1930,82 +2431,54 @@ router.post('/table_abastecimientos/:page', function(req, res, next){
             "abastecimiento.detalle",
             "abastecimiento.cuenta"
         ];
-        var clave;
-        if(input.clave == '' || input.clave == null || input.clave == undefined){
-            clave = [];
-        }
-        else{
-        	clave = input.clave.split(',');
-		}
-        var orden;
-        if(input.orden.split('/').length > 1){
-        	orden = input.orden.split('/')[1];
-		}
-		else{
-            orden = input.orden;
-		}
-        var showPend = input.showPend;
-        //var cc_selected = input.cc_selected.split(',');
-        var where = " WHERE ";
+        var object_fill = {
+            "abastecimiento.idodabast-off":[],
+            "abastecimiento.factura_token-off":[],
+            "abastecimiento.gd_token-off":[],
+            "abastecimiento.sigla-off":[],
+            "abastecimiento.detalle-off":[],
+            "abastecimiento.cuenta-off":[],
+            "abastecimiento.idodabast-on":[],
+            "abastecimiento.factura_token-on":[],
+            "abastecimiento.gd_token-on":[],
+            "abastecimiento.sigla-on":[],
+            "abastecimiento.detalle-on":[],
+            "abastecimiento.cuenta-on":[]
+        };
+
         var condiciones_where = [];
-        var condiciones_cc = [];
-
-        if(clave.length>0){
-			for(var e=0; e < clave.length; e++){
-				condiciones_where.push(array_fill[parseInt(clave[e].split('@')[0])]+" LIKE '%"+clave[e].split('@')[1]+"%'");
-			}
-        }
-        var cc_cond = " ";
-        if(showPend == 'false'){
-            //condiciones_where.push("abastecimiento.cantidad > abastecimiento.recibidos");
-            condiciones_where.push("abastecimiento.cantidad > abastecimiento.facturados");
-        }
-        where += condiciones_where.join(" AND ");
-        /*if(cc_selected.length>0){
-            for(var cc=0; cc <  cc_selected.length ; cc++){
-                if(cc_selected[cc] == 'all'){
-                    condiciones_cc.push(" abastecimiento.cc LIKE '%%'");
-                    break;
-                }
-                else{
-                    condiciones_cc.push(" abastecimiento.cc LIKE '%"+cc_selected[cc]+"%'");
-                }
+		if(input.cond != ''){
+            for(var e=0; e < input.cond.split('@').length; e++){
+                condiciones_where.push(input.cond.split('@')[e]);
             }
-        }*/
-        console.log(condiciones_where);
-
-        if(condiciones_where.length==0){
-        	condiciones_where.push('true');
 		}
-        if(condiciones_cc.length==0){
-            condiciones_cc.push('true');
-        }
-        where = "WHERE "+ condiciones_where.join(" AND ")+ " AND ("+condiciones_cc.join(' OR ')+")";
-        console.log(where);
-        orden = orden.replace('-', ' ');
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        var where = result[0];
+        var limit = result[1];
         req.getConnection(function(err, connection){
         	if(err) { console.log("Error Connection : %s", err);
         	} else {
-	        	connection.query("SELECT * FROM (SELECT abastecimiento.*,coalesce(sum(recepcion_detalle.cantidad),0) as recib,coalesce(sum(facturacion.cantidad),0) as facturados ,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token,"
-                    + " COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(cuenta.detalle, 'NO DEFINIDO') as cuenta,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle FROM abastecimiento"
-	        		+ " LEFT JOIN oda ON oda.idoda=abastecimiento.idoda"
-	        		+ " LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor"
-	        		+ " LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial"
-                    + " LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast"
-                    + " LEFT JOIN factura ON factura.idfactura = facturacion.idfactura"
-                    + " LEFT JOIN recepcion_detalle ON recepcion_detalle.idabast=abastecimiento.idabast"
-                    + " LEFT JOIN recepcion ON recepcion.idrecepcion=recepcion_detalle.idrecepcion"
-	        		+ " LEFT JOIN cuenta ON cuenta.cuenta = substring_index(abastecimiento.cc,'-',1)"
-	        		+ " GROUP BY abastecimiento.idabast ORDER BY oda.idoda DESC) AS abastecimiento "+where, function(err, abs){
-	        		if(err) { console.log("Error Selecting : %s", err);
-	        		}else {
-		        		res.render('abast/table_abastecimientos', {data: abs, key: orden.replace(' ', '-'), page: page+1},function(err,html){
-		        			if(err) console.log(err);
-		        			res.send(html);
-						});
-		        	}
-	        	});
-	        }
+                connection.query("select * from (select abastecimiento.*,oda.anulado,oda.creacion as oda_creacion,coalesce(recepciones.cantidad,0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token, facturacion.fanulado_token, recepciones.gd_token, " +
+                    "COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as subcuenta,COALESCE(cuenta_g.cuenta, 'NO DEFINIDO') as cuenta_g,COALESCE(ccontable.cuenta, 'NO DEFINIDO') as cuenta,coalesce(sub_ccontable.idccontable, 'Indefinido') as idccontable,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle from abastecimiento " +
+                    "left join (select facturacion.idabast, sum(facturacion.cantidad) as cantidad,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(factura.anulado) as fanulado_token from facturacion left join factura on factura.idfactura = facturacion.idfactura WHERE !factura.anulado group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast " +
+                    "left join (select recepcion_detalle.idabast,sum(recepcion_detalle.cantidad) as cantidad, group_concat(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token from recepcion_detalle left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion group by recepcion_detalle.idabast) as recepciones on recepciones.idabast = abastecimiento.idabast " +
+                    "LEFT JOIN oda ON oda.idoda=abastecimiento.idoda " +
+                    "LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial " +
+                    "LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor " +
+                    "LEFT JOIN sub_ccontable on sub_ccontable.idsub = abastecimiento.cc " +
+					"LEFT JOIN ccontable on sub_ccontable.idccontable = ccontable.idccontable " +
+					"LEFT JOIN cuenta_g ON cuenta_g.idcuenta = SUBSTRING(ccontable.idccontable, 1, 2)) as abastecimiento "+where +" ORDER BY abastecimiento.oda_creacion DESC "+limit, function(err, abs){
+                    if(err) { console.log("Error Selecting : %s", err);
+                    }else {
+
+                        res.render('abast/table_abastecimientos', {data: abs,  page: parseInt(req.params.page), largoData: abs.length },function(err,html){
+                            if(err) console.log(err);
+                            res.send(html);
+                        });
+                    }
+                });
+            }
         });
     } else res.redirect("/bad_login");
 });
@@ -3114,7 +3587,9 @@ router.post('/newoc_ped', function(req, res, next){
         req.getConnection(function(err,connection){
         	if(err)
         		console.log("Error Connection : %s", err);
-        	
+
+
+
         	connection.query("INSERT INTO oda (numoda, idproveedor, tokenoda) VALUES (?,?,?)", [input.nrodc, idprov, token], 
         		function(err, odc){
         			if(err)
@@ -3126,22 +3601,41 @@ router.post('/newoc_ped', function(req, res, next){
         				console.log(mats);
         				var idorden = mats[0].idodc;
         				var idODC = odc.insertId;
+                        var prod = [];
         				if(mats.length>0){
 		        			for(var e=0; e < mats.length; e++){
 		        				for(var w=0; w < input.idped.split("@").length; w++){
 		        					if(input.idped.split("@")[w]==mats[e].idpedido){
 		        						if(input.ex_iva.split('@')[w] == 'on'){
-		        							array.push([odc.insertId,mats[e].idmaterial,mats[e].cantidad, input.costo.split("@")[w].replace(',','.'), true, input.centroc.split('@')[w]]);
+		        							array.push([odc.insertId,mats[e].idmaterial,mats[e].cantidad, input.costo.split("@")[w].replace(',','.'), true, input.centroc.split('@')[w], input.idfab.split('@')[w]]);
 		        						}
 		        						else{
-		        							array.push([odc.insertId,mats[e].idmaterial,mats[e].cantidad, input.costo.split("@")[w].replace(',','.'), false, input.centroc.split('@')[w]]);
+		        							array.push([odc.insertId,mats[e].idmaterial,mats[e].cantidad, input.costo.split("@")[w].replace(',','.'), false, input.centroc.split('@')[w], input.idfab.split('@')[w]]);
 		        						}
+                                        //LA CANTIDAD TOTAL A PRODUCIR SE INICIA DESDE LA SEGUNDA ETAPA
+                                        //idfabricaciones  cantidad_recibida etapa2
+                                        prod.push([input.idfab.split('@')[w], mats[e].cantidad, mats[e].cantidad]);
 		        					}
 		        				}
 		        			}
 	        			}
 	        			console.log(array);
-	        			connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc) VALUES ?", [array], function(err, ped){
+
+                connection.query("INSERT INTO ordenproduccion() VALUES ()", function(err, inOp){
+                    if(err){console.log("Error Inserting : %s", err);}
+                    console.log(inOp);
+                    for(var p=0; p < prod.length; p++){
+                        prod[p].push(inOp.insertId);
+                    }
+                    console.log(prod);
+                    connection.query("INSERT INTO produccion(idfabricaciones, cantidad, `e`, idordenproduccion) VALUES ?", [prod], function(err, inProd){
+                        if(err){console.log("Error Inserting : %s", err);}
+
+                        for(var e=0; e < array.length; e++){
+                        	array[e][6] = inProd.insertId+e;
+						}
+						console.log(array);
+	        			connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc, idproduccion) VALUES ?", [array], function(err, ped){
 	        				if(err){
 	        					console.log("Error Selecting : %s", err);
 	        					res.send('error');
@@ -3168,15 +3662,14 @@ router.post('/newoc_ped', function(req, res, next){
 	        						console.log(upData);
 	        						//res.redirect('/abastecimiento/comprobar_notificaciones/'+idorden);
 
-		        					res.send(idorden+'@'+idODC);
-	        					});
+                                    res.send(idorden+'@'+idODC);
+                                });
 	        				}
 	        			});
-
-        			});
-
-        			
+                        });
+                    });
         		});
+        	});
         });
       	
     } else res.redirect("/bad_login");
@@ -3240,6 +3733,17 @@ router.get('/get_factura/:idfact', function(req, res, next) {
     });
 });
 
+router.get('/anular_factura/:idfact', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+        connection.query('UPDATE factura SET anulado = true WHERE idfactura = ?', [req.params.idfact], function (err, factura) {
+            if (err) console.log('We got an error! - '+err);
+
+            console.log(factura);
+            res.redirect('/abastecimiento/get_factura/'+req.params.idfact);
+        });
+    });
+});
 
 router.get('/get_guiaAbast/:idgd', function(req, res, next) {
     req.getConnection(function(err, connection) {
@@ -3250,7 +3754,6 @@ router.get('/get_guiaAbast/:idgd', function(req, res, next) {
 					+'LEFT JOIN abastecimiento ON abastecimiento.idabast=recepcion_detalle.idabast '
 					+'LEFT JOIN material ON material.idmaterial=abastecimiento.idmaterial WHERE recepcion.idrecepcion = ?', [req.params.idgd], function (err, guia) {
 	        	if (err) console.log('We got an error! - '+err);
-    	        console.log(guia);
 	        	res.render('abast/modal_gd', {guia: guia, info: [guia[0].fecha, guia[0].numgd, guia[0].razon] });
 
         });
@@ -3269,7 +3772,28 @@ router.post('/new_cliente/', function (req, res, next) {
     });
 });
 
+router.get('/refreshProductWhitP/:check', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+        var cond ;
+        if(req.params.check){
+        	cond = " OR codigo like 'P%' OR codigo like 'S%'";
+		}
+		else{
+			cond = " ";
+		}
 
+        connection.query("select " +
+            "material.*,coalesce(caracteristica.cnom,'Sin Característica') as cnom from material " +
+            "left join caracteristica on caracteristica.idcaracteristica = SUBSTRING(material.codigo, 4, 2) " +
+            "where codigo like 'C%' or codigo like 'M%' or codigo like 'I%' or codigo like 'O%'"+ cond, function(err, mats){
+            if(err)
+                console.log("Error Selecting : %s", err);
+
+            res.render('abast/table_session_preoda', {mats: mats});
+        });
+    });
+});
 router.get('/visualizar_ofs', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);
@@ -3278,8 +3802,9 @@ router.get('/visualizar_ofs', function(req, res, next) {
 			"FROM fabricaciones " +
 			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
 			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
-			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0", function (err, ofs) {
+			"left join material on material.idmaterial=fabricaciones.idmaterial where fabricaciones.restantes > 0 order by ordenfabricacion.idordenfabricacion DESC", function (err, ofs) {
             if (err) console.log('We got an error! - '+err);
+
             res.render('abast/visualizar_ofs', {of: ofs});
         });
     });

@@ -1,0 +1,71 @@
+<div class="col-sm-12">
+    <table id="inventarioTableModal" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTable dtr-inline" style="width: 100%; top: -7px;" role="grid">
+        <thead>
+        <tr role="row">
+            <th>Detalle</th>
+            <th>Stock Anterior</th>
+            <th>Stock Inventario</th>
+            <th>Diferencia</th>
+
+        </tr>
+        </thead>
+        <tbody class="ui-sortable">
+        <%for(var t = 0; t < invent.length; t++){
+            if(invent[t].diferencia < 0){%>
+                <tr class="o_data_row success" role="row">
+            <%}else{%>
+                <tr class="o_data_row danger" role="row">
+            <%}%>
+                <td><%= invent[t].detalle%></td>
+                <td style="text-align: center"><%= invent[t].stock%></td>
+                <td style="text-align: center"><%= invent[t].cantidad%></td>
+                <td style="text-align: center"><%= invent[t].diferencia%></td>
+            </tr>
+        <%}%>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    $("#inventarioModal .modal-dialog .modal-content .modal-header .modal-title small").html('<%= invent.length%>'+" diferencias encontradas.");
+
+
+    $("#inventarioTableModal").DataTable( {
+        paging: false,
+        fixedColumns: true,
+        responsive: true,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    } );
+</script>

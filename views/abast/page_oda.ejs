@@ -3,7 +3,22 @@ function fechaLatino(string){
     return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
 }
 %>
+<style>
+    .volver-tabla:hover{
+        background-color: rgb(124,123,173);
+        color: white;
+        cursor: pointer;
+    }
+    .volver-tabla{
+        position: relative;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        border-radius: 25%;
+    }
+</style>
 <div class="o_view_manager_content">
+    <i class="fa fa-arrow-left volver-tabla" id="odaBack" onclick="volver_tabla()"></i>
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
             <div class="o_form_sheet_bg">
@@ -27,7 +42,7 @@ function fechaLatino(string){
                     </div>
                     <div class="row" style="width: 100%;">
                         <div class="col-md-7">
-                            <h1 style="width: 100%; margin-top: 0"><span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%></span></h1>
+                            <h1 style="width: 100%; margin-top: 0"><span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=oda.idoda%> <a href="#"  onclick="setAnular(this)" data-val="<%=oda.idoda%>" data-nom="idoda" data-url="/abastecimiento/updOca/anular" data-cantMin="0" ><p class="text-danger text-right" style="font-size: small">- Anular</p></a></span></h1>
                         </div>
                         <div class="col-md-3" style="margin-left: 12.7%">
                             <h1 style="width: 100%; margin-top: 0">
@@ -38,7 +53,7 @@ function fechaLatino(string){
                                     <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
                                 </a>
                                 <%if(user.nombre != 'siderval'){%>
-                                    <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" onclick="setFactuNum(this)">
+                                    <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" data-view="pagina" onclick="setFactuNum(this)">
                                         <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>
                                     </a>
                                 <%}%>
@@ -49,19 +64,13 @@ function fechaLatino(string){
                                 <%}%>
                             </h1>
                         </div>
-                        <div class="col-md-1" style="padding: 0; width: 32px">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-danger" onclick="mostrar_tabla()" type="button" style="align-content: center;"><i class="fa fa-close"></i>
-                                </button>
-                            </div>
-                        </div>
                     </div>
                     <div class="o_group">
                         <table class="o_group o_inner_group o_group_col_6">
                             <tbody>
                             <tr>
                                 <td class="o_td_label">
-                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Proveedor</label>
+                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Proveedor <a href="#updOcaModal" data-toggle="modal" ><p class="text-info" style="font-size: small"> <i class="fa fa-edit"></i>Editar</p></a></label>
                                 </td>
                                 <td style="width: 100%;">
                                     <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=oda.sigla%><br><%=oda.razon%>
@@ -211,73 +220,34 @@ function fechaLatino(string){
                                                 <th class="o_column_sortable" style="text-align: center;">Costo Unitario</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
+                                                <th class="o_column" id="btnGroup" style="text-align: center;"></th>
                                                 <!--<th class="o_column_sortable">Impuestos</th>
                                                 <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
                                             </tr>
                                             </thead>
                                             <tbody class="ui-sortable">
                                             <%for(var e=0; e < abast.length; e++){%>
-                                            <tr class="o_data_row text-info danger">
-                                                <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
-                                                <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
-                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].recibidos%></td>
-                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].facturados%></td>
-                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].costo%></td>
-                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
-                                                <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date().toLocaleDateString())%></td>
-                                                <!--<td class="o_data_cell o_many2many_tags_cell">
-                                                    <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
+                                            <tr class="text-info danger">
+                                                <td style="text-align: center;"><%=abast[e].detalle%></td>
+                                                <td style="text-align: center;"><%=abast[e].cantidad%></td>
+                                                <td style="text-align: center;"><%=abast[e].recibidos%></td>
+                                                <td style="text-align: center;"><%=abast[e].facturados%></td>
+                                                <td style="text-align: center;"><%=abast[e].costo%></td>
+                                                <%if(abast[e].u_medida == '' || abast[e].u_medida == null){%>
+                                                    <td style="text-align: center;">und</td>
+                                                <%}else{%>
+                                                    <td style="text-align: center;"><%=abast[e].u_medida%></td>
+                                                <%}%>
+                                                <td style="text-align: center;"><%=fechaLatino(new Date().toLocaleDateString())%></td>
+                                                <td class="o_data_cell btn-group" style="text-align: center;">
+                                                    <button type="button" class="btn btn-xs btn-warning" onclick="setAnular(this)" data-val="<%=abast[e].idabast%>" data-nom="idabast" data-url="/abastecimiento/updOca/cerrarAbast" data-cantMin="<%= Math.min(Math.max(parseInt(abast[e].facturados),parseInt(abast[e].recibidos)),parseInt(abast[e].cantidad))%>"><i class="fa fa-remove"></i> Cerrar</button>
                                                 </td>
-                                                <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier">
-                                                    <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="price_subtotal">7.290,00&nbsp;$</span>
-                                                </td>-->
                                             </tr>
                                             <%}%>
                                             </tbody>
-                                            <tfoot>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
-                                            </tfoot>
                                         </table>
                                     </div>
                                 </div>
-                                <!--<table class="o_group o_inner_group oe_subtotal_footer oe_right">
-                                    <tbody>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_readonly_modifier" for="o_field_input_1076">Base imponible</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_untaxed">7.315,00&nbsp;$</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_readonly_modifier" for="o_field_input_1077">Impuestos</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_tax">0,00&nbsp;$</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width: 50%;">
-                                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                                                    <label class="o_form_label" for="o_field_input_1078">Total</label>
-                                                </div>
-                                            </td>
-                                            <td style="width: 50%;">
-                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier oe_subtotal_footer_separator" name="amount_total">7.315,00&nbsp;$</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>-->
                                 <span class="o_field_text o_field_widget o_field_empty oe_inline" name="note"></span>
                                 <div class="oe_clear"></div>
                             </div>
@@ -296,12 +266,16 @@ function fechaLatino(string){
                                         if(oda.facturas_token != null){
                                             oda.facturas_token = oda.facturas_token.split(",");
                                             var lista_aux = [];
-                                            for(var j = 0;j<oda.facturas_token.length;j++){
+                                            for(var j = 0;j< oda.facturas_token.length; j++){
                                                 lista_aux = oda.facturas_token[j].split('@');%>
                                         <tr>
                                             <td class="o_td_label">
                                                 <a href="#" onclick="modal_fact(this)" data-idfactura="<%=lista_aux[1]%>">
-                                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">N° <%= lista_aux[0]%></label>
+                                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1083">N° <%= lista_aux[0]%>
+                                                        <% if(lista_aux[4] === '1'){%>
+                                                            (Anulado)
+                                                        <%}%>
+                                                    </label>
                                                     <span class="label label-primary pull-right"><%= new Date(lista_aux[2]).toLocaleDateString()%></span>
                                                 </a>
                                             </td>
@@ -380,16 +354,190 @@ function fechaLatino(string){
     </div>
 </div>
 
+<!-- Modal anular abastecimiento/oca -->
+<div id="anularModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <form id="anularModalForm">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmar Anulación</h4>
+                </div>
+                <div class="modal-body">
+                        <p id="anularModalBody">Some text in the modal.</p>
+                        <input type="hidden" name="url" id="urlAnularModal" value="/abastecimiento/updOca/anular">
+                        <input type="hidden" name="idabast" id="idAnularModal" value="0">
+                        <input type="hidden" name="cantmin" id="cantAnularModal" value="0">
+                        <div class="alert alert-danger hidden" role="alert" id="anularModalAlert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" id="anularModalSubmit" class="btn btn-danger">Anular</button>
+                </div>
+            </form>
+            <script type="text/javascript">
+                var refreshFlag = false;
+                function setAnular (esto) {
+                    var data = $(esto).data();
+                    $("#idAnularModal").val(data.val);
+                    $("#idAnularModal").attr('name',data.nom);
+                    $("#cantAnularModal").val(data.cantmin);
+                    $("#urlAnularModal").val(data.url);
+                    if (data.nom === 'idoda') {
+                        refreshFlag = false;
+                        $("#anularModalBody").html("¿Estás seguro/a que quieres anular la OCA?")
+                    } else {
+                        refreshFlag = true;
+                        $("#anularModalBody").html("¿Estás seguro/a que quieres cerrar la fila?")
+                    }
+                    $("#anularModal").modal('toggle');
+                };
+                $("#anularModalForm").on('submit', function (e) {
+                    var array = $(this).serializeArray();
+                    var data = {};
+                    array.map(function (input) {
+                        data[input.name] = input.value;
+                        return input;
+                    });
+                    $("#anularModalSubmit").attr('disabled',true);
+                    var url = data.url;
+                    delete data.url;
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        data: data,
+                        success: function (dataResponse) {
+                            if (!dataResponse.err) {
+                                $("#anularModal").modal('toggle');
+                                setTimeout(function () {
+                                    if (refreshFlag) {
+                                        $.ajax({
+                                            type: 'GET',
+                                            url: '/abastecimiento/page_oda/<%=oda.idoda%>',
+                                            success: function(data){
+                                                $(".main-page").html(data);
+                                            }
+                                        });
+                                    } else {
+                                        $("#odaBack").click();
+                                    }
+                                },1000);
+                            } else {
+                                $("#anularModalAlert").html("<strong>Error!</strong> " + dataResponse.errMsg);
+                                $("#anularModalAlert").removeClass("hidden");
+                                setTimeout(function () {
+                                    $("#anularModalAlert").addClass("hidden");
+                                }, 5000);
+                            }
+                            $("#anularModalSubmit").attr('disabled',false);
+                        }
+                    });
+                    return false;
+                });
+            </script>
+        </div>
+    </div>
+</div>
+<!-- Modal anular abastecimiento/oca -->
+<div id="updOcaModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <form id="updOcaModalForm">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modificar OC</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Proveedor: </label>
+                        <div class='predic_text' onkeyup='getPredictions(this)'>
+                            <input type='text' class="form-control" name='prov' autocomplete='off' value="<%= oda.idproveedor%> - <%= oda.sigla%>" required>
+                            <div></div>
+                        </div>
+                        <script type="text/javascript">
+                            function getPredictions(yo){
+                                if($(yo).children('input').val()!=''){
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: '/plan/get_client_pred/'+$(yo).children('input').val(),
+                                        success: function(data){
+                                            $(yo).children('div').css('width', $(yo).width()+"px");
+                                            $(yo).children('div').html(data);
+                                        }
+                                    });
+                                }
+                                else{
+                                    $(yo).children('div').html('');
+                                }
+                            };
+                        </script>
+                    </div>
+                    <div class="form-group">
+                        <label>Moneda: </label>
+                        <select class="form-control" name="money" id="money">
+                            <option value="usd">Dolares (USD)</option>
+                            <option value="eur">Euro (EUR)</option>
+                            <option value="clp" selected>Pesos Chilenos (CLP)</option>
+                            <option value="gbp">Libra (GBP)</option>
+                        </select>
+                    </div>
+                    <input type="hidden" name="idoda" value="<%= oda.idoda%>">
+                    <div class="alert alert-danger hidden" role="alert" id="updOcaModalAlert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" id="updOcaModalSubmit" class="btn btn-primary">Modificar</button>
+                </div>
+            </form>
+            <script type="text/javascript">
+                $("#updOcaModalForm").on('submit', function (e) {
+                    var array = $(this).serializeArray();
+                    var data = {};
+                    array.map(function (input) {
+                        data[input.name] = input.value;
+                        return input;
+                    });
+                    data.prov = parseInt(data.prov.split("-")[0]);
+                    $("#updOcaModalSubmit").attr('disabled',true);
+                    $.ajax({
+                        url: "/abastecimiento/updOca",
+                        type: 'post',
+                        data: data,
+                        success: function (data) {
+                            if (!data.err) {
+                                $("#updOcaModal").modal('toggle');
+                                setTimeout(function () {
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: '/abastecimiento/page_oda/<%=oda.idoda%>',
+                                        success: function(data){
+                                            $(".main-page").html(data);
+                                        }
+                                    });
+                                },1000);
+                            } else {
+                                $("#updOcaModalAlert").html("<strong>Error!</strong> " + data.errMsg);
+                                $("#updOcaModalAlert").removeClass("hidden");
+                                setTimeout(function () {
+                                    $("#updOcaModalAlert").addClass("hidden");
+                                }, 5000);
+                            }
+                            $("#updOcaModalSubmit").attr('disabled',false);
+                        }
+                    });
+                    return false;
+                });
+            </script>
+        </div>
+    </div>
+</div>
 <script>
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
         setDataTable2('#tablaODA');
     });
-
-    function verPdf(yo){
-       window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
-    }
-
     function receiveAll(self) {
         if (confirm("¿Esta seguro que desea recepcionar todo lo que falte por recepcionar?")){
             $.ajax({

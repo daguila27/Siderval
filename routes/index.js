@@ -4,19 +4,12 @@ var path = require('path');
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
 
-
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
 
 router.use(
 
-    connection(mysql,{
-
-        host: '127.0.0.1',
-        user: 'user',
-        password : '1234',
-        port : 3306,
-        database:'siderval',
-        insecureAuth : true
-    },'pool')
+    connection(mysql,dbCredentials,'pool')
 
 );
 

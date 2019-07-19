@@ -11,81 +11,104 @@
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 7px">
-	<style>
-		.order-column:hover{
-			cursor: pointer;
-		}
-	</style>
-	<thead style="/*position: fixed; width: 100%*/">
-			<tr>
-                <th id="numof" class="cabecera o_column_sortable order-column" data-order="ordenfabricacion.idordenfabricacion-ASC">N° OF</th>
-                <th id="numoc" class="cabecera o_column_sortable order-column" data-order="odc.numoc-ASC">N° OC</th>
-                <th id="descrip" class="cabecera o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
-				<th id="solicitados" class="cabecera o_column_sortable order-column" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
-				<th id="sin_produccion" class="cabecera o_column_sortable order-column" data-order="fabricaciones.restantes-ASC">Sin Producción</th>
-				<!--<th id="p_terminado" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">PT</th>
-				<th id="planta" class="cabecera o_column_sortable" data-order="fabricaciones.restantes-ASC">Planta</th>-->
-				<th id="f_entrega" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
-				<th id="f_creacion" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="ordenfabricacion.creacion-ASC">Fecha de Creación</th>
-				<%if(user.nombre != 'siderval'){%>
-					<th id="habilitar_cand" class="cabecera o_column_sortable order-column" style="text-align: center;" data-order="fabricaciones.lock-ASC">Habilitar</th>
-				<%}%>
-			</tr>
-		</thead>
-	<tbody class="ui-sortable" style="margin-top: 10px">
-		<%for(var i=0; i < data.length; i++){%>
-			<tr class="o_data_row" <%if(i+1 < data.length && data[i].idordenfabricacion != data[i+1].idordenfabricacion){%>style="border-bottom: 2px dashed grey"<%}%>>
-					<td class="numof o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].idordenfabricacion%></td>
-					<td class="numoc o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].numoc%></td>
-					<td class="descrip o_data_cell o_readonly_modifier o_required_modifier" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%=data[i].detalle%></td>
-					<td class="solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].cantidad %></td>
-					<td class="sin_produccion o_data_cell parsear_nro" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>"><%= data[i].restantes %></td>
-					<td class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-bottom: 0px !important; margin-top: 0px !important;">
+	<thead>
+		<tr>
+            <th data-name="numof" id="cab-numof" class="order-column cab-numof" data-order="ordenfabricacion.idordenfabricacion-ASC">OF</th>
+			<th data-name="numitem" id="cab-numitem" class="order-column cab-numitem" data-order="ordenfabricacion.idordenfabricacion-ASC">Item</th>
+			<th data-name="numoc" id="cab-numoc" class="order-column cab-numoc" data-order="ordenfabricacion.idordenfabricacion-ASC">OC</th>
+			<th data-name="cliente" id="cab-cliente" class="order-column cab-cliente" data-order="cliente.razon-ASC">Cliente</th>
+			<th data-name="descrip" id="cab-descrip" class="order-column cab-descrip" data-order="material.detalle-ASC">Descripción</th>
+			<th data-name="solicitados" id="cab-solicitados" class="order-column cab-solicitados" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
+			<th data-name="sin_produccion" id="cab-sin_produccion" class="order-column cab-sin_produccion" data-order="fabricaciones.restantes-ASC">Por Moldear</th>
+			<th data-name="en_produccion" id="cab-en_produccion" class="order-column cab-en_produccion" >En Producción</th>
+			<th data-name="finalizado" id="cab-finalizado" class="order-column cab-finalizado" >Finalizados</th>
+			<th data-name="pesoxproducir" id="cab-pesoxproducir" class="order-column cab-pesoxproducir" style="text-align: center;">Peso unitario</th>
+			<th data-name="pesototal" id="cab-pesototal" class="order-column cab-pesototal" style="text-align: center;">Peso Total (sin producir)</th>
+			<th data-name="f_entrega" id="cab-f_entrega" class="order-column cab-f_entrega" style="text-align: center;" data-order="fabricaciones.f_entrega-DESC">Fecha de Entrega</th>
+			<%if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){%>
+				<th data-name="habilitar_cand" id="cab-habilitar_cand" class="order-column cab-habilitar_cand" style="text-align: center;" data-order="fabricaciones.lock-ASC"></th>
+			<%}%>
+		</tr>
+	</thead>
+	<tbody class="ui-sortable">
+		<%
+		var cantidad_total = 0;
+		var restantes_total = 0;
+		var enproduccion_total = 0;
+		var finalizados_total = 0;
+		var peso_u = 0;
+		var peso_t = 0;
+		for(var i=0; i < data.length; i++){%>
+			<tr class="o_data_row">
+					<td data-toggle="tooltip" title="OF" class="numof o_data_cell o_readonly_modifier o_required_modifier" data-order="<%=data[i].idordenfabricacion%>">
+						<a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
+								<%=data[i].idordenfabricacion%>
+						</a>
+					</td>
+
+					<td data-toggle="tooltip" title="Item" class="numitem o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numitem%></td>
+					<td data-toggle="tooltip" title="OC" class="numoc o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numoc%></td>
+					<td data-toggle="tooltip" title="Cliente" class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" title="<%= data[i].razon%>"><%=data[i].cliente%></td>
+					<td data-toggle="tooltip" title="Descripción" class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
+					<%cantidad_total += data[i].cantidad %>
+					<td data-toggle="tooltip" title="Solicitados" data-cs="0" data-name="solicitados" data-valor="<%= data[i].cantidad %>" class="checkFunction solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad %></td>
+					<%restantes_total += data[i].restantes %>
+					<td data-toggle="tooltip" title="Por Moldear" data-cs="0" data-name="sin_produccion" data-valor="<%= data[i].restantes %>" class="checkFunction sin_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].restantes %></td>
+					<%enproduccion_total += (data[i].cantidad - data[i].restantes - data[i].finalizados) %>
+					<td data-toggle="tooltip" title="En Producción" data-cs="0" data-name="en_produccion" data-valor="<%= data[i].cantidad - data[i].restantes - data[i].finalizados%>" class="checkFunction en_produccion o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].cantidad - data[i].restantes - data[i].finalizados%></td>
+					<%finalizados_total += data[i].finalizados %>
+					<td data-toggle="tooltip" title="Finalizados" data-cs="0" data-name="finalizado" data-valor="<%= data[i].finalizados%>" class="checkFunction finalizado o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].finalizados%></td>
+					<%peso_u += data[i].peso %>
+					<td data-toggle="tooltip" title="Peso Unitario" data-cs="1" data-name="pesoxproducir" data-valor="" class="checkFunction pesoxproducir o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso%></td>
+					<%peso_t += (data[i].peso * data[i].restantes) %>
+					<td data-toggle="tooltip" title="Peso Total (Sin producir)" data-cs="1" data-name="pesototal" data-valor="<%= data[i].peso * data[i].restantes%>" class="checkFunction pesototal o_data_cell parsear_nro" style="text-align: center;" ><%= data[i].peso * data[i].restantes%></td>
+					<td data-toggle="tooltip" title="Fecha de Entrega" class="f_entrega o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" >
 						<span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaLatino(new Date(data[i].f_entrega).toLocaleDateString())%> </span>
 					</td>
-					<td class="f_creacion o_data_cell o_list_number o_monetary_cell o_readonly_modifier" data-order="<%= new Date(data[i].creacion).getTime()%>" style="text-align: center;" onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>">
-						<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString())%></span>
-					</td>
 					<%
-					if(user.nombre != 'siderval'){
+					if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){
 						if(data[i].externo == '0' && data[i].restantes > 0 ){
 							if(data[i].lock == '0'){%>
-								<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+								<td data-toggle="tooltip" title="Habilitar Producción" class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 									<button class="btn btn-xs btn-primary" onclick="habFabricacion(this)" data-state="0" data-id="<%= data[i].idfabricaciones%>">
 										<i class="fa fa-unlock"></i>
 									</button>
 								</td>
 							<%}else{%>
-								<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+								<td data-toggle="tooltip" title="Habilitar Producción" class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 									<button class="btn btn-xs btn-danger"  onclick="habFabricacion(this)" data-state="1" data-id="<%= data[i].idfabricaciones%>">
 										<i class="fa fa-lock"></i>
 									</button>
 								</td>
 							<%}
 						}else{%>
-								<td class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
+								<td data-toggle="tooltip" title="Habilitar Producción" class="habilitar_cand o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;">
 									<button class="btn btn-xs btn-danger">
 										<i class="fa fa-ban"></i>
 									</button>
 								</td>
 						<%}%>
 					<%}%>
-            </tr>
+			</tr>
 		<%}%>
 	</tbody>
 	<tfoot>
 		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<!--<td class="o_list_number" title="Total sin producir">124.021,00</td>-->
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<%if(user.nombre != 'siderval'){%>
-				<td></td>
+			<td id="numof"></td>
+			<td id="numitem"></td>
+			<td id="numoc"></td>
+			<td id="cliente"></td>
+			<td id="descrip"></td>
+			<td id="solicitados" data-cs="0" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%= cantidad_total%></td>
+			<td id="sin_produccion" data-cs="0" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%= restantes_total%></td>
+			<td id="en_produccion" data-cs="0" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%= enproduccion_total%></td>
+			<td id="finalizado" data-cs="0" data-toggle="tooltip" title="Total Finalizados" style="text-align: center;" class="parsear_nro"><%= finalizados_total %></td>
+			<td id="pesoxproducir" data-cs="1" data-toggle="tooltip" title="Peso Unitario" style="text-align: center;" class="parsear_nro"><%= peso_u%></td>
+			<td id="pesototal" data-cs="1" data-toggle="tooltip" title="Peso Total" style="text-align: center;" class="parsear_nro"><%= peso_t%></td>
+			<td id="f_entrega"></td>
+			<%if(user.nombre != 'siderval'&& user.nombre != 'jefeplanta'){%>
+				<td id="habilitar_cand"></td>
 			<%}%>
 		</tr>
 	</tfoot>
@@ -95,48 +118,76 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#DataTableFabs");
+    function refreshSumas(){
+        var object = {
+            "solicitados" : 0,
+            "sin_produccion" : 0,
+            "en_produccion" : 0,
+            "finalizado" : 0,
+            "pesoxproducir": 0,
+            "pesototal": 0
+        };
+        if($('.focus-row').length == 0) {
+            $(".checkFunction").each(function(){
+                object[$(this).data('name')] += $(this).data('valor');
+            });
+        }
+        else{
+            $(".checkFunction").each(function(){
+                if($(this).parent().hasClass('focus-row')){
+                    object[$(this).data('name')] += $(this).data('valor');
+                }
+            });
+        }
+
+
+        $("#solicitados").text(object.solicitados);
+        $("#sin_produccion").text(object.sin_produccion);
+        $("#en_produccion").text(object.en_produccion);
+        $("#finalizado").text(object.finalizado);
+        $("#pesoxproducir").text(object.pesoxproducir);
+        $("#pesototal").text(object.pesototal);
+    }
+    setDataTableFixed("#DataTableFabs");
+
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), ".indicador_paginas");
+
+    /*var down = false;
+    $(document).mousedown(function() {
+        down = true;
+    }).mouseup(function() {
+        down = false;
+    });*/
     $(document).ready(function(){
-        /*$(".order-column").removeClass('o-sort-up');
-        $(".order-column").removeClass('o-sort-down');
-        $(".order-column").each(function(){
-            //$(this).css("width", $("."+$(this).attr('id')).css('width'));
-
-            if($(this).data('order').split('-')[0] == "< key.split('-')[0]>" ){
-                if("< key.split('-')[1]>" == "ASC"){
-                    $(this).addClass('o-sort-up');
-                    $(this).data('order', '< key.split("-")[0]>-DESC');
+        $('#DataTableFabs tbody tr').mousedown(function (e) {
+            $(this).toggleClass('success');
+            $(this).toggleClass('focus-row');
+            refreshSumas();
+            /*if(down){
+				if($(this).hasClass('focus-row')){
+                    $(this).removeClass('success');
+                    $(this).removeClass('focus-row');
+                    refreshSumas();
                 }
-				else{
-                    $(this).addClass('o-sort-down');
-
-                    $(this).data('order', '< key.split("-")[0]>-ASC');
-                }
-            }
-        });*/
+                else{
+                    $(this).addClass('success');
+                    $(this).addClass('focus-row');
+                    refreshSumas();
+				}
+            }*/
+        });
     });
-	/*$(".order-column").on('click', function(e){
-		e.preventDefault();
-		var item = this;
-		var orden = $(this).data('order');
-		var showPend = $("#pend").is(':checked'); 
-		$.ajax({
-			type: 'GET',
-			url: '/plan/table_fabricaciones/'+orden+'/'+showPend,
-			success: function(data){
-				$(".main-page").html(data);
-			}
-		});
-	});*/
-
 
 	function submit_form(yo){
 		//$("#form"+$(yo).data('idodc')).submit();
 		$.ajax({
 			type: 'GET',
+			beforeSend: function(){
+			  	destroyDataTable();
+			},
 			url: '/plan/page_of/'+$(yo).data('idodc'),
 			success: function(data){
-				$(".main-page").html(data);	
+				$(".main-page").html(data);
 			}
 		});
 	}

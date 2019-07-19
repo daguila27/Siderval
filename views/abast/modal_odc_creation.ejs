@@ -6,154 +6,163 @@
     <div class="modal-header">
        	<button type="button" class="close" data-dismiss="modal">&times;</button>
         <h4 class="modal-title">Orden de compra: #<%=last%></h4>
+        <ul class="nav nav-tabs segm-pill">
+            <li class="active"><a data-toggle="tab" href="#peds">Pedidos</a></li>
+            <li><a data-toggle="tab" href="#infog">Información General</a></li>
+        </ul>
     </div>
       <div class="modal-body sliderModal" style="overflow: hidden; width: 95%; padding: 0; margin: 10px;position:relative;">
-            <div style="margin: 0; width: 200%; display: flex; transition: 0.5s">
+            <div style="margin: 0; width: 100%; display: flex; transition: 0.5s">
                 <div style="width: 100%;">
           			<h5><b>Cliente:</b> <%= data[0].client%></h5>
-                    <table class="table table-striped table-hover">
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th>Nombre</th>
-                            <th style="text-align: center;">U. Compra</th>
-                            <th>Pedidos</th>
-                            <th>Unidades</th>
-                            <th>Costo</th>
-                            <th>Total</th>
-                            <th>C.C.</th>
-                            <th>Exento</th>
-                        </tr>
-                        </thead>
-                        <tbody id="t<%= data[0].idodc%>">
-                        <% 
-                        if(data[0].mat_token){
-                            data[0].mat_token = data[0].mat_token.split('@');
-                            data[0].date_token = data[0].date_token.split(',');
-                            data[0].cant_token = data[0].cant_token.split(',');
-                            data[0].idp_token = data[0].idp_token.split(',');
-                            data[0].uni_token = data[0].uni_token.split(',');
-                            data[0].ucompra_token = data[0].ucompra_token.split(',');
-                            data[0].cc = data[0].cc.split(',');
-                            for(var j = 0;j< data[0].mat_token.length;j++){%>
-                                <tr style="align-content: center;" data-content="Fecha de Entrega: <%=fechaLatina(new Date(data[0].date_token[j]).toLocaleDateString())%>" data-toggle="popover" data-placement="top">
-                                    <td class="ped-hab"><input type="checkbox" name="hab" onchange="habInId(this)" class="check-ped"><input class="idped" type="hidden" name="idpedido" value="<%=data[0].idp_token[j]%>" disabled></td>
-                                    <td><%= data[0].mat_token[j].substring(0,1).toUpperCase() + data[0].mat_token[j].substring(1,data[0].mat_token[j].lenght).toLowerCase()%></td>
-                                    <td style="text-align: center;"><%= data[0].ucompra_token[j]%></td>
-                                    <td class="td-cant"><input type="number" class="form-control cant_compra cantCompraModal" value="<%= data[0].cant_token[j]%>" min="0" step="<%= data[0].ucompra_token[j]%>" disabled></td>
-                                    <td style="text-align: center;"><%= data[0].uni_token[j]%></td>
-                                    <td class="td-costo td-money"><input class="form-control costo moneda key_money" type="float" name="costo" onkeyup="refreshAllCostModal()" disabled></td>
-                                    <td class="costo-total"></td>
-                                    <td class="td-cc"><input type="hidden" name="centroc" class="cc" id="extCC<%=j%>" disabled><a class="setCC" onclick='selectCCModal(this)' data-toggle="modal" data-target="#ccModal"><%= data[0].cc[j]%></a></td>
-                                    <td class="td-ex"><input type="checkbox" name="ex_iva" class="checkEx" onchange="refreshAllCostModal()" disabled></td>
-                                </tr>
-                            <%}
-                        }%>
 
-                        </tbody>
-                        <tfoot>
-                          <tr>
-                              <th></th>
-                              <th></th>
-                              <th></th>
-                              <th></th>
-                              <th></th>
-                              <th><b>Neto</b></th>
-                              <th><b>IVA</b></th>
-                              <th><b>Total</b></th>
-                              <th></th>
-                              <th></th>
-                          </tr>
-                           <tr>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td class="total-neto-modal"></td>
-                              <td class="total-iva-modal"></td>
-                              <td class="total-total-modal"></td>
-                              <td></td>
-                              <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                      <div class="form-group" style="display: flex; width: 100%">
-                        <div style="width: 100%;">
-                          <label>Moneda: </label>
-                            <select class="form-control" name="money" id="money" onchange="conversor(this)">
-                              <option value="usd">Dolares (USD - $)</option>
-                              <option value="eur">Euro (EUR - &euro;)</option>
-                              <option value="clp" selected>Pesos Chilenos (CLP - $)</option>
-                              <option value="gbp">Libra (GBP - &pound;)  </option>
-                            </select>
-                            <label>
-                        </div>  
-                      <div style="width: 50%">
-                        <label for="dest">Descuento (%):</label>
-                        <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" onkeyup="refreshAllCostModal()">
-                      </div>
-                        <!--<div style="width: 40%; margin-left: 10%; margin-top: 20px;">                            
-                          <label for="exento">
-                            <input type="checkbox" name="exento">
-                            Exento de IVA
-                          </label>
-                        </div>-->
-                      </div>
-                </div>
-                <div style="width: 100%">
-                    <div class="form-group" style="width: 100%">
-                      <label for="prov">Seleccione Proveedor:</label>
-                      <select class="form-control" name="prov" onchange="setPago(this)">
-                        <%for(var t=0; t < provs.length; t++){%>
-                          <option value="<%=provs[t].idcliente%>@<%=provs[t].pago%>"><%=provs[t].sigla%> - <%=provs[t].razon%></option>
-                        <%}%>
-                      </select>
+                    <div class="tab-content">
+                        <div id="peds" class="tab-pane fade in active">
+                            <div style="max-height: 300px; overflow-y: scroll; padding: 0; width: 100%">
+                                <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin: 0">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Nombre</th>
+                                        <th style="text-align: center;">U. Compra</th>
+                                        <th>Pedidos</th>
+                                        <th>Unidades</th>
+                                        <th>Costo</th>
+                                        <th>Total</th>
+                                        <th>C.C.</th>
+                                        <th>Exento</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="t<%= data[0].idodc%>">
+                                    <%
+                                    if(data[0].mat_token){
+                                        data[0].mat_token = data[0].mat_token.split('@');
+                                        data[0].date_token = data[0].date_token.split(',');
+                                        data[0].cant_token = data[0].cant_token.split(',');
+                                        data[0].idp_token = data[0].idp_token.split(',');
+                                        data[0].idf_token = data[0].idf_token.split(',');
+                                        data[0].uni_token = data[0].uni_token.split(',');
+                                        data[0].ucompra_token = data[0].ucompra_token.split(',');
+                                        data[0].cc = data[0].cc.split(',');
+                                    for(var j = 0;j< data[0].mat_token.length;j++){%>
+                                    <tr style="align-content: center;" data-content="Fecha de Entrega: <%=fechaLatina(new Date(data[0].date_token[j]).toLocaleDateString())%>" data-toggle="popover" data-placement="bottom">
+                                        <td class="ped-hab">
+                                            <input type="checkbox" name="hab" onchange="habInId(this)" class="check-ped">
+                                            <input class="idped" type="hidden" name="idpedido" value="<%=data[0].idp_token[j]%>">
+                                            <input class="idfab" type="hidden" name="idfabricaciones" value="<%=data[0].idf_token[j]%>">
+                                        </td>
+                                        <td><%= data[0].mat_token[j].substring(0,1).toUpperCase() + data[0].mat_token[j].substring(1,data[0].mat_token[j].lenght).toLowerCase()%></td>
+                                        <td style="text-align: center;"><%= data[0].ucompra_token[j]%></td>
+                                        <td class="td-cant"><input type="number" class="form-control cant_compra cantCompraModal" value="<%= data[0].cant_token[j]%>" min="0" step="<%= data[0].ucompra_token[j]%>" disabled></td>
+                                        <td style="text-align: center;"><%= data[0].uni_token[j]%></td>
+                                        <td class="td-costo td-money"><input class="form-control costo moneda key_money" type="float" name="costo" onkeyup="refreshAllCostModal()" disabled></td>
+                                        <td class="costo-total"></td>
+                                        <td class="td-cc"><input type="hidden" name="centroc" class="cc" id="extCC<%=j%>" disabled><a class="setCC" onclick='selectCCModal(this)' data-toggle="modal" data-target="#ccModal"><%= data[0].cc[j]%></a></td>
+                                        <td class="td-ex"><input type="checkbox" name="ex_iva" class="checkEx" onchange="refreshAllCostModal()" disabled></td>
+                                    </tr>
+                                    <%}
+                                    }%>
 
-                    </div>
-                    
-                    <div class="form-group" style="display: flex; width: 100%">
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th><b>Neto:</b></th>
+                                        <th><b>IVA:</b></th>
+                                        <th><b>Total:</b></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="total-neto-modal">0</td>
+                                        <td class="total-iva-modal">0</td>
+                                        <td class="total-total-modal">0</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="form-group" style="display: flex; width: 100%; margin-top: 15px">
+                                <div style="width: 100%;">
+                                    <label>Moneda: </label>
+                                    <select class="form-control" name="money" id="money" onchange="conversor(this)">
+                                        <option value="usd">Dolares (USD - $)</option>
+                                        <option value="eur">Euro (EUR - &euro;)</option>
+                                        <option value="clp" selected>Pesos Chilenos (CLP - $)</option>
+                                        <option value="gbp">Libra (GBP - &pound;)  </option>
+                                    </select>
+                                </div>
+                                <div style="width: 50%">
+                                    <label for="dest">Descuento (%):</label>
+                                    <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" onkeyup="refreshAllCostModal()">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="infog" class="tab-pane fade">
+                            <div style="width: 100%">
+                                <div class="form-group" style="width: 100%">
+                                    <label for="prov">Seleccione Proveedor:</label>
+                                    <select class="form-control" name="prov" onchange="setPago(this)">
+                                        <%for(var t=0; t < provs.length; t++){%>
+                                        <option value="<%=provs[t].idcliente%>@<%=provs[t].pago%>"><%=provs[t].sigla%> - <%=provs[t].razon%></option>
+                                        <%}%>
+                                    </select>
 
-                      <!--<div style="width: 33%">
-                      <label for="cuent">Cuenta:</label>
-                      <input type="text" class="form-control" id="cuent" name='cuent'>
-                      </div>-->
-                      <div style="width: 50%; display: none;">
-                      <label for="dest">Destino:</label>
-                      <input type="text" class="form-control" id="dest" name='dest'>
-                      </div>
-                      <!--<div style="width: 50%">
-                      <label for="dest">Descuento (%):</label>
-                      <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" onkeyup="refreshAllCostModal()">
-                      </div>-->
-                    </div>
-                    <div class="form-group" style="display: flex; width: 100%">
-                      <div style="width: 33%">
-                      <label for="plae">Plazo de entrega:</label>
-                      <input type="date" class="form-control" id="plae" name="plae" required>
-                      </div>
-                      <div style="width: 33%">
-                      <label for="pag">Forma de pago:</label>
-                      <input type="text" class="form-control" id="pag" name="pag" placeholder="Ej: Factura">
-                      </div>
-                      <div style="width: 33%">
-                      <label for="entr">Lugar de entrega:</label>
-                        <select type="text" class="form-control" id="entr" name="entr">
-                          <option value="siderval">Bodega Siderval</option>
-                          <option value="proveedor">Bodega Proveedor</option>
-                          <option value="Por definir">Por definir</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="form-group" style="display: flex;">
-                      <div style="width: 100%">
-                        <label for="obs">Observaciones:</label>
-                        <textarea class="form-control" id="obs" name="obs" style="width: 100%" cols="10" rows="5" charswidth="23" >
+                                </div>
+
+                                <div class="form-group" style="display: flex; width: 100%">
+
+                                    <!--<div style="width: 33%">
+                                    <label for="cuent">Cuenta:</label>
+                                    <input type="text" class="form-control" id="cuent" name='cuent'>
+                                    </div>-->
+                                    <div style="width: 50%; display: none;">
+                                        <label for="dest">Destino:</label>
+                                        <input type="text" class="form-control" id="dest" name='dest'>
+                                    </div>
+                                    <!--<div style="width: 50%">
+                                    <label for="dest">Descuento (%):</label>
+                                    <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" onkeyup="refreshAllCostModal()">
+                                    </div>-->
+                                </div>
+                                <div class="form-group" style="display: flex; width: 100%">
+                                    <div style="width: 33%">
+                                        <label for="plae">Plazo de entrega:</label>
+                                        <input type="date" class="form-control" id="plae" name="plae" required>
+                                    </div>
+                                    <div style="width: 33%">
+                                        <label for="pag">Forma de pago:</label>
+                                        <input type="text" class="form-control" id="pag" name="pag" placeholder="Ej: Factura">
+                                    </div>
+                                    <div style="width: 33%">
+                                        <label for="entr">Lugar de entrega:</label>
+                                        <select type="text" class="form-control" id="entr" name="entr">
+                                            <option value="siderval">Bodega Siderval</option>
+                                            <option value="proveedor">Bodega Proveedor</option>
+                                            <option value="Por definir">Por definir</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="display: flex;">
+                                    <div style="width: 100%">
+                                        <label for="obs">Observaciones:</label>
+                                        <textarea class="form-control" id="obs" name="obs" style="width: 100%" cols="10" rows="2" charswidth="23" >
                         </textarea>
-                      </div>
-                    </div>
-                    <div class="form-inline">
-                        <input type="text" name="nrodc" id="num" style="width:80%; display: none" placeholder="N° Orden de Compra / N° Orden de Venta" value="<%=last%>" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-inline">
+                                    <input type="text" name="nrodc" id="num" style="width:80%; display: none" placeholder="N° Orden de Compra / N° Orden de Venta" value="<%=last%>" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -163,7 +172,7 @@
             </div>
         </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary send-newOC" disabled>Enviar</button>
+        <button type="submit" class="btn btn-primary send-newOC">Enviar</button>
    		 <button type="button" class="btn btn-default cerrarNewOC" data-dismiss="modal">Cerrar</button>
 	     <!--<button type="button" class="btn btn-default" onclick="showForm()">Show</button>-->
   </div> 
@@ -177,20 +186,15 @@
         }
     $(".atr-canv").on('click', function(e){
         e.preventDefault();
-        if($(".sliderModal > div").css('margin-left') != '0px' ){
-            $(".sliderModal > div").css('margin-left','0px');
-            $(this).attr('disabled', true);
-            $(".sig-canv").removeAttr('disabled');
-        }
+        $(".sig-canv").attr('disabled', false);
+        $(this).attr('disabled', true);
+        $('.segm-pill li a[href="#peds"]').tab('show');
     });
     $(".sig-canv").on('click', function(e){
         e.preventDefault();
-        if($(".sliderModal > div").css('margin-left') == '0px' ){
-            $(".sliderModal > div").css('margin-left','-100%');
-            $(this).attr('disabled', true);
-            $(".atr-canv").removeAttr('disabled');
-            $(".send-newOC").removeAttr('disabled');
-        }
+        $(".atr-canv").attr('disabled', false);
+        $(this).attr('disabled', true);
+        $('.segm-pill li a[href="#infog"]').tab('show');
     });
 
 
