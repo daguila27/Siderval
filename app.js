@@ -116,14 +116,11 @@ const io = require('socket.io')(server);
 
 
 var mysql = require('mysql');
-var connection = mysql.createConnection({
-      host: '127.0.0.1',
-      user: 'admin',
-      password: 'tempo123',
-      port: 3306,
-      database: 'siderval',
-      insecureAuth : true
-});
+
+var dbCredentials = require("./dbCredentials");
+dbCredentials.insecureAuth = true;
+
+var connection = mysql.createConnection(dbCredentials);
 
 
 connection.connect();
