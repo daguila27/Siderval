@@ -93,14 +93,16 @@ router.get('/crear_recepcion', function(req, res, next){
                 "abastecimiento.cantidad," +
                 "abastecimiento.recibidos," +
                 "material.detalle," +
-                "pedido.idodc," +
+                "pedido.idodc, coalesce(odc.numoc, 'OF/ODV') as numoc," +
                 "fabricaciones.idorden_f " +
                 "FROM abastecimiento " +
-                "LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial " +
                 "LEFT JOIN produccion ON abastecimiento.idproduccion = produccion.idproduccion " +
                 "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
-                "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
-                "WHERE pedido.externo AND abastecimiento.cantidad > abastecimiento.recibidos", function(err, abast){
+                "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
+                "LEFT JOIN producido ON producido.idmaterial = material.idmaterial " +
+                "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido LEFT JOIN odc ON odc.idodc = pedido.idodc " +
+                "WHERE (coalesce(pedido.externo, producido.ruta like '%,e%') || producido.ruta like '%,e%') AND abastecimiento.cantidad > abastecimiento.recibidos", function(err, abast){
+                //EN EL CASO DE LOS MATERIALES CON ETAPA EXTERNALIZADA INTERMEDIA
                 if(err){console.log("Error Selecting : %s", err);}
 
                 //console.log(abast);
@@ -119,8 +121,6 @@ router.post('/save_recepcion_externo', function(req, res, next){
         var data = JSON.parse(input.data);
         var recep = [input.numgd, 0];
         var recep_d = [];
-        console.log("DATA");
-        console.log(data);
         for(var e=0; e < data.length; e++){recep_d.push([data[e][0], data[e][2]]);}
         var query = "";
         var ids = [];
@@ -202,22 +202,24 @@ router.post('/save_recepcion_externo', function(req, res, next){
 
                                     if(q===0){query_f = "UPDATE fabricaciones SET restantes = CASE ";}
                                     query_f += " WHEN idfabricaciones = "+data[q][1]+" THEN restantes - "+data[q][2];
-                                    if(q===data.length-1){query_f += " ELSE recibidos END WHERE idfabricaciones IN ("+idfabs.join(',')+")";}
+                                    if(q===data.length-1){query_f += " ELSE restantes END WHERE idfabricaciones IN ("+idfabs.join(',')+")";}
                                 }
                                 query_ext += " ELSE produccion.e END WHERE idproduccion IN ("+idprods.join(',')+")";
                                 query_cc += " ELSE produccion.7 END WHERE idproduccion IN ("+idprods.join(',')+")";
-                                console.log(query_ext);
-                                console.log(query_cc);
+                                console.log(query_f);
                                 //SE ASUME QUE LA SIGUIENTE ETAPA A EXTERNALIZADO EN Cc
                                 connection.query(query_ext, function(err, queExt){
                                     if(err){console.log("Error Inserting : %s", err);}
                                     connection.query(query_cc, function(err, queCc){
                                         if(err){console.log("Error Inserting : %s", err);}
+                                        connection.query(query_f, function(err, queF){
+                                            if(err){console.log("Error Inserting : %s", err);}
+                                            console.log("Actualizando restantes en fabricaciones");
+                                            connection.query("INSERT INTO produccion_history(enviados, `from`, `to`, idproduccion) VALUES ?", [prod_h], function(err, inProdH){
+                                                if(err){console.log("Error Inserting : %s", err);}
 
-                                        connection.query("INSERT INTO produccion_history(enviados, `from`, `to`, idproduccion) VALUES ?", [prod_h], function(err, inProdH){
-                                        if(err){console.log("Error Inserting : %s", err);}
-
-                                            res.redirect('/bodega/crear_recepcion');
+                                                res.redirect('/bodega/crear_recepcion');
+                                            });
                                         });
                                     });
                                 });
@@ -1759,8 +1761,6 @@ router.get('/view_bodega', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-
-
 router.post('/table_bodega', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -1809,15 +1809,15 @@ router.post('/table_bodega', function(req, res, next){
                         if(err)
                             console.log("Error Selecting :%s", err);
                         console.log(newInv);
-                         idInv = newInv.insertId;
-                         connection.query("select material.idmaterial, inv.inventariados, codigo,detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
-                             " left join (select inventario_detalle.idinventario as idinv, idmaterial, cantidad as inventariados from inventario_detalle where inventario_detalle.idinventario = '"+idInv+"') as inv on inv.idmaterial = material.idmaterial " +
-                             " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
-                             + where+" "+limit,function(err, desp){
-                             if(err)
-                                 console.log("Error Selecting :%s", err);
-                             res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv,largoData: desp.length});
-                         });
+                        idInv = newInv.insertId;
+                        connection.query("select material.idmaterial, inv.inventariados, codigo,detalle, stock, stock_i , stock_c, coalesce(enPlanta.enplanta,0) as enplanta from material" +
+                            " left join (select inventario_detalle.idinventario as idinv, idmaterial, cantidad as inventariados from inventario_detalle where inventario_detalle.idinventario = '"+idInv+"') as inv on inv.idmaterial = material.idmaterial " +
+                            " left join (select material.idmaterial, sum(produccion.cantidad - produccion.standby - produccion.8) as enplanta from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones left join material on material.idmaterial = fabricaciones.idmaterial group by fabricaciones.idmaterial) as enPlanta on enPlanta.idmaterial = material.idmaterial "
+                            + where+" "+limit,function(err, desp){
+                            if(err)
+                                console.log("Error Selecting :%s", err);
+                            res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv,largoData: desp.length});
+                        });
                     });
                 }
                 else{
@@ -1830,6 +1830,77 @@ router.post('/table_bodega', function(req, res, next){
                         res.render('bodega/table_bodega', {data: desp, tipo: tipo, idinv : idInv,largoData: desp.length});
                     });
                 }
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+router.get('/view_externo', function(req, res, next){
+    if(verificar(req.session.userData)){
+        res.render('bodega/view_externo', {username: req.session.userData.nombre});
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.post('/table_externo', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var array_fill = [
+            "odc.numoc",
+            "abastecimiento.idoda",
+            "fabricaciones.idorden_f",
+            "recepcion.numgd",
+            "material.detalle"
+        ];
+        var object_fill = {
+            "odc.numoc-off": [],
+            "abastecimiento.idoda-off": [],
+            "fabricaciones.idorden_f-off": [],
+            "recepcion.numgd-off": [],
+            "material.detalle-off": [],
+            "odc.numoc-on": [],
+            "abastecimiento.idoda-on": [],
+            "fabricaciones.idorden_f-on": [],
+            "recepcion.numgd-on": [],
+            "material.detalle-on": []
+        };
+        var condiciones_where = [];
+
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
+            }
+        }
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        console.log(result);
+
+        var where = result[0];
+        var limit = result[1];
+
+        req.getConnection(function(err, connection){
+            connection.query("SELECT " +
+                "abastecimiento.idmaterial, " +
+                "COALESCE(odc.numoc,'OF/ODV') as numoc, " +
+                "fabricaciones.idorden_f, " +
+                "material.detalle, " +
+                "abastecimiento.idoda, " +
+                "recepcion.*, " +
+                "recepcion_detalle.*, " +
+                "produccion.`7` >= recepcion_detalle.cantidad as isanulable " +
+                "FROM recepcion_detalle " +
+                "left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion " +
+                "left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast " +
+                "left join material on material.idmaterial = abastecimiento.idmaterial " +
+                "inner join produccion on produccion.idproduccion = abastecimiento.idproduccion " +
+                "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
+                "left join odc on odc.idodc = pedido.idodc "+where,function(err, data){
+                if(err){console.log("Error Selecting :%s", err);}
+
+                res.render('bodega/table_externo', {data: data});
             });
         });
     }
@@ -2277,6 +2348,155 @@ router.post('/create_packinglist', function(req, res, next){
 });
 
 
+
+router.get("/anular_recepcion_externo_modal/:idrecep",function(req,res,next){
+    if(req.session.userData){
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+                connection.query("SELECT " +
+                    "abastecimiento.idmaterial,abastecimiento.idproduccion, " +
+                    "COALESCE(odc.numoc,'OF/ODV') as numoc, " +
+                    "fabricaciones.idorden_f, " +
+                    "material.detalle, " +
+                    "abastecimiento.idoda, " +
+                    "recepcion.*, " +
+                    "recepcion_detalle.*, " +
+                    "produccion.`7` >= recepcion_detalle.cantidad as isanulable, cliente.sigla, cliente.razon " +
+                    "FROM recepcion_detalle " +
+                    "left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion " +
+                    "left join abastecimiento on abastecimiento.idabast = recepcion_detalle.idabast " +
+                    "left join material on material.idmaterial = abastecimiento.idmaterial " +
+                    "inner join produccion on produccion.idproduccion = abastecimiento.idproduccion " +
+                    "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                    "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
+                    "left join odc on odc.idodc = pedido.idodc " +
+                    "left join oda on oda.idoda = abastecimiento.idoda " +
+                    "left join cliente on cliente.idcliente = oda.idproveedor " +
+                    "WHERE recepcion_detalle.idrecepcion IN ("+req.params.idrecep+")", function(err, dets){
+                    if(err) console.log(err);
+
+                    var recep = {
+                        idoda: dets[0].idoda,
+                        cliente: dets[0].sigla +" "+ dets[0].razon,
+                        idrecepcion: dets[0].idrecepcion,
+                        numgd: dets[0].numgd,
+                        fecha: dets[0].fecha
+                    };
+                    res.render("bodega/anular_externo_modal", {data: dets, recep: recep});
+                });
+        });
+    } else res.redirect("/bad_login");
+});
+
+
+
+router.post("/anular_recepcion_externo",function(req,res,next){
+    if(req.session.userData){
+        var input = JSON.parse(JSON.stringify(req.body));
+        /*
+        * { 'idabast[]': [ '7827', '7828' ],
+              'idmat[]': [ '111713', '111663' ],
+              'cant[]': [ '200', '400' ] }
+        *
+        *
+        * UPDATE `table` SET `uid` = CASE
+                WHEN id = 1 THEN 2952
+                WHEN id = 2 THEN 4925
+                WHEN id = 3 THEN 1592
+                ELSE `uid`
+                END
+            WHERE id  in (1,2,3)
+        * */
+        var queryabs = "";
+        var querymat = "";
+        var querymat2 = "";
+        var abast = {};
+        var prods = {};
+
+        if(typeof input['idabast[]'] === 'string'){
+            input['idabast[]'] = [input['idabast[]']];
+            input['idprod[]'] = [input['idprod[]']];
+            input['cant[]'] = [input['cant[]']];
+        }
+        //SE AGRUPA POR ABASTECIMIENTO Y POR MATERIAL
+        for(var t=0; t < input['idabast[]'].length; t++){
+            if(Object.keys(prods).indexOf(input['idprod[]'][t]) === -1){
+                prods[input['idprod[]'][t]] = parseInt(input['cant[]'][t]);
+            }
+            else{
+                prods[input['idprod[]'][t]] += parseInt(input['cant[]'][t]);
+            }
+            if(Object.keys(abast).indexOf(input['idabast[]'][t]) === -1){
+                abast[input['idabast[]'][t]] = parseInt(input['cant[]'][t]);
+            }
+            else{
+                abast[input['idabast[]'][t]] += parseInt(input['cant[]'][t]);
+            }
+            //queryfab += " WHEN fabricaciones.idabast = ? THEN fabricaciones.recibidos = fabricaciones.recibidos - "+input['cant[]'][t];
+        }
+        var prod_h = [];
+        for(var f=0; f < Object.keys(abast).length; f++){
+            if(f === 0){queryabs += "UPDATE abastecimiento SET abastecimiento.recibidos = CASE ";}
+            queryabs += " WHEN abastecimiento.idabast = "+Object.keys(abast)[f]+" THEN abastecimiento.recibidos - "+Object.values(abast)[f];
+        }
+        for(var m=0; m < Object.keys(prods).length; m++){
+            if(m === 0){
+                querymat += "UPDATE produccion SET produccion.`7` = CASE ";
+                querymat2 += "UPDATE produccion SET produccion.`e` = CASE ";
+            }
+            querymat += " WHEN produccion.idproduccion = "+Object.keys(prods)[m]+" THEN produccion.`7` - "+Object.values(prods)[m];
+            querymat2 += " WHEN produccion.idproduccion = "+Object.keys(prods)[m]+" THEN produccion.`e` + "+Object.values(prods)[m];
+            prod_h.push({
+                idproduccion: Object.keys(prods)[m],
+                from: '7',
+                to: 'e',
+                enviados: Object.values(prods)[m]
+            });
+        }
+        queryabs += " ELSE abastecimiento.recibidos END WHERE abastecimiento.idabast IN ("+Object.keys(abast).join(',')+")";
+        querymat += " ELSE produccion.`7` END WHERE produccion.idproduccion IN ("+Object.keys(prods).join(',')+")";
+        querymat2 += " ELSE produccion.`e` END WHERE produccion.idproduccion IN ("+Object.keys(prods).join(',')+")";
+        var er = false;
+        req.getConnection(function(err,connection){
+            if(err) console.log(err);
+            connection.query("UPDATE recepcion SET anulado = true WHERE idrecepcion = "+input.idrecepcion, function(err,upRec){
+                if(err) {
+                    console.log(err);
+                    er = true;
+                }
+                connection.query(queryabs, function(err, upAbast){
+                    if(err) {
+                        console.log(err);
+                        er = true;
+                    }
+                    connection.query(querymat, function(err, upMat){
+                        if(err) {
+                            console.log(err);
+                            er = true;
+                        }
+                        connection.query(querymat2, function(err, upMat){
+                            if(err) {
+                                console.log(err);
+                                er = true;
+                            }
+                            connection.query("INSERT INTO produccion_history SET ?", [[prod_h]], function(err, upMat){
+                                if(err) {
+                                    console.log(err);
+                                    er = true;
+                                }
+                                if(er){
+                                    res.send('error');
+                                }else{
+                                    res.send('ok');
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    } else res.redirect("/bad_login");
+});
 
 
 module.exports = router;

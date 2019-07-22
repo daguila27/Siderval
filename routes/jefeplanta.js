@@ -321,7 +321,7 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
         req.getConnection(function(err, connection){
             if(err) throw err;
 
-                var consulta = "select " +
+                var consulta = "SELECT " +
                     "material.detalle, material.peso, " +
                     "produccion_history.*, produccion_history.fecha as mov_fecha,coalesce(odc.numoc, 'Producción para Stock') as numoc, " +
                     "fabricaciones.idorden_f, " +

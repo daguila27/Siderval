@@ -107,7 +107,8 @@
             $("#page-wrapper").data('view') === "/bodega/view_despachos" ||
             $("#page-wrapper").data('view') === "/bodega/view_bodega"||
             $("#page-wrapper").data('view') === "/bodega/view_pendientes"||
-            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"
+            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"||
+            $("#page-wrapper").data('view') === "/bodega/view_externo"
         )){
             //ajax($(".oe_secondary_submenu li.active"));
             busc.hidden_screen();
@@ -131,9 +132,10 @@
         $("#up-fills").css('width', '100%');
         if( (
             $("#page-wrapper").data('view') === "/bodega/view_despachos" ||
-            $("#page-wrapper").data('view') === "/bodega/view_bodega"||
-            $("#page-wrapper").data('view') === "/bodega/view_pendientes"||
-            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"
+            $("#page-wrapper").data('view') === "/bodega/view_bodega" ||
+            $("#page-wrapper").data('view') === "/bodega/view_pendientes" ||
+            $("#page-wrapper").data('view') === "/jefeprod/view_producciones" ||
+            $("#page-wrapper").data('view') === "/bodega/view_externo"
         )){
             //ajax($(".oe_secondary_submenu li.active"));
             busc.hidden_screen();

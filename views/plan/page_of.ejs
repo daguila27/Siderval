@@ -3,7 +3,23 @@
         return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
     }
 %>
+
+<style>
+    .volver-tabla:hover{
+        background-color: rgb(124,123,173);
+        color: white;
+        cursor: pointer;
+    }
+    .volver-tabla{
+        position: relative;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        border-radius: 25%;
+    }
+</style>
 <div class="o_view_manager_content">
+    <i class="fa fa-arrow-left volver-tabla" id="odaBack" onclick="volver_tabla()"></i>
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
             <div class="o_form_sheet_bg">
@@ -45,8 +61,7 @@
                                         <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Cliente</label>
                                     </td>
                                     <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=of.sigla%><br><%=of.razon%>
-                                        </a>
+                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=of.sigla%><br><%=of.razon%></a>
                                     </td>
                                 </tr>
                                 <tr>

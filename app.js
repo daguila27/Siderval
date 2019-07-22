@@ -149,10 +149,12 @@ io.on('connection', function (socket) {
          });
      });
       socket.on('addNotificacion', function(input){
+          console.log("addNotificacion");
           console.log(input);
           var userf = input.key.substring(2,input.key.length);
           connection.query("SELECT fabricaciones.idmaterial, produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion){
               if(err){console.log("Error Selecting : %s", err);}
+
                 var idmaterial = produccion[0].idmaterial;
                 var idop = produccion[0].idop;
                 var dataInsert = {};
@@ -168,20 +170,45 @@ io.on('connection', function (socket) {
                 if(userf === '8'){
                   dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                   connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                      if(err){console.log("Error Selecting : %s", err);}                    
+                      if(err){console.log("Error Selecting : %s", err);}
                         io.sockets.emit("notif");
                   });
 
-
                 }
-                else if(userf === "9"){
+                else if(userf === "e"){
                     dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                     console.log(dataInsert);
                     connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                         if(err){console.log("Error Selecting : %s", err);}
-                        io.sockets.emit("refreshfaena"+userf);
 
-                        //connection.end();
+                        var idprod = [];
+                        var cantprod = [];
+                        var cant_aux = parseInt(input.cantidad);
+
+                        for(var w=0; w < input.idproduccion.split('-').length; w++){
+                            cant_aux -= parseInt(input.cantprod.split('-')[w]);
+                            if(cant_aux > 0){
+                                idprod.push(input.idproduccion.split('-')[w]);
+                                cantprod.push(parseInt(input.cantprod.split('-')[w]));
+                            }
+                            else{
+                                idprod.push(input.idproduccion.split('-')[w]);
+                                cantprod.push(cant_aux+parseInt(input.cantprod.split('-')[w]));
+                                break;
+                            }
+                        }
+                        //odaext@22955-22958@2019-7-10 01:04:06@110813@300-684
+                        var token = "odaext@"+idprod.join('-')+"@"+date+"@"+idmaterial+"@"+cantprod.join('-');
+                        dataInsert = {descripcion: token};
+                        connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                            if(err){console.log("Error Selecting : %s", err);}
+
+
+                            io.sockets.emit("refreshfaena"+userf);
+
+                            //connection.end();
+                        });
+
                     });
                 }
                 else{
@@ -194,7 +221,7 @@ io.on('connection', function (socket) {
                       //connection.end();
                   });
                 }
-                
+
 
         });
       });

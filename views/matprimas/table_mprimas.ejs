@@ -31,9 +31,9 @@ function fechaLatino(string){
     for(var j=0; j < mat.length; j++){
         stock_total += mat[j].stock;%>
     <tr>
-        <!--<td><%= mat[j].codigo%></td>-->
+        <!--<td>mat[j].codigo</td>-->
         <td><%= mat[j].descripcion%></td>
-        <!--<td><%= mat[j].sigla%></td>-->
+        <!--<td>mat[j].sigla</td>-->
         <td style="text-align: center" class="parsear_nro" data-cs="0"><%= mat[j].stock %></td>
         <td style="text-align: center" class="parsear_nro" data-cs="0"><%= mat[j].stock_i %></td>
         <td style="text-align: center" class="parsear_nro" data-cs="0"><%= mat[j].stock_c %></td>

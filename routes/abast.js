@@ -1070,6 +1070,7 @@ router.get('/notif_abast', function(req, res, next){
         			if(err){
         				console.log("Error Selecting : %s", err);
         			}
+        			console.log(notif);
         			res.render('abast/notificaciones', {notif: notif});
 
         		});
@@ -1472,11 +1473,11 @@ router.get('/get_dataodc/:idodc', function(req, res, next){
 });
 
 
-router.get('/get_dataodcext/:idprod/:cant', function(req, res, next){
+router.get('/get_dataodcext/:idprod/:cant/:idnotif', function(req, res, next){
     if(verificar(req.session.userData)){
-        var idprod = req.params.idprod;
-        var cant = req.params.cant;
-		idprod = idprod.split('-');
+        var idprod = req.params.idprod.split('-');
+        var cant = req.params.cant.split('-');
+        console.log(idprod);
         req.getConnection(function(err, connection){
             if(err)
                 console.log("Error Connection : %s", err);
@@ -1493,7 +1494,7 @@ router.get('/get_dataodcext/:idprod/:cant', function(req, res, next){
 	        			+"group_concat(material.detalle separator '@') as mat_token
                     * */
                     connection.query("SELECT " +
-						"pedido.idpedido, " +
+						"coalesce(pedido.idpedido, '0') as idpedido, " +
 						"produccion.idproduccion, " +
 						"fabricaciones.idfabricaciones, " +
 						"material.idmaterial as idmaterial_master, " +
@@ -1507,13 +1508,13 @@ router.get('/get_dataodcext/:idprod/:cant', function(req, res, next){
 						"LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
 						"LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
 						"LEFT JOIN producto ON producto.idmaterial = material.idmaterial " +
-						"LEFT JOIN (SELECT idmaterial,detalle,u_medida, u_compra FROM material) AS material_h ON material_h.idmaterial = producto.idmaterial_ext " +
+						"LEFT JOIN (SELECT idmaterial,detalle,u_medida,u_compra FROM material) AS material_h ON material_h.idmaterial = producto.idmaterial_ext " +
 						"WHERE produccion.idproduccion IN ("+idprod.join(',')+") ORDER BY produccion.idproduccion ASC", function(err, dets){
 						if(err)
 							console.log("Error Selecting : %s", err);
 
-						console.log(dets);
-						res.render('abast/modal_odcext_creation', {data: dets, cant: cant, provs: proveedor, last: last[0].num + 1});
+						console.log(cant);
+						res.render('abast/modal_odcext_creation', {data: dets, cant: cant, provs: proveedor, last: last[0].num + 1, idnotificacion: req.params.idnotif});
 					});
                 });
             });
@@ -3672,6 +3673,77 @@ router.post('/newoc_ped', function(req, res, next){
         	});
         });
       	
+    } else res.redirect("/bad_login");
+});
+
+
+
+router.post('/newoc_ped_ext', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        var er = false;
+        if(input.desc === '' || input.desc === undefined){
+            input.desc = 0;
+        }
+        if(input.exento == undefined){
+            input.exento = 'off';
+        }
+        var array=[];
+        input.pag = input.prov.split('@')[1];
+        input.prov = input.prov.split('@')[0];
+
+        input.ex_iva = input.ex_iva.split('@');
+        input.idped = input.idped.split('@');
+        input.idfab = input.idfab.split('@');
+        input.costo = input.costo.split('@');
+        input.centroc = input.centroc.split('@');
+        input.idprod = input.idprod.split('@');
+        input.idmat = input.idmat.split('@');
+        input.cantidad = input.cantidad.split('@');
+        var token = input.obs+"@"+input.dest+"@"+input.plae+"@"+input.pag+"@"+input.entr+"@"+input.cuent+"@"+input.money+"@off@"+input.desc;
+        var idprov = input.prov;
+        console.log("luego");
+        console.log(input);
+        for(var w=0; w < input.idmat.length; w++){
+			//idoda, idmaterial, cantidad, costo, exento, cc, idproduccion
+			array.push([input.nrodc, input.idmat[w], input.cantidad[w], input.costo[w], input.ex_iva[w] !== 'off', input.centroc[w], input.idprod[w]]);
+		}
+        req.getConnection(function(err,connection){
+            if(err)
+                console.log("Error Connection : %s", err);
+            connection.query("INSERT INTO oda (numoda, idproveedor, tokenoda) VALUES (?,?,?)", [input.nrodc, idprov, token],
+                function(err, odc){
+                    if(err){
+                        console.log("Error Selecting : %s", err);
+                    	er = true;
+                    }
+                    if(odc.length>0){
+						for(var e=0; e < array.length; e++ ){
+							array[e][0] = odc.insertId;
+						}
+					}
+					input.nrodc = odc.insertId;
+					console.log(array);
+                    connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc, idproduccion) VALUES ?", [array], function(err, ped){
+                    	if(err){
+                    		console.log("Error Selecting : %s", err);
+                            er = true;
+                        }
+                        connection.query("UPDATE notificacion SET active = false WHERE idnotificacion = "+input.idnotif, function(err, inNotif){
+                            if(err){
+                                console.log("Error Selecting : %s", err);
+                                er = true;
+                            }
+							if(er){res.send('error');}
+							else{
+								res.send(input.nrodc.toString());
+							}
+                        });
+                    });
+                });
+        });
+
     } else res.redirect("/bad_login");
 });
 
