@@ -34,7 +34,7 @@ var gestionpl = require('./routes/gestionpl');
 
 
 // view engine setup
-app.set('port', process.env.PORT || 4300);
+app.set('port', process.env.PORT || 6300);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
@@ -46,7 +46,7 @@ app.use(cookieParser("usuarios"));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieSession({
     name: 'session',
-    keys: ['usuarios']
+    keys: ['usuario_espejo']
 }));
 
 
@@ -116,14 +116,11 @@ const io = require('socket.io')(server);
 
 
 var mysql = require('mysql');
-var connection = mysql.createConnection({
-      host: '127.0.0.1',
-      user: 'admin',
-      password: 'tempo123',
-      port: 3306,
-      database: 'siderval',
-      insecureAuth : true
-});
+
+var dbCredentials = require("./dbCredentials");
+dbCredentials.insecureAuth = true;
+
+var connection = mysql.createConnection(dbCredentials);
 
 
 connection.connect();
