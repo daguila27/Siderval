@@ -89,16 +89,16 @@ app.use(function(err, req, res, next) {
 
 
 // Create a new service object
-
-/*var svc = new Service({
-  name:'Siderval SGP',
+/*
+var svc = new Service({
+  name:'Siderval espejo alfa',
   description: 'Servicio creado por nodejs para nuevo repositorio git.',
-  script: '/app.js'
-});*/
+  script: 'C:/Siderapp/alpha-testeo/app.js'
+});
 
 // Listen for the "install" event, which indicates the
 // process is available as a service.
-/*svc.on('install',function(){
+svc.on('install',function(){
   svc.start();
 });
 
@@ -116,11 +116,14 @@ const io = require('socket.io')(server);
 
 
 var mysql = require('mysql');
-
-var dbCredentials = require("./dbCredentials");
-dbCredentials.insecureAuth = true;
-
-var connection = mysql.createConnection(dbCredentials);
+var connection = mysql.createConnection({
+      host: '127.0.0.1',
+      user: 'admin',
+      password: 'tempo123',
+      port: 3306,
+      database: 'siderval',
+      insecureAuth : true
+});
 
 
 connection.connect();
