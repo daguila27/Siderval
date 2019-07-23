@@ -628,8 +628,8 @@ router.get('/page_oc/:idodc', function(req, res, next){
                 if(err) console.log("Connection Error: %s",err);
                 connection.query("SELECT * FROM odc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente WHERE odc.idodc = ?",[idodc], function(err, odc){
                     if(err) console.log("Select Error: %s",err);
-                    connection.query("SELECT pedido.*,pedido.precio as precioOC, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
-                        +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial WHERE pedido.idodc = ? ORDER BY (pedido.numitem*1)",[idodc], function(err ,ped){
+                    connection.query("SELECT fabricaciones.restantes as restantes_fabricaciones, pedido.*,pedido.precio as precioOC, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
+                        +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido WHERE pedido.idodc = ? ORDER BY (pedido.numitem*1)",[idodc], function(err ,ped){
                             if(err) console.log("Select Error: %s",err);
                             
                             console.log(req.session);
@@ -1796,7 +1796,6 @@ router.post('/view_ordenpdf_first', function(req,res,next){
                                     ph.exit();
                                     var fs = require('fs');
                                     var filePath = '\\pdf\\odc'+oda[0].numoda+'.pdf';
-                                    console.log(__dirname.replace('routes','public') + filePath);
                                     fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
                                         res.contentType("application/pdf");
                                         console.log(data);
@@ -1825,6 +1824,7 @@ router.get('/show_pdf_first/:numoda', function(req,res,next){
             console.log("ARCHIVO INEXISTENTE");
         }
         console.log(data);
+
         fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
             res.contentType("application/pdf");
             console.log(data);
@@ -1843,15 +1843,28 @@ router.get('/show_pdf/:numoda', function(req,res,next){
             console.log('error: ', err);
             console.log("ARCHIVO INEXISTENTE");
             res.redirect('/plan/view_ordenpdf_after/'+req.params.numoda);
-
         } else {
+            var r = __dirname.replace('routes','public') + filePath;
+            console.log( r );
             console.log(data);
             console.log("ARCHIVO SI EXISTE");
-            fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
-                res.contentType("application/pdf");
-                console.log(data);
-                res.send(data);
-            });
+            if(req.session.booleanPDFgen) {
+                fs.readFile(__dirname.replace('routes', 'public') + filePath, function (err, data) {
+                    res.contentType("application/pdf");
+                    console.log(data);
+                    req.session.booleanPDFgen = false;
+                    res.send(data);
+                });
+            }else{
+                fs.unlink(r, function (err, data) {
+                    if (err) {
+                        console.log("Ha Ocurrido un error : %s", err);
+                    }
+                    req.session.booleanPDFgen = true;
+                    res.redirect('/plan/show_pdf/' + req.params.numoda);
+                });
+            }
+
         }
     });
 
@@ -3067,6 +3080,95 @@ router.get('/xlsx_desp', function(req,res){
                     }
 
                 });
+        });
+    }
+    else res.redirect('/bad_login');
+});
+
+
+router.post('/editar_oc_save', function(req,res){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        if(typeof input['idpedido[]'] === 'string'){
+            input['idmaterial[]'] = [input['idmaterial[]']];
+            input['idpedido[]'] = [input['idpedido[]']];
+            input['cantidad_a[]'] = [input['cantidad_a[]']];
+            input['cantidad[]'] = [input['cantidad[]']];
+            input['precio[]'] = [input['precio[]']];
+        }
+        var idodc = input['idodc[]'];
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection : %s", err);}
+            //STOCK DISPONIBLE = STOCK BODEGA + STOCK PRODUCCION  - POR DESPACHAR
+            //SE OBTIENE EL STOCK DISPONIBLE PARA SABER QUE CANTIDAD SE NECESITA FABRICAR (CARGAR A fabricaciones)
+            connection.query("select " +
+                "material.idmaterial, " +
+                "material.stock + queryProd.enproduccion  - queryPed.xdespachar as disponible" +
+                " from material " +
+                "left join (select pedido.idmaterial, sum(pedido.cantidad - pedido.despachados) AS xdespachar " +
+                "from pedido where pedido.cantidad > pedido.despachados group by pedido.idmaterial) as queryPed ON " +
+                "queryPed.idmaterial = material.idmaterial " +
+                "left join (select fabricaciones.idmaterial, sum(produccion.1 + produccion.2 + produccion.3 + produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones where produccion.1 + produccion.2 + produccion.3 + produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as queryProd ON queryProd.idmaterial = material.idmaterial " +
+                "WHERE material.idmaterial in ("+input['idmaterial[]'].join(',')+")", function(err, disp){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                console.log(disp);
+                var queryFabCant;
+                var queryFabRest;
+                var queryPedCant;
+                var queryPedCost;
+                for(var w=0; w < input['idpedido[]'].length; w++){
+                    if(w===0){
+                        queryPedCant = "UPDATE pedido SET cantidad = CASE";
+                        queryFabCant = "UPDATE fabricaciones SET cantidad = CASE";
+                        queryPedCost = "UPDATE pedido SET precio = CASE";
+                        queryFabRest = "UPDATE fabricaciones SET restantes = CASE";
+                    }
+                    queryPedCant += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN "+input['cantidad[]'][w];
+                    queryFabCant += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN "+input['cantidad[]'][w];
+                    queryPedCost += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN "+input['precio[]'][w];
+                    if(parseInt(input['cantidad[]'][w]) < parseInt(input['cantidad_a[]'][w]) ){
+                        queryFabRest += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN restantes - "+( parseInt(input['cantidad_a[]'][w]) - parseInt(input['cantidad[]'][w]) );
+                    }
+                    else{
+                        for(var q=0; q < disp.length; q++){
+                            console.log(disp[q].idmaterial +"==="+ input['idmaterial[]'][w]);
+                            if(disp[q].idmaterial == input['idmaterial[]'][w]){
+                                console.log("si");
+                                if(parseInt(disp[q].disponible) >= (parseInt(input['cantidad[]'][w]) - parseInt(input['cantidad_a[]'][w])) || disp[q].disponible < 0 ){
+                                    queryFabRest += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN restantes + 0";
+                                }else{
+                                    queryFabRest += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN restantes + "+(parseInt(input['cantidad[]'][w]) - parseInt(input['cantidad_a[]'][w])-parseInt(disp[q].disponible));
+                                }
+                            }
+                        }
+                    }
+                    if(w===input['idpedido[]'].length-1){
+                        queryPedCant += " ELSE cantidad END WHERE idpedido IN ("+input['idpedido[]'].join(',')+")";
+                        queryFabCant += " ELSE cantidad END WHERE idpedido IN ("+input['idpedido[]'].join(',')+")";
+                        queryPedCost += " ELSE precio END WHERE idpedido IN ("+input['idpedido[]'].join(',')+")";
+                        queryFabRest += " ELSE restantes END WHERE idpedido IN ("+input['idpedido[]'].join(',')+")";
+                    }
+                }
+                //SE ACTUALIZAN LOS PEDIDO - cantidad
+                connection.query(queryPedCant, function(err, data){
+                    if(err){console.log("Error Selecting : %s", err);}
+                    //SE ACTUALIZAN LOS PEDIDO - costo
+                    connection.query(queryPedCost, function(err, data){
+                        if(err){console.log("Error Selecting : %s", err);}
+                        //SE ACTUALIZAN LAS FABRICACIONES - cantidad
+                        connection.query(queryFabCant, function(err, data){
+                            if(err){console.log("Error Selecting : %s", err);}
+                            //SE ACTUALIZAN LAS FABRICACIONES - restantes
+                            connection.query(queryFabRest, function(err, data){
+                                if(err){console.log("Error Selecting : %s", err);}
+                                res.redirect('/plan/page_oc/'+idodc);
+                            });
+                        });
+                    });
+                });
+            });
         });
     }
     else res.redirect('/bad_login');

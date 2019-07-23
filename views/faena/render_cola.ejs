@@ -55,6 +55,8 @@
 						data-sgt_etapa="<%=data[i].nextstep%>"
 						data-sigetp="<%= data[i].sigetapa%>"
 						data-cantprod="<%= data[i].cant_prod%>"
+						data-prevetp = "<%= data[i].nombre_previa%>"
+						data-prev_etapa="<%=data[i].prevStep%>"
 						data-toggle="modal"
 						data-target="#send_step">
                   Enviar Producto</button>
@@ -100,10 +102,15 @@
 	  	$("#prod_id").val($(yo).data('id'));
 	  	$("#cantprod").val($(yo).data('cantprod'));
 		$("#sgt_etapa").val($(yo).data('sgt_etapa'));
+        $("#prev_etapa").val($(yo).data('prev_etapa'));
 		$("#sendnum").attr('max',$(yo).data('cantidad'));
 		$("#sendnum").val($(yo).data('cantidad'));
 		$(".totalSend").html("/ "+$(yo).data('cantidad'));
-		$(".p-sigetp").html("<b>Siguiente etapa: </b> "+$(yo).data('sigetp'));
+
+        $(".p-sigetp").html('<select class="form-control" id="etp-selector">' +
+			'<option value="'+$(yo).data('sgt_etapa')+'">Siguiente etapa: '+$(yo).data('sigetp')+'</option>' +
+            /*'<option value="'+$(yo).data('prev_etapa')+'">Etapa previa: '+$(yo).data('prevetp')+'</option>' +*/
+            '</select>');
 		console.log($(yo).data('sgt_etapa'));
 	}
 

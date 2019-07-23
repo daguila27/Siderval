@@ -36,7 +36,7 @@
 		display: flex;
 	}
 </style>
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; z-index: 9;">
 	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
 			<li class="active">Listado de Pedidos</li>
@@ -100,6 +100,42 @@
 </style>
 
 <script type="text/javascript">
+
+    var alto_buscador = $(".up-fills").height();
+    var margen_tabla = $('#fw-container').css('margin-top');
+    function mostrar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+    }
+    function restaurar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        busc.buscar_action(true);
+        $('.up-fills').css('transition', '0.5s');
+    }
+    function ocultar_buscador(){
+        $('.up-fills').css('z-index', '0');
+        $('.up-fills').css('top', '-'+$('.up-fills').height()+'px');
+        $('#fw-container').css('margin-top', '0px');
+        $('#fw-container').css('padding-top', '30px');
+        $("#pageView").val('1');
+        //busc.buscar_action();
+    }
+    function volver_tabla(){
+        $('.up-fills').css('z-index', '9');
+        $('.up-fills').css('top', 0);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('#fw-container').css('padding-top', '0px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+        $("#pageView").val('0');
+    }
+
+
 	function changeSize(yo){
 	    alert($(yo).val());
 	    $(".row_main").css('font-size', $(yo).val()+"px");

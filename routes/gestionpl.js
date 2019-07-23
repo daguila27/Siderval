@@ -213,7 +213,7 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
             "from produccion " +
             "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
             "left join material on material.idmaterial=fabricaciones.idmaterial " +
-            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial", [idmat], function(err, rows){
+            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial order by produccion.idproduccion ASC", [idmat], function(err, rows){
             if(err) throw err;
 
             /*
@@ -250,27 +250,11 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                     key: 'fa8'
                 };
                 enviarNotificacionBodega(req, notif);
-            }else if(to === 'e'){
-                notif = {
-                    idproduccion: rows[0].idprod,
-                    cantidad: env,
-                    key: 'fae'
-                };
-                enviarNotificacionExternalizacion(req, notif);
             }
             /*
             * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
             *
             * */
-            /*
-            * UPDATE `table` SET `uid` = CASE
-                    WHEN id = 1 THEN 2952
-                    WHEN id = 2 THEN 4925
-                    WHEN id = 3 THEN 1592
-                    ELSE `uid`
-                    END
-                WHERE id  in (1,2,3)
-            **/
             input.idprod = input.idprod.split('-');
             input.cantprod = input.cantprod.split('-');
             var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
@@ -283,21 +267,29 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
             var ids = "";
             var cant_aux = parseInt(input.sendnum);
             var history = [];
-
+            var prod_affected = [];
+            var env_affected = [];
             for(var w=0; w < input.idprod.length; w++){
                 cant_aux -= parseInt(input.cantprod[w]);
                 if(cant_aux > 0){
                     // SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION
                     query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
-                    query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
-                    //history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
-                    if(input.cantprod[w] > 0){
+                    if(input.newetapa === 's'){
+                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+input.cantprod[w];
+                    }else{
+                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
+                    }
+
+                    if(parseInt(input.cantprod[w]) > 0){
                         history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
+                        prod_affected.push(input.idprod[w]);
+                        //LA CANTIDAD TRASPASADA
+                        env_affected.push(input.cantprod[w]);
                     }
                     ids += input.idprod[w]+",";
                 }
                 else{
-                    /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA */
+                    /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA --> cant_aux negativo*/
                     query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
                     if(input.newetapa === 's'){
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+(cant_aux+parseInt(input.cantprod[w]));
@@ -306,6 +298,9 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                     }
                     //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
                     history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa]);
+                    prod_affected.push(input.idprod[w]);
+                    //LA CANTIDAD TRASPASADA
+                    env_affected.push(cant_aux+parseInt(input.cantprod[w]));
                     ids += input.idprod[w]+",";
                     break;
                 }
@@ -325,6 +320,15 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                     conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
                         if(err) throw err;
 
+
+                        if(to === 'e'){
+                            notif = {
+                                idproduccion: prod_affected.join('-'),
+                                cantidad: env_affected.join('-'),
+                                key: 'fae'
+                            };
+                            enviarNotificacionExternalizacion(req, notif);
+                        }
                     });
                 });
             });
@@ -407,7 +411,22 @@ function enviarNotificacionExternalizacion(req, input){
     if(conn){
         console.log("INGRESANDO NOTIFICACIÓN DE EXTERNALIZACION");
         console.log(input);
-        //
+        //{ idproduccion: '22744-22853', cantidad: '1', key: 'fae' }
+        //odaext@idproduccion@2019-07-08 16:51:53@idmaterial@cantidad
+        conn.query("SELECT fabricaciones.idmaterial FROM produccion " +
+            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+            "WHERE idproduccion IN ('"+input.idproduccion.split('-').join(',')+"') GROUP BY fabricaciones.idmaterial", function(err, idmat) {
+            if(err){console.log("Error Selecting : %s", err);}
+            idmat = idmat[0].idmaterial;
+            var d = new Date();
+            var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+            var token = "odaext@"+input.idproduccion+"@"+date+"@"+idmat+"@"+input.cantidad;
+            console.log(token);
+            conn.query("INSERT INTO notificacion (descripcion) VALUES ('"+token+"')", function(err, inNotif) {
+                if(err){console.log("Error Selecting : %s", err);}
+
+            });
+        });
     }
 }
 

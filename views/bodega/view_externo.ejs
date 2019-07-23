@@ -1,0 +1,198 @@
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+    .indicator-color::before {
+        content: 'aa';
+        width: 2px;
+        height: 2px;
+        margin-right: 2px;
+    }
+
+
+    .indicator-color-green::before {
+        color: rgb(223,240,216);
+        background-color: rgb(223,240,216);
+    }
+    .indicator-color-red::before {
+        color: rgb(242,222,222);
+        background-color: rgb(242,222,222);
+    }
+    .busc-din-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 90%;
+        transition:0.5s;
+        z-index: 9;
+    }
+    .busc-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 100%;
+        transition:0.5s;
+        z-index: 9;
+    }
+</style>
+
+
+<div class="modal fade" id="anularExternoModal" tabindex="-1" role="dialog">
+    <form class="form-inline" id="anuExtForm"></form>
+</div><!-- /.modal -->
+<%
+var clase;
+if(username == 'gestionpl'){clase='busc-din-menu';}
+else{clase='busc-menu';}%>
+<div id="up-fills" class="row up-fills <%=clase%>">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+            <li class="active change-inv-title">Recepción de Externalizados</li>
+            <!-- Mostrar cantidad de datos -->
+            <div id="pedidos" data-total="0" style="margin-top: 8px"></div>
+
+
+        </ol>
+        <div style="width: 50%;">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+            </div>
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="getcsvof" data-tipo="stock"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
+                <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='Lista' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                <div style="display: flex">
+                    <label style="margin-left: 30px; margin-top: 6px;">Mostrar Anuladas</label>
+                    <input type="checkbox" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="addCondCheck(this)">
+                    <h5 style="margin-left: 10px" class="indicator-ext-check hidden"><small>Mostrando recepciones anuladas</small></h5>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+
+<style>
+    .ch_page:hover{
+        cursor:pointer;
+        color: black;
+        font-size: 15px;
+    }
+    .caption a:hover{
+        cursor:pointer;
+    }
+</style>
+
+<script type="text/javascript">
+    var array_fill = [
+        "OC@primary",
+        "OCA@primary",
+        "OF@primary",
+        "GDD@primary",
+        "Detalle@primary"
+    ];
+
+    var busc = new Buscador("buscar_externo", ".o_searchview", array_fill, "/bodega/table_externo", "DataTableExterno" , true, false);
+
+    busc.add_cond = "!recepcion.anulado";
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        busc.extraInfo = [];
+        busc.buscar_action();
+    });
+
+    function addCondCheck(yo){
+        if($(yo).is(':checked')){
+            busc.add_cond = "";
+        }
+        else{
+            busc.add_cond = "!recepcion.anulado";
+        }
+        $(".indicator-ext-check").toggleClass('hidden');
+        busc.buscar_action();
+    }
+
+    $("form#anuExtForm").submit(function(e){
+        e.preventDefault();
+        if(confirm("¿Está seguro?")){
+            var array = $(this).serializeArray();
+            var datos = {};
+            for(var i=0; i < array.length; i++){
+                if(array[i].name === 'idrecepcion' || array[i].name === 'idrecepcion'){
+                    datos[array[i].name] = array[i].value;
+                }else{
+                    if(datos[array[i].name]){
+                        datos[array[i].name].push(array[i].value);
+                    }else{
+                        datos[array[i].name] = [array[i].value];
+                    }
+                }
+            }
+            console.log(datos);
+            $.ajax({
+                type: 'POST',
+                data: datos,
+                url: '/bodega/anular_recepcion_externo',
+                success: function(data){
+                    if(data==='ok'){
+                        alert("¡Recepción Anulado con exito!");
+                    }
+                    else{
+                        alert("¡Ha ocurrido un error!");
+                    }
+
+                    $("#anularExternoModal").modal('hide');
+                    busc.buscar_action();
+                }
+            });
+        }
+    });
+
+</script>
+
+<script src="/buscador_funciones.js"></script>

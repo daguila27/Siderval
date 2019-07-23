@@ -1,0 +1,89 @@
+
+<div class="modal-dialog" role="document">
+    <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h3 class="modal-title">
+                Anular Recepción: <%= recep.numgd%>
+                <input type="hidden" name="idrecepcion" value="<%= recep.idrecepcion%>">
+            </h3>
+            <h4 class="modal-title" style="text-align: right">Fecha de Recepción: <%=new Date(recep.fecha).toLocaleDateString()%></h4>
+        </div>
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="mycontent-left">
+                        <h3>
+                            <label for="of">
+                                OCA: <small style="font-size: 16px"><%= recep.idoda%></small>
+                                <input type="hidden" name="idoda" value="<%= recep.idoda%>">
+                            </label>
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="mycontent-right">
+                        <h3>
+                            <label>
+                                Proveedor: <small style="font-size: 16px"><%= recep.cliente%></small>
+                            </label>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <style>
+                .mycontent-right {
+                    border-left: 1px dashed rgb(124,123,173);
+                    padding-left: 25px;
+                }
+
+            </style>
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>
+                        <label for="material">
+                            <small style="font-size: 15px">Se anularán las recepciones:</small>
+                        </label>
+                    </h4>
+                    <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" >
+                        <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <%
+                        var bloc = false;
+                        for(var e=0; e < data.length; e++){
+                            if(data[e].isanulable){%>
+                                <tr class="success">
+                            <%}else{%>
+                                <tr class="danger">
+                            <%bloc=true;}%>
+                            <input type="hidden" name="idabast" value="<%= data[e].idabast%>">
+                            <input type="hidden" name="idprod" value="<%= data[e].idproduccion%>">
+                            <input type="hidden" name="cant" value="<%= data[e].cantidad%>">
+                                <td><%= data[e].detalle%></td>
+                                <td><%= data[e].cantidad%></td>
+                            </tr>
+                        <%}%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <h4 class="pull-left hidden" id="msjAlerta"><small style="color: rgb(255,0,0)"><i class="fa fa-exclamation-triangle"></i> Imposible anular Recepción, no hay stock suficiente.</small></h4>
+            <button type="submit" class="btn btn-primary" id="buttonSubmit">Anular</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+<script>
+    if('<%= bloc%>' === 'true'){
+        $("#msjAlerta").toggleClass('hidden');
+        $("#buttonSubmit").attr('disabled', 'true');
+    }
+</script>

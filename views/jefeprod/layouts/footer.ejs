@@ -413,8 +413,10 @@
     });
     $("form.form-newp").on('submit', function(e){
         e.preventDefault();
-
         var array = $(this).serializeArray();
+        var etp_act = array.etapa_act;
+
+        alert("array__");
         console.log(array);
         $.ajax({
             type: 'POST',

@@ -33,6 +33,9 @@
         <th class="cabecera o_column_sortable " style="text-align: center;" >Movimiento</th>
         <th class="cabecera o_column_sortable " style="text-align: center;">Receptor</th>
         <th class="cabecera o_column_sortable" style="text-align: center;" >Fecha de Registro</th>
+        <%if(user === 'matprimas'){%>
+            <th>Anular</th>
+        <%}%>
     </tr>
     </thead>
     <tbody class="ui-sortable">
@@ -57,6 +60,13 @@
             <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" onclick="submit_form(this)" data-idmov="<%= data[i].idmovimiento%>">
                 <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_gen).getTime()%>" name="amount_total"><%= fechaLatino(new Date(data[i].f_gen).toLocaleDateString())%></span>
             </td>
+            <%if(user === 'matprimas'){%>
+                <td style="text-align: center">
+                    <button class="btn btn-danger btn-xs anularMovimiento" data-idmat="<%= data[i].idmaterial%>" data-idmovimiento="<%=data[i].idmovimiento%>">
+                        <i class="fa fa-ban"></i>
+                    </button>
+                </td>
+            <%}%>
         </tr>
     <%}%>
     </tbody>
@@ -70,6 +80,9 @@
         <td></td>
         <td></td>
         <td></td>
+        <%if(user === 'matprimas'){%>
+            <td></td>
+        <%}%>
     </tr>
     </tfoot>
 </table>
@@ -93,6 +106,18 @@
             }
         });
     }
+
+    $(".anularMovimiento").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/matprimas/anular_movimiento_modal/'+$(this).data('idmovimiento')+"/"+$(this).data('idmat'),
+            success: function(data){
+                $("#anuMovForm").html(data);
+                $("#anularMovimientoModal").modal('show');
+            }
+        });
+    });
 
 
 </script>

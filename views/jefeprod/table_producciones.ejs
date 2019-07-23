@@ -28,6 +28,9 @@ function fechaLatino(string){
             <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">Rch</th>
             <th class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center">TRA</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center">Creación</th>
+            <% if(user === 'jefeprod'){%>
+            <th data-toggle="tooltip" data-placement="bottom" title="Anular Producción" style="text-align: center">Anular</th>
+            <%}%>
         </tr>
     </thead>
     <tbody>
@@ -53,7 +56,7 @@ function fechaLatino(string){
             to_con += datalen[i]['7'];
             to_rec += datalen[i].standby;
     %>
-    <tr>
+    <tr class="column-prods">
         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
         <td style="text-align: center"><%= datalen[i].idordenproduccion %></td>
         <td style="text-align: center"><%= datalen[i].numordenfabricacion %></td>
@@ -68,6 +71,17 @@ function fechaLatino(string){
         <td data-cs="0" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
         <td data-cs="0" class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
         <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center" data-order="<%=new Date(datalen[i].creacion).getTime()%>"><%= new Date(datalen[i].creacion).toLocaleDateString() %></td>
+        <% if(user === 'jefeprod' ){
+            if(datalen[i].anulable){%>
+            <td data-order='1' data-toggle="tooltip" data-placement="bottom" title="Anular Producción" style="text-align: center" >
+                <button class="btn btn-danger btn-xs anulButton" data-idproduccion="<%= datalen[i].idproduccion%>">
+                <i class="fa fa-ban"></i>
+                </button>
+            </td>
+        <%}else{%>
+            <td data-order='0' data-toggle="tooltip" data-placement="bottom" title="No es posible Anular Producción" style="text-align: center" >
+                <span class="label label-warning">No anulable</span></td>
+        <%}}%>
     </tr>
     <%  }
     } else {
@@ -88,6 +102,9 @@ function fechaLatino(string){
         <td></td>
         <td></td>
         <td></td>
+        <% if(user === 'jefeprod'){%>
+            <td></td>
+        <%}%>
     </tr>
     <%}%>
     </tbody>
@@ -107,6 +124,9 @@ function fechaLatino(string){
             <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_rec%></td>
             <td></td>
             <td></td>
+            <% if(user === 'jefeprod'){%>
+                <td></td>
+            <%}%>
         </tr>
     </tfoot>
 </table>
@@ -116,6 +136,16 @@ function fechaLatino(string){
 
 <script type="text/javascript">
         setDataTableFixed("#prodTable");
-
+        $(".anulButton").on('click', function(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '/jefeprod/anular_produccion_modal/'+$(this).data('idproduccion'),
+                success: function(data){
+                    $("#anuProdForm").html(data);
+                    $("#anularProduccionModal").modal('show');
+                }
+            })
+        });
 
 </script>
