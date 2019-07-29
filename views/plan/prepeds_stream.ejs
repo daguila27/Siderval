@@ -20,7 +20,6 @@ function letraMayus(string) {
         %>
     <tr>
         <td><%= data[i].detalle%></td>
-        <!--<td><%# data[i].cnom%></td>-->
         <td style="text-align: center"><%= data[i].stock%></td>
         <td style="text-align: center"><%= data[i].xdespachar%></td>
         <td style="text-align: center"><%= data[i].enproduccion%></td>
@@ -32,7 +31,6 @@ function letraMayus(string) {
         <td>
             <div class="btn-group" style="display:flex;margin: 0 auto;">
                 <%
-                console.log(data[i].ruta);
                 if(data[i].idproducido != null){%>
                 <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducido%>" data-tipo="producido" class="btn btn-xs btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Fabricar</a>
                 <%}%>

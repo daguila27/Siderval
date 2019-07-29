@@ -39,7 +39,7 @@
 		cursor: pointer;
 	}
 </style>
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; z-index: 9;">
 	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
 			<li class="active">Listado de Fabricaciones</li>
@@ -63,12 +63,6 @@
 
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
 				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-
-				<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_ofs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-
-				<button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
-
-
 				<div style="display: flex">
 					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Bloqueados</label>
 					<input type="checkbox" id="fabsBloq" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="change_tipo_of()">
@@ -93,6 +87,40 @@
 	</div>
 </div>
 <script type="text/javascript">
+
+    var alto_buscador = $(".up-fills").height();
+    var margen_tabla = $('#fw-container').css('margin-top');
+    function mostrar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+    }
+    function restaurar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        busc.buscar_action(true);
+        $('.up-fills').css('transition', '0.5s');
+    }
+    function ocultar_buscador(){
+        $('.up-fills').css('z-index', '0');
+        $('.up-fills').css('top', '-'+$('.up-fills').height()+'px');
+        $('#fw-container').css('margin-top', '0px');
+        $('#fw-container').css('padding-top', '30px');
+        $("#pageView").val('1');
+        //busc.buscar_action();
+    }
+    function volver_tabla(){
+        $('.up-fills').css('z-index', '9');
+        $('.up-fills').css('top', 0);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('#fw-container').css('padding-top', '0px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+        $("#pageView").val('0');
+    }
     function change_tipo_of(){
 
         if($("#fabsBloq").is(':checked')){

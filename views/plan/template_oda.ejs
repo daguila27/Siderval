@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-	<html>
 	<head>
 
 		<meta charset="utf-8">
@@ -8,7 +7,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="description" content="">
 		<meta name="author" content="">
-
 		<title>Orden de Compra #<%=oda[0].numoda%></title>
 		<link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -70,7 +68,8 @@
 			border: 1px solid;
 		}
 	</style>
-		<%function numberFormat(numero){
+		<%
+		function numberFormat(numero){
             var resultado = "";
             if(numero[0]=="-")
             {
@@ -96,7 +95,6 @@
 		    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
 		    return num.toString().match(re)[0];
 		}
-
         %>
 	<body>
 		<div class='headerss' style="width: 100%; margin-bottom: 20px;float: left;">
