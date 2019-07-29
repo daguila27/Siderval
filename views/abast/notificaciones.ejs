@@ -2,6 +2,7 @@
         for(var u=0; u < notif.length; u++){
             var desc = notif[u].descripcion.split('@');
             var hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];
+            console.log(desc[0]);
             if(desc[0] === 'aoc'){%>
                 <li style="cursor: pointer; display: flex">
                 <a class="notificacion" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-idoc="<%= desc[1]%>">
@@ -18,17 +19,31 @@
                 <li class="divider"></li>
             <%}else if(desc[0] === 'odaext'){%>
                 <li style="cursor: pointer; display: flex;">
-                <a class="notificacion-odaext" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-idprod="<%= desc[1]%>" data-cant="<%= desc[4]%>">
-                    <div>
-                        <strong>Creación de OC</strong>
-                        <span class="pull-right text-muted">
-                            <em><%= hora%></em>
-                            </span>
-                    </div>
-                    <div>Es necesaria la creación de un OCA <br> de externalización para <%= notif[u].material%></div>
-                </a>
-                <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
-            </li>
+                    <a class="notificacion-odaext" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-idprod="<%= desc[1]%>" data-cant="<%= desc[4]%>">
+                        <div>
+                            <strong>Creación de OC</strong>
+                            <span class="pull-right text-muted">
+                                <em><%= hora%></em>
+                                </span>
+                        </div>
+                        <div>Es necesaria la creación de un OCA <br> de externalización para <%= notif[u].material%></div>
+                    </a>
+                    <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+                </li>
+                <li class="divider"></li>
+            <%}else if(desc[0] === 'odaextrech'){%>
+                <li style="cursor: pointer; display: flex;">
+                    <a class="notificacion" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>">
+                        <div>
+                            <strong>Externalización Rechazada</strong>
+                            <span class="pull-right text-muted">
+                                <em><%= hora%></em>
+                                </span>
+                        </div>
+                        <div>Se ha Anulado parte del pedido de OCA <%= notif[u].idoda%> - <%= notif[u].mat_ext%></div>
+                    </a>
+                    <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+                </li>
                 <li class="divider"></li>
             <%}else{%>
                 <li style="cursor: pointer; display: flex;">

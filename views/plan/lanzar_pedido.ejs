@@ -132,7 +132,6 @@
                     <th>Por Despachar</th>
                     <th>En Producción</th>
                     <th>Disponible</th>
-                    <!--<th>Caracteristica</th>-->
                     <th></th>
                 </tr>
                 </thead>
@@ -204,20 +203,6 @@
             $(this).val(valor);
         })
     });
-    /*$(".strim_input").on("change",function(e){
-        var data ={};
-        data.caract = $("#caract").val();
-        data.det = $("#det").val();
-        $.ajax({
-            type: 'POST',
-            data: data,
-            url: '/plan/producidos_stream',
-            success: function(data){
-                $("#prefabrs").html(data);
-            }
-        });
-
-    });*/
     $("#num").on('keyup', function(e){
             e.preventDefault();
             if($(this).val() != ''){
