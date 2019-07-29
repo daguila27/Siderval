@@ -105,10 +105,10 @@
         e.preventDefault();
         $.ajax({
             type: 'GET',
-            url: '/abastecimiento/get_dataodcext/'+$(this).data('idprod')+'/'+$(this).data('cant'),
+            url: '/abastecimiento/get_dataodcext/'+$(this).data('idprod')+'/'+$(this).data('cant')+'/'+$(this).data('id'),
             success: function(data){
-                $("#crearocModal div div form").html(data);
-                $("#crearocModal").modal('show');
+                $("#crearocextModal div div form").html(data);
+                $("#crearocextModal").modal('show');
             }
         });
     });

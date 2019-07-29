@@ -548,8 +548,6 @@
             }
         });
     }
-
-
     function destroyDataTable(callback){
         if ( $.fn.DataTable.isDataTable('table') ) {
             $('table').DataTable().destroy();
@@ -592,7 +590,6 @@
             return false;
         }
     }
-
     // Ajax para insertar clientes nuevos
     $("#clienteForm").submit(function (event) {
         event.preventDefault();
@@ -882,6 +879,9 @@
         data['costo'] = cost;
         console.log(data);
     }
+
+
+
     $("#odcForm").submit(function(e){
         e.preventDefault();
         var array = $(this).serializeArray();
@@ -955,6 +955,107 @@
                                 url: '/abastecimiento/comprobar_notificaciones/'+data.split('@')[0],
                                 success: function(data){
 
+                                    $(".notificaciones").html(data);
+                                    $(".cerrarNewOC").click();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        }
+        else{
+            alert("Debe seleccionar al menos un producto de la lista");
+        }
+    });
+
+
+    $("#odcFormExt").submit(function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        console.log(array);
+        var data = {};
+        var idp = [];
+        var idf = [];
+        var cost = [];
+        var cc = [];
+        var idprod = [];
+        var idmat = [];
+        var cant = [];
+        var boolNull = false;
+        for(var i=0; i < array.length; i++){
+            if(array[i].name === 'idpedido'){
+                idp.push(array[i].value);
+                boolNull = true;
+                //data.push(array[i].value);
+            }
+            else if(array[i].name === 'idfabricaciones'){
+                idf.push(array[i].value);
+                //boolNull = true;
+                //data.push(array[i].value);
+            }
+            else if(array[i].name === 'costo'){
+                cost.push(array[i].value);
+                //boolNull = true;
+                //data.push(array[i].value);
+            }
+            else if(array[i].name === 'centroc'){
+                cc.push(array[i].value);
+            }
+            else if(array[i].name === 'idproduccion'){
+                idprod.push(array[i].value);
+                //data.push(array[i].value);
+            }
+            else if(array[i].name === 'idmaterial'){
+                idmat.push(array[i].value);
+                //data.push(array[i].value);
+            }
+            else if(array[i].name === 'cantidad'){
+                cant.push(array[i].value);
+                //data.push(array[i].value);
+            }
+            else if(array[i].name !== 'hab'){
+                data[array[i].name] = array[i].value;
+                //data.push(array[i].value);
+            }
+        }
+        data.ex_iva = [];
+        $("#odcFormExt .checkEx").each(function(){
+            if($(this).is(':checked')){
+                data.ex_iva.push('on');
+            }
+            else{
+                data.ex_iva.push('off');
+            }
+        });
+
+        data['ex_iva'] = data['ex_iva'].join('@');
+        //data['prov'] = data['prov'].split('@')[0];
+        data['idped'] = idp.join('@');
+        data['idfab'] = idf.join('@');
+        data['costo'] = cost.join('@');
+        data['centroc'] = cc.join('@');
+        data['idprod'] = idprod.join('@');
+        data['idmat'] = idmat.join('@');
+        data['cantidad'] = cant.join('@');
+        console.log(data);
+        if(boolNull){
+            if(confirm("¿Está seguro que desea crear la OC?")){
+                $.ajax({
+                    type: 'POST',
+                    data: data,
+                    url: '/abastecimiento/newoc_ped_ext',
+                    success: function(data){
+                        if(data === 'error'){
+                            alert("La OCA que esta intentando crear es inválida.");
+                        } else {
+                            alert("La OCA fue creada exitosamente.");
+                            $(".footer-hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+                            $(".footer-hidden form").submit();
+                            $.ajax({
+                                type: 'GET',
+                                url: '/abastecimiento/notif_abast',
+                                success: function(data){
                                     $(".notificaciones").html(data);
                                     $(".cerrarNewOC").click();
                                 }

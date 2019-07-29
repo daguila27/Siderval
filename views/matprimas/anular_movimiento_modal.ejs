@@ -1,0 +1,126 @@
+<%
+var etapas = [
+    "Jefe de Producción",
+    "Moldeo",
+    "Fusión",
+    "Quiebre",
+    "Terminación",
+    "Tratamiento Térmico",
+    "Maestranza",
+    "Control de Calidad",
+    "Mantención",
+    "Externo",
+    "Otros"
+];
+ %>
+<div class="modal-dialog" role="document">
+    <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h3 class="modal-title">
+                Anular Movimiento N° <%= data.idmovimiento%>:
+            </h3>
+            <h4 class="modal-title" style="text-align: right">Fecha de Movimiento: <%= new Date(data.f_gen).toLocaleDateString()%></h4>
+        </div>
+        <div class="modal-body">
+            <div class="row alert alert-default" style="margin-bottom: 15px;background-color: rgb(124,123,173); margin: 20px; color:white">
+                <div class="col-md-7"><h3>Descripción: <small style="font-size: 16px; color: white;"><%= data.detalle%></small></h3></div>
+                <div class="col-md-5"><h3>Stock Actual: <small style="font-size: 16px; color: white;"><%= data.stock%> <%= data.u_medida%></small></h3></div>
+            </div>
+            <div class="row info-prod">
+                <div class="col-md-4">
+                    <div class="mycontent-left">
+                        <h4>
+                            <label for="material">
+                                <small style="font-size: 15px">Se anulará:</small>
+                            </label>
+                        </h4>
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                            <thead>
+                            <tr>
+                                <th>N° Mov</th>
+                                <% if(data.tipo === 0){%>
+                                    <th style="text-align: center">Retiro</th>
+                                <%}else{%>
+                                    <th style="text-align: center">Devolución</th>
+                                <%}%>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td style="text-align: center"><%= data.idmovimiento%></td>
+                                <td style="text-align: center"><%= data.cantidad%></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="mycontent-right">
+                        <h4>
+                            <label for="material">
+                                <small style="font-size: 15px">Mediante la creación del movimiento:</small>
+                            </label>
+                        </h4>
+
+
+                        <input type="hidden" name="idmo" value="<%= data.idmovimiento%>">
+                        <input type="hidden" name="etap" value="<%= data.etapa%>">
+                        <input type="hidden" name="idma" value="<%= data.idmaterial%>">
+                        <input type="hidden" name="cant" value="<%= data.cantidad%>">
+                        <input type="hidden" name="resp" value="Anulación de Mov N°<%= data.idmovimiento%>">
+                        <% if(data.tipo === 0){%>
+                            <input type="hidden" name="tipo" value="1">
+                        <%}else{%>
+                            <input type="hidden" name="tipo" value="0">
+                        <%}%>
+
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" >
+                            <thead>
+                                <tr>
+                                    <th>N° Mov</th>
+                                    <% if(data.tipo === 0){%>
+                                        <th style="text-align: center">Devolución</th>
+                                    <%}else{%>
+                                        <th style="text-align: center">Retiro</th>
+                                    <%}%>
+                                    <th style="text-align: center">Responsable</th>
+                                    <th style="text-align: center">Área</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center"><%= last%></td>
+                                    <td style="text-align: center"><%= data.cantidad%></td>
+                                    <td style="text-align: center">Anulación</td>
+                                    <td style="text-align: center"><%= etapas[parseInt(data.etapa)]%></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-12" style="margin-top: 10px">
+                    <h4 class="pull-right"><small><i class="fa fa-exclamation-triangle"></i> Solo es posible anular el movimiento en su totalidad </small></h4>
+                </div>
+            </div>
+            <style>
+                .mycontent-right {
+                    border-left: 1px dashed rgb(124,123,173);
+                    padding-left: 25px;
+                }
+
+            </style>
+        </div>
+        <div class="modal-footer">
+            <h4 class="pull-left hidden" id="msjAlerta"><small style="color: rgb(255,0,0)"><i class="fa fa-exclamation-triangle"></i> Imposible crear Movimiento, no hay stock suficiente. </small></h4>
+            <button type="submit" class="btn btn-primary" id="buttonSubmit">Anular</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+<script>
+    if(parseInt('<%= data.cantidad%>') > parseInt('<%= data.stock%>') && '<%= data.tipo%>' === '1' ){
+        $("#buttonSubmit").prop('disabled', 'true');
+        $("#msjAlerta").removeClass('hidden');
+    }
+</script>

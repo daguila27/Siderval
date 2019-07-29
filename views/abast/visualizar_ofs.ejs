@@ -128,7 +128,7 @@
         })
     }
     function renderBOM(yo){
-       $.ajax({
+        $.ajax({
            type: 'POST',
            data: {idmaterial: $(yo).data('idmat'), addOCA: true, cant: $(yo).data('cant')},
            url: 'abastecimiento/data_bom',

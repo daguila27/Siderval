@@ -91,15 +91,15 @@
         }
     </style>
     <ul class="nav nav-tabs col-md-10 col-md-offset-1" style="padding-left: 1%">
-        <li class="active"><a data-toggle="tab" data-etp="mol" href="#mol">Moldeo <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="fus" href="#fus">Fusión <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="qui" href="#qui">Quiebre <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="tra" href="#tra">Tratamiento Térmico <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="ter" href="#ter">Terminación <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="mae" href="#mae">Maestranza <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="con" href="#con">Control de Calidad <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="rec" href="#rec">Rechazo <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="ext" href="#ext">Externalizado <small></small></a></li>
+        <li class="active"><a data-toggle="tab" data-etp="mol" href="#mol">Moldeo<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="fus" href="#fus">Fusión<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="qui" href="#qui">Quiebre<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="tra" href="#tra">Tratamiento<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ter" href="#ter">Terminación<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="mae" href="#mae">Maestranza<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="con" href="#con">Cc<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="rec" href="#rec">Rechazo<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ext" href="#ext">Externalizado<small></small></a></li>
     </ul>
     <div class="etapas-content tab-content">
         <div id="mol" class="tab-pane fade in active">
@@ -582,6 +582,7 @@
 
     function col_movh(yo){
         var next;
+        var previus;
         var r = $(yo).parent().data('ruta').split(',');
         //SE OBTIENE LA SIGUIENTE ETAPA SEGÚN RUTA
         //SI LA ETAPA ACTUAL NO SE ENCUENTRA EN LA RUTA DE PRODUCCION
@@ -599,14 +600,15 @@
                     next = 9;
                 }else{next = r[r.indexOf($(yo).data('etapa').toString()) + 1];}
             }
-
+            previus = r[r.indexOf($(yo).data('etapa').toString()) - 1];
             $('#prod_info').children('strong').html($(yo).parent().data('nombre'));
             $('#prod_info').children('strong').data('idmat', $(yo).parent().data('idmat'));
             $("#etapa-previus").val($(yo).data('etapa'));
 
             $('#prod_info').children('small').html("<label>Enviar a:     " +
                 "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
-                "<option value='"+next+"' selected>"+etapas[parseInt(next)-1]+"</option>" +
+                "<option value='"+next+"' selected>Siguiente Etapa: "+etapas[parseInt(next)-1]+"</option>" +
+                "<option value='"+previus+"'>Etapa Previa: "+etapas[parseInt(previus)-1]+"</option>" +
                 "<option value='s'>Rechazo</option>" +
                 "</select></label>");
             $("#nom-etapa").val($(yo).data('netapa'));
@@ -681,6 +683,7 @@
         $(".tab-content td").each(function(){
             data[$(this).data('name')].push($(this).data('valor'));
         });
+        console.log(data);
         $.ajax({
             type: 'POST',
             data: data,
