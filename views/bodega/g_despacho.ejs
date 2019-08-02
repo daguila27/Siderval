@@ -166,7 +166,11 @@ function letraMayus(string) {
                                 
                                 <td style="text-align: center;" class="parsear_nro"><%= data[i].cantidad - data[i].despachados %></td>
                                 
-                                <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock %></td>
+                                <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock - data[i].pl_cantidad%></td>
+
+                                <td id="pl<%=data[i].idpedido%>" style="text-align: center;" class="parsear_nro pl_cantidad"><%= data[i].pl_cantidad %></td>
+
+                                <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= Math.min(  data[i].cantidad - data[i].despachados, data[i].stock - data[i].pl_cantidad) %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" data-idpaletitem="0"  data-idpalet='0' class="form-control" value="1" style="width: 80px;margin: 0"></td>
                                 
                                 <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" class="form-control" value="1" style="width: 80px;margin: 0"></td>
                                 
@@ -359,6 +363,27 @@ function letraMayus(string) {
         });
     });
 
+    function comprobarCliente(){
+        if($("#cliente_gd").val() == 0){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    function comprobarStock(){
+        /*$().each(function(){
+            alert($(this).children('input').attr('min') +" - "+typeof $(this).children('input').attr('min')  );
+            alert($(this).children('input').val() +" - "+typeof $(this).children('input').val()  );
+            if($(this).children('input').attr('min') <  $(this).children('input').val() ){
+                alert();
+           }
+        });*/
+    }
+
+
+
     $("form#send_gdd").on('submit',function(e){
         e.preventDefault();
         var aux = [];
@@ -372,6 +397,25 @@ function letraMayus(string) {
         } else {
             conf = confirm("¿Esta seguro que desea crear esta GDD?")
         }
+        else{
+            pl = $(".num_pl_input input").val();
+        }
+
+        if(comprobarCliente()){
+            if(aux.length == 0){
+                conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
+                est = "Blanco";
+            } else {
+                conf = confirm("¿Esta seguro que desea crear esta GDD?");
+            }
+        }
+        /*else if(!comprobarCliente()){
+            alert("Seleccione Cliente.");
+        }*/
+        else{
+            alert("No es posible crear la GDD. \n ¡Uno de los pedidos a despachar supera el stock disponible en Bodega!");
+        }
+
         if(conf){
             $.ajax({
                 type: 'POST',
