@@ -24,7 +24,7 @@
                         <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
                         <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
                       </ul>
-                    </div>
+                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <h3>Crear Orden de Fabricación: </h3>
@@ -110,7 +110,6 @@
             factor_item: $("input[name='factor_item']:checked").val(),
             cliente: $("#cliente").val()
         }
-        alert($("input[name='factor_item']:checked").val());
         for(var i =0;i<$(this).serializeArray().length;i++){
             if(lista[i].name != 'nroordenfabricacion'){
                 data[lista[i].name].push(lista[i].value);
@@ -128,21 +127,24 @@
            }
            //console.log($(this).val());
         });
-        $.ajax({
-            type: 'POST',
-            data: data,
-            url: '/plan/crear_of',
-            success: function(data){
-                if(data == 'error'){
-                    alert("El pedido es inválido");
-                } else {
-                    alert("La OF fue creada exitosamente")
-                    emitToast([data, 0]);
-                    loadStateOF();
-                    //$("#page-wrapper").html(data);
+        var validate = confirm("¿Estás seguro de crear la OF con los datos ingresados?");
+        if(validate){
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/plan/crear_of',
+                success: function(data){
+                    if(data == 'error'){
+                        alert("El pedido es inválido");
+                    } else {
+                        alert("La OF fue creada exitosamente")
+                        emitToast([data, 0]);
+                        loadStateOF();
+                        //$("#page-wrapper").html(data);
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 
 </script>

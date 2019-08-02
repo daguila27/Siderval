@@ -1,3 +1,14 @@
-<%- include header_new.ejs %>
+<%- include layouts/header.ejs %>
 
-<%- include footer_new.ejs %>
+<%- include layouts/footer.ejs %>
+<script>
+    //llama a la primera vista
+    $.ajax({
+        type: 'GET',
+        url: '<%= route%>',
+        success: function(data){
+            $("#page-wrapper").data('view', '<%= route%>');
+            $("#page-wrapper").html(data);
+        }
+    });
+</script>

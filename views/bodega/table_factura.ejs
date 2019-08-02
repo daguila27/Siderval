@@ -1,0 +1,59 @@
+<%
+	var count = 0;
+	function fechaLatino(string){
+		date = string.getUTCFullYear() + '-' +
+                    ('00' + (string.getUTCMonth()+1)).slice(-2) + '-' +
+                    ('00' + string.getUTCDate()).slice(-2) + ' ' + 
+                    ('00' + string.getUTCHours()).slice(-2) + ':' + 
+                    ('00' + string.getUTCMinutes()).slice(-2) + ':' + 
+                    ('00' + string.getUTCSeconds()).slice(-2);
+		return date;
+	}
+%>
+
+<table id="facturaTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+		<thead>
+			<tr>
+				<th class="o_column_sortable">N° de Factura</th>
+				<th class="o_column_sortable">N° Conector</th>
+				<th class="o_column_sortable">N° de GD</th>
+				<th class="o_column_sortable">Detalle</th>
+				<th class="o_column_sortable">N° Items</th>
+				<th class="o_column_sortable">Cliente</th>
+				<th class="o_column_sortable" style="text-align: center;">Fecha de Factura</th>
+			</tr>
+		</thead>
+	<tbody class="ui-sortable">
+		<%
+		for(var i=0; i < data.length; i++){ %>
+			<tr class="o_data_row" data-idodc="">
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].numfac%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].conector%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].idgd%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].detalle%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].cantidad%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%=data[i].sigla%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center;"><%= new Date(data[i].f_fact).toLocaleDateString() %></td>
+			</tr>
+		<%}%>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    setDataTableMain("#facturaTable");
+
+</script>

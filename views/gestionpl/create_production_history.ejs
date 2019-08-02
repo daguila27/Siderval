@@ -1,0 +1,734 @@
+
+<!-- Modal adjuntar Movimiento-->
+<div id="crearProdHist" class="modal-primary modal fade" role="dialog">
+    <div class="modal-dialog">
+        <form id="prodhistForm">
+            <!-- addclientform     editclientform-->
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Registrar Movimiento:</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-default" id="prod_info" style="background-color: rgb(124,123,173); display: flex">
+                        <strong style="color: white; width: 70%; font-size: 15px; margin-top: 15px" id="prod_nombre" data-idmat="">Inserto 23023</strong><small class="pull-right" id="sig_etapa" style="color: white; width:30%"> Siguiente Etapa: Quiebre</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="email">Procesados:</label>
+                        <div>
+                            <input type="number" class="form-control procesados-input" id="procesados" name="procesados" placeholder="Procesados">
+                            <label id="comentario-rechazo" for="" style="width: 100%;">
+                                Comentario:
+                                <textarea class="form-control" name="" id="comentarioMov" cols="20" rows="3"></textarea>
+                            </label>
+                        </div>
+                        <input type="hidden" id="idmaterial" name="idmaterial">
+                        <input type="hidden" id="nom-etapa" name="nom-etapa">
+                        <input type="hidden" id="nom-etapa-previus" name="nom-etapa-previus">
+                        <input type="hidden" id="etapa-previus" name="etapa-previus">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <button type="button" class="btn btn-default" onclick="$('#crearProdHist').modal('hide')" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal adjuntar Movimiento-->
+<div id="verRutaModal" class="modal fade bs-example-modal-lg" role="dialog">
+    <div class="modal-dialog modal-lg">
+       <div class="modal-content panel panel-primary">
+           <div class="modal-header panel-heading">
+               <button type="button" class="close" data-dismiss="modal">&times;</button>
+               <h4 class="modal-title">Ruta de Producción: <small style="color: white;">Inserto 23023</small></h4>
+           </div>
+           <style>
+               .circulo {
+                   width: 50px;
+                   height: 50px;
+                   -moz-border-radius: 50%;
+                   -webkit-border-radius: 50%;
+                   border-radius: 50%;
+                   background: rgb(124,123,173);
+                   border: 3px solid rgb(210,210,210);
+                   text-align: center;
+                   vertical-align: center;
+                   transition: 0.2s;
+                   padding-top: 2px;
+                   color: white
+               }
+               .circulo:hover{
+                   transform: scale(1.2);
+                   cursor: pointer
+               }
+               .linea {
+                   width: 50px;
+                   height: 1px;
+                   margin-top: 24px;
+                   background: rgb(124,123,173);
+               }
+           </style>
+           <div class="modal-body" style="width: 100%;">
+
+           </div>
+           <div class="modal-footer">
+               <button type="button" class="btn btn-default" onclick="$('#verRutaModal').modal('hide')" data-dismiss="modal">Cancelar</button>
+           </div>
+       </div>
+    </div>
+</div>
+
+<div style="margin-top: 50px; padding: 0 30px">
+
+    <style>
+        .nav-tabs li.active a{
+            background-color: rgb(124,123,173) !important;
+            color: white !important;
+        }
+    </style>
+    <ul class="nav nav-tabs col-md-10 col-md-offset-1" style="padding-left: 1%">
+        <li class="active"><a data-toggle="tab" data-etp="mol" href="#mol">Moldeo <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="fus" href="#fus">Fusión <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="qui" href="#qui">Quiebre <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="tra" href="#tra">Tratamiento Térmico <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ter" href="#ter">Terminación <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="mae" href="#mae">Maestranza <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="con" href="#con">Control de Calidad <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="rec" href="#rec">Rechazo <small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ext" href="#ext">Externalizado <small></small></a></li>
+    </ul>
+    <div class="etapas-content tab-content">
+        <div id="mol" class="tab-pane fade in active">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Siguiente Etapa" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="fus" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="qui" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="tra" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="ter" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="mae" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="con" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="rec" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Rechazado Desde</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+        <div id="ext" class="tab-pane fade">
+            <div class="panel panel-primary col-md-12" style="padding: 0">
+                <div class="panel-heading">
+                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
+                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
+                        <ul class="dropdown-menu" style="right: 0; left: auto;">
+                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body" style="padding: 0%">
+                    <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+                            <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Rechazado Desde</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel-footer" style="text-align: right">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submit_action()" style="margin-left: 80%; margin-right: 10%; margin-bottom: 10px; width: 10%;">Enviar</button>
+
+    <div class="panel panel-primary col-md-12" style="padding: 0">
+        <div class="panel-heading">Producción:</div>
+        <div class="panel-body" style="padding: 0%">
+            <div>
+                <style>
+                    .col-proceso{
+                        text-align: center;
+                    }
+                    .col-proceso:hover{
+                        text-decoration-line: underline;
+                        color: blue;
+                    }
+                </style>
+                <table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;">
+                    <thead>
+                    <tr>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">MOL</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center">FUS</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center">QUI</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center">TER</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Externalizado" style="text-align: center">EXT</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">RCH</th>
+                        <th data-toggle="tooltip" data-placement="bottom" title="Ruta" style="text-align: center">Ruta</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <%if(datalen.length){
+                    for(var i = 0; i< datalen.length; i++){%>
+                        <tr data-ruta="<%=datalen[i].ruta%>" data-nombre="<%=datalen[i].detalle%>" data-idmat="<%=datalen[i].idmaterial%>">
+                            <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
+                            <td data-cs="0" class="col-can parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] %></td>
+                            <td data-valor="" data-netapa="mol" data-etapa="1" data-cs="0" onclick="col_movh(this)" class="col-proceso col-mol parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1"><%= datalen[i]['1'] %></td>
+                            <td data-valor="" data-netapa="fus" data-etapa="2" data-cs="0" onclick="col_movh(this)" class="col-proceso col-fus parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1"><%= datalen[i]['2'] %></td>
+                            <td data-valor="" data-netapa="qui" data-etapa="3" data-cs="0" onclick="col_movh(this)" class="col-proceso col-qui parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3"><%= datalen[i]['3'] %></td>
+                            <td data-valor="" data-netapa="ter" data-etapa="4" data-cs="0" onclick="col_movh(this)" class="col-proceso col-ter parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4"><%= datalen[i]['4'] %></td>
+                            <td data-valor="" data-netapa="tra" data-etapa="5" data-cs="0" onclick="col_movh(this)" class="col-proceso col-tra parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5"><%= datalen[i]['5'] %></td>
+                            <td data-valor="" data-netapa="mae" data-etapa="6" data-cs="0" onclick="col_movh(this)" class="col-proceso col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6"><%= datalen[i]['6'] %></td>
+                            <td data-valor="" data-netapa="con" data-etapa="7" data-cs="0" onclick="col_movh(this)" class="col-proceso col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7"><%= datalen[i]['7'] %></td>
+                            <td data-valor="" data-netapa="ext" data-etapa="e" data-cs="0" onclick="col_movh(this)" style="text-align: center;" class="col-proceso col-ext parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Externalizados" id="prod<%=datalen[i].idproduccion%>-e"><%= datalen[i]['e'] %></td>
+                            <td data-valor="" data-netapa="rec" data-etapa="s" data-cs="0" style="text-align: center;" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-s"><%= datalen[i].standby %></td>
+                            <td data-cs="0" style="text-align: center;" class="col-proceso col-rut" data-cant="<%= %>" data-ruta="<%= datalen[i].ruta%>" data-toggle="tooltip" data-placement="bottom" title="Ruta de Producción" onclick="verRuta(this)"><button class="btn btn-xs btn-primary">Ver Ruta</button></td>
+                        </tr>
+                        <style>
+                        .col-proceso{
+                            text-align: center;
+                        }
+                    </style>
+                    <%}
+                    }else{%>
+                        <tr>
+                            <td>No hay nada por producir</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel-footer" style="text-align: right">
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var etapas = [
+        "Moldeo",
+        "Fusión",
+        "Quiebre",
+        "Terminación",
+        "Tratamiento Térmico",
+        "Maestranza",
+        "Control de Calidad",
+        "Producto Terminado",
+        "Externalizado"
+    ];
+
+   $('#prodTable').DataTable({
+        paging: false,
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+    $("#prodTable_wrapper").css('margin-top', '-39px');
+    $("#prodTable_wrapper label").css('color', 'white');
+
+    function verRuta(yo){
+        $("#verRutaModal").modal('show');
+        var html = "";
+        var ruta = $(yo).data('ruta').split(',');
+        //var cant = $(yo).data('cant').split(',')
+        for(var t=0; t < ruta.length; t++){
+            if(t===0){
+                html += "<div style='display: flex;'>";
+            }
+
+            html += "<div class='circulo'>"+etapas[parseInt(ruta[t])-1].substring(0,3).toUpperCase()+"<br>100</div>";
+
+            if(t === ruta.length-1){
+                html += "</div>";
+            }
+            else{
+                html += "<div class='linea'></div>";
+            }
+        }
+        $("#verRutaModal .modal-body").html(html);
+        /*
+        * <div style="display: flex;">
+                    <div class="circulo">Mol<br>100</div>
+                    <div class="linea"></div>
+                    <div class="circulo">Fus<br>100</div>
+                    <div class="linea"></div>
+                    <div class="circulo">Qui<br>100</div>
+                    <div class="linea"></div>
+                    <div class="circulo">Ter<br>100</div>
+                    <div class="linea"></div>
+                    <div class="circulo">Tto<br>100</div>
+                    <div class="linea"></div>
+                    <div class="circulo">Mae<br>100</div>
+                    <div class="linea"></div>
+                    <div class="circulo">CC<br>100</div>
+                    <div class="linea"></div>
+                    <div class="circulo">BPT<br>100</div>
+                </div>
+                */
+    }
+
+    function col_movh(yo){
+        var next;
+        var r = $(yo).parent().data('ruta').split(',');
+        //SE OBTIENE LA SIGUIENTE ETAPA SEGÚN RUTA
+        //SI LA ETAPA ACTUAL NO SE ENCUENTRA EN LA RUTA DE PRODUCCION
+        if(r.indexOf($(yo).data('etapa').toString()) === -1){alert("Producto no pasa por etapa selecionada");}
+        else if(parseInt($(yo).html()) <= 0){alert("No hay piezas en la etapa seleccionada.");}
+        else{
+            //SE ALMACENA EL NOMBRE DE LA ETAPA DESDE DONDE SE LIBERA PARA REFERENCIAR
+            // A LA TABLA DONDE DEBE ADJUNTARSE LA COLUMNA, ENTRE OTRAS ACCIONES
+            $("#nom-etapa-previus").val($(yo).data('netapa'));
+            //SI ETAPA ACTUAL ES CONTROL DE CALIDAD ENTONCES POR DEFECTO ENVIA A PRODUCTO TERMINADO
+            if($(yo).data('etapa') === 7){next = 8;}
+            //EN CASO CONTRARIO SE OBTIENE SIGUIENTE ETAPA TOMANDO EL INDICE SIGUIENTE AL DE LA ETAPA ACTUAL
+            else{
+                if(r[r.indexOf($(yo).data('etapa').toString()) + 1] === 'e'){
+                    next = 9;
+                }else{next = r[r.indexOf($(yo).data('etapa').toString()) + 1];}
+            }
+
+            $('#prod_info').children('strong').html($(yo).parent().data('nombre'));
+            $('#prod_info').children('strong').data('idmat', $(yo).parent().data('idmat'));
+            $("#etapa-previus").val($(yo).data('etapa'));
+
+            $('#prod_info').children('small').html("<label>Enviar a:     " +
+                "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
+                "<option value='"+next+"' selected>"+etapas[parseInt(next)-1]+"</option>" +
+                "<option value='s'>Rechazo</option>" +
+                "</select></label>");
+            $("#nom-etapa").val($(yo).data('netapa'));
+            $(".procesados-input").attr('max', parseInt($(yo).html()) )
+            $("#crearProdHist").modal('show');
+
+
+        }
+    }
+
+    $("#prodhistForm").submit(function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        var html;
+        var c = 0;
+        //SI LA ETAPA SELECCIONADA ES RECHAZO
+        if($('#prod_info > small > label > select').val() === 's'){
+            html = "<tr>" +
+                "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
+                "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+                "<td style='text-align: center' data-name='to' data-valor='s'>" +
+                 etapas[parseInt($("#etapa-previus").val())] +
+                "</td>" +
+                "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
+                "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                "</td></tr>";
+
+
+            $(".tab-content div#rec table tbody").append(html);
+            $(".tab-content div#rec table tbody tr").each(function(){c++;});
+            $(".nav-tabs li a[data-etp='rec'] small").html("("+c+")");
+        }
+        //SI NO ES RECHAZO
+        else{
+            html = "<tr>" +
+                "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
+                "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+                "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
+                $('#prod_info > small > label > select > option:selected').html()
+                +"</td>" +
+                "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
+                "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                "</td></tr>";
+
+
+            $(".tab-content div#"+$("#nom-etapa").val()+" table tbody").append(html);
+            $(".tab-content div#"+$("#nom-etapa").val()+" table tbody tr").each(function(){c++;});
+            $(".nav-tabs li a[data-etp='"+$("#nom-etapa").val()+"'] small").html("("+c+")");
+        }
+        $("#crearProdHist").modal('hide');
+
+    });
+
+    function act_numcol(yo){
+        var c = 0;
+        $(".tab-content div#"+$(yo).data('preetp')+" table tbody tr").each(function(){c++;});
+        if(c===0){$(".nav-tabs li a[data-etp='"+$(yo).data('preetp')+"'] small").html("");}
+        else{$(".nav-tabs li a[data-etp='"+$(yo).data('preetp')+"'] small").html("("+c+")");}
+        //$(".tab-pane#"+id)
+    }
+
+    function submit_action(){
+        data = {
+            idmat: [],
+            env: [],
+            to: [],
+            from: [],
+            coment: []
+        };
+        $(".tab-content td").each(function(){
+            data[$(this).data('name')].push($(this).data('valor'));
+        });
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/gestionpl/save_production_history',
+            success: function(data){
+                alert(data);
+                $(".oe_secondary_submenu li.active").click();
+            }
+        });
+    }
+
+
+
+
+    function saveStateProdHist(){
+        var token = [];
+        //CADA TABLA/ETAPA
+        $(".etp-mov").each(function () {
+            var aux = [];
+            //CADA FILA
+            $(this).children('tbody').children('tr').each(function(){
+                var t = [];
+                //CADA CAMPO
+                $(this).children('td').each(function(){
+                    t.push($(this).data('valor'));
+                });
+                //CADA REGISTRO DE AUX SEPARADO POR @ ES UN MOVIMIENTO DE LA ETAPA
+                aux.push(t.join('@'));
+            });
+            //CADA REGISTRO DE TOKEN SEPARADO POR % ES UNA ETAPA
+            token.push(aux.join('%'));
+        });
+        $.ajax({
+            type: 'POST',
+            data: {token: token.join('//')},
+            url: '/gestionpl/save_production_history_state',
+            success: function(data){
+                alert(data)
+            }
+        });
+    }
+    function loadStateProdHist(){
+        $.ajax({
+            type: 'GET',
+            url: '/gestionpl/load_production_history_state',
+            success: function(data){
+                $(".etapas-content").html(data);
+            }
+        });
+    }
+</script>

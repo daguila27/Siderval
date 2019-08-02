@@ -1,0 +1,126 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+%>
+<style>
+    .center-number{
+        text-align: center;
+    }
+</style>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"><%= data.length %></div>
+
+<table id="DataTableDesp" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin-top: 0px !important; width: 100%;">
+    <thead>
+    <tr>
+        <th id="cab-gd">GD</th>
+        <th id="cab-oc">OC</th>
+        <th id="cab-item">Item</th>
+        <th id="cab-cliente">Cliente</th>
+        <th id="cab-descripcion">Descripción</th>
+        <th id="cab-despachados">Despachados</th>
+        <th id="cab-peso">Peso Unitario</th>
+        <th id="cab-pesodespachado">Peso Despachado</th>
+        <th id="cab-fecha">Fecha</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+    var total_cantidad = 0;
+    var total_peso = 0;
+    for(var e=0; e < data.length; e++){%>
+        <tr>
+            <%
+            total_cantidad += data[e].cantidad;
+            total_peso += (data[e].peso*data[e].cantidad);
+            %>
+            <td data-toggle="tooltip" title="GD" class="gd center-number" onclick="ver_gdd(this)" data-idgd="<%= data[e].idgd%>"><a class="btn btn-xs btn-primary"><%= data[e].idgd%></a></td>
+            <td data-toggle="tooltip" title="OC" class="oc center-number"><%= data[e].numoc%></td>
+            <td data-toggle="tooltip" title="Item" class="item center-number"><%= data[e].numitem%></td>
+            <td data-toggle="tooltip" title="Cliente" class="cliente center-number"><%= data[e].sigla%></td>
+            <td data-toggle="tooltip" title="Descripción" class="descripcion"><%= data[e].detalle%></td>
+            <td data-toggle="tooltip" title="Despachados" data-valor="<%= data[e].cantidad%>" data-name="despachados" class="checkFunction despachados center-number parsear_nro"><%= data[e].cantidad%></td>
+            <td data-toggle="tooltip" title="Peso Unitario" class="peso center-number parsear_nro"><%= data[e].peso%></td>
+            <td data-toggle="tooltip" title="Peso Despachado" data-valor="<%= data[e].peso*data[e].cantidad%>" data-name="pesodespachado" class="checkFunction pesodespachado center-number parsear_nro"><%= data[e].peso*data[e].cantidad%></td>
+            <td data-toggle="tooltip" title="Fecha" class="fecha center-number" data-order="<%= new Date(data[e].fecha).getTime()%>"><%= data[e].esp_fecha_gd%></td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td id="gd"></td>
+            <td id="oc"></td>
+            <td id="item"></td>
+            <td id="cliente"></td>
+            <td id="descripcion"></td>
+            <td id="despachados" data-toggle="tooltip" title="Piezas Despachadas" style="text-align: center;" class="parsear_nro"><%= total_cantidad%></td>
+            <td id="peso"></td>
+            <td id="pesodespachado" data-toggle="tooltip" title="Peso Despachado" style="text-align: center;" class="parsear_nro"><%= total_peso%></td>
+            <td id="fecha"></td>
+        </tr>
+    </tfoot>
+</table>
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    setDataTableFixed("#DataTableDesp");
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), ".indicador_paginas");
+
+
+    function refreshSumas(){
+        var object = {
+            "despachados" : 0,
+            "pesodespachado" : 0
+        };
+        if($('.focus-row').length == 0) {
+            $(".checkFunction").each(function(){
+                object[$(this).data('name')] += $(this).data('valor');
+            });
+        }
+        else{
+            $(".checkFunction").each(function(){
+                if($(this).parent().hasClass('focus-row')){
+                    object[$(this).data('name')] += $(this).data('valor');
+                }
+            });
+        }
+        $("#despachados").text(object.despachados);
+        $("#pesodespachado").text(object.pesodespachado);
+    }
+
+
+    $(document).ready(function(){
+        $('#DataTableFabs tbody').on( 'click', 'tr', function () {
+            $(this).toggleClass('success');
+            $(this).toggleClass('focus-row');
+            refreshSumas();
+        });
+    });
+
+    function submit_form(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/page_of/'+$(yo).data('idodc'),
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+    function ver_gdd(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/page_gdd/'+$(yo).data('idgd'),
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+
+</script>

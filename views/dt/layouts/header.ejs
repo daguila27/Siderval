@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <title><%=page_title%></title>
+    <link rel="shortcut icon" href="/assets/img/logomin.png">
+
+
+    <!-- Bootstrap Core CSS -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+
+    <!-- Morris Charts CSS -->
+    <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="/assets/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/fixedHeader-dataTables.min.css">
+    <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="/vendor/jquery/jquery.min.js"></script>
+    <script type="text/javascript" language="javascript" src="/vendor/datatables/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" language="javascript" src="/assets/js/dataTables.fixedHeader.min.js"></script>
+    <script src="/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+    <script src="/vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+
+
+
+    <script src="/js/socket.io.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Julee" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Chicle" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+
+
+    <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_common.0.css"/>
+    <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.0.css"/>
+    <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.1.css"/>
+    <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
+    <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
+    <%function show_user(usename){
+        if(username == 'abastecimiento'){
+            return "Abastecimiento";
+        }
+    }%>
+
+</head>
+
+
+
+<body class="o_web_client" style="overflow-y: scroll;">
+
+
+
+
+
+<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 90%;margin-left:10%; z-index: 10; transition: 0.5s">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <div style="margin: 5px 0px" onclick="show_menu();">
+                <i style="color: white" class="fa fa-bars"></i>
+            </div>
+        </button>
+    </div>
+
+    <div class="navbar-collapse collapse">
+
+        <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
+            <li onclick="close_menu()" style="cursor:pointer;">
+                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-times"></i> Menu</span></a>
+            </li>
+            <li>
+                <a class="oe_menu_leaf"><span class="oe_menu_text"></span></a>
+            </li>
+
+
+        </ul>
+
+
+        <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
+            <li>
+                <div style="font-family: 'Lobster'; font-size: 15px; color: white;">Bienvenido <%= show_user(username)%></div>
+            </li>
+            <li>
+                <div><a href="../user/log_out">Cerrar sesión</a></div>
+            </li>
+        </ul>
+
+        <!--<ul class="nav navbar-nav navbar-right oe_user_menu_placeholder"></ul>
+        <ul class="nav navbar-nav navbar-right oe_systray"></ul>-->
+
+
+        <ul class="nav navbar-right o_mail_navbar_item open">
+            <li class="dropdown">
+                <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
+                    <i class="fa fa-envelope fa-fw"></i>
+                    <i class="fa fa-caret-down"></i>
+                    <span class="badge badge-notificaciones"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
+
+                </ul>
+                <!-- /.dropdown-messages -->
+            </li>
+            <!-- /.dropdown -->
+        </ul>
+
+
+
+    </div>
+</nav>
+
+
+
+
+<div class="o_main">
+    <div class="o_sub_menu" style="position: fixed; z-index: 20; height: 100%; left: 0%; width: 10%; transition: 0.5s;">
+        <a class="o_sub_menu_logo" style="background-color: white">
+            <img src="/assets/img/logo.png" style="margin: 0; padding: 0; width: 100%">
+        </a>
+        <div class="o_sub_menu_content">
+
+            <style type="text/css">
+                .oe_secondary_menu_section{
+                    margin-top: 5px;
+                }
+
+            </style>
+            <div class="oe_secondary_menu">
+                <div class="oe_secondary_menu_section">
+                    Productos
+                </div>
+                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li class="active" onclick="ajax(this)" data-link="/dt/create_producto">
+                        <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Nuevo Producto
+                                        </span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li onclick="ajax(this)" data-link="/jefeplanta/view_fusion">
+                        <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Listado Maestro
+                                        </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script src="/buscador.js"></script>
+
+    <div id="page-wrapper" style="width: 90%;margin-left:10%; transition: 0.5s;" data-view="/abastecimiento/abast_myself">

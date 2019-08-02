@@ -15,13 +15,22 @@
             <li>
                 <a class="notificacion" data-toggle="modal" data-target="#rechazoModal" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
                     <div>
-                            <strong>Material <%= desc[6]%></strong>
+                            <strong><%= desc[2]%> <%= notif[u].detalle%> Rechazado(s)</strong>
                             <span class="pull-right text-muted">
                             <em><%= hora%></em>
                             </span>
                     </div>
-                    <div>La etapa <%= notif[u].nombre_etapa%> ha recibido <%= desc[2]%> unidades de <%=notif[u].detalle%> <%= translate(desc[6])%></div>
+                    <div>Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
+                        <div class="well">
+                        <% if(desc[6] != ''){ %>
+                            <%= translate(desc[6])%>
+                        <%} else {%>
+                            - Sin Mensaje -
+                        <%}%>
+                        </div>
+                    </div>
                 </a>
+                <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
             </li>
             <li class="divider"></li>
         <%}%>
@@ -31,7 +40,7 @@
             <a href="#">
                 <div>
                         <strong>No hay notificaciones</strong>
-                        <span class="pull-right text-muted">
+                        <span class="pull-right text-muted" style="margin-left: 20px">
                         <em>Ahora mismo</em>
                         </span>
                 </div>
@@ -76,7 +85,15 @@
     });
 
 
-
+    function removeNotif(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/faena/drop_notif/'+$(yo).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    }
     $(document).on('click', '.notificaciones li', function (e) {
         e.stopPropagation();
     });

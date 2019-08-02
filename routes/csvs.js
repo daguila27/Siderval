@@ -3,16 +3,10 @@ var express = require('express');
 var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
-
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
 router.use(
-    connection(mysql,{
-        host: '127.0.0.1',
-        user: 'user',
-        password : '1234',
-        port : 3306,
-        database:'siderval',
-        insecureAuth : true
-    },'pool')
+    connection(mysql,dbCredentials,'pool')
 );
 
 
@@ -1652,4 +1646,100 @@ router.get('/putnumfac_despachos', function(req, res, next){
     input.pipe(parser);
 
 });
+
+
+
+
+router.get('/comparar_stockfinales', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
+
+    var parser = parse(
+        function(err,gd){
+            if(err) throw err;
+            req.getConnection(function(err, connection){
+                if(err) throw err;
+                connection.query("SELECT codigo,detalle, stock, s_inicial FROM material", function(err, mats){
+                    if(err) throw err;
+                    var si=[];
+                    var no=[];
+                    console.log(gd[0].length);
+                    for(var e=0; e < mats.length; e++){
+                        for(var a = 0; a < gd.length; a++) {
+                            if (mats[e].codigo == gd[a][0]){
+                                if (parseInt(mats[e].s_inicial) == parseInt(gd[a][17])) {
+                                    mats[e].stock_inicial_real = parseInt(gd[a][17]);
+                                    si.push(mats[e]);
+                                }
+                                else{
+                                    mats[e].stock_inicial_real = parseInt(gd[a][17]);
+                                    no.push(mats[e]);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    console.log("CANTIDAD COINCIDENTE");
+                    console.log(si.length);
+                    console.log((si.length/(si.length+no.length))*100);
+
+                    console.log("NO COINCIDENTE");
+                    console.log(no.length);
+                    console.log((no.length/(si.length+no.length))*100);
+
+                    console.log(no);
+
+                });
+            });
+        });
+    var input = fs.createReadStream('csvs/IDSDiciembre2018.csv');
+    input.pipe(parser);
+
+});
+
+
+router.get('/setproduccionini_material', function(req, res, next){
+    var fs = require('fs')
+    var parse = require('csv-parse');
+
+    var parser = parse(
+        function(err,prod){
+            if(err) throw err;
+            var codigos = []
+            console.log(prod);
+            var query = "UPDATE material SET p_inicial = CASE ";
+            /*
+            * UPDATE `table` SET `uid` = CASE
+                    WHEN id = 1 THEN 2952
+                    WHEN id = 2 THEN 4925
+                    WHEN id = 3 THEN 1592
+                    ELSE `uid`
+                    END
+                WHERE id  in (1,2,3)
+            * */
+
+            for(var i=0; i < prod.length; i++){
+                query += " WHEN codigo = '"+prod[i][0]+"' THEN "+prod[i][1];
+                codigos.push("'"+prod[i][0]+"'");
+            }
+            query += " ELSE p_inicial END WHERE codigo IN ("+codigos.join(',')+")";
+
+            req.getConnection(function(err, connection){
+                if(err) throw err;
+
+                connection.query(query, function(err, result){
+                    if(err) throw err;
+                    console.log(result);
+                    res.redirect('/');
+                });
+
+            });
+        });
+    var input = fs.createReadStream('csvs/enProduccionInicialEnero.csv');
+    input.pipe(parser);
+
+});
+
+
+
 module.exports = router;

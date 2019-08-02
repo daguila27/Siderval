@@ -22,10 +22,10 @@
         "Otros"
     ];
 %>
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="tablaMovimientos" style="top: -7px">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="tablaMovimientos" style="width: 100%;margin-top: 0px !important;">
     <thead>
     <tr>
-        <th class="cabecera o_column_sortable ">N° Mov</th>
+        <th class="cabecera o_column_sortable ">Mov</th>
         <th class="cabecera o_column_sortable " data-order="material.detalle-ASC">Descripción</th>
         <th class="cabecera o_column_sortable " style="text-align: center;" data-order="movimiento_detalle.cantidad*1-ASC">Solicitados</th>
         <th class="cabecera o_column_sortable " style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
@@ -36,7 +36,10 @@
     </tr>
     </thead>
     <tbody class="ui-sortable">
-    <%for(var i=0; i < data.length; i++){%>
+    <%
+    var sol_total = 0;
+    for(var i=0; i < data.length; i++){
+        sol_total += parseInt(data[i].cantidad);%>
         <tr class="o_data_row">
             <td class="o_data_cell o_readonly_modifier o_required_modifier"  style="text-align: center"><%=data[i].idmovimiento%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
@@ -61,6 +64,8 @@
     <tr>
         <td></td>
         <td></td>
+        <td style="text-align: center"><%=sol_total%></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -74,11 +79,9 @@
 
 <script type="text/javascript">
 
-    $('#tablaMovimientos').DataTable( {
-        "scrollCollapse": true,
-        'searching': false,
-        "paging":         false
-    } );
+    setDataTableFixed("#tablaMovimientos");
+    $("#indicador_paginas").data('total', parseInt('<%= data.length%>'));
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), "#indicador_paginas");
 
     function submit_form(yo){
         //$("#form"+$(yo).data('idodc')).submit();

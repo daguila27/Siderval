@@ -10,7 +10,7 @@
       <div class="panel panel-primary panel-defecto" style="display: block;">
         <div class="panel-heading" style="display: flex">
           <div style="width: 45%">
-            <h3>Lanzar Orden de Compra: #<%=last%></h3>
+            <h3>Orden de Compra: #<%=last%></h3>
             <div style="display: flex">
               <button class="btn btn-primary" onclick="saveState(false)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
               <button class="btn btn-primary" onclick="loadState(false)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
@@ -37,16 +37,19 @@
               <option value="eur">Euro (EUR)</option>
               <option value="clp" selected>Pesos Chilenos (CLP)</option>
               <option value="gbp">Libra (GBP)</option>
+              <option value="uf">Unidad de Fomento (UF)</option>
+
             </select>
           </div>
         </div>
         <div style="overflow-y: scroll; max-height: 300px;">
-          <table class="table table-striped" style="margin: 0">
+          <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin: 0">
             <thead>
               <tr>
+                <th class="hidden">F. Directa</th>
                 <th>Exento</th>
                 <th>Descripción</th>
-                <th>Mínimo de Compra</th>
+                <th style="text-align: center">U.C.</th>
                 <th>Cantidad</th>
                 <th>Precio x Unidad</th>
                 <th>Total</th>
@@ -59,20 +62,20 @@
               if(data['idm[]']){
                 for(var t=0; t < data['idm[]'].length; t++){%>
                   <tr>
-                    <td style="align-content: center;" class="td-ex">
+                    <td style='text-align: center' class='td-fd hidden'><input type='checkbox' name='set_fd' class='set_fd'></td>
+                    <td style="text-align: center;" class="td-ex">
                       <%if(data['ex_iva[]'][t] == 'on'){%>
-                          <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="ex_iva" class="ex_iva" onchange="refreshAllCost()" checked>
+                          <input type="checkbox" name="ex_iva" class="ex_iva" onchange="refreshAllCost()" checked>
                       <%}else{%>
-                          <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="ex_iva" class="ex_iva" onchange="refreshAllCost()">
+                          <input type="checkbox" name="ex_iva" class="ex_iva" onchange="refreshAllCost()">
                       <%}%>
                     </td>
                     <td><%= data['dets[]'][t]%><input type="hidden" name="idm" value="<%=data['idm[]'][t]%>"></td>
-                    <td style="align-content: center;"><%= data['u_compra[]'][t]%></td>
-                    <td style="display: flex; padding: 0; padding-top: 2px" class="td-cant">
-                      <input class="form-control cant_compra" type="float" name="cants" min="0" onkeyup="refreshAllCost()" onchange="refreshAllCost()" step="1" value="<%= data['cants[]'][t]%>">
-                      <b style="margin-left: 2%"><%= data['u_med[]'][t]%></b>
+                    <td data-toggle='tooltip' title='Unidad de Compra' style='text-align: center'><h6 style='margin:0; text-aling: center;'><span class='label label-default'><%= data['u_compra[]'][t]+" "+data['u_med[]'][t]%></span></h6></td>
+                    <td style="display: flex;" class="td-cant">
+                      <input class="form-control cant_compra" type="float" name="cants" onkeyup="refreshAllCost()" onchange="refreshAllCost()" step="<%=data['u_compra[]'][t]%>"  min='<%=data['u_compra[]'][t]%>' value="<%= data['cants[]'][t]%>" required>
                     </td>
-                    <td class="td-money" style="padding: 0; padding-top: 3px">
+                    <td class="td-money">
                       <input class="form-control moneda key_money" type="float" name="costo" onkeyup="refreshAllCost()" onchange="refreshAllCost()" min="0" value="<%= data['costo[]'][t]%>">
                     </td>
                     <td class="costo-total">0</td>
@@ -187,6 +190,7 @@ function getPredictions(yo){
 $("#send_of").submit(function(e){
   e.preventDefault();
   lista = $(this).serializeArray();
+  console.log(lista);
   var data = {
     idm: [],
     idp: [],
@@ -196,6 +200,7 @@ $("#send_of").submit(function(e){
     prov: [],
     costo: [],
     ex_iva: [],
+    set_fd: [],
     centroc: []
   }
    
@@ -208,7 +213,7 @@ $("#send_of").submit(function(e){
      }
   }
   data.ex_iva = [];
-  $("#send_of :checkbox").each(function(){
+  $("#send_of .ex_iva").each(function(){
     if($(this).is(':checked')){
       data.ex_iva.push('on');
     } else{
@@ -227,15 +232,11 @@ $("#send_of").submit(function(e){
           alert("La OC que esta intentando crear es inválida.");
         } else {
           alert("La OC fue creada exitosamente.");
-          $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-          $(".hidden form").submit();
-          $.ajax({
-            type: 'GET',
-            url: '/abastecimiento/abast_myself',
-            success: function(data){
-              $("#page-wrapper").html(data);
-            }
-          });
+          $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+          $(".form-pdf form").submit();
+          setTimeout(function(){
+              location.reload();
+          }, 500);
         }
       }
     });

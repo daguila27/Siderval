@@ -3,36 +3,32 @@
             var desc = notif[u].descripcion.split('@');
             var hora = desc[3].split(' ')[1].split(':')[0] +":"+desc[3].split(' ')[1].split(':')[1];
             %>
-            <li>
-                <a href="#" data-toggle="modal" data-target="#notifModal" class="notificacion" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
-                    <div>
+            <li style="cursor: pointer; display: flex;width:100%">
+                <div class="btn-group" style="display: flex;margin-left: 5px;margin-right: 10%">
+                    <a href="#" data-toggle="modal" data-target="#notifModal" class="btn btn-default" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
+                        <div>
                             <strong>Material entrante</strong>
                             <span class="pull-right text-muted">
-                            <em><%= hora%></em>
+                                <em><%= hora%></em>
                             </span>
-                    </div>
-                    <div>Ha recibido <%= desc[2]%> unidades de <%=notif[u].detalle%></div>
-                </a>
+                        </div>
+                        <div>Ha recibido <%= desc[2]%> unidades de <%=notif[u].detalle%></div>
+                    </a>
+                    <a onclick="confirm_notif(this)" class="btn btn-success" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>"><i style="margin-top: 60%" class="fa fa-check"></i></a>
+                    <a href="#" class="btn btn-warning"><i style="margin-top: 60%" class="fa fa-warning"></i></a>
+                </div>
             </li>
-            <li class="divider"></li>
-        <%}%>
-                    <li>
-                                <a class="text-center" href="#">
-                                    <strong>Read All Messages</strong>
-                                    <i class="fa fa-angle-right"></i>
-                                </a>
-                            </li>
-    <%}
-    else{%>
+            <li class="divider" style="width: 100%;"></li>
+        <%}
+    } else {%>
         <li>
             <a href="#">
                 <div>
-                        <strong>No hay notificaciones</strong>
-                        <span class="pull-right text-muted">
-                        <em>Ahora mismo</em>
-                        </span>
+                    <strong>No hay notificaciones</strong>
+                    <span class="pull-right text-muted">
+                    <em>Ahora mismo</em>
+                    </span>
                 </div>
-                <div>No tiene notificaciones.</div>
             </a>
         </li>
     <%}%>
@@ -46,11 +42,15 @@
         $(".badge-notificaciones").css('display', 'none');
     else
         $(".badge-notificaciones").css('display', 'block');
-
-    $(".notificacion").on('click', function(e){
-        e.preventDefault();
-        $(".matModal").html($(this).data('detalle'));
-        $("#idNotif").val($(this).data('id'));
-        $("#sendcant").val($(this).data('cant'));
-    });
+    //Funcion Confirmar notificación
+    function confirm_notif(esto){
+        var data = $(esto).data();
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/confirm_notificacion/'+data.id+'/'+data.cant,
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    }
 </script>
