@@ -8,7 +8,7 @@ function fechaLatino(string){
     }
 }
 %>
-<table id="progresoTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style=" margin-top: -2px !important; width: 100%;">
+<table id="progresoTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin:0; padding: 0;width: 100%;">
     <thead>
     <tr>
         <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
@@ -26,7 +26,7 @@ function fechaLatino(string){
         <th data-toggle="tooltip" data-placement="bottom" title="Progreso" style="text-align: center">Progreso</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody id="todosbodyprogress">
     <%var progress = [];
     var prod;
     for(var e=0; e < prog.length; e++){
@@ -87,20 +87,7 @@ function fechaLatino(string){
     <%  }
     } else {
     %>
-        <tr>
-            <td>No hay producciones en proceso</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+        <tr><td>No hay nada por producir</td></tr>
     <%
     }
     %>
@@ -111,5 +98,5 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableFixed("#progresoTable");
+    setDataTableMain("#progresoTable");
 </script>

@@ -59,6 +59,7 @@ function trunc (x, posiciones = 0) {
         </div>
 
       </div>
+
     </div>
     <div>
     </div>
@@ -72,9 +73,9 @@ function trunc (x, posiciones = 0) {
             <th style="text-align: center;">Cantidad sin Facturar</th>
             <th style="text-align: center;">Precio OCA</th>
             <th style="text-align: left;">Precio Unidad</th>
-            <th style="text-align: left;">Unidades Facturadas</th>
+              <th style="text-align: left;">Unidades Facturadas</th>
             <th>Moneda</th>
-            <th style="align-content: center;">F.D.</th>
+              <th style="align-content: center;" class="hidden">Recepcionar</th>
           </tr>
         </thead>
         <tbody>
@@ -93,8 +94,8 @@ function trunc (x, posiciones = 0) {
             <input type="hidden" name="idabast" value="<%= oda[e].idabast%>">
             <td align="center"><%= oda[e].cantidad - oda[e].facturados%></td>
             <td align="center" style="width: 15%"><%= parsear_nro(oda[e].odacosto)%></td>
-            <td><input class="form-control" type="number" step=".01" name="costo_unid" min="0" value="<%= oda[e].costo%>"></td>
-              <td><input class="form-control" type="number" step=".01" name="cantidad" min="0" value="<%= oda[e].cantidad - oda[e].facturados%>" max="<%= oda[e].cantidad - oda[e].facturados%>" required></td>
+            <td><input class="form-control" type="number" step=".01" name="costo_unid" min="0"></td>
+              <td><input class="form-control" type="number" step=".01" name="cantidad" min="0" value="0" max="<%= oda[e].cantidad - oda[e].facturados%>" required></td>
             <td>
               <select class="form-control" name="moneda-factura" required>
               <%for(var w=0; w < select_money.length; w++){
@@ -105,13 +106,7 @@ function trunc (x, posiciones = 0) {
               <%}}%>
               </select>
             </td>
-              <%
-              console.log(typeof oda[e].fd);
-              if(oda[e].fd === 1){%>
-                  <td><input type="checkbox" name="recepcion" data-maxrec="<%= oda[e].cantidad - oda[e].recibidos%>" checked></td>
-              <%}else{%>
-                  <td><input type="checkbox" name="recepcion" data-maxrec="<%= oda[e].cantidad - oda[e].recibidos%>"></td>
-              <%}%>
+              <td class="hidden"><input type="checkbox" name="recepcion" data-maxrec="<%= oda[e].cantidad - oda[e].recibidos%>"></td>
           </tr>
           <%}
           }%>

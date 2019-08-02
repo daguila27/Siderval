@@ -1,5 +1,5 @@
 
-<h2 class="page-header" style="font-family: 'Oswald'; padding:40px">B.O.M. de Productos: </h2>
+<h2 class="page-header" style="font-family: 'Oswald'">B.O.M. de Productos: </h2>
         <form id="form-mat">
             <div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;display: flex;">
                 <input style="width: 80%" id="mat-info" type="text" class="form-control" placeholder="Ingrese Codigo o Detalle" tabindex="1">
@@ -7,29 +7,28 @@
                 <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_mat()"><i class="glyphicon glyphicon-refresh"></i></button>
             </div>
         </form>
-        <nav aria-label="Page navigation" style="margin-left: 30px">
+        <nav aria-label="Page navigation">
             <ul class="pagination" id="paginationup">
             </ul>
         </nav>
         <div class="container pagina-contenedor" style="width: 100%; margin: 0; padding: 0; font-family: 'Oswald">    
         </div>
-        <nav class="nav-pag" aria-label="Page navigation" style="margin-left: 30px">
+        <nav class="nav-pag" aria-label="Page navigation">
             <ul class="pagination" id="paginationdown">
             </ul>
         </nav>
 <script type="text/javascript">
+   function render_all_mat(){
+                $.ajax({
+                    type:'GET', 
+                    url: '/abastecimiento/bom_mat_uni_page/1',
+                    success: function(data){
+                        $(".pagina-contenedor").html(data);
+                        $("#mat-info").val('');
+                    }
+                });
+   }
 
-
-       function render_all_mat(){
-          $.ajax({
-              type:'GET',
-              url: '/abastecimiento/bom_mat_uni_page/1',
-              success: function(data){
-                  $(".pagina-contenedor").html(data);
-                  $("#mat-info").val('');
-              }
-          });
-       }
     $(function(){
         window.pagObj = $('.pagination').twbsPagination({
             totalPages: <%=Math.ceil(largo/15)%>,
@@ -52,6 +51,8 @@
             console.info(page + ' (from event listening)');
         });
     });
+
+    
     $("#form-mat").on('submit', function(e){
         e.preventDefault();
         $.ajax({
@@ -64,4 +65,15 @@
         });
 
     });
+
+    /*$(document)
+                    .ajaxStart(function () {
+                        //ajax request went so show the loading image
+                         $("#loading").show();
+                     })
+                   .ajaxStop(function () {
+                       //got response so hide the loading image
+                        $("#loading").hide();
+                    });*/
+
 </script>

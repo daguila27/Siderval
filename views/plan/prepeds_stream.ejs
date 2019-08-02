@@ -1,94 +1,35 @@
-<%
+
+<% 
 function letraMayus(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+} 
+
+if(data.length){
+for(var i = 0;i<data.length;i++){
+    %>
+<tr>
+    <td><%= data[i].detalle%></td>
+    <!--<td><%# data[i].cnom%></td>-->
+    <td>
+        <div class="btn-group" style="margin-left: 40%">        
+            <% if(data[i].idproducido != null){%>
+            <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducido%>" data-tipo="producido" class="btn btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Fabricar</a>
+            <%}%>
+            <% if(data[i].idproducto != null){%>
+            <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducto%>" data-tipo="producto" class="btn btn-info" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Externo</a>
+            <%}%>
+            <% if(typeof data[i].idotro != 'object'){%>
+            <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idotro%>" data-tipo="otro" class="btn btn-warning" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Otro</a>
+            <%}%>
+        </div>
+    </td>
+</tr>
+
+
+<%
 }
-%>
-    <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" id="sessionPeds">
-        <thead>
-        <tr>
-            <th>Descripción</th>
-            <th>Stock</th>
-            <th>Por Despachar</th>
-            <th>En Producción</th>
-            <th>Disponible</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-    <%if(data.length){
-    for(var i = 0;i<data.length;i++){
-        %>
-    <tr>
-        <td><%= data[i].detalle%></td>
-        <!--<td><%# data[i].cnom%></td>-->
-        <td style="text-align: center"><%= data[i].stock%></td>
-        <td style="text-align: center"><%= data[i].xdespachar%></td>
-        <td style="text-align: center"><%= data[i].enproduccion%></td>
-        <% if( data[i].stock+data[i].enproduccion-data[i].xdespachar > 0 ){%>
-            <td style="text-align: center;"><%= data[i].stock+data[i].enproduccion-data[i].xdespachar%></td>
-        <%}else{%>
-            <td style="text-align: center;">0</td>
-        <%}%>
-        <td>
-            <div class="btn-group" style="display:flex;margin: 0 auto;">
-                <%
-                console.log(data[i].ruta);
-                if(data[i].idproducido != null){%>
-                <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducido%>" data-tipo="producido" class="btn btn-xs btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Fabricar</a>
-                <%}%>
-                <% if(data[i].idproducto != null && data[i].ruta.substring(0,1) === 'e'){%>
-                <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducto%>" data-tipo="producto" class="btn btn-xs btn-info" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Externo</a>
-                <%}%>
-                <% if(typeof data[i].idotro != 'object'){%>
-                <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idotro%>" data-tipo="otro" class="btn btn-xs btn-warning" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Otro</a>
-                <%}%>
-            </div>
-        </td>
-    </tr>
-
-
-    <%
-    }
-    } else {%>
-    <tr>
-        <td>No Hay productos para mostrar</td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-    </tr>
-    <%}%>
-
-
-    </tbody>
-</table>
-<script>
-    $("#sessionPeds").DataTable({
-            paging: false,
-            lengthChange: false,
-            bFilter: false,
-            bInfo: false,
-            order: [],
-            language: {
-                "sProcessing":     "Procesando...",
-                "sZeroRecords":    "No se encontraron resultados",
-                "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-
-                "sSearch":         "Buscar:",
-                "sLoadingRecords": "Cargando...",
-                "oPaginate": {
-                    "sFirst":    "Primero",
-                    "sLast":     "Último",
-                    "sNext":     "&raquo",
-                    "sPrevious": "&laquo"
-                },
-                "oAria": {
-                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                }
-            }
-        });
-</script>
+} else {%>
+<tr>
+    <td>No Hay productos para mostrar</td>
+</tr>
+<%}%>

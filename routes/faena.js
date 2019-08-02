@@ -12,11 +12,17 @@ var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
 
-var dbCredentials = require("../dbCredentials");
-dbCredentials.insecureAuth = true;
+
 router.use(
 
-	connection(mysql,dbCredentials, 'pool')
+	connection(mysql, {
+		  host: '127.0.0.1',
+		  user: 'admin',
+		  password: 'tempo123',
+		  port: 3306,
+		  database: 'siderval',
+  		  insecureAuth : true
+	}, 'pool')
 );
 
 
@@ -50,40 +56,7 @@ router.get('/', function(req, res, next) {
 	else{res.redirect('bad_login');}
 });
 
-router.get('/drop_notif/:idnotif', function(req, res, next){
-    req.getConnection(function(err,connection){
-        if(err){
-            console.log("Error Connection : %s", err);
-        }
-        connection.query("SELECT descripcion FROM notificacion WHERE idnotificacion = ?",[req.params.idnotif],function (err,rows){
-            if(err){
-                console.log("Error Selecting : %s", err);
-            }
-            var notif = rows[0].descripcion.split("@");
-			connection.query("SELECT fabricaciones.idfabricaciones,fabricaciones.idorden_f,fabricaciones.cantidad,fabricaciones.restantes,SUM(produccion.cantidad) AS cants,SUM(produccion.`8`) AS finish,SUM(produccion.standby) AS rechas" +
-				" FROM fabricaciones LEFT JOIN produccion ON produccion.idfabricaciones = fabricaciones.idfabricaciones" +
-				" WHERE fabricaciones.idfabricaciones IN (SELECT idfabricaciones FROM produccion WHERE idproduccion = ?) GROUP BY fabricaciones.idfabricaciones",[notif[4]],function(err,rows){
-                if(err){
-                    console.log("Error Selecting : %s", err);
-                }
-                console.log(rows[0]);
-                connection.query("UPDATE fabricaciones SET restantes = restantes + ? WHERE idfabricaciones = ?",[Math.min(parseInt(notif[2]),parseInt(rows[0].cantidad) - parseInt(rows[0].restantes) - (parseInt(rows[0].cants) - parseInt(rows[0].finish) - parseInt(rows[0].rechas))),rows[0].idfabricaciones],function (err,rows){
-                    if(err){
-                        console.log("Error Selecting : %s", err);
-                    }
-                    connection.query("UPDATE notificacion SET active = false WHERE idnotificacion = ?",[req.params.idnotif],
-                        function(err, notif){
-                            if(err){
-                                console.log("Error Selecting : %s", err);
-                            }
-                            //res.render('abast/notificaciones', {notif: notif});
-                            res.redirect('/jefeprod/render_notificaciones');
-					});
-				});
-			});
-		});
-    });
-});
+
 
 router.get('/procesos', function(req, res, next){
 	if(verificar(req.session.userData)){
@@ -153,69 +126,71 @@ router.post("/next_step",function(req,res,next){
         var ids = "";
         var cant_aux = parseInt(input.sendnum);
         var history = [];
-
         for(var w=0; w < input.idprod.length; w++){
             cant_aux -= parseInt(input.cantprod[w]);
-            if(cant_aux > 0){
-                /* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION  */
+        	if(cant_aux > 0){
+        		/* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION  */
                 query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
                 query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
-                //history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
+				//history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
                 history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
                 ids += input.idprod[w]+",";
             }
-            else{
+			else{
                 /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA */
-                query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
+				query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
                 query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
                 //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
                 history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa]);
                 ids += input.idprod[w]+",";
-                break;
+				break;
             }
         }
         var notif =  {cant: input.sendnum, idproduccion: input.idprod};
-        query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
+		query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
         query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")"
 
         //SE EMITE UNA NOTIFICACION AL USUARIO FAENA
         //req.app.locals.io.emit('refreshfaena'+input.newetapa, notif);
-        req.getConnection(function(err,connection){
-            if(err) throw err;
-            //connection.query("UPDATE produccion SET `" + input.etapa_act + "` = `" + input.etapa_act  + "` - ?,`" + input.newetapa + "` = `" + input.newetapa + "` + ? WHERE idproduccion = ?",[parseInt(input.sendnum),parseInt(input.sendnum),input.idprod],function(err,prod){
-            console.log(query);
+		req.getConnection(function(err,connection){
+			if(err) throw err;
+			//connection.query("UPDATE produccion SET `" + input.etapa_act + "` = `" + input.etapa_act  + "` - ?,`" + input.newetapa + "` = `" + input.newetapa + "` + ? WHERE idproduccion = ?",[parseInt(input.sendnum),parseInt(input.sendnum),input.idprod],function(err,prod){
             connection.query(query ,function(err,upProd1){
                 if(err) throw err;
                 console.log(upProd1);
 
                 connection.query(query2 ,function(err,upProd2){
-                    if(err) throw err;
+					if(err) throw err;
 
-                    console.log(upProd2);
-                    connection.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
-                        if(err) throw err;
-                        res.send("si");
-                    });
-                });
-            });
-        });
+					console.log(upProd2);
+					connection.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
+						if(err) throw err;
+						res.send("si");
+						/*res.on('finish', function(){
+							req.app.locals.io.emit('refreshfaena'+input.newetapa, notif);
+							if(input.newetapa == '8'){
+								res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/idm');
+								req.app.locals.io.emit('notif', notif);
+							}
+						});
+						res.redirect('/faena/add_notificacion/'+input.idprod+'/'+cantidad+'/fa'+input.newetapa);*/
+
+					});
+				});
+	        });
+
+    })
 	} else res.send("no");
 });
 
 router.get('/render_proceso/:proceso', function(req, res, next){
 	if(verificar(req.session.userData)){
 		var input = req.params;
-        input.proceso = input.proceso.toString();
-        input.etapa_val = input.proceso;
-        input.etapa_act = input.proceso;
-		if(input.proceso === 's') {
-			input.proceso = 'standby';
-            input.etapa_act = '8';
-        }
+		input.proceso = input.proceso.toString();
 		req.session.myValue = input.proceso;
 		req.getConnection(function(err, connection){
 			//select * from ordenproduccion left join material on (ordenproduccion.idproducido=material.idmaterial) left join producto ON (ordenproduccion.idproducido=producto.idmaterial)
-			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.etapa_val, function(err, etapa){
+			connection.query("SELECT * FROM EtapaFaena WHERE value = ?",input.proceso, function(err, etapa){
 				if(err){console.log("Error Selecting : %s", err);}
 				/*connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "+
 					"(select produccion.*,coalesce(producido.ruta,'1,2,3,4,5,6,7,8') as ruta,material.detalle, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.proceso+"') as nextStep from produccion"+
@@ -226,10 +201,10 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 					" as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`)",*/
 					connection.query("SELECT querytable.*,EtapaFaena.nombre_etapa as sigetapa FROM "
 						+"(select group_concat(produccion.idproduccion separator '-') as idproduccion,group_concat(produccion.idordenproduccion separator '-') as idordenproduccion,sum(produccion.cantidad) as cantidad ,"
-						+"group_concat(produccion.e separator '-') as prod_e,group_concat(produccion.1 separator '-') as prod_1,group_concat(produccion.2 separator '-') as prod_2,group_concat(produccion.3 separator '-') as prod_3,group_concat(produccion.4 separator '-') as prod_4,"
+						+"group_concat(produccion.1 separator '-') as prod_1,group_concat(produccion.2 separator '-') as prod_2,group_concat(produccion.3 separator '-') as prod_3,group_concat(produccion.4 separator '-') as prod_4,"
 						+"group_concat(produccion.5 separator '-') as prod_5,group_concat(produccion.6 separator '-') as prod_6,group_concat(produccion.7 separator '-') as prod_7,group_concat(produccion.8 separator '-') as prod_8,"
-						+"sum(produccion.`e`) as `e`,sum(produccion.`1`) as `1`,sum(produccion.`2`) as `2`,sum(produccion.`3`) as `3`,sum(produccion.`4`) as `4`,sum(produccion.`5`) as `5`,sum(produccion.`6`) as `6`,sum(produccion.`7`) as `7`,sum(produccion.`8`) as `8`,"
-						+"coalesce(producido.ruta, '1,2,3,4,5,6,7,8') as ruta,material.detalle,material.idmaterial, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.etapa_act+"') as nextStep from produccion"
+						+"sum(produccion.`1`) as `1`,sum(produccion.`2`) as `2`,sum(produccion.`3`) as `3`,sum(produccion.`4`) as `4`,sum(produccion.`5`) as `5`,sum(produccion.`6`) as `6`,sum(produccion.`7`) as `7`,sum(produccion.`8`) as `8`,"
+						+"coalesce(producido.ruta, '1,2,3,4,5,6,7,8') as ruta,material.detalle,material.idmaterial, Siguiente(coalesce(producido.ruta, '1,2,3,4,5,6,7,8'), '"+input.proceso+"') as nextStep from produccion"
 						+" left join fabricaciones ON (produccion.idfabricaciones=fabricaciones.idfabricaciones) left join material on (fabricaciones.idmaterial=material.idmaterial) left join producido on (material.idmaterial=producido.idmaterial)"
 						+"WHERE produccion."+input.proceso+" > 0 group by material.idmaterial ORDER BY produccion.idproduccion DESC )"
 						+"as querytable left join EtapaFaena ON (querytable.nextStep = EtapaFaena.`value`) group by querytable.idmaterial",
@@ -246,7 +221,7 @@ router.get('/render_proceso/:proceso', function(req, res, next){
 							rows[i].nextstep = "bodega";
 						} else rows[i].nextstep = rows[i].ruta[nextstep];
 					}
-					res.render('faena/render_cola', {data: rows,etapaactual:input.proceso, nombreetapa: etapa[0].nombre_etapa, user: req.session.userData});
+					res.render('faena/render_cola', {data: rows,etapaactual:input.proceso, nombreetapa: etapa[0].nombre_etapa});
 				});
 			});
 			
@@ -314,7 +289,7 @@ router.get('/render_notificaciones/:uservalue', function(req, res, next){
 			+ "LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial "
 			+ "WHERE SUBSTRING(notificacion.descripcion,1,3) = ? AND notificacion.active = true", key, function(err, notif){
 			if(err){console.log("Error Selecting : %s", err);}
-			res.render('faena/notificaciones', {notif: notif});
+			res.render('faena/notificaciones', {notif: notif})
 		});
 	});
 });
@@ -345,9 +320,7 @@ router.post('/report_error', function(req, res, next){
 		req.getConnection(function(err, connection){
             if(err){console.log("Error Connection : %s", err);}
 			//UPDATE `siderval`.`produccion` SET `5`='4', `standby`='1' WHERE `idproduccion`='14';
-            var aaa = "SELECT produccion.idproduccion, produccion.`"+input.thisetapa+"` AS cantidad  FROM produccion WHERE produccion.idproduccion IN ("+input.idproduccion.split('-').join(',')+") ORDER BY produccion.idproduccion ASC";
-            console.log(aaa);
-			connection.query(aaa, function(err, idprods){
+            connection.query("SELECT produccion.idproduccion, produccion.`"+input.thisetapa+"` AS cantidad  FROM produccion WHERE produccion.idproduccion IN ("+input.idproduccion.split('-').join(',')+") ORDER BY produccion.idproduccion ASC", function(err, idprods){
                 if(err){console.log("Error Selecting : %s", err);}
                 /*
 				* UPDATE `table` SET `uid` = CASE

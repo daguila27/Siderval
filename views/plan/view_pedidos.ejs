@@ -36,18 +36,28 @@
 		display: flex;
 	}
 </style>
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
-	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+<div class="row" style="margin: 0; padding: 0;">
+	<div class="col-sm-12 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%;">
 		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
-			<li class="active">Listado de Pedidos</li>
+			<li class="active">Orden de Compra </li>
 			<!-- Mostrar cantidad de datos -->
-			<div class="indicador_paginas" style="margin-top: 8px"></div>
+			<div id="pedidos" style="margin-top: 8px"></div>
 
 
 		</ol>
-		<div style="width: 50%;">
+		<div style="width: 50%; margin-right: 4%">
 			<div class="form-group o_searchview" style="margin: 0;padding: 0;">
-
+				<div class="form-control etiqueta-input" style="display:flex; vertical-align: center;">
+					<div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
+					</div>
+					<input id="buscar_pedido" style="border: none" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
+					<input id="buscar_pedido-value" style="display: none" type="text">
+				</div>
+				<ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
+					<li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OC</em> para: <strong></strong></a></li>
+					<li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Descripción</em> para: <strong></strong></a></li>
+					<li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Cliente</em> para: <strong></strong></a></li>
+				</ul>
 			</div>
 			<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
 				<button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
@@ -61,16 +71,11 @@
 	    
 		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_odcs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
 	    
-	    	    <!--<button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>-->
+	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 				<div style="display: flex">
-					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
-					<input type="checkbox" id="pend_oc" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px">
+					<label style="margin-left: 30px; margin-top: 6px;">Mostrar Pendientes Solamente</label>
+					<input type="checkbox" id="pend_oc" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_oc()" checked>
 					<h5 style="margin-left: 10px" class="indicator-oc-check"><small>Mostrando solo pedido(s) sin despachar</small></h5>
-					<!--<div style="display: flex; margin-left: 20px">
-						<input type="number" onchange="changeSize(this)">
-					</div>-->
-
-					<div class="filters"></div>
 				</div>
 	       		<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
 	    	
@@ -86,13 +91,10 @@
 		</div>
 	</div>
 </div>
-
-<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
-	<div id="fw-body"  style="padding:0;margin: 0;">
-		<div class="content main-page">
-		</div>
-	</div>
+<div class="row row-main" style=" margin: 0; padding: 0;">			
+	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5; top:-7px;"></div>
 </div>
+
 <style type="text/css">
 	.caption a:hover{
 		cursor:pointer;
@@ -100,54 +102,197 @@
 </style>
 
 <script type="text/javascript">
-	function changeSize(yo){
-	    alert($(yo).val());
-	    $(".row_main").css('font-size', $(yo).val()+"px");
-	}
     var array_fill = [
         "OC@primary",
-        "OF@primary",
         "Detalle@success",
-        "Cliente@info",
-        "Estado@warning"
+        "Cliente@info"
     ];
-
-    var busc = new Buscador("buscar_pedido", ".o_searchview", array_fill, "/plan/table_pedidos", "DataTablePeds", false, true, ".filters","pedido.f_entrega");
-
-    busc.add_cond = "pedido.cantidad>pedido.despachados";
-    $("#pend_oc").on('change', function(e){
-        e.preventDefault();
-        $(".indicator-oc-check").toggleClass('hidden');
-        if( $(this).prop('checked') ) {
-            busc.ispage = true;
-            busc.page = 1;
-            busc.add_cond = "";
-        }
-        else{
-            busc.ispage = false;
-            busc.add_cond = "pedido.cantidad>pedido.despachados";
-        }
-        busc.buscar_action();
-    });
-
-    // Carga la tabla de pedidos
+    var filtros_seleccionados = [];
+	// Carga la tabla de pedidos
 	$(document).ready(function(){
-        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
-		busc.buscar_action();
+		/*$.ajax({
+            type: 'GET',
+            url: '/plan/table_pedidos/pedido.f_entrega-ASC/1',
+            beforeSend: function(){
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+			success: function(data){
+				$(".main-page").html(data);
+				//Muestra la cantidad de pedidos
+				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+			}
+		});*/
+		buscar_oc();
+		$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
 	});
 
+	function buscar_oc(){
+        $.ajax({
+            type: 'POST',
+            data: {clave: filtros_seleccionados.join(','), pendientes: $('#pend_oc').is(":checked")},
+            url: '/plan/table_pedidos/pedido.f_entrega-ASC/1',
+            beforeSend: function(){
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+            success: function(data){
+                $(".main-page").html(data);
+                //Muestra la cantidad de pedidos
+                $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+            }
+        });
+	}
+
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
+
+    function despInput(event){
+        var char = event.which || event.keyCode;
+        var item = $(".o_searchview_autocomplete").data('item');
+        //BORRAR LABEL
+        if(char == 8 && ($("#buscar_pedido").val()==null || $("#buscar_pedido").val()=='' || $("#buscar_pedido").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
+            eliminarEtiqueta($("#label"+labels).children('div'));
+        }
+        //ENTER
+        else if(char == 13){
+            $(".fill-item-abast.o-selection-focus").click();
+        }
+        //ARRIBA
+        else if(char == 38){
+            item = parseInt(item) - 1;
+        }
+        //ABAJO
+        else if(char == 40){
+            item = parseInt(item) + 1;
+        }
+
+
+        //SI SOBREPASA EL LIMITE INFERIOR
+        if(parseInt(item) >= 5){
+            $(".o_searchview_autocomplete").data('item', "0");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item0").addClass("o-selection-focus");
+        }
+        //SI SOBREPASA EL LIMITE SUPERIOR
+        else if(parseInt(item) < 0){
+            $(".o_searchview_autocomplete").data('item', "4");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item4").addClass("o-selection-focus");
+        }
+        else{
+            $(".o_searchview_autocomplete").data('item', item);
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item"+item).addClass("o-selection-focus");
+        }
+
+    }
+
+    $(".fill-item-abast").on('click', function(e){
+        e.preventDefault();
+        var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
+        var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
+        $(".etiqueta-filtro-div").append(
+            "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_pedido").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
+            +$("#buscar_pedido").val()+
+            "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+        );
+        $(".etiqueta-filtro-div").data('cant', labels+1);
+        if($("#buscar_pedido-value").val() == '' || $("#buscar_pedido-value").val() == null || $("#buscar_pedido-value").val() == undefined){
+            $("#buscar_pedido-value").val($(this).data('searchcol')+"@"+$("#buscar_pedido").val());
+        }
+        else{
+            $("#buscar_pedido-value").val([$("#buscar_pedido-value").val(),$(this).data('searchcol')+"@"+$("#buscar_pedido").val()].join(','));
+        }
+        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_pedido").val());
+        $(".o_searchview_autocomplete").css('display', 'none');
+        $(".o_searchview_autocomplete strong").html('');
+        $("#buscar_pedido").val('');
+        $("#buscar_pedido").focus();
+        buscar_oc();
+    });
+    function eliminarEtiqueta(yo){
+        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
+        $(yo).parent().remove();
+        $(".etiqueta-filtro").removeAttr('id');
+        var count = 0;
+        $(".etiqueta-filtro").each(function(){
+            $(this).attr("id","label"+count);
+            count++;
+        });
+        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        buscar_oc();
+    }
+
+    $("#buscar_pedido").on('keyup', function(e){
+        e.preventDefault();
+        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
+            $(".o_searchview_autocomplete").css('display', 'none');
+            $(".o_searchview_autocomplete strong").html('');
+        }
+        else{
+            $(".o_searchview_autocomplete").css('display', 'block');
+            $(".o_searchview_autocomplete strong").html($(this).val());
+        }
+    });
+    /*
+	$("#buscar_pedido").on('keyup', function(e){
+		e.preventDefault();
+		if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+			$.ajax({
+				type: 'POST',
+				data: {clave: $(this).val(), orden: $(".o_cp_switch_buttons .active").data('view')},
+				url: '/plan/buscar_pedido_list/1',
+				success: function(data){
+                    $(".page-item").each(function(){
+                        if($(this).hasClass('first')){
+                            $(this).click();
+                        }
+                    });
+					$(".main-page").html(data);
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+				}
+			});
+		}
+		else{
+			$.ajax({
+				type: 'POST',
+				data: {clave: $(this).val()},
+				url: '/plan/buscar_odcs_item',
+				success: function(data){
+					$(".main-page").html(data);
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+				}
+			});		
+		}
+	});
+	*/
 	$('.view-option').on('click', function(e){
 		e.preventDefault();
 		$('.view-option').removeClass('active');
 		$(this).addClass('active');
 		if($(this).data('view')=='item_odcs') {
-			busc.url = '/plan/item_odcs';
-			busc.buscar_action();
+			// Quita el nav de paginacion
+			$("#paginacion").css('display','none');
+            $.ajax({
+                type: 'GET',
+                url: '/plan/'+$(this).data('view'),
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de pedidos
+                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                }
+            });
 		}
 		else if($(this).data('view') == 'table_pedidos/pedido.f_entrega-ASC/1') {
 			// Muestra el nav de paginacion
-            busc.url = '/plan/table_pedidos';
-			busc.buscar_action();
+			$("#paginacion").css('display','block');
+			buscar_oc();
 		}
 
 	});
@@ -176,9 +321,59 @@
         });
     });
 
+    // Muestra la tabla antes de ver una OC
+    function mostrar_tabla(){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+        	if($("#buscar_pedido").val() == "" || $("#buscar_pedido").val() == null) {
+        		$.ajax({
+					type: 'GET',
+					url: '/plan/table_pedidos/pedido.f_entrega-ASC/1',
+					success: function(data){
+						$(".main-page").html(data);
+						//Muestra la cantidad de pedidos
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+					}
+				});
+				$(".row-main").css('padding-top', $(".o_control_panel").css('height') );
+        	}
+        	else{
+        		$.ajax({
+	                type: 'POST',
+	                data: {clave: $("#buscar_pedido").val(), orden: "pedido.f_entrega-ASC"},
+	                url: '/plan/buscar_pedido_list/1',
+	                success: function(data){
+	                    $(".main-page").html(data);
+	                    //Muestra la cantidad de pedidos
+	                    $("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+	                }
+	            });
+        	}
+        }
+        else {
+        	$.ajax({
+				type: 'POST',
+				data: {clave: $("#buscar_pedido").val()},
+				url: '/plan/buscar_odcs_item',
+				success: function(data){
+					$(".main-page").html(data);
+					//Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+				}
+			});
+        }
+    };
 
 
 
+    $("#pend_oc").on('change', function(e){
+        e.preventDefault();
+        if($(".indicator-oc-check").css('display') == 'block'){
+            $(".indicator-oc-check").css('display', 'none');
+        }
+        else{
+            $(".indicator-oc-check").css('display', 'block');
+        }
+    });
 
     $(".getcsvof").click(function(e){
         var yo = $(this);
@@ -194,5 +389,3 @@
     });
 
 </script>
-
-<script src="/buscador_funciones.js"></script>

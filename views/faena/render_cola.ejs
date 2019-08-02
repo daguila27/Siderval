@@ -46,7 +46,6 @@
     					<p style="width: 25%"><b>OP N° </b><%= data[i].idordenproduccion%></p>
     				</div>
     			</div>
-    			<%if(user.nombre != 'siderval') {%>
                 <button style="margin-top: 10px;" class="btn btn-success btnProd"
 						id="bq<%=data[i].idproduccion%>"
 						data-cantidad="<%=data[i][etapaactual]%>"
@@ -65,19 +64,18 @@
 						data-det="<%= data[i].detalle%>"
 						data-cant="<%= data[i][etapaactual]%>"
 						data-etapa="<%= etapaactual%>"
-						data-sigetp="<%= data[i].sigetapa%>"
 						style="margin-top: 10px; margin-left: 25px">
 					<i class="fa fa-trash"></i>
 				</button>
-				<%}%>
 	        </div>
     	</div>
 	<%}}%>
 </div>
 <script type="text/javascript">
-	//var io = io();
+	
 	$(".rechazarProduccion").on('click', function(e){
 	    e.preventDefault();
+	    //alert("ESTAMOS AQUI JEFE GORGORI");
 		$("#productoRechazado").html("<small><b>Producto: </b>"+$(this).data('det')+"</small>")
 		$("#idproduccionRechazo").val($(this).data('idp'));
 		$("#cantidadSolicitada").val($(this).data('cant'));
@@ -85,14 +83,7 @@
             "max" : parseInt($(this).data('cant')),        // substitute your own
             "min" : 1          // values (or variables) here
         });
-        $("#thisetapa_rechazo").val( $(this).data('etapa') );
-        // Enviar notificacion a abastecimiento
-        // var input = {
-        //     idproduccion: $(this).data('idp'),
-        //     cantidad: $(this).data('cant'),
-        //     key: 'aop'+$(this).data('sigetp')
-        // };
-        // io.emit('addNotificacion', input);
+        $("#thisetapa").val( $(this).data('etapa') );
 	});
 
 

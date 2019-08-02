@@ -1,0 +1,570 @@
+<div class="row" style=" margin: 0 ;padding-top: 3%; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<h2 class="page-header" style="margin: 2% 10%;">Ordenes de Compra: 
+    <a class="btn btn-info pull-right getcsvof" data-tipo="of" href="#"><i class="fa fa-download"></i> Generar excel</a></h2>
+<div id="divalert" class="collapse">
+    <div class="alert alert-danger" id="alerta" role="alert" >
+    </div>
+</div>
+
+<div class="container" style="width: 100%; font-family: 'Oswald">
+
+    <form id="ped-search" >
+        <div class="form-group col-md-offset-2" style="display: flex; margin-top: 25px">
+            <div class="form-group col-md-4">
+                <label for="estad" style="position: absolute; top:-25px">Estado de la OC:</label>
+              <select class="form-control" id="estad" name="estad" tabindex="1" onchange="changeType()">
+                <%if(selector == 'todos'){%>
+                    <option value="todos" selected="selected">Todos</option>
+                    <option value="activo">Activo</option>
+                    <option value="despachado">Despachado</option>
+                    <option value="atraso">Atraso</option>
+                <%}else if(selector == 'activo'){%>
+                    <option value="todos">Todos</option>
+                    <option value="activo" selected="selected">Activo</option>
+                    <option value="despachado">Despachado</option>
+                    <option value="atraso">Atraso</option>
+                <%}else if(selector == 'despachado'){%>
+                    <option value="todos">Todos</option>
+                    <option value="activo">Activo</option>
+                    <option value="despachado" selected="selected">Despachado</option>
+                    <option value="atraso">Atraso</option>
+                <%}else if(selector == 'atraso'){%>
+                    <option value="todos">Todos</option>
+                    <option value="activo">Activo</option>
+                    <option value="despachado">Despachado</option>
+                    <option value="atraso" selected="selected">Atraso</option>
+                <%}%>
+
+                </select>
+            </div>
+            <div class="form-group col-md-6" style="display: flex;">
+                <input style="width: 80%" name="num" type="text" class="form-control" placeholder="N° OC / Sigla o Razon Social de Cliente" tabindex="2">
+                <button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="3"><i class="glyphicon glyphicon-search"></i></button>
+                <button style="width: 10%" type="button" class="btn input-group-addon" tabindex="4" onclick="refresh_list()"><i class="glyphicon glyphicon-refresh"></i></button>
+            </div>
+        </div>
+    </form>
+    <div class="col-md-10 col-md-offset-1">
+    <div id="accordion_of" role="tablist" aria-multiselectable="true" style="margin-top: 20px" class="panel-group">
+        
+        <%
+            function fechaLatino(string){
+                if(string != null || string != ''){
+                    return string.split('-')[2]+"-"+string.split('-')[1]+"-"+string.split('-')[0];
+                }
+                else{
+                    return 'error';
+                }
+            }
+          function letraMayus(string) {
+             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+          } 
+          function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }
+        if(data.length){
+            var estado;
+            var panel;
+            for(var i = 0; i< data.length;i++){
+                if(data[i].estado){
+                    estado = 'Completamente despachado';%>  
+                    <form class="form-oc" id="f<%= data[i].idodc%>">   
+                    <div class="panel panel-finish panel-odc">
+                    <%}
+                else{
+                    if(data[i].sum_cant==data[i].sum_desp){
+                        estado = 'Despachado';
+                    }
+                    else if(data[i].atraso){
+                        estado = 'Atraso';
+                    }
+                    else{
+                        estado = 'Activo';
+                    }%>
+                        <form class="form-oc" id="f<%= data[i].idodc%>">
+                        <div class="panel panel-default panel-odc">        
+                <%}%>
+        <div class="panel-heading" role="tab" id="h<%= data[i].idodc%>" style="display: flex;">
+                <a style="width: 100%" role="button" href="#c<%= data[i].idodc%>" data-toggle="collapse" data-parent="#accordion_of"  aria-expanded="true" aria-controls="h<%= data[i].idodc%>">
+                    <h3 style="width: 100%">Orden de Compra #<%= data[i].numoc%> <small style="margin-left: 10px"><%=  estado%></small></h3>
+                    <p class="pull-left">
+                        <b>Cliente: </b> <%=data[i].sigla%> - <%=data[i].razon%> <br>
+                        <b>Moneda: </b> <%=data[i].moneda.toUpperCase()%></p>
+                    <%if(estado == 'Despachado' || data[i].estado){%>
+                        <small class="pull-right">Ultimo despacho: <%if(data[i].ult_desp){%><%= new Date(data[i].ult_desp).toLocaleDateString()%><%}else{%>Sin despachos<%}%> / Despachado</small>
+                    <%}else{%>
+                        <small class="pull-right">Ultimo despacho: <%if(data[i].ult_desp){%><%= new Date(data[i].ult_desp).toLocaleDateString()%><%}else{%>Sin despachos<%}%> / Parcialmente despachado (<%=data[i].sum_desp%> piezas de <%=data[i].sum_cant%>)</small>
+                    <%}%>
+                </a>
+                <div class="dropdown" style="height: 100%">
+                    <button type="button" class="btn btn-circle dropdown-toggle button-option" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></button>
+                    <ul class="dropdown-menu" style="position: absolute;">
+                        <!--LA OPCION EDITAR:
+                            - Solo permite editar cantidades solicitadas ,fechas de entrega y precio.
+                            - Solo se pueden editar las cantidades que no hayan sido lanzadas a produccion (No producidos)-->
+                        <li class="ped-option" id="edit<%= data[i].idodc%>" onclick="transformBodyPanel(this)" data-id="<%= data[i].idodc%>"><a><i class="glyphicon glyphicon-pencil"></i> Editar</a></li>
+                        <li class="ced-option" id="cloedit<%= data[i].idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= data[i].idodc%>" style="display: none;" ><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion</a></li>
+                        <li id="cloeditde<%= data[i].idodc%>" onclick="restaurarTablaOption(this)" data-id="<%= data[i].idodc%>" style="display: none;"><a><i class="glyphicon glyphicon-pencil"></i> Cerrar Modo Edicion(DE)</a></li>
+                        <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                        <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                    </ul>
+                </div>
+            </div>
+            <div id="c<%= data[i].idodc%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="h<%= data[i].idodc%>">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>N° Item</th>
+                        <th style="text-align: center;">Nombre</th>
+                        <th style="text-align: center;">Solicitados</th>
+                        <th style="text-align: center;">Sin Producir</th>
+                        <th style="text-align: center;">Despachado</th>
+                        <th style="text-align: center;">Fecha de entrega</th>
+                        <!--<th>Ultimo despacho</th>-->
+                        <th style="text-align: center;">Precio</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody id="t<%= data[i].idodc%>" data-edition="off">
+                        <input type="hidden" name="idodc" value="<%= data[i].idodc%>">
+                    <% 
+                    if(data[i].token){
+                        data[i].token = data[i].token.split(',');
+                        var color;
+                        var mensajeToast = '';
+                        for(var j = 0;j< data[i].token.length;j++){
+                            data[i].token[j] = data[i].token[j].split('@');
+                            
+                            if( parseInt(data[i].token[j][1])==parseInt(data[i].token[j][2]) ){
+                                mensajeToast = 'Despachado';
+                                color = 'default';
+                            }
+                            else if(parseInt(data[i].token[j][1])>=parseInt(data[i].token[j][2]) && parseInt(data[i].token[j][4]) <= 10 && parseInt(data[i].token[j][4]) > 0){
+                                mensajeToast = 'Quedan '+data[i].token[j][4]+' días para entrega';
+                                color = 'warning';
+                            }
+                            else if(parseInt(data[i].token[j][1])>=parseInt(data[i].token[j][2]) && parseInt(data[i].token[j][4]) == 0){
+                                mensajeToast = 'Pedido debe ser despachado hoy';
+                                color = 'warning';
+                            }
+                            else if(parseInt(data[i].token[j][1])>=parseInt(data[i].token[j][2]) && parseInt(data[i].token[j][4]) > 10){
+                                mensajeToast = 'Quedan '+data[i].token[j][4]+' días para entrega';
+                                color = 'success';
+                            }
+                            else{
+                                mensajeToast = 'Pedido atrasado '+Math.abs(parseInt(data[i].token[j][4]))+' días';
+                                color = 'danger';
+                            }
+                            if(data[i].token[j][6] == 'NODATE'){
+                                data[i].token[j][6] = 'No registra';
+                            }
+                            else{
+                                data[i].token[j][6] = new Date(data[i].token[j][6]).toLocaleString();
+                            }
+                            %>
+                                <tr class="<%=color%>" data-toggle="tooltip" data-placement="bottom" title="<%= mensajeToast%>">
+                                    <input type="hidden" name="idped" class="idped" id="idp<%= data[i].token[j][10]%>" value="<%= data[i].token[j][10]%>">
+                                    <input type="hidden" name="ocant" class="ocant" value="<%= numberFormat(data[i].token[j][1])%>">
+                                    <input type="hidden" name="odate" class="odate" value="<%= new Date(data[i].token[j][3])%>">
+                                    <input type="hidden" name="oprice" class="oprice" value="<%= numberFormat(data[i].token[j][7])%>">
+                                    <%if(data[i].token[j][8] == '1'){%>
+                                        <input type="hidden" name="rest" value="EX">
+                                    <%}else{%>
+                                        <input type="hidden" name="rest" value="<%= data[i].token[j][9]%>">
+                                    <%}%>
+                                    <td><%=j+1%></td>
+                                    <td style="text-align: center;"><%= data[i].token[j][0]%></td>
+                                    <td class="input-cantidad" style="text-align: center;"><%= numberFormat(data[i].token[j][1])%></td>
+                                    <%if(data[i].token[j][8] == '1'){%>
+                                        <td class="input-sol" style="text-align: center;">EXTERNO</td> 
+                                    <%}else{%>
+                                        <td class="input-sol" style="text-align: center;"><%= data[i].token[j][9]%></td> 
+                                    <%}%>
+                                    <td style="text-align: center;"><%= numberFormat(data[i].token[j][2])%></td>
+                                    <td class="row-entrDate input-fecha" style="text-align: center;"><%= fechaLatino(new Date(data[i].token[j][3]).toLocaleDateString()) %></td>
+                                    <!--<td class="row-despDate"><%= data[i].token[j][6]%></td>-->
+                                    <td class="input-precio" style="text-align: center;"><%= numberFormat(data[i].token[j][7])%></td>
+                                    <td class="restRow"></td>
+                                </tr>
+                        <%}
+                    }%>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <!--<td></td>-->
+                            <td style="text-align: center;" id="b<%= data[i].idodc%>"></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div><!--cierre de panel OC (color)-->
+</form>
+            <%}%>
+            <%if(!nomore){%>    
+            <div class="panel panel-default panel-plus">
+                <div class="panel-heading" role="tab" style="display: flex;" data-plusitem="10" onclick="loadItems(this)">
+                    <a role="button" style="width: 100%">
+                        <h3 style="text-align: center;width: 100%"><i class="fa fa-caret-down"></i> Cargar </h3>
+                    </a>
+                </div>
+            </div>
+            <%}else{%>
+                <div class="panel panel-default panel-plus" style="display: none">
+                    <div class="panel-heading" role="tab" style="display: flex;" data-plusitem="10" onclick="loadItems(this)">
+                        <a role="button" style="width: 100%">
+                            <h3 style="text-align: center;width: 100%"><i class="fa fa-caret-down"></i> Cargar </h3>
+                        </a>
+                    </div>
+                </div>
+            <%}%>
+
+        <%}else{%>
+
+            <h1 style="text-align: center; margin-top: 10px"> No hay OC registradas</h1>
+            <div class="panel panel-default panel-plus" style="display: none">
+                    <div class="panel-heading" role="tab" style="display: flex;" data-plusitem="10" onclick="loadItems(this)">
+                        <a role="button" style="width: 100%">
+                            <h3 style="text-align: center;width: 100%"><i class="fa fa-caret-down"></i> Cargar </h3>
+                        </a>
+                    </div>
+                </div>
+        <%}%>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        var count = 0; 
+        $(".panel-odc").each(function(){
+            count++;
+        });
+        $(".panel-plus div").data('plusitem',count);
+    });
+
+/*    $(".submit-oc").on('click', function(e){
+        e.preventDefault();
+        console.log($("#f"+$(this).data('id')).serializeArray() );
+        alert("HOLA");
+    });*/
+
+
+    $(".form-oc").submit(function(e){
+        e.preventDefault();
+        var lista = $(this).serializeArray();
+        var idodc; 
+        var data = {
+            idped: [],
+            ocant: [],
+            oprice: [],
+            odate: [],
+            newcant: [],
+            newdate: [],
+            newprecio: [],
+            rest: [], 
+            idodc: ''
+        }
+        for(var i =0;i<lista.length;i++){
+            if(lista[i].name != 'idodc'){
+                data[lista[i].name.replace('-','')].push(lista[i].value);
+            } 
+            else{
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        idodc = data.idodc;
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/plan/edit_oc',
+            success: function(data){
+                console.log(data);
+                for(var e = 0; e < data.idped.length; e++){
+                    $("#idp"+data.idped[e]).parent().children('.ocant').val(data.ocant[e]);
+                    $("#idp"+data.idped[e]).parent().children('.oprice').val(data.oprice[e]);
+                    $("#idp"+data.idped[e]).parent().children('.odate').val(data.odate[e]);
+                    if(data.orest[e] == 'none'){
+                        $("#idp"+data.idped[e]).parent().children('.rest').val('Sin OF');
+                        $("#idp"+data.idped[e]).parent().children('.input-sol').html('EXTERNO');
+                    }
+                    else{
+                        $("#idp"+data.idped[e]).parent().children('.rest').val(data.orest[e]);
+                        $("#idp"+data.idped[e]).parent().children('.input-sol').html(data.orest[e]);
+                        
+                    }    
+                }
+                restaurarTablaForm(idodc);
+            }
+        });
+    });
+
+
+    function transformBodyPanel(yo){
+        if($("#t"+$(yo).data('id')).data('edition') == 'off'){
+            $("#t"+$(yo).data('id')+" .input-fecha").each(function(){
+                var fecha = new Date($(this).parent().children('.odate').val());
+                var mes = fecha.getMonth() + 1;
+                var dia = fecha.getDate();
+                if(mes<10){
+                    mes = '0'+mes;
+                }
+                if(dia < 10){
+                    dia = '0'+dia;
+                }
+                fecha = fecha.getFullYear()  + '-' + mes + '-' + dia;
+                $(this).html("<input name='new-date' class='form-control' type='date' value='"+fecha+"'>");
+                
+            });
+            $("#t"+$(yo).data('id')+" .input-cantidad").each(function(){
+                $(this).html("<input name='new-cant' min='"+(parseInt($(this).text()) - parseInt($(this).parent().children('.input-sol').text()))+"' class='form-control' style='width: 60%; margin-left:40%' type='number' value='"+parseInt($(this).text().replace(',','').replace('.',''))+"'>");
+            });
+            $("#t"+$(yo).data('id')+" .input-precio").each(function(){
+                $(this).html("<input name='new-precio' class='form-control' style='width: 60%; margin-left:28%' type='number' value='"+parseInt($(this).text().replace(',','').replace('.',''))+"'>");
+            });
+
+            $("#t"+$(yo).data('id')+" .restRow").each(function(){
+                $(this).html("<i class='fa fa-refresh' onclick='restRow(this)'></i>");
+            });
+            $("#t"+$(yo).data('id')).data('edition', 'on');
+            $("#b"+$(yo).data('id')).html("<button class='btn btn-primary submit-oc' data-id='"+$(yo).data('id')+"'>Editar</button>");
+            $(yo).css('display', 'none');
+            $(yo).parent().children('.ced-option').css('display', 'block');
+        }
+    }
+
+    function restRow(yo){
+        $(yo).parent().parent().children('.input-cantidad').children('input').val(
+                $(yo).parent().parent().children('.ocant').val()
+            );
+        $(yo).parent().parent().children('.input-precio').children('input').val(
+                $(yo).parent().parent().children('.oprice').val()
+            );
+
+        var fecha = new Date($(yo).parent().parent().children('.odate').val());
+        var mes = fecha.getMonth() + 1;
+        var dia = fecha.getDate();
+        if(mes<10){
+            mes = '0'+mes;
+        }
+        if(dia < 10){
+            dia = '0'+dia;
+        }
+        fecha = fecha.getFullYear()  + '-' + mes + '-' + dia;
+        $(yo).parent().parent().children('.input-fecha').html("<input name='new-date' class='form-control' type='date' value='"+fecha+"'>");
+    }
+
+
+    function restaurarTablaForm(idodc){
+        restaurateBodyPanel("#cloedit"+idodc);
+    }
+
+    function restaurarTablaOption(yo){
+        if(confirm("Se perderán todos los cambios aplicados. \n ¿Desea continuar?")){
+            restaurateBodyPanel(yo);
+        }
+    }
+    function restaurateBodyPanel(yo){
+        if($("#t"+$(yo).data('id')).data('edition') == 'on'){
+                $("#t"+$(yo).data('id')+" .restRow i").each(function(){
+                    $(this).click();
+                });
+                $("#t"+$(yo).data('id')+" .input-fecha").each(function(){
+                    var fecha = new Date($(this).parent().children('.odate').val());
+                    var mes = fecha.getMonth() + 1;
+                    var dia = fecha.getDate();
+                    if(mes<10){
+                        mes = '0'+mes;
+                    }
+                    if(dia < 10){
+                        dia = '0'+dia;
+                    }
+                    fecha = fecha.getFullYear()  + '-' + mes + '-' + dia;
+                    $(this).html(fechaLatino(fecha));
+                    
+                });
+                $("#t"+$(yo).data('id')+" .input-cantidad").each(function(){
+                    $(this).html(numberFormat($(this).children('input').val()));
+                });
+                $("#t"+$(yo).data('id')+" .input-precio").each(function(){
+                    $(this).html(numberFormat($(this).children('input').val()));
+                });
+
+                $("#t"+$(yo).data('id')+" .restRow").each(function(){
+                    $(this).html("");
+                });
+                $("#t"+$(yo).data('id')).data('edition', 'off');
+                $("#b"+$(yo).data('id')).html('');
+                $(yo).css('display', 'none');
+                $(yo).parent().children('.ped-option').css('display', 'block');
+        }
+    }
+
+   function numberFormat(numero){
+            var resultado = "";
+            if(numero[0]=="-")
+            {
+                nuevoNumero=numero.replace(/\./g,'').substring(1);
+            }else{
+                nuevoNumero=numero.replace(/\./g,'');
+            }
+            if(numero.indexOf(",")>=0)
+                nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+     
+            for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+                resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+            if(numero.indexOf(",")>=0)
+                resultado+=numero.substring(numero.indexOf(","));
+            if(numero[0]=="-")
+            {
+                return "-"+resultado;
+            }else{
+                return resultado;
+            }
+        }
+    
+
+    $(".panel-odc .panel-collapse table tbody tr").each(function(){
+        //alert($(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').attr('class').split(' ')[1]);
+            if($(this).attr('class') == 'danger'){
+                $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').addClass('panel-danger');
+            }
+            else if($(this).attr('class') == 'warning' && $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').attr('class').split(' ')[1] == 'panel-default'){
+                $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').addClass('panel-warning');        
+            }
+            else if($(this).attr('class') == 'success' && $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').attr('class').split(' ')[1] == 'panel-default'){
+               $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').addClass('panel-success');        
+                
+            }
+            else if($(this).attr('class') == 'success' && $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').attr('class').split(' ')[1] == 'panel-default'){
+               $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').addClass('panel-success');        
+                
+            }
+
+            else if($(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').attr('class').split(' ')[1] == 'panel-finish'){
+               if(new Date($(this).children('.row-entrDate').text() ) > new Date($(this).children('.row-despDate').text()) ){
+                    console.log($(this).children('.row-entrDate').text());
+                    console.log($(this).children('.row-despDate').text());
+                    console.log("a tiempo");
+                    $(this).attr('title',"Despachado (A tiempo)");
+                    $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').addClass('panel-success');          
+               }
+               else{
+                    console.log($(this).children('.row-entrDate').text());
+                    console.log($(this).children('.row-despDate').text());
+                    console.log("Atrasado");
+                    $(this).attr('title',"Despachado (Atrasado)");
+                    $(this).parent('tbody').parent('table').parent(".panel-collapse").parent('.panel-odc').addClass('panel-danger');        
+               }
+
+                
+            }
+            $(".button-option").each(function(){
+                $(this).css('background-color', $(this).parent().parent().css('background-color'));
+            });
+    });
+
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                yo.attr("href",data);
+                yo.attr("download","ofs hasta ~ " + new Date().toLocaleDateString() + ".xlsx");
+                yo.removeClass("btn-info");
+                yo.removeClass("getcsv");
+                yo.addClass("btn-success");
+                yo.html("<i class='fa fa-download'></i> Descargar excel");
+            }
+        });
+
+    });
+function fechaLatino(string){
+                if(string != null || string != ''){
+                    console.log(string);
+                    console.log(string.split('-'));
+                    return string.split('-')[2]+"-"+string.split('-')[1]+"-"+string.split('-')[0];
+                }
+                else{
+                    return 'error';
+                }
+            }
+
+    function loadItems(yo){
+        $(yo).data('plusitem',parseInt($(yo).data('plusitem')) +10);
+        $("#ped-search").submit();
+    }
+    $("#ped-search").submit(function(e){
+        e.preventDefault();
+        var formArray = $(this).serializeArray();
+        var returnArray = {};
+        for (var i = 0; i < formArray.length; i++){
+            returnArray[formArray[i]['name']] = formArray[i]['value'];
+        }
+        if($(".panel-plus div").data('plusitem') < 10){
+            returnArray.items = 10;
+        }
+        else{
+            returnArray.items = $(".panel-plus div").data('plusitem');
+        }
+        $.ajax({
+            type: 'POST',
+            data: returnArray,
+            url: '/plan/buscar_ped',
+            success: function(data){
+                if(data == 'null'){
+                    $("#alerta").html('<strong>Error!</strong> No se ha encontrado ningun pedido');
+                    $("#divalert").collapse('toggle');
+                    setTimeout(function () {
+                        $("#divalert").collapse('toggle');
+                    },3000);
+                }
+                else{
+                    $("#page-wrapper").html(data);
+                }
+            }
+        });
+    });
+
+    function changeType(){
+        $("#ped-search").submit();
+    }
+
+    function refresh_list(){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/list_peds',
+            success: function(data){
+                $("#page-wrapper").html(data);
+            }
+        });
+    }
+
+</script>
+</div>

@@ -1,118 +1,44 @@
-<script src="../assets/parsear_nro_otro.js" type="text/javascript"></script>
+<script src="parsear_nro.js" type="text/javascript"></script>
 <%
 var d = new Date(factura[0].fecha);
 var tot_cost = 0;
 %>
 <div class="modal-dialog" role="document">
-    <% if(factura[0].anulado){%>
-        <div class="modal-content panel-danger">
-    <%}else{%>
-        <div class="modal-content panel-primary">
-    <%}%>
+    <div class="modal-content panel-primary">
         <div class="modal-header panel-heading">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h3 class="modal-title">
-                Factura n° <%=factura[0].numfac%>
-                <% if(factura[0].anulado){%>
-                    <small style="color: rgb(169,68,66)">(Anulado)</small>
-                <%}%>
-            </h3>
+            <h3 class="modal-title">Factura n° <%=factura[0].numfac%></h3>
             <h4 class="modal-title" style="text-align: right"><%=d.toLocaleDateString()%> </h4>
         </div>
-        <div class="modal-body" id="vpdf" style="overflow-y: scroll; overflow-x: hidden; max-height: 400px; padding: 0">
-             <table id="facturaDataTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin: 0 !important; width: 100% !important;">
-                 <thead>
-                     <tr>
-                         <th>Detalle</th>
-                         <th style="text-align: center">Cantidad</th>
-                         <th style="text-align: center">Precio</th>
-                         <th style="text-align: center" class="cab-hidden hidden"><input type="checkbox" checked> Anular</th>
-                     </tr>
-                 </thead>
+        <div class="modal-body" id="vpdf" style="overflow-y: scroll; max-height: 600px">
+             <table class="table" >
+                 <tr>
+                     <th>Codigo</th>
+                     <th>Detalle</th>
+                     <th>Cantidad</th>
+                     <th>Precio</th>
+                 </tr>
                  <tbody>
                  <%for (var i = 0; i < mats.length; i++){%>
                      <tr>
+                         <td><%=mats[i].codigo%></td>
                          <td><%=mats[i].detalle%></td>
-                         <td class="parsear_nro_otro" style="text-align: center"><%=mats[i].cantidad%></td>
-                         <td class="parsear_nro_otro" style="text-align: center"><%=mats[i].costo%></td>
-                         <td class="cab-hidden hidden" style="text-align: center">
-                             <!--<input type="number" class="form-control" style="width: 100px" placeholder="Anular">-->
-                             <input type="checkbox" checked>
-                         </td>
-                         <%tot_cost += (mats[i].cantidad * mats[i].costo);%>
+                         <td class="parsear_nro"><%=mats[i].cantidad%></td>
+                         <td class="parsear_nro"><%=mats[i].costo%></td>
+                         <%
+                         tot_cost += (mats[i].cantidad * mats[i].costo);
+                         %>
                      </tr>
-                <%}%>
                  </tbody>
+                <%}%>
                  <tfoot>
-                     <tr>
-                        <td class="parsear_nro_otro" colspan="3" style="text-align: right">Costo Total: <%=tot_cost%></td>
-                         <td class="cab-hidden hidden"></td>
-                     </tr>
+                    <td class="parsear_nro" colspan="4" style="text-align: right">Costo Total: <%=tot_cost%></td>
                  </tfoot>
              </table>
         </div>
-        <style>
-            .anular-button:hover::before {
-                content: "Anular ";
-            }
-            .cancelar-button:hover::before {
-                content: "Cancelar ";
-            }
-
-            .aceptar-button:hover::before {
-                content: "Enviar ";
-            }
-        </style>
-        <script>
-            $(".anular-button").on('click', function(e){
-                e.preventDefault();
-                if(confirm("¿Seguro que desea anular la factura por completo?")){
-                    $.ajax({
-                        type: 'GET',
-                        url: '/abastecimiento/anular_factura/'+$(this).data('id'),
-                        success: function(data){
-                            $('#myModalInformation').html(data);
-                        }
-                    });
-                }
-            });
-        </script>
-        <div class="modal-footer">
-            <% if(!factura[0].anulado){%>
-                <a class="anular-button btn btn-danger" data-id="<%=factura[0].idfactura%>"><i class="fa fa-ban"></i></a>
-            <%}%>
+        <div class="modal-footer" >
             <a onclick="gen_pdf(<%= factura[0].idfactura%>)" class="btn btn-primary" id="vpdf_btn">Gen PDF</a>
             <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
         </div>
     </div><!-- /.modal-content -->
 </div><!-- /.modal-dialog -->
-<script>
-    $("#facturaDataTable").DataTable({
-        paging: false,
-        lengthChange: false,
-        bFilter: false,
-        bInfo: false,
-        order: [],
-        language: {
-            "sProcessing":     "Procesando...",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-
-            "sSearch":         "Buscar:",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "&raquo",
-                "sPrevious": "&laquo"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        }
-    });
-</script>

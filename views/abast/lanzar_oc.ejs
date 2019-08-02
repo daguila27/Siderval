@@ -7,15 +7,10 @@
     cursor: pointer;
   }
 </style>
-<!-- Funcion para parsear nros -->
-<script src="parsear_nro.js" type="text/javascript"></script>
 <%
     function toFixed(num, fixed) {
         var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
         return num.toString().match(re)[0];
-    }
-    function eliminarDiacriticos(texto) {
-        return texto.normalize('NFD').replace(/[\u0300-\u036f]/g,"");
     }
     %>
 <div id="help" class="panel-collapse collapse" role="tabpanel" aria-labelledby="help" style="margin: 0 5%;background-color: rgb(202,202,202);">
@@ -23,6 +18,8 @@
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
   </p> 
 </div>
+
+
 <div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
   <div class="col-md-12 panel-creacion" style="margin-top: 20px">
     <div class="panel panel-primary cargando-panel" style="display: none;">
@@ -37,7 +34,7 @@
       <div class="panel panel-primary panel-defecto">
         <div class="panel-heading" style="display: flex">
           <div style="width: 45%">
-            <h3>Orden de Compra: #<%=last%></h3>
+            <h3>Lanzar Orden de Compra: #<%=last%></h3>
             <div style="display: flex">
               <button class="btn btn-primary" onclick="saveState(false)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
               <button class="btn btn-primary" onclick="loadState(false)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
@@ -53,7 +50,7 @@
           <div style="width: 20%">
             <label>Proveedor: </label>
             <div class='predic_text' onkeyup='getPredictions(this)'> 
-              <input type='text' class="form-control" name='prov' autocomplete='off' required>
+              <input type='text' class="form-control" name='prov' autocomplete='off' required></input>
             </div>
           </div>
           <div style="width: 30%; margin-left: 2%">
@@ -67,13 +64,12 @@
           </div>
         </div>
         <div style="overflow-y: scroll; max-height: 300px;">
-          <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+          <table class="table table-striped">
             <thead>
               <tr>
-                <th class="hidden">F. Directa</th>
                 <th>Exento</th>
                 <th>Descripción</th>
-                <th style="text-align: center">U.C.</th>
+                <th>Mínimo de Compra</th>
                 <th>Cantidad</th>
                 <th>Precio x Unidad</th>
                 <th>Total</th>
@@ -87,19 +83,11 @@
           </table>
         </div>
         <div class="panel-footer">
-            <h4 style="margin-top: 0">
-                <div class="row">
-                    <div class="col-md-2 col-md-offset-1">
-                        <div class="total-neto"><small>Neto: </small></div>
-                    </div>
-                    <div class="col-md-2 col-md-offset-2">
-                        <div class="total-iva"><small>IVA: </small></div>
-                    </div>
-                    <div class="col-md-2 col-md-offset-2">
-                        <div class="total-total"><small>Total: </small></div>
-                    </div>
-                </div>
-            </h4>
+          <h4 style="width: 100%;display: flex;">
+            <div style="margin-left: 10%;width: 30%;text-align: left" class="total-neto"><small>Neto: </small></div> 
+            <div style="margin-left: 0%;width: 30%;text-align: left" class="total-iva"><small>IVA: </small></div>  
+            <div style="margin-left: 0%;width: 30%;text-align: left" class="total-total"><small>Total: </small></div> 
+          </h4>
           <div style="width: 100%;text-align: center; cursor: pointer; margin-bottom: 5px"><a data-toggle="collapse" data-target="#generalInfo"><b>Información general <i class="fa fa-caret-down desp-arrow"></i></b></a></div>
           <div class="collapse" id="generalInfo">
             <div class="form-group" style="display: flex; width: 100%">
@@ -171,48 +159,24 @@
           <div class="panel-body">
             <form id="strimform">
               <div class="form-inline">
-                <!--<input name="det" placeholder="Descripción" class="form-control strim_input" id="det">-->
-                <label class="pull-right" style="font-weight: normal; margin-left: 20px; margin-right: 20px">
-                <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="showProd" id="showProd" onchange="refreshTableProduct()"> Mostrar Productos (Fundidos)
+                <input name="det" placeholder="Descripción" class="form-control strim_input" id="det">
+                <label style="font-weight: normal; margin-left: 20px; margin-right: 20px">
+                <input type="checkbox" class="form-control" style="width: 20px; height: 20px; margin-top: 0;" name="showProd" id="showProd"> Mostrar Productos (Fundidos)
                 </label>
-                <!--<a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>-->
+                <a href="#" onclick="refresh()" class="btn btn-primary"><i class="fa fa-search"></i> Buscar</a>
               </div>
             </form>
           </div>
-          <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="viewProductos">
+          <table class="table table-responsive">
             <thead>
               <tr>
-                    <th>Descripción</th>
-                    <th>Unidad de Medida</th>
-                    <th>Stock Aviso</th>
-                    <th>Stock Crítico</th>
-                    <th>Unidad Mínima de Compra</th>
-                    <th>Stock Actual</th>
-                    <th>Precio</th>
-                    <th></th>
+                <th>Descripción</th>
+                <th>Caracteristica</th>
+                <th>Stock</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="prefabrs">
-                <% for(var t=0; t < mats.length; t++){%>
-                    <tr>
-                        <td data-search="<%=eliminarDiacriticos(mats[t].detalle)%>"><%= mats[t].detalle%></td>
-                        <td style="text-align: center"><%= mats[t].u_medida%></td>
-                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].stock_i%></td>
-                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].stock_c%></td>
-                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].u_compra%></td>
-                        <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].stock%></td>
-                        <%if(mats[t].precio == null || mats[t].precio == 8888){%>
-                            <td style="text-align: center"> - </td>
-                        <%}else{%>
-                            <td data-cs="0" class="parsear_nro" style="text-align: center"><%= mats[t].precio%></td>
-                        <%}%>
-                        <td style="text-align: center">
-                            <div class="btn-group">
-                                <a data-idm="<%= mats[t].idmaterial%>" class="btn btn-success btn-xs" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></a>
-                            </div>
-                        </td>
-                    </tr>
-                <%}%>
             </tbody>
           </table>
         </div>
@@ -220,6 +184,25 @@
           <div class="panel panel-info">
             <div class="panel-heading">
               <div style="display: flex;">
+                  <!--<div style="width: 45%; margin-right: 5%;">
+                      <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
+                      <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
+                  </div>
+                  <div style="width: 50%;" class="form-group">
+                        <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
+                        <div style="display: flex;">
+                        <select style="width: 40%" class="form-control" id="filtro" onchange="refreshGDList()">
+                          <option value="odc.numoc">N° OC</option>
+                          <option value="material.detalle">Detalle</option>
+                          <option value="subaleacion.subnom">Aleación</option>
+                          <option value="pedido.cantidad - pedido.despachados">Sin Despachar</option>
+                          <option value="pedido.f_entrega" selected="selected">Fecha de Entrega</option>
+                        </select>
+                        <select style="width: 40%" class="form-control" id="orden" onchange="refreshGDList()">
+                          <option value="ASC" selected="selected">Ascendente</option>
+                          <option value="DESC">Descendente</option>
+                        </select>
+                        </div>-->
               </div>
             </div>
           </div>
@@ -230,7 +213,7 @@
     </div>
   </div>
 </div>
-<div  class="hidden form-pdf" style="display: none" ></div>
+<div  class="hidden" style="display: none" ></div>
 
 
 
@@ -297,81 +280,19 @@
     }
 </style>
 <script>
-
-    function refreshTableProduct(){
-        $.ajax({
-            type: 'GET',
-            url: '/abastecimiento/refreshProductWhitP/'+$("#showProd").is(':checked'),
-            beforeSend: function(){
-                $('#viewProductos').DataTable().destroy();
-                $('#viewProductos').html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
-            },
-            success: function(data){
-                $('#viewProductos').html(data);
-                $('#viewProductos').DataTable({
-                    pageLength: 10,
-                    language: {
-                        "sProcessing":     "Procesando...",
-                        "sZeroRecords":    "No se encontraron resultados",
-                        "sEmptyTable":     "Ningún dato disponible en esta tabla",
-                        "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                        "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-                        "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-
-                        "sSearch":         "Buscar:",
-                        "sLoadingRecords": "Cargando...",
-                        "oPaginate": {
-                            "sFirst":    "Primero",
-                            "sLast":     "Último",
-                            "sNext":     "&raquo",
-                            "sPrevious": "&laquo"
-                        },
-                        "oAria": {
-                            "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                            "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-                        }
-                    }
-                });
-            }
-        })
-    }
-
-    $('#viewProductos').DataTable({
-        "lengthChange": false,
-        "paging": true,
-        "language": {
-            "sProcessing":     "Procesando...",
-            "sLengthMenu":     "Mostrar _MENU_ registros",
-            "sZeroRecords":    "No se encontraron resultados",
-            "sEmptyTable":     "Ningún dato disponible en esta tabla",
-            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
-            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix":    "",
-            "sSearch":         "Buscar:",
-            "sUrl":            "",
-            "sInfoThousands":  ",",
-            "sLoadingRecords": "Cargando...",
-            "oPaginate": {
-                "sFirst":    "Primero",
-                "sLast":     "Último",
-                "sNext":     "Siguiente",
-                "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
-            }
-        }
-    });
-
-    //$("#viewProductos_wrapper").css('margin-top', '-41px');
-
-
-    function moveArrow(){
-        $(".desp-arrow").css('transform', 'rotate(180deg)');
-    }
-    function getPredictions(yo){
+  $(document).ready(function(){
+     $.ajax({
+         type: 'GET',
+         url: '/abastecimiento/visualizar_ofs',
+         success: function(data){
+             $(".renderizar_ofs").html(data)
+         }
+     });
+  });
+  function moveArrow(){
+    $(".desp-arrow").css('transform', 'rotate(180deg)');  
+  }
+  function getPredictions(yo){
       if($(yo).children('input').val()!=''){
              $.ajax({
                   type: 'GET',
@@ -385,7 +306,7 @@
       else{
           $(yo).children('div').html('');
       }
-    }
+  }
   function refresh(){
       var data ={};
       data.det = $("#det").val();
@@ -422,7 +343,7 @@
   }
     
 
-   /*$("#send_of").submit(function(e){
+   $("#send_of").submit(function(e){
       e.preventDefault();
       alert("enviando");
       lista = $(this).serializeArray();
@@ -469,126 +390,126 @@
                   alert("La OC que esta intentando crear es inválida.");
               } else {
                   alert("La OC fue creada exitosamente.");
-                  $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+                  $(".hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
                   $(".hidden form").submit();
-
-                  setTimeout(function(){
-                      location.reload();
-                  }, 1000);
+                  $.ajax({
+                      type: 'GET',
+                      url: '/abastecimiento/abast_myself',
+                      success: function(data){
+                          $("#page-wrapper").html(data);
+                      }
+                  });
               }
           }
       });
       }
-  });*/
+  });
 
-  function renderInsumos(idof){
-   //alert("AJAX");
-   $.ajax({
-     type: 'GET',
-     url: '/abastecimiento/get_insumos_of/'+idof,
-     success: function(data){
-         if(data == 'err'){
-           alert("Ha ocurrido un error al obtener los insumos.");
-         }
-         else{
-           //alert(data);
-           $("#ins"+idof).html(data);
-         }
+     function renderInsumos(idof){
+      //alert("AJAX");
+      $.ajax({
+        type: 'GET',
+        url: '/abastecimiento/get_insumos_of/'+idof,
+        success: function(data){
+            if(data == 'err'){
+              alert("Ha ocurrido un error al obtener los insumos.");
+            }
+            else{
+              //alert(data);
+              $("#ins"+idof).html(data);
+            }
+        }
+      });
      }
-   });
-  }
 
-   function selectCC(yo){
-      //alert($(yo).parent('td').children('input').val());
-      $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
-   }
+     function selectCC(yo){
+        //alert($(yo).parent('td').children('input').val());
+        $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
+     }
 
+     
+    function saveState(plantilla){
+        var lista = $("#send_of").serializeArray();
+        var data = {
+            idm: [],
+            cants: [],
+            prov: [],
+            costo: [],
+            ex_iva: [],
+            centroc: []
+        }
+        
+        console.log(lista);
+        for(var i =0;i<lista.length;i++){
+            if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
+                //console.log(lista[i].name);
+                data[lista[i].name].push(lista[i].value);
+            } else{
+                //console.log(lista[i].name);
+                data[lista[i].name] = lista[i].value;
+            }
+        }
+        data.ex_iva = [];
+        $("#send_of :checkbox").each(function(){
+            if($(this).is(':checked')){
+              data.ex_iva.push('on');
+            }
+            else{
+              data.ex_iva.push('off');  
+            }
+            //console.log($(this).val());
+        });
+        console.log(data);
+        data.plantilla = plantilla;
+        data.namePlant = $("#namePlant").val();
+        $.ajax({
+            type: 'POST',
+            data: data,
+            url: '/abastecimiento/saveStateODABD',
+            beforeSend: function(xhr){
+                //alert("Guardando!!");
 
-   function saveState(plantilla){
-       var lista = $("#send_of").serializeArray();
-       var data = {
-           idm: [],
-           cants: [],
-           prov: [],
-           costo: [],
-           ex_iva: [],
-           centroc: []
-       }
-       for(var i =0;i<lista.length;i++){
-           if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
-               data[lista[i].name].push(lista[i].value);
-           } else{
-               data[lista[i].name] = lista[i].value;
-           }
-       }
-       data.ex_iva = [];
-       $("#send_of .ex_iva").each(function(){
-           if($(this).is(':checked')){
-             data.ex_iva.push('on');
-           }
-           else{
-             data.ex_iva.push('off');
-           }
-       });
-       data.plantilla = plantilla;
-       data.namePlant = $("#namePlant").val();
-       $.ajax({
-           type: 'POST',
-           data: data,
-           url: '/abastecimiento/saveStateODABD',
-           beforeSend: function(xhr){
-               //alert("Guardando!!");
+                $(".guardado_automatico").text("Guardando estado de ODA ...");
+            },
+            success: function(data){
+                //alert("Estado de OC guardado");
+                $(".guardado_automatico").text("Guardado por ultima vez: "+ new Date().toLocaleString());
 
-               $(".guardado_automatico").text("Guardando estado de ODA ...");
-           },
-           success: function(data){
-               //alert("Estado de OC guardado");
-               $(".guardado_automatico").text("Guardado por ultima vez: "+ new Date().toLocaleString());
+            }
+        });
 
-           }
-       });
+    }
 
-   }
+    function loadState(plantilla){
+         /*
+         * EL CONTROLADOR ACEPTA plantilla (booleano que indica si se esta cargando un plantilla o no)
+         *  Y idplant (id de plantilla en el caso de utilizar una). SI plantilla ES false ENTONCES SE CARGA
+         *  EL ULTIMO ESTADO GUARDADO.
+         * */
+        $.ajax({
+            type: 'POST',
+            data: {plantilla: plantilla, idplant: $(".select-plant").data('id')},
+            url: '/abastecimiento/loadStateODABD',
+            beforeSend: function(xhr){
+                $(".guardado_automatico").css('display', 'none');
+                $(".panel-defecto").css('display', 'none');
+                $(".cargando-panel").css('display', 'block');
 
-   function loadState(plantilla){
-        /*
-        * EL CONTROLADOR ACEPTA plantilla (booleano que indica si se esta cargando un plantilla o no)
-        *  Y idplant (id de plantilla en el caso de utilizar una). SI plantilla ES false ENTONCES SE CARGA
-        *  EL ULTIMO ESTADO GUARDADO.
-        * */
-       $.ajax({
-           type: 'POST',
-           data: {plantilla: plantilla, idplant: $(".select-plant").data('id')},
-           url: '/abastecimiento/loadStateODABD',
-           beforeSend: function(xhr){
-               $(".guardado_automatico").css('display', 'none');
-               $(".panel-defecto").css('display', 'none');
-               $(".cargando-panel").css('display', 'block');
+                setTimeout(function(){  }, 1000);
+            },
+            success: function(data){
 
-               setTimeout(function(){  }, 1000);
-           },
-           success: function(data){
+                var text = $(".guardado_automatico").text();
+                $(".panel-creacion").html(data);
+                $(".guardado_automatico").text(text);
+            }
+        });
+    }
+    $(document).ready(function(){
+      loadState(false);
+    });
 
-               var text = $(".guardado_automatico").text();
-               $(".panel-creacion").html(data);
-               $(".guardado_automatico").text(text);
-           }
-       });
-   }
-
-
-   $(document).ready(function(){
-     loadState(false);
-     $.ajax({
-         type: 'GET',
-         url: '/abastecimiento/visualizar_ofs',
-         success: function(data){
-             $(".renderizar_ofs").html(data)
-         }
-     });
-   });
-
-   function renderPlantillasModal(){
+  function renderPlantillasModal(){
       $.ajax({
           type: 'GET',
           url: '/abastecimiento/show_plantillas',

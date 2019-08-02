@@ -14,7 +14,7 @@ if(data.length){
 for(var i = 0; i< data.length;i++){
 %>
     <div class="col-md-4 list-group factura" onclick="submit_form(this)" data-idodc="<%= data[i].idodc%>">
-        <div class="dropdown" style="position: absolute; top: 15px; right: 15px; z-index: 5">
+        <div class="dropdown" style="position: absolute; top: 15px; right: 15px; z-index: 10">
             <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
             <ul class="dropdown-menu dropdown-menu-right">
                 <li><a>Ver PDF</a></li>

@@ -3,7 +3,6 @@ var path = require('path');
 var connect = require('connect');
 var http = require('http');
 
-//se crea server
 var app = express();
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -21,13 +20,10 @@ var plan = require('./routes/plan');
 var dt = require('./routes/dt');
 var dm = require('./routes/dm');
 var jefeprod = require('./routes/jefeprod');
-var jefeplanta = require('./routes/jefeplanta');
 var bodega = require('./routes/bodega');
 var abast = require('./routes/abast');
 var matprimas = require('./routes/matprimas');
 var csvs = require('./routes/csvs');
-var test = require('./routes/test');
-var gestionpl = require('./routes/gestionpl');
 
 //const ejslint = require('ejs-lint');
 
@@ -52,6 +48,7 @@ app.use(cookieSession({
 
 app.use('/', index);
 app.use('/user', users);
+
 app.use('/siderval', siderval);
 app.use('/plan', plan);
 app.use('/gerencia', admin);
@@ -60,13 +57,10 @@ app.use('/dt', dt);
 app.use('/plan', plan);
 app.use('/dm', dm);
 app.use('/jefeprod', jefeprod);
-app.use('/jefeplanta', jefeplanta);
 app.use('/bodega', bodega);
 app.use('/abastecimiento', abast);
 app.use('/matprimas', matprimas);
 app.use('/csvs', csvs);
-app.use('/test', test);
-app.use('/gestionpl', gestionpl);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -106,8 +100,6 @@ svc.install();*/
 
 var server  = http.createServer(app);
 
-
-//EJECUTA EL SERVER
 server.listen(app.get('port'), function(){
     console.log('The game starts on port ' + app.get('port'));
 });
@@ -115,7 +107,7 @@ server.listen(app.get('port'), function(){
 const io = require('socket.io')(server);
 
 
-var mysql = require('mysql');
+var mysql      = require('mysql');
 var connection = mysql.createConnection({
       host: '127.0.0.1',
       user: 'admin',
@@ -128,10 +120,9 @@ var connection = mysql.createConnection({
 
 connection.connect();
 io.on('connection', function (socket) {
-      //FUNCION QUE SE REGISTRA LAS NOTIFICACIONES DE RECHAZO EN JEFE DE PRODUCCIÓN
+      console.log("Conectado");
       socket.on('addError',function(input){
-         console.log("INGRESANDO NOTIFICACIÓN DE RECHAZO");
-         connection.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion in ("+input.idproduccion.split('-').join(',')+")", function(err, produccion) {
+         connection.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion) {
              if (err) {
                  console.log("Error Selecting : %s", err);
              }
@@ -148,9 +139,8 @@ io.on('connection', function (socket) {
              });
          });
      });
-      socket.on('addNotificacion', function(input){
-          console.log(input);
-          var userf = input.key.substring(2,input.key.length);
+      socket.on('addNotificacion', function(input){ 
+          var userf = input.key.substring(2,3);
           connection.query("SELECT fabricaciones.idmaterial, produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion){
               if(err){console.log("Error Selecting : %s", err);}
                 var idmaterial = produccion[0].idmaterial;
@@ -165,7 +155,7 @@ io.on('connection', function (socket) {
                           [d.getHours(),
                            d.getMinutes(),
                            d.getSeconds()].join(':');*/
-                if(userf === '8'){
+                if(userf == '8'){
                   dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                   connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                       if(err){console.log("Error Selecting : %s", err);}                    
@@ -173,16 +163,6 @@ io.on('connection', function (socket) {
                   });
 
 
-                }
-                else if(userf === "9"){
-                    dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-                    console.log(dataInsert);
-                    connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                        if(err){console.log("Error Selecting : %s", err);}
-                        io.sockets.emit("refreshfaena"+userf);
-
-                        //connection.end();
-                    });
                 }
                 else{
                   dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
@@ -204,10 +184,12 @@ io.on('connection', function (socket) {
             io.sockets.emit('showToastnewOF', {newOF: input});
             
       });
+
       socket.on('showToastCount', function(){
             console.log("HELLO WORLD");  
             io.sockets.emit('showToastnewFab');
       });
+
       socket.on('showToastnotif', function(input){ 
           console.log(input);
           var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
@@ -251,12 +233,13 @@ io.on('connection', function (socket) {
             }
           });
       });
+
+
       socket.on('refreshJefeprod', function(id){ 
           console.log('refreshJefeprod');
           console.log(id);
           io.sockets.emit("refreshProduccion", {info : id});
       });
-      app.locals.socket = socket;
 });
 app.locals.io = io;
 

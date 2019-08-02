@@ -6,8 +6,6 @@
 
 
 
-<!-- Funcion para parsear nros -->
-<script src="parsear_nro.js"></script>
 <div class="o_view_manager_content">
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
@@ -182,23 +180,15 @@
                                         </div>
                                     </div>
                                     <div class="table-responsive">
-                                        <%
-                                        var clase = '';
-                                        if(username != 'plan'){
-                                            clase = 'hidden'
-                                        }
-                                        %>
                                         <table id="tablaOC" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                                 <tr>
                                                     <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
                                                     <th class="o_column_sortable" style="text-align: left;">Item</th>
+
                                                     <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                     <th class="o_column_sortable">Cantidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Despachados</th>
-
-                                                    <th class="o_column_sortable <%= clase%>" style="text-align: center;">Precio Unidad</th>
-                                                    <th class="o_column_sortable <%= clase%>" style="text-align: center;">Precio Total</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Días Restantes</th>
@@ -208,8 +198,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody class="ui-sortable">
-                                                <%var precio_total = 0;
-                                                for(var e=0; e < ped.length; e++){
+                                                <%for(var e=0; e < ped.length; e++){
                                                     if(ped[e].dias < 0 && ped[e].cantidad > ped[e].despachados){%>
                                                         <tr class="o_data_row text-info danger">
                                                     <%}else if((ped[e].dias >= 0 && ped[e].dias <= 10) && ped[e].cantidad>ped[e].despachados ){%>
@@ -225,9 +214,6 @@
                                                         <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=ped[e].detalle%></td>
                                                         <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=ped[e].cantidad%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].despachados%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier parsear_nro <%= clase%>" style="text-align: center;"><%=ped[e].precioOC%></td>
-                                                        <%precio_total += ped[e].precioOC*ped[e].cantidad%>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier parsear_nro <%= clase%>" style="text-align: center;"><%=ped[e].precioOC*ped[e].cantidad%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].u_medida%></td>
                                                         <td class="o_data_cell o_list_text o_required_modifier" data-order="<%= new Date(ped[e].f_entrega).getTime()%>" style="text-align: center;"><%=fechaLatino(new Date(ped[e].f_entrega).toLocaleDateString())%></td>
                                                         <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=ped[e].dias%></td>
@@ -247,8 +233,7 @@
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
-                                                    <td class=" <%= clase%>"></td>
-                                                    <td class="parsear_nro <%= clase%>" style="text-align: center"><%= precio_total%></td>
+                                                    <td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>

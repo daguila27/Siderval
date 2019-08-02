@@ -54,21 +54,7 @@ function largeID(string, large){
                     <td style="text-align: center;"><%=parsear_nro(data[i].cantidad - data[i].despachados)%></td>
                     <td class="mat_stock" style="text-align: center;"><%=parsear_nro(data[i].stock)%></td>
                     <td style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
-                    <td class="mat_butt">
-                        <a onclick="send_queue(this)"
-                           data-notstock="<%=stateButton%>"
-                           data-num="<%=data[i].numordenfabricacion%>"
-                           data-idmat="<%= data[i].idmaterial%>"
-                           data-stock="<%= data[i].stock%>"
-                           data-sinenviar="<%= data[i].cantidad - data[i].despachados%>"
-                           data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>"
-                           data-id="<%= data[i].idfabricaciones%>"
-                           data-idof="<%= data[i].idordenfabricacion%>"
-                           data-idcli="<%= data[i].idcliente%>"
-                           data-numitem="<%= data[i].idcliente%>" class="btn btn-success addqq">
-                            <i class="glyphicon glyphicon-plus"></i>
-                        </a>
-                    </td>
+                    <td class="mat_butt"><a onclick="send_queue(this)" data-notstock="<%=stateButton%>" data-num="<%=data[i].numordenfabricacion%>" data-idmat="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>" data-sinenviar="<%= data[i].cantidad - data[i].despachados%>" data-cantidad="<%= data[i].cantidad%>" data-detalle="<%=data[i].detalle%>" data-id="<%= data[i].idfabricaciones%>" data-idof="<%= data[i].idordenfabricacion%>" data-idcli="<%= data[i].idcliente%>" data-numitem="<%= data[i].idcliente%>" class="btn btn-success addqq"><i class="glyphicon glyphicon-plus"></i></a></td>
 
                 </tr>
 

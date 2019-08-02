@@ -14,7 +14,7 @@
  }
 %>
 
-<table id="viewOF" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width:100%;">
+<table id="viewOF" class="table table-striped table-bordered" style="width:100%;">
         <thead>
         <tr>
             <th>OF</th>
@@ -31,7 +31,7 @@
         <tbody>
         <%for(var e=0; e < of.length; e++){%>
             <tr>
-                <td style="text-align: center"><%= of[e].idordenfabricacion%></td>
+                <td style="text-align: center"><%= setZeros(of[e].idordenfabricacion)%></td>
                 <td><%= of[e].detalle%></td>
                 <td style="text-align: center"><%= of[e].cantidad%></td>
                 <td style="text-align: center;"><%= of[e].restantes%></td>
@@ -42,7 +42,7 @@
                 <%}else{%>
                     <td style="text-align: center">Interna</td>
                 <%}%>
-                <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" data-cant="<%= of[e].restantes%>" onclick="renderBOM(this)"><i class="fa fa-eye"></i></button></td>
+                <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" onclick="renderBOM(this)"><i class="fa fa-eye"></i></button></td>
                 <td style="text-align: center" class="btn-group">
                     <button class="btn btn-xs btn-success" onclick="obtener_pdf(<%= of[e].idordenfabricacion%>, this)"><i class="fa fa-file-pdf-o"></i></button>
                     <!--<button class="btn btn-xs btn-danger" data-idmat="<%= of[e].idmaterial%>"><i class="fa fa-remove"></i></button>-->
@@ -81,30 +81,24 @@
     </div>
 </div>
 <script>
-
     $(document).ready(function() {
         $('#viewOF').DataTable({
-            "lengthChange": false,
-            "paging": true,
-            order: [[ 0, "desc" ]],
-            "language": {
+            pageLength: 10,
+            language: {
                 "sProcessing":     "Procesando...",
-                "sLengthMenu":     "Mostrar _MENU_ registros",
                 "sZeroRecords":    "No se encontraron resultados",
                 "sEmptyTable":     "Ningún dato disponible en esta tabla",
                 "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
                 "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
                 "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix":    "",
+
                 "sSearch":         "Buscar:",
-                "sUrl":            "",
-                "sInfoThousands":  ",",
                 "sLoadingRecords": "Cargando...",
                 "oPaginate": {
                     "sFirst":    "Primero",
                     "sLast":     "Último",
-                    "sNext":     "Siguiente",
-                    "sPrevious": "Anterior"
+                    "sNext":     "&raquo",
+                    "sPrevious": "&laquo"
                 },
                 "oAria": {
                     "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
@@ -130,8 +124,8 @@
     function renderBOM(yo){
        $.ajax({
            type: 'POST',
-           data: {idmaterial: $(yo).data('idmat'), addOCA: true, cant: $(yo).data('cant')},
-           url: '/abastecimiento/data_bom',
+           data: {idmaterial: $(yo).data('idmat'), addOCA: true},
+           url: 'abastecimiento/data_bom',
            success: function(data){
                $("#modalbody-bom").html(data);
                $("#visorInsumos").modal("show");

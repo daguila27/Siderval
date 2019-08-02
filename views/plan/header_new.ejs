@@ -7,17 +7,13 @@
 
              <meta charset="utf-8">
                 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <meta name="description" content="">
                 <meta name="author" content="">
 
                 <title><%=page_title%></title>
-
-
-
                 <link rel="shortcut icon" href="/assets/img/logomin.png">
-                <!-- Bootstrap Core CSS-->
+                <!-- Bootstrap Core CSS -->
                 <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
                 <!-- MetisMenu CSS -->
@@ -28,21 +24,20 @@
 
                 <!-- Morris Charts CSS -->
                 <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+                
 
 
                 <!-- Advance Table CSS -->
                 <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">
 
-                <!-- Advance Table CSS
-                <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">-->
                 <!-- Custom Fonts -->
                 <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
                 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
                 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
                 <!--[if lt IE 9]>
-                <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-                <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+                    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
                 <![endif]-->
 
 
@@ -51,7 +46,7 @@
                 <script src="/js/jquery-3.1.1.min.js"></script>
                 <script src="/js/jquery-1.11.3.min.js"></script>
                 <script src="/js/socket.io.js"></script>
-
+                
                 <!-- Google Fonts -->
                 <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
                 <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
@@ -68,11 +63,7 @@
                <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.1.css"/>
                <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
                <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
-
-
-
-
-
+               
 
                <!--<script type="text/javascript" src="/assets/js/web.assets_common.js"></script>
                <script type="text/javascript" src="/assets/js/web.assets_backend.js"></script>
@@ -82,30 +73,20 @@
    
                
                    <!--[if lt IE 10]>
+                       <body class="ie9">
                    <![endif]-->
-
+               
+               <script type="text/javascript">
+                   
+               </script>
+           
         </head>
 
 
         <body class="o_web_client">
-
-
-        <script>
-            console.log("⊂_ヽ \n" +
-                "　 ＼＼ __\n" +
-                "　　 ＼(    •_•) \n" +
-                "　　　 >　⌒ヽS\n" +
-                "　　　/ 　 へ＼ I\n" +
-                "　　 /　　/ E　＼＼ D\n" +
-                "　　 ﾚ　ノR    　 ヽ_つ \n" +
-                "　　/　/ V\n" +
-                "　 /　/| A\n" +
-                "　(　(ヽL \n" +
-                "　|　|、＼ \n" +
-                "　| 丿 ＼ ⌒) \n" +
-                "　| |　　) / \n" +
-                "`ノ )　 ﾉ");
-        </script>
+                
+            
+            
             
 
             <nav id="oe_main_menu_navbar" class="navbar navbar-inverse">
@@ -171,6 +152,10 @@
                     
                     </div>
             </nav>
+
+
+
+
             <div class="o_main">
                 <div class="o_sub_menu">
                     <a class="o_sub_menu_logo" href="/web" style="background-color: white">
@@ -318,7 +303,7 @@
                                     </a>
                         
                                 </li>
-                                <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/1">
+                                <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids">
                                     <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Informe de Stock
@@ -360,24 +345,10 @@
                                     </a>
                                 </li>
                             </ul>
-
-                            <!-- Facturas -->
-                            <div class="oe_secondary_menu_section">
-                                Facturas
-                            </div>
-                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                                <li onclick="ajax(this)" data-link='bodega/view_factura'>
-                                    <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Facturas
-                                        </span>
-                                    </a>
-                                </li>
-                            </ul>
                         </div>
                     </div>
                 </div>
-                    <div id="wrapper" style="overflow-y: none; overflow-x: scroll; background-color: white">
+                    <div id="wrapper" style="overflow-y: none;overflow-x: scroll; background-color: white">
                         <div id="page-wrapper" style="padding: 0; margin: 0; overflow-y: none">
                           
 

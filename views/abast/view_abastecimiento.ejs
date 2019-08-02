@@ -43,108 +43,57 @@
 		display: flex;
 	}
 </style>
-
-<!--<div style="position: absolute; top: 0px; right: 10px; z-index: 50" class="abrir-buscador">
-	<button class="btn btn-xs btn-circle btn-lg" onclick="mostrar_buscador()"><i class="fa fa-angle-down"></i></button>
-</div>-->
-<%if(username == 'abastecimiento'){%>
-	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 90%;transition:0.5s; ;z-index: 9;">
-<%}else{%>
-	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; ;z-index: 9;">
-<%}%>
-	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
-		<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+<div class="row" style="margin: 0; padding: 0;">
+	<div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.5%">
+		<ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
 			<li class="active">Orden de Compra</li>
+
 			<!-- Mostrar cantidad de datos -->
-			<div id="indicador_paginas" data-total="0" style="margin-top: 8px"></div>
+			<div id="pedidos" style="margin-top: 8px"></div>
 		</ol>
 
 		<div style="width: 50%;">
 			<div class="form-group o_searchview" style="margin: 0;padding: 0;">
-
-			</div>
-			<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
-				<button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
-				<ul class="dropdown-menu">
-					<li><a href="#" class="getcsvoda" data-tipo="oda"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+				<div class="form-control etiqueta-input" style="display:flex; vertical-align: center">
+					<div class="etiqueta-filtro-div" style="height: 100%;" data-cant="0">
+					</div>
+					<input id="buscar_abastecimiento" style="border: none;" placeholder="Buscar…" type="text" onkeydown="despInput(event)">
+					<input id="buscar_abastecimiento-value" style="display: none" type="text">
+				</div>
+				<ul class="dropdown-menu o_searchview_autocomplete" data-item="0" role="menu" style="display: none;">
+					<li data-searchcol="0" class="item0 fill-item-abast o-selection-focus"><a class="o-expand" href="#"></a><a href="#">Buscar <em>N° OC</em> para: <strong></strong></a></li>
+					<li data-searchcol="1" class="item1 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Facturas</em> para: <strong></strong></a></li>
+					<li data-searchcol="2" class="item2 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Guias de Despacho</em> para: <strong></strong></a></li>
+					<li data-searchcol="3" class="item3 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Proveedor</em> para: <strong></strong></a></li>
+					<li data-searchcol="4" class="item4 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Detalle</em> para: <strong></strong></a></li>
+					<li data-searchcol="5" class="item5 fill-item-abast"><a class="o-expand" href="#"></a><a href="#">Buscar <em>Centro de Costo (CC)</em> para: <strong></strong></a></li>
 				</ul>
 			</div>
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
-				<!--<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-DESC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+				<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_abastecimientos/abastecimiento.idabast-DESC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
 		        <button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_abs' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>-->
+	    	    <button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='/calendar_abs' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
 	    		<div class="search-option-list" style="display: flex;">
 	    			<label style="margin-left: 30px; margin-top: 6px">Mostrar Todos</label>
-					<input type="checkbox" id="pend" style="margin-left: 5px; margin-top: 6px; width: 20px; height: 20px">
+					<input type="checkbox" id="pend" style="margin-left: 5px; margin-top: 6px; width: 20px; height: 20px" onchange="buscar_oda(true)">
 					<h5 style="margin-left: 10px" class="indicator-of-check"><small>Mostrando solo pedidos sin facturar</small></h5>
 				</div>
-
-				<div class="abast-fill"></div>
 	        </div>
-
-			<!--<div style="position: absolute; bottom: 10px; right: 10px">
-				<button class="btn btn-xs btn-circle btn-lg" onclick="ocultar_buscador()"><i class="fa fa-angle-up"></i></button>
-			</div>-->
-
+	        <!-- Paginacion -->
+		  	<div id="paginacion" style="position: absolute; top: 28px; left: 17%;">
+		  		<nav aria-label="Page navigation">
+			        <ul class="pagination-sm" id="paginationup">
+			        </ul>
+			    </nav>
+		  	</div>
 		</div>
 	</div>
 </div>
-<div id="fw-container" style="background-color: white; width: 100%; height: 100%; transition: 0.5s">
-	<div id="fw-body"  style="padding:0;margin: 0;">
-		<div class="content main-page">
-		</div>
-	</div>
+<div class="row row-main" style="margin: 0; padding: 0;">
+	<div class="col-sm-12 main-page" style="margin: 0; padding: 0; z-index: 5; top: -7px"></div>
 </div>
-
-<style>
-	.ch_page:hover{
-		cursor:pointer;
-		color: black;
-		font-size: 15px;
-	}
-</style>
-
 
 <script type="text/javascript">
-
-    var alto_buscador = $(".up-fills").height();
-    var margen_tabla = $('#fw-container').css('margin-top');
-	function mostrar_buscador(){
-        $('.up-fills').css('top', alto_buscador);
-        $('.up-fills').css('height', alto_buscador);
-        $('#fw-container').css('margin-top', margen_tabla+'px');
-        $('.up-fills').removeClass('hidden');
-        busc.buscar_action(true);
-	}
-    function restaurar_buscador(){
-        $('.up-fills').css('top', alto_buscador);
-        $('.up-fills').css('height', alto_buscador);
-        $('#fw-container').css('margin-top', margen_tabla+'px');
-        busc.buscar_action(true);
-        $('.up-fills').css('transition', '0.5s');
-    }
-	function ocultar_buscador(){
-        $('.up-fills').css('z-index', '0');
-        $('.up-fills').css('top', '-'+$('.up-fills').height()+'px');
-        $('#fw-container').css('margin-top', '0px');
-        $('#fw-container').css('padding-top', '30px');
-        $("#pageView").val('1');
-        //busc.buscar_action();
-    }
-    function volver_tabla(){
-        $('.up-fills').css('z-index', '9');
-        $('.up-fills').css('top', 0);
-        $('#fw-container').css('margin-top', margen_tabla+'px');
-        $('#fw-container').css('padding-top', '0px');
-        $('.up-fills').removeClass('hidden');
-        busc.buscar_action(true);
-        $("#pageView").val('0');
-    }
-
-
-
-
-
 	var cc_fill = [];
 	var array_fill = [
         "OC@default",
@@ -154,25 +103,30 @@
         "Detalle@warning",
 		"CC@danger"
 	];
+	var filtros_seleccionados = [];
+	// Pagina actual
+	var global_page = '1';
+	$(document).ready(function(){
 
-    var busc = new Buscador("buscar_abastecimiento", ".o_searchview", array_fill, "/abastecimiento/table_abastecimientos", "dataTableOdoo", true, false);
+		$.ajax({
+			type: 'POST',
+            data: {
+                clave: filtros_seleccionados.join(','),
+                orden: $(".o_cp_switch_buttons .active").data('view'),
+                showPend: $("#pend").is(':checked')
+            },
+            beforeSend: function(){
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+			url: '/abastecimiento/table_abastecimientos/' + global_page,
+			success: function(data){
+				$(".main-page").html(data);
+				//Muestra la cantidad de pedidos
+				$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+			}
+		});
 
-    busc.add_cond = "abastecimiento.cantidad>abastecimiento.facturados AND !abastecimiento.anulado";
-
-    $("#pend").on('change', function (e) {
-        e.preventDefault();
-        if($(this).is(":checked")){
-            busc.add_cond = "!abastecimiento.anulado";
-        }else{
-            busc.add_cond = "abastecimiento.cantidad>abastecimiento.facturados AND !abastecimiento.anulado";
-        }
-        busc.buscar_action();
-    });
-
-
-    $(document).ready(function(){
-        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
-        busc.buscar_action();
+        $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
 
 	function saveinSession(option){
@@ -185,7 +139,155 @@
         e.stopPropagation();
     });
 
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
 
+    $("#buscar_abastecimiento").on('keyup', function(e){
+		e.preventDefault();
+		if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
+            $(".o_searchview_autocomplete").css('display', 'none');
+            $(".o_searchview_autocomplete strong").html('');
+		}
+		else{
+            $(".o_searchview_autocomplete").css('display', 'block');
+            $(".o_searchview_autocomplete strong").html($(this).val());
+
+		}
+	});
+
+	$(".fill-item-abast").on('click', function(e){
+	   e.preventDefault();
+	   var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
+	   var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
+	   $(".etiqueta-filtro-div").append(
+	       "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
+		   +$("#buscar_abastecimiento").val()+
+		   "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+	   );
+        $(".etiqueta-filtro-div").data('cant', labels+1);
+	   if($("#buscar_abastecimiento-value").val() == '' || $("#buscar_abastecimiento-value").val() == null || $("#buscar_abastecimiento-value").val() == undefined){
+           $("#buscar_abastecimiento-value").val($(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val());
+       }
+	   else{
+           $("#buscar_abastecimiento-value").val([$("#buscar_abastecimiento-value").val(),$(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val()].join(','));
+       }
+       filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_abastecimiento").val());
+	   $(".o_searchview_autocomplete").css('display', 'none');
+	   $(".o_searchview_autocomplete strong").html('');
+        $("#buscar_abastecimiento").val('');
+        $("#buscar_abastecimiento").focus();
+        buscar_oda(false);
+    });
+
+
+	function eliminarEtiqueta(yo){
+        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
+        $(yo).parent().remove();
+        $(".etiqueta-filtro").removeAttr('id');
+        var count = 0;
+        $(".etiqueta-filtro").each(function(){
+            $(this).attr("id","label"+count);
+            count++;
+        });
+        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        buscar_oda(false);
+	}
+
+
+
+    function despInput(event){
+        var char = event.which || event.keyCode;
+        var item = $(".o_searchview_autocomplete").data('item');
+        //BORRAR LABEL
+        if(char == 8 && ($("#buscar_fabricaciones").val()==null || $("#buscar_fabricaciones").val()=='' || $("#buscar_fabricaciones").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
+            eliminarEtiqueta($("#label"+labels).children('div'));
+        }
+        //ENTER
+        else if(char == 13){
+            $(".fill-item-abast.o-selection-focus").click();
+        }
+        //ARRIBA
+        else if(char == 38){
+            item = parseInt(item) - 1;
+        }
+        //ABAJO
+        else if(char == 40){
+            item = parseInt(item) + 1;
+        }
+
+
+        //SI SOBREPASA EL LIMITE INFERIOR
+        if(parseInt(item) >= 6){
+            $(".o_searchview_autocomplete").data('item', "0");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item0").addClass("o-selection-focus");
+        }
+        //SI SOBREPASA EL LIMITE SUPERIOR
+        else if(parseInt(item) < 0){
+            $(".o_searchview_autocomplete").data('item', "5");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item5").addClass("o-selection-focus");
+        }
+        else{
+            $(".o_searchview_autocomplete").data('item', item);
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item"+item).addClass("o-selection-focus");
+        }
+
+    }
+
+
+
+    function buscar_oda(onlylist){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista'){
+            $.ajax({
+                type: 'POST',
+                data: {
+                    clave: filtros_seleccionados.join(','),
+                    orden: $(".o_cp_switch_buttons .active").data('view'),
+                    showPend: $("#pend").is(':checked')
+                    /*cc_selected: $(".select_cc").val().join(',')*/
+                },
+                url: '/abastecimiento/table_abastecimientos/1',
+                beforeSend: function(){
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                },
+                success: function(data){
+
+                    $(".page-item").each(function(){
+                        if($(this).hasClass('first')){
+							$(this).click();
+
+                        }
+                    });
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                }
+            });
+        }
+        else{
+            if(!onlylist){
+				$.ajax({
+					type: 'POST',
+					data: {
+						clave: $("#buscar_abastecimiento").val()
+					},
+					url: '/abastecimiento/buscar_abastecimiento_item',
+					success: function(data){
+						$(".main-page").html(data);
+						//Muestra la cantidad de pedidos
+						$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+					}
+				});
+            }
+        }
+	}
 
 	$('.view-option').on('click', function(e){
 		e.preventDefault();
@@ -196,7 +298,21 @@
 			// Muestra el nav de paginacion
 			$("#paginacion").css('display','block');
             $(".search-option-list").css('display', 'flex');
-            busc.buscar_action();
+            $.ajax({
+                type: 'POST',
+                data: {
+                    clave: $("#buscar_abastecimiento").val(),
+                    orden: $(".o_cp_switch_buttons .active").data('view'),
+                    showPend: $("#pend").is(':checked')
+                },
+                url: '/abastecimiento/table_abastecimientos/' + global_page,
+                success: function(data){
+
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de pedidos
+					$("#pedidos").html("<h5><small>Mostrando " + $("#registros").text() + " pedido(s)</small></h5>");
+                }
+            });
 		}
 		else{
 			// Quita el nav de paginacion
@@ -204,9 +320,6 @@
             $.ajax({
                 type: 'POST',
                 url: '/abastecimiento/'+$(this).data('view')+"/"+$("#pend").is(':checked'),
-                beforeSend: function(){
-                    destroyDataTable();
-                },
                 success: function(data){
                     $(".main-page").html(data);
                     //Muestra la cantidad de pedidos
@@ -319,18 +432,4 @@
 	});
 
 
-    $(".getcsvoda").click(function(e){
-        var yo = $(this);
-        $.ajax({
-            type: 'GET',
-            contentType: 'application/json',
-            url: '/abastecimiento/xlsx_' + $(this).data('tipo'),
-            success: function(data) {
-                window.open(data,'_blank');
-            }
-        });
-
-    });
-
 </script>
-<script src="/buscador_funciones.js"></script>

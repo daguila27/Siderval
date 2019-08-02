@@ -1,48 +1,8 @@
-<style>
-    .o_searchview_autocomplete {
-        position: absolute;
-        top: 100%;
-        left: auto;
-        bottom: auto;
-        right: auto;
-        width: 100%;
-    }
-    .o_searchview {
-        background-color: white;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 1px 25px 3px 5px;
-    }
-    .etiqueta-filtro{
-        padding: 5px;
-        margin: 3px;
-        display: flex;
-    }
 
-    .etiqueta-filtro div{
-        padding: 0px;
-        margin: 0px 0px 0px 7px;
-        color: white;
-    }
-    .etiqueta-filtro strong{
-        padding: 0px;
-        margin: 0px 0px 0px 7px;
-        color: white;
-    }
-    .etiqueta-input{
-        padding: 2px 6px;
-    }
-    .etiqueta-filtro-div{
-        display: flex;
-    }
-</style>
-
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
-    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+<div class="row" style="margin: 0; padding: 0;">
+    <div class="col-sm-10 o_control_panel" style="margin: 0; padding: 10px; display: flex; position: fixed; z-index: 10; width: 82.6%">
         <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
-            <li class="active">Recepción de Materias Primas</li>
-            <div id="indicador_paginas" data-total="0" style="margin-right: 3px"></div>
-
+            <li class="active">Recepcion de Materias Primas</li>
         </ol>
         <div style="width: 50%;">
             <div class="form-group o_searchview" style="margin: 0;padding: 0;">
@@ -60,43 +20,152 @@
             </div>
             <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
                 <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_movimientos' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-
-                <div class="filters" style="display: flex;"></div>
             </div>
         </div>
     </div>
 </div>
-<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
-    <div id="fw-body"  style="padding:0;margin: 0;">
-        <div class="content main-page">
-        </div>
+<div class="row row-main" style=" margin: 0; padding: 0;">
+    <div class="col-sm-12 col-md-12 main-page" style="margin: 0; padding: 0; z-index: 5; width: 100%">
     </div>
 </div>
 
-<style>
-    .ch_page:hover{
-        cursor:pointer;
-        color: black;
-        font-size: 15px;
-    }
-</style>
 <script type="text/javascript">
+    var filtros_seleccionados = [];
     var array_fill = [
         "GD@success",
         "Descripción@warning",
         "Registro@default"
     ];
-    var busc = new Buscador("buscar_recepcion", ".o_searchview", array_fill, "/matprimas/table_recepcion", "receps_table", true, true, '.filters', 'recepcion.fecha');
-
-    busc.add_cond = "";
     $(document).ready(function(){
-        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
-        busc.buscar_action();
+        $.ajax({
+            type: 'POST',
+            data:{ orden: 'recepcion_detalle.idrecepcion-DESC', clave: filtros_seleccionados.join(',')},
+            url: '/matprimas/table_recepcion',
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+        $(".row-main").css('padding-top', $(".o_control_panel").css('height') );
     });
     //PARA QUE EL FILTRO NO SE CIERRE AL SELECCIONAR ALGUNA OPCION
     $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
         e.stopPropagation();
     });
+
+    function buscar_recepcion(){
+        $.ajax({
+            type: 'POST',
+            data:{ orden: 'recepcion_detalle.idrecepcion-DESC', clave: filtros_seleccionados.join(',')},
+            url: '/matprimas/table_recepcion',
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+
+    $('.fill-item-abast').hover(function() {
+        $(this).css('cursor','pointer');
+        $('.fill-item-abast').removeClass("o-selection-focus");
+        $(this).addClass("o-selection-focus");
+        $(".o_searchview_autocomplete").data('item', $(this).data('searchcol'));
+    });
+
+    $("#buscar_recepcion").on('keyup', function(e){
+        e.preventDefault();
+        if($(this).val() == '' || $(this).val() == null || $(this).val()==undefined ){
+            $(".o_searchview_autocomplete").css('display', 'none');
+            $(".o_searchview_autocomplete strong").html('');
+        }
+        else{
+            $(".o_searchview_autocomplete").css('display', 'block');
+            $(".o_searchview_autocomplete strong").html($(this).val());
+
+        }
+
+    });
+
+    $(".fill-item-abast").on('click', function(e){
+        e.preventDefault();
+        var clase = array_fill[parseInt($(this).data('searchcol'))].split('@');
+        var labels = parseInt($(".etiqueta-filtro-div").data('cant'));
+        $(".etiqueta-filtro-div").append(
+            "<label id='label"+labels+"' data-valor='"+$(this).data('searchcol')+"@"+$("#buscar_recepcion").val()+"' class='etiqueta-filtro label label-"+clase[1]+"'>"+clase[0]+": <strong>"
+            +$("#buscar_recepcion").val()+
+            "</strong> <div onclick='eliminarEtiqueta(this)' class='fa fa-sm fa-remove etiqueta-filtro-del'></div></label>"
+        );
+        $(".etiqueta-filtro-div").data('cant', labels+1);
+        if($("#buscar_recepcion-value").val() == '' || $("#buscar_recepcion-value").val() == null || $("#buscar_recepcion-value").val() == undefined){
+            $("#buscar_recepcion-value").val($(this).data('searchcol')+"@"+$("#buscar_recepcion").val());
+        }
+        else{
+            $("#buscar_recepcion-value").val([$("#buscar_recepcion-value").val(),$(this).data('searchcol')+"@"+$("#buscar_recepcion").val()].join(','));
+        }
+        filtros_seleccionados.push($(this).data('searchcol')+"@"+$("#buscar_recepcion").val());
+        $(".o_searchview_autocomplete").css('display', 'none');
+        $(".o_searchview_autocomplete strong").html('');
+        $("#buscar_recepcion").val('');
+        $("#buscar_recepcion").focus();
+        buscar_recepcion();
+        //buscar_oda(false);
+    });
+
+
+    function eliminarEtiqueta(yo){
+        filtros_seleccionados.splice(filtros_seleccionados.indexOf($(yo).parent().data('valor')),1);
+        $(yo).parent().remove();
+        $(".etiqueta-filtro").removeAttr('id');
+        var count = 0;
+        $(".etiqueta-filtro").each(function(){
+            $(this).attr("id","label"+count);
+            count++;
+        });
+        $(".etiqueta-filtro-div").data('cant', $(".etiqueta-filtro-div").data('cant')-1);
+        buscar_recepcion();
+    }
+
+
+
+    function despInput(event){
+        var char = event.which || event.keyCode;
+        var item = $(".o_searchview_autocomplete").data('item');
+        //BORRAR LABEL
+        if(char == 8 && ($("#buscar_recepcion").val()==null || $("#buscar_recepcion").val()=='' || $("#buscar_recepcion").val()==undefined ) &&  parseInt($(".etiqueta-filtro-div").data('cant')) > 0 ){
+            var labels = parseInt($(".etiqueta-filtro-div").data('cant'))-1;
+            eliminarEtiqueta($("#label"+labels).children('div'));
+        }
+        //ENTER
+        else if(char == 13){
+            $(".fill-item-abast.o-selection-focus").click();
+        }
+        //ARRIBA
+        else if(char == 38){
+            item = parseInt(item) - 1;
+        }
+        //ABAJO
+        else if(char == 40){
+            item = parseInt(item) + 1;
+        }
+
+
+        //SI SOBREPASA EL LIMITE INFERIOR
+        if(parseInt(item) >= 3){
+            $(".o_searchview_autocomplete").data('item', "0");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item0").addClass("o-selection-focus");
+        }
+        //SI SOBREPASA EL LIMITE SUPERIOR
+        else if(parseInt(item) < 0){
+            $(".o_searchview_autocomplete").data('item', "2");
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item2").addClass("o-selection-focus");
+        }
+        else{
+            $(".o_searchview_autocomplete").data('item', item);
+            $(".fill-item-abast").removeClass("o-selection-focus");
+            $(".item"+item).addClass("o-selection-focus");
+        }
+
+    }
 
 
     $('.view-option').on('click', function(e){
@@ -134,4 +203,3 @@
 
 
 </script>
-<script src="/buscador_funciones.js"></script>

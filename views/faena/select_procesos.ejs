@@ -98,14 +98,12 @@
         var data = {};
         console.log($("#sendnum").val());
         data.idprod = $("#prod_id").val();
-        //STRING DE LAS CANTIDADES DE CADA PRODUCCION PARA APLICAR PEPS
         data.cantprod = $("#cantprod").val();
-        //SIGUIENTE ETAPA
+
         data.newetapa = $("#sgt_etapa").val();
-        //CANTIDAD ENVIADA
         data.sendnum = $("#sendnum").val();
         data.etapa_act = $("#e_act").val();
-        console.log(data);
+
         $.ajax({
             type: 'POST',
             data: data,

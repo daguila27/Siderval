@@ -1,4 +1,30 @@
 <div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
+<!--<button id="button-a">Crear EXCEL</button>-->
+<script type="text/javascript">
+    /*function s2ab(s) { 
+                var buf = new ArrayBuffer(s.length); //convert s to arrayBuffer
+                var view = new Uint8Array(buf);  //create uint8array as viewer
+                for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF; //convert to octet
+                return buf;    
+    }
+    var wb = XLSX.utils.book_new();
+    wb.Props = {
+                Title: "SheetJS Tutorial",
+                Subject: "Test",
+                Author: "Red Stapler",
+                CreatedDate: new Date(2017,12,19)
+        };
+        wb.SheetNames.push("Test Sheet");
+        var ws_data = [['hello' , 'world']];  //a row with 2 columns
+        var ws = XLSX.utils.aoa_to_sheet(ws_data);
+        wb.Sheets["Test Sheet"] = ws;
+        var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+
+        $("#button-a").click(function(){
+               saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+        });*/
+
+</script>
 <div class="col-md-12 panel-creacion">
         <div class="panel panel-primary cargando-panel" style="display: none;">
             <div class="panel-heading">
@@ -38,7 +64,7 @@
                                     <label for="setdates">
                                         Ingresar fecha para todos: 
                                     </label>
-                                    <div class="input-group" style="width:30%;margin-left: 20%;margin-top: 5px">
+                                    <div class="input-group"  style="width:30%;margin-left: 20%;margin-top: 5px">
                                         <span class="input-group-addon" ><i class="fa fa-calendar-o"></i></span>
                                         <input type="date" id="setdates" class="form-control input-sm pull-right" data-toggle="tooltip" data-placement="top" title="Fijar fechas para todos">
                                     </div>
@@ -66,38 +92,38 @@
                     </div>
             </div>
             <form id="send_of">
-                <div style="overflow-y: scroll; max-height: 300px;">
-                <table class="table table-striped sectionSave" style="margin: 0">
-                    <thead>
-                    <tr>
-                        <th>Descripción</th>
-                        <th>Fabricación</th>
-                        <th>Aleación</th>
-                        <th>Fecha de Entrega</th>
-                        <th>Cantidad</th>
-                        <th>Stock</th>
-                        <th>Precio Unitario</th>
-                        <th>Bloquear</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody id="session_fabrs">
+            <div style="overflow-y: scroll; max-height: 300px;">
+            <table class="table table-striped sectionSave" style="margin: 0">
+                <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Fabricación</th>
+                    <th>Aleación</th>
+                    <th>Fecha de Entrega</th>
+                    <th>Cantidad</th>
+                    <th>Stock</th>
+                    <th>Precio Unitario</th>
+                    <th>Bloquear</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody id="session_fabrs">
 
-                    </tbody>
-                </table>
-                </div>
-                <div class="panel-footer">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
-                        </div>
-                        <div class="col-md-1 col-md-offset-5" style="padding: 0; padding-right: 8px">
-                            <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
-                            <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
-                        </div>
+                </tbody>
+            </table>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
                     </div>
-
+                    <div class="col-md-1 col-md-offset-5" style="padding: 0; padding-right: 8px">
+                        <button class="btn btn-success" style="width: 80px" id="of_submit">Crear</button>
+                        <div class="contenedor" style="overflow: hidden;height: 0; width: 100%; align-content: center;"><h4 class="mensaje" style="text-align: center;"></h4></div>
+                    </div>
                 </div>
+
+            </div>
             </form>
         </div>
 
@@ -123,26 +149,19 @@
                 </div>
             </form>
         </div>
-        <div id="prefabrs">
-            <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" id="sessionPeds">
-                <thead>
-                <tr>
-                    <th>Descripción</th>
-                    <th>Stock</th>
-                    <th>Por Despachar</th>
-                    <th>En Producción</th>
-                    <th>Disponible</th>
-                    <!--<th>Caracteristica</th>-->
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
 
+        <table class="table table-responsive">
+            <thead>
+            <tr>
+                <th>Descripción</th>
+                <!--<th>Caracteristica</th>-->
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="prefabrs">
+            </tbody>
+        </table>
 
-
-                </tbody>
-            </table>
-        </div>
     </div>
 </div>
 </div>
@@ -162,10 +181,6 @@
         var data ={};
         data.caract = $("#caract").val();
         data.det = $("#det").val();
-        $("#prefabrs").html("<div style='width: 100%;text-align: center;'>\n" +
-            "<img style='width: 25%' src='/loading.gif'>" +
-            "</div>")
-        $("#sessionPeds").DataTable().destroy();
         $.ajax({
             type: 'POST',
             data: data,
@@ -321,8 +336,8 @@
                         $.ajax({
                             type: 'GET',
                             url: '/plan/lanzar_of/pedido',
-                            success: function(html){
-                                $("#page-wrapper").html(html);
+                            success: function(html){    
+                                    $("#page-wrapper").html(html);
                             }
                         });
                     }

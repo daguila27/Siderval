@@ -310,23 +310,24 @@
         }
         //$('#triggermodal').trigger('click');
         function make_faena(){
-            $.ajax({
-                type: 'GET',
-                url: 'faena/render_proceso/'+$("#thisetapa").val(),
-                success: function(data){
-                    $("#page-wrapper").html(data);
-                    $.ajax({
-                        type: 'GET',
-                        url: 'faena/render_notificaciones/'+$("#thisetapa").val(),
-                        success: function(data){
-                            $(".notificaciones").html(data);
-                            //$(".badge-notificaciones").html($(".open-notif").data('cant'));
-                        }
-                    });
-                }
-            });
-        }
+                
+                $.ajax({
+                    type: 'GET',
+                    url: 'faena/render_proceso/'+$("#thisetapa").val(),
+                    success: function(data){
+                        $("#page-wrapper").html(data);
+                        $.ajax({
+                            type: 'GET',
+                            url: 'faena/render_notificaciones/'+$("#thisetapa").val(),
+                            success: function(data){
+                                $(".notificaciones").html(data);
+                                //$(".badge-notificaciones").html($(".open-notif").data('cant'));
+                            }
+                        });
+                    }
+                });
 
+        }
         function show_faena(){
                 $.ajax({
                     type: 'GET',
@@ -434,7 +435,6 @@
                         razon: razon,
                         etapa: datos.thisetapa
                     };
-                    //emit que crea la notificación de jefe de producción
                     io.emit('addError', input);
                     $(".notificaciones").html(data);
                     $(".collapse").collapse('hide');
