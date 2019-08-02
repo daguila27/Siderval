@@ -3,9 +3,6 @@
         return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
     }
 %>
-
-
-
 <style>
     .volver-tabla:hover{
         background-color: rgb(124,123,173);
@@ -20,7 +17,6 @@
         border-radius: 25%;
     }
 </style>
-
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 <div class="o_view_manager_content">
@@ -48,9 +44,73 @@
                     </div>
                     <div class="oe_title" style="display: flex; margin: 0; width: 100%">
                         <h1>
-                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Compra N°<%=odc.numoc%></span>
-                        </h1>
+                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name" style="display: flex">
+                                <small style="font-size: 25px">Orden de Compra N°<%=odc.numoc%></small>
+                                <% if(rev.length > 0){%>
+                                <select class="form-control rev-select" style="width: 25%; margin-left: 20px">
+                                    <option value="0">Revisión Original</option>
+                                    <%for(var e = 0; e < odc.idmodificaciones_concat.split(',').length; e++ ){
+                                        if(e === odc.idmodificaciones_concat.split(',').length-1){%>
+                                        <option value="<%= odc.idmodificaciones_concat.split(',')[e]%>" selected>Revisión N°<%= e + 1%> (Actual)</option>
+                                    <%}else{%>
+                                        <option value="<%= odc.idmodificaciones_concat.split(',')[e]%>">Revisión N°<%= e + 1%></option>
+                                    <%}%>
+                                 <%}%>
+                                </select>
+                                <%}%>
+                            </span>
+                            <script>
+                                var lastEdit = parseInt($(".rev-select").val());
+                                var rev = '<%= rev%>';
+                                rev = rev.split('&#34;').join('"');
+                                rev = JSON.parse(rev);
+                                console.log(rev);
+                                $(".rev-select").on('change', function(e){
+                                   e.preventDefault();
+                                   //ID DE MOVIMIENTO
+                                   var idmov = parseInt($(this).val());
+                                   var key;
+                                    if(lastEdit === idmov){
+                                        $(".div-button-edit").removeClass('hidden');
+                                        $(".oc-edit-col div").each(function(){
+                                             $(this).html( parseInt( $(this).data('valor') ));
+                                        });
+                                    }else{
+                                        $(".div-button-edit").addClass('hidden');
+                                        $(".oc-edit-col div").each(function(){
+                                            key = $(this).parent().data('key');
+                                            var yo = this;
+                                            //$(this).data('valor', $(this).data('valoraux') );
+                                            for(var q=0; q < Object.keys(rev).length; q++ ){
+                                                if(Object.keys(rev)[q].split('-')[0] === $(this).parent().parent().children('.oc-edit-col-idped').children('input').val()
+                                                    && parseInt(Object.keys(rev)[q].split('-')[1]) > idmov ){
+                                                    for(var a=0; a < rev[Object.keys(rev)[q]].length; a++ ){
+                                                        if(rev[Object.keys(rev)[q]][a][1] === key){
+                                                            $(this).data('valoraux', parseInt( $(this).data('valoraux') ) - parseInt(rev[Object.keys(rev)[q]][a][0]));
+                                                            $(this).html( parseInt( $(this).data('valoraux') ) - parseInt(rev[Object.keys(rev)[q]][a][0]) );
+                                                            if( a === rev[Object.keys(rev)[q]].length - 1 ){
+                                                                $(yo).parent().addClass('danger');
+                                                                $(this).html( parseInt( $(this).data('valoraux') ));
+                                                                setTimeout(function(){
+                                                                    //alert($(yo).html());
+                                                                    //$(yo).parent().addClass('danger');
+                                                                    $(yo).parent().removeClass('danger');
+                                                                }, 1500);
+                                                            }
+                                                        }
+                                                        else if( a === rev[Object.keys(rev)[q]].length - 1 ){
+                                                            $(this).html( parseInt( $(this).data('valor') ));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
 
+                                   //console.log(data);
+                                });
+                            </script>
+                        </h1>
                         <style>
                             .edit-icon:hover{
                                 background-color: #d4d4d4;
@@ -62,32 +122,37 @@
                                     $(".button-edit").toggleClass('hidden');
                                     var c = 0;
                                     $(".oc-edit-col").each(function(){
-                                        //n = $(this).html();
-                                        //$(this).data('valor', n);
-                                        $(this).html('<input class="form-control input-xs" name="'+$(this).data('name')+c.toString()+'" min="'+$(this).data('min')+'" style="width: 95px" type="'+$(this).data('input')+'">');
-                                        $(this).children('input').val(parseInt($(this).data('valor')));
-                                        c++;
+                                        //CAMBIA EL TIPO DE INPUT
+                                        $(this).children('input').toggleClass('hidden');
+                                        $(this).children('div').toggleClass('hidden');
+                                        //$(this).children('input').attr('type', $(this).children('input').data('input'));
                                     });
                                 }
-
                                 function editarOCcancelar(){
                                     var n;
                                     $(".button-edit").toggleClass('hidden');
+
                                     $(".oc-edit-col").each(function(){
-                                        $(this).html($(this).data('valor'));
+                                        //CAMBIA EL TIPO DE INPUT
+                                        $(this).children('input').toggleClass('hidden');
+                                        $(this).children('div').toggleClass('hidden');
+                                        //$(this).children('input').attr('type', $(this).children('input').data('input'));
                                     });
                                 }
-                                function editarOCfinalizar(){
-                                    var array = {};
-                                    $("form#formEditOC").serializeArray();
-                                    $(".oc-edit-col").each(function(){
-                                        if(Object.keys(array).indexOf($(this).data('name')) === -1 ){
-                                            array[$(this).data('name')] = [$(this).children('input').val()];
-                                        }else{
-                                            array[$(this).data('name')].push($(this).children('input').val());
-                                        }
-                                    });
-                                    $.ajax({
+                                $("form#formEditOC").submit(function(e){
+                                    e.preventDefault();
+                                    var a = $(this).serializeArray();
+                                    if( confirm("¿Está seguro?") ){
+                                        var array = {};
+                                        $(".oc-edit-col").each(function(){
+                                            if(Object.keys(array).indexOf($(this).children('input').data('name')) === -1 ){
+                                                array[$(this).children('input').data('name')] = [$(this).children('input').val()];
+                                            }else{
+                                                array[$(this).children('input').data('name')].push($(this).children('input').val());
+                                            }
+                                        });
+                                        console.log(array);
+                                        $.ajax({
                                         type: 'POST',
                                         data: array,
                                         url: '/plan/editar_oc_save',
@@ -95,9 +160,13 @@
                                             alert("¡OC editada con Exito!");
                                             $(".main-page").html(data);
                                         }
-                                    });
+                                    });}
+                                });
+                                function editarOCfinalizar(){
+                                    $("form#formEditOC").submit();
                                 }
                         </script>
+                        <div class="div-button-edit">
                             <button type="button" onclick="editarOC()" class="button-edit btn btn-xs btn-info" style="align-content: center; height: 50%; ">
                                 <i class="glyphicon glyphicon-pencil"></i> Editar
                             </button>
@@ -109,7 +178,7 @@
                                     <i class="fa fa-times"></i> Cancelar
                                 </button>
                             </div>
-
+                        </div>
                     </div>
                     <div class="o_group">
                         <table class="o_group o_inner_group o_group_col_6">
@@ -236,9 +305,11 @@
                                         <table id="tablaOC" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                                 <tr>
-                                                    <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
+                                                    <th class="o-sort-up o_column_sortable hidden" style="text-align: right;"></th>
                                                     <th class="o_column_sortable" style="text-align: left;">Item</th>
                                                     <th class="o_column_sortable" style="text-align: left;">Descripción</th>
+                                                    <th class="o_column_sortable hidden">Cantidad Antes</th>
+                                                    <th class="o_column_sortable hidden">Precio Antes</th>
                                                     <th class="o_column_sortable">Cantidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Despachados</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Sin Producir</th>
@@ -248,7 +319,8 @@
                                                     <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Días Restantes</th>
 
-                                                    <th class="oc-edit-col hidden" data-name="idodc" data-min="0" data-input="hidden" data-valor="<%=odc.idodc%>">
+                                                    <th class="oc-edit-col hidden">
+                                                        <input type="hidden" name="idodc" class="form-control input-xs" data-name="idodc" data-min="0" data-input="hidden" data-valor="<%=odc.idodc%>" value="<%=odc.idodc%>">
                                                     </th>
                                                     <!--<th class="o_column_sortable">Impuestos</th>
                                                     <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
@@ -264,28 +336,33 @@
                                                     <%}else{%>
                                                         <tr class="o_data_row text-info success">
                                                     <%}%>
-                                                        <td class="o_data_cell o_list_number o_handle_cell oc-edit-col hidden" data-name="idmaterial" data-min="0" data-input="hidden" data-valor="<%=ped[e].idmaterial%>">
+                                                        <td class="o_data_cell o_list_number o_handle_cell oc-edit-col hidden">
+                                                            <input type="hidden" name="idmaterial<%= e%>" class="form-control input-xs" data-name="idmaterial" min="0" data-input="hidden" data-valor="<%=ped[e].idmaterial%>" value="<%=ped[e].idmaterial%>">
                                                         </td>
-                                                        <td class="o_data_cell o_list_number o_handle_cell oc-edit-col" data-name="idpedido" data-min="0" data-input="hidden" data-valor="<%=ped[e].idpedido%>">
+                                                        <td class="o_data_cell o_list_number o_handle_cell oc-edit-col oc-edit-col-idped hidden">
+                                                            <input type="hidden" name="idpedido<%= e%>" class="form-control input-xs" value="<%=ped[e].idpedido%>" data-name="idpedido" min="0" data-input="hidden" data-valor="<%=ped[e].idpedido%>">
                                                         </td>
                                                         <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=ped[e].numitem%></td>
                                                         <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=ped[e].detalle%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier oc-edit-col hidden" data-name="cantidad_a" data-min="0" data-input="number" style="text-align: center;" data-valor="<%=ped[e].cantidad%>"><%=ped[e].cantidad%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier oc-edit-col" data-name="cantidad" data-min="<%= Math.max(ped[e].cantidad - ped[e].restantes_fabricaciones, ped[e].despachados)%>" data-input="number" style="text-align: center;" data-valor="<%=ped[e].cantidad%>"><%=ped[e].cantidad%></td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier oc-edit-col hidden">
+                                                            <input type="hidden" name="cantidad_a<%= e%>" class="form-control input-xs" value="<%=ped[e].cantidad%>" data-name="cantidad_a" data-min="0" data-input="number" data-valor="<%=ped[e].cantidad%>">
+                                                        </td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier oc-edit-col hidden" style="text-align: center;">
+                                                            <input type="hidden" name="precio_a<%= e%>" class="form-control input-xs" data-min="0" value="<%=ped[e].precioOC%>" data-name="precio_a" data-input="number" data-valor="<%=ped[e].precioOC%>">
+                                                        </td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier oc-edit-col" data-key="cant" style="text-align: center;">
+                                                            <input type="number" name="cantidad<%= e%>" class="form-control input-xs hidden" value="<%=ped[e].cantidad%>" data-input="number" data-valor="<%=ped[e].cantidad%>" min="<%= Math.max(ped[e].cantidad - ped[e].restantes_fabricaciones, ped[e].despachados)%>" data-name="cantidad" required><div data-valor="<%= ped[e].cantidad%>" data-valoraux="<%= ped[e].cantidad%>"><%=ped[e].cantidad%></div>
+                                                        </td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].despachados%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].restantes_fabricaciones%></td>
-                                                        <td class="o_data_cell o_list_number o_readonly_modifier parsear_nro <%= clase%> oc-edit-col" data-name="precio" data-min="0" data-input="number" data-valor="<%=ped[e].precioOC%>" style="text-align: center;"><%=ped[e].precioOC%></td>
+                                                        <td class="o_data_cell o_list_number o_readonly_modifier oc-edit-col <%= clase%>" data-key="cost" style="text-align: center;">
+                                                            <input type="number" name="precio<%= e%>" class="form-control input-xs hidden" min="0" data-name="precio" data-input="number" data-valor="<%= ped[e].precioOC%>" value="<%= ped[e].precioOC%>"> <div data-valor="<%= ped[e].precioOC%>" data-valoraux="<%= ped[e].precioOC%>"><%= ped[e].precioOC%></div>
+                                                        </td>
                                                         <%precio_total += ped[e].precioOC*ped[e].cantidad%>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier parsear_nro <%= clase%>" style="text-align: center;"><%=ped[e].precioOC*ped[e].cantidad%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=ped[e].u_medida%></td>
                                                         <td class="o_data_cell o_list_text o_required_modifier" data-name="entrega" data-min="0" data-input="date" data-order="<%= new Date(ped[e].f_entrega).getTime()%>" data-valor="<%=fechaLatino(new Date(ped[e].f_entrega).toLocaleDateString())%>" style="text-align: center;"><%=fechaLatino(new Date(ped[e].f_entrega).toLocaleDateString())%></td>
                                                         <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=ped[e].dias%></td>
-                                                        <!--<td class="o_data_cell o_many2many_tags_cell">
-                                                            <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
-                                                        </td>
-                                                        <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier">
-                                                            <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="price_subtotal">7.290,00&nbsp;$</span>
-                                                        </td>-->
                                                     </tr>
                                                 <%}%>
                                             </tbody>

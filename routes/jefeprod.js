@@ -1589,7 +1589,30 @@ router.get('/render_notificaciones', function(req, res, next){
     req.getConnection(function(err,connection){
         connection.query("select notificacion.*,material.detalle,etapafaena.nombre_etapa from notificacion LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value WHERE SUBSTRING(notificacion.descripcion,1,3) = 'jfp' AND notificacion.active = true", function(err, notif){
             if(err){console.log("Error Selecting : %s", err);}
-            res.render('jefeprod/notificaciones', {notif: notif})
+            var idprods = [];
+            for(var e=0; e < notif.length; e++){
+                for(var w=0; w < notif[e].descripcion.split('@')[4].split('-').length; w++){
+                    idprods.push(notif[e].descripcion.split('@')[4].split('-')[w]);
+                }
+            }
+            connection.query("SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ("+idprods.join(',')+")", function(err, ext){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                for(var e=0; e < notif.length; e++){
+                    for(var w=0; w < notif[e].descripcion.split('@')[4].split('-').length; w++){
+                        for(var q=0; q < ext.length; q++){
+                            if(ext[q].idproduccion.toString() === notif[e].descripcion.split('@')[4].split('-')[w]){
+                                //SE CREA
+                                if(notif[e].externo === undefined || !notif[e].externo){
+                                    notif[e].externo = ext[q].externo;
+                                }
+                            }
+                        }
+                    }
+                }
+                res.render('jefeprod/notificaciones', {notif: notif})
+
+            });
         });
     });
 });
@@ -1604,7 +1627,6 @@ router.get('/render_notificaciones', function(req, res, next){
 * */
 router.post('/predict_newop', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
-    console.log(input);
     req.getConnection(function(err,connection){
         connection.query("select produccion.idordenproduccion,ordenfabricacion.numordenfabricacion,"
                 +"material.detalle,produccion.cantidad from produccion left join fabricaciones on "
@@ -1613,9 +1635,83 @@ router.post('/predict_newop', function(req, res, next){
                 +" ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f WHERE idproduccion = ?",[input.idp], function(err, produccion){
                 if(err){console.log("Error Selecting : %s", err);}
 
-                console.log(produccion);
-
                 res.send({newop: produccion});
+        });
+    });
+});
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
+
+router.post('/predict_newop_ext', function(req, res, next){
+    var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input);
+    req.getConnection(function(err,connection){
+        connection.query("SELECT " +
+            "material.detalle, material.u_medida, " +
+            "produccion.idordenproduccion, fabricaciones.idorden_f, " +
+            "abastecimiento.idoda, produccion_history.comentario, cliente.sigla as cliente " +
+            "FROM produccion " +
+            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+            "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
+            "LEFT JOIN abastecimiento ON abastecimiento.idproduccion = produccion.idproduccion " +
+            "LEFT JOIN oda ON oda.idoda = abastecimiento.idoda " +
+            "LEFT JOIN cliente ON cliente.idcliente = oda.idproveedor " +
+            "LEFT JOIN produccion_history ON produccion_history.idproduccion_history = ? " +
+            "WHERE produccion.idproduccion IN (?)",[input.idph,input.idp], function(err, produccion){
+            if(err){console.log("Error Selecting : %s", err);}
+
+            produccion = produccion[0];
+            console.log(produccion);
+            res.render("jefeprod/modal_rechazo_externo", {data: produccion, cant: input.rep, comentario: input.com});
+        });
+    });
+});
+
+
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
+
+router.post('/save_notificacion_abastecimiento', function(req, res, next){
+    var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input);
+    //token_notificacion: odaext@22959-22960@2019-7-10 16:26:48@110813@500-1000
+    req.getConnection(function(err,connection){
+        connection.query("SELECT fabricaciones.idfabricaciones, abastecimiento.idabast FROM produccion " +
+            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+            "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
+            "LEFT JOIN abastecimiento ON abastecimiento.idproduccion = produccion.idproduccion " +
+            "WHERE produccion.idproduccion IN (?)",[input.idp], function(err, dets){
+            if(err){console.log("Error Selecting : %s", err);}
+
+            console.log(dets);
+            var idabast = dets[0];
+            var token = "odaextrech@"+input.idp+"@"+new Date().toLocaleDateString()+"@"+dets[0].idfabricaciones+"@"+input.rep;
+            connection.query("INSERT INTO notificacion(descripcion,active) VALUES('"+token+"', true)", function(err, inNotif){
+                if(err){console.log("Error Selecting : %s", err);}
+
+
+                connection.query("UPDATE abastecimiento SET restantes = restantes + "+input.rep+" WHERE abastecimiento.idabast in ("+idabast+")", function(err, upAbast){
+                    if(err){console.log("Error Selecting : %s", err);}
+
+                    console.log(upAbast);
+                    console.log(inNotif);
+                    res.send("ok");
+                });
+            });
         });
     });
 });

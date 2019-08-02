@@ -187,6 +187,7 @@
 			},
 			url: '/plan/page_of/'+$(yo).data('idodc'),
 			success: function(data){
+                ocultar_buscador();
 				$(".main-page").html(data);
 			}
 		});

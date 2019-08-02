@@ -1062,15 +1062,18 @@ router.get('/notif_abast', function(req, res, next){
         	if(err){
         		console.log("Error Connection : %s", err);
         	}
-        	connection.query("SELECT notificacion.*, odc.numoc, material.detalle as material FROM notificacion " +
-				"left join odc on odc.idodc = substring_index(substring_index(descripcion, '@', 2),'@',-1) " +
+        	connection.query("SELECT substring_index(substring_index(descripcion, '@', 4),'@',-1) as ida, matq.detalle as mat_ext,notificacion.*, odc.numoc, material.detalle as material, oda.idoda FROM notificacion " +
+				"left join odc ON odc.idodc = substring_index(substring_index(descripcion, '@', 2),'@',-1) " +
+                "left join oda ON oda.idoda = substring_index(substring_index(descripcion, '@', 2),'@',-1) " +
+                "left join fabricaciones ON fabricaciones.idfabricaciones = substring_index(substring_index(descripcion, '@', 4),'@',-1) " +
+				"left join (select idmaterial, detalle from material) as matq on matq.idmaterial = fabricaciones.idmaterial " +
 				"left join material on material.idmaterial= substring_index(substring_index(descripcion, '@', 4),'@',-1) " +
-				"WHERE (descripcion LIKE 'aoc@%' AND active = true) OR (descripcion LIKE 'aof@%' AND active = true) OR (descripcion LIKE 'odaext@%' AND active = true)",
+				"WHERE (descripcion LIKE 'aoc@%' AND active = true) OR (descripcion LIKE 'aof@%' AND active = true) OR (descripcion LIKE 'odaext@%' AND active = true) OR (descripcion LIKE 'odaextrech@%' AND active = true)",
         					function(err, notif){
         			if(err){
         				console.log("Error Selecting : %s", err);
         			}
-        			console.log(notif);
+					console.log(notif);
         			res.render('abast/notificaciones', {notif: notif});
 
         		});
@@ -3586,11 +3589,7 @@ router.post('/newoc_ped', function(req, res, next){
         }
         where = where.substring(0, where.length - 2 );
         req.getConnection(function(err,connection){
-        	if(err)
-        		console.log("Error Connection : %s", err);
-
-
-
+        	if(err){console.log("Error Connection : %s", err);}
         	connection.query("INSERT INTO oda (numoda, idproveedor, tokenoda) VALUES (?,?,?)", [input.nrodc, idprov, token], 
         		function(err, odc){
         			if(err)
@@ -3622,54 +3621,41 @@ router.post('/newoc_ped', function(req, res, next){
 	        			}
 	        			console.log(array);
 
-                connection.query("INSERT INTO ordenproduccion() VALUES ()", function(err, inOp){
-                    if(err){console.log("Error Inserting : %s", err);}
-                    console.log(inOp);
-                    for(var p=0; p < prod.length; p++){
-                        prod[p].push(inOp.insertId);
-                    }
-                    console.log(prod);
-                    connection.query("INSERT INTO produccion(idfabricaciones, cantidad, `e`, idordenproduccion) VALUES ?", [prod], function(err, inProd){
-                        if(err){console.log("Error Inserting : %s", err);}
+						connection.query("INSERT INTO ordenproduccion() VALUES ()", function(err, inOp){
+							if(err){console.log("Error Inserting : %s", err);}
+							for(var p=0; p < prod.length; p++){
+								prod[p].push(inOp.insertId);
+                                prod[p].push(true);
+							}
+							connection.query("INSERT INTO produccion(idfabricaciones, cantidad, `e`, idordenproduccion, externo) VALUES ?", [prod], function(err, inProd){
+								if(err){console.log("Error Inserting : %s", err);}
 
-                        for(var e=0; e < array.length; e++){
-                        	array[e][6] = inProd.insertId+e;
-						}
-						console.log(array);
-	        			connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc, idproduccion) VALUES ?", [array], function(err, ped){
-	        				if(err){
-	        					console.log("Error Selecting : %s", err);
-	        					res.send('error');
-	        				}
-	        				else{
-	        					/*
-								UPDATE `table` SET `uid` = CASE
-								    WHEN id = 1 THEN 2952
-								    WHEN id = 2 THEN 4925
-								    WHEN id = 3 THEN 1592
-								    ELSE `uid`
-								    END
-								WHERE id  in (1,2,3)
-	        					*/
-	        					var wh = " WHERE"
-						        for(var y=0; y < input.idped.split('@').length; y++){
-						        	wh += " idpedido="+input.idped.split('@')[y]+" OR";
-						        }
-						        wh = wh.substring(0,wh.length-2);
-	        					console.log(wh);
-	        					connection.query("UPDATE pedido SET idproveedor = ? "+wh, [odc.insertId], function(err, upData){
-	        						if(err)
-	        							console.log("Error Selecting :%s", err);
-	        						console.log(upData);
-	        						//res.redirect('/abastecimiento/comprobar_notificaciones/'+idorden);
-
-                                    res.send(idorden+'@'+idODC);
-                                });
-	        				}
-	        			});
-                        });
-                    });
-        		});
+								for(var e=0; e < array.length; e++){
+									array[e][6] = inProd.insertId+e;
+								}
+								console.log(array);
+								connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc, idproduccion) VALUES ?", [array], function(err, ped){
+									if(err){
+										console.log("Error Selecting : %s", err);
+										res.send('error');
+									}
+									else{
+										var wh = " WHERE";
+										for(var y=0; y < input.idped.split('@').length; y++){
+											wh += " idpedido="+input.idped.split('@')[y]+" OR";
+										}
+										wh = wh.substring(0,wh.length-2);
+										connection.query("UPDATE pedido SET idproveedor = ? "+wh, [odc.insertId], function(err, upData){
+											if(err){
+                                                console.log("Error Selecting :%s", err);
+											}
+											res.send(idorden+'@'+idODC);
+										});
+									}
+								});
+								});
+							});
+						});
         	});
         });
       	
@@ -3703,8 +3689,6 @@ router.post('/newoc_ped_ext', function(req, res, next){
         input.cantidad = input.cantidad.split('@');
         var token = input.obs+"@"+input.dest+"@"+input.plae+"@"+input.pag+"@"+input.entr+"@"+input.cuent+"@"+input.money+"@off@"+input.desc;
         var idprov = input.prov;
-        console.log("luego");
-        console.log(input);
         for(var w=0; w < input.idmat.length; w++){
 			//idoda, idmaterial, cantidad, costo, exento, cc, idproduccion
 			array.push([input.nrodc, input.idmat[w], input.cantidad[w], input.costo[w], input.ex_iva[w] !== 'off', input.centroc[w], input.idprod[w]]);

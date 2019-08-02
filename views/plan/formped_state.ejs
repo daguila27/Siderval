@@ -102,7 +102,6 @@
                     if(data['idm[]']){
                         var fabricacion = '';
                         var color = '';
-                        console.log(data);
                         for(var e=0; e < data['idm[]'].length; e++){
                             if(data['prov[]'][e] == '-1'){
                                 fabricacion = 'Interna';
@@ -111,8 +110,7 @@
                             else{
                                 fabricacion = 'Externa';
                                 color = 'warning';
-                            }
-                        %>                
+                            }%>
                         <tr class="<%= color%>">
                             <td><%=data['dets[]'][e]%><input type="hidden" name="idm" value="<%=data['idm[]'][e]%>"><input type="hidden" name="idp" value="<%=data['idp[]'][e]%>"><input type='hidden' name='disp' value="<%= data['stock[]'][e]%>"></td>
                             <td><strong><%=fabricacion%></strong></td>

@@ -593,11 +593,18 @@ router.get('/page_of/:idof', function(req, res, next){
                     if(err) console.log("Select Error: %s",err);
                     connection.query("SELECT fabricaciones.*, material.*, (to_days(fabricaciones.f_entrega)-to_days(now())) as dias "
                         +"FROM fabricaciones LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial "
-                        +"WHERE fabricaciones.idorden_f = ? ORDER BY (fabricaciones.numitem*1)",[idof], function(err ,fabs){
+                        +"WHERE fabricaciones.idorden_f = ? ORDER BY (fabricaciones.numitem*1)",[idof], function(err ,fabs) {
                         if(err) console.log("Select Error: %s",err);
 
-                        //res.redirect('/plan');
-                        res.render('plan/page_of', {of:of[0], fabs: fabs});
+                        var odv = true;
+                        for(var t=0; t < fabs.length; t++){
+                            if(fabs[t].idpedido){
+                                odv = false;
+                            }
+                        }
+                        if(odv){console.log("SI es ODV");}
+                        else{console.log("NO es ODV");}
+                        res.render('plan/page_of', {of:of[0], fabs: fabs, odv: odv});
                     });
                 });
             });
@@ -624,16 +631,40 @@ router.get('/page_oc/:idodc', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
             var idodc = req.params.idodc;
+            console.log("idodc: "+idodc);
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
-                connection.query("SELECT * FROM odc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente WHERE odc.idodc = ?",[idodc], function(err, odc){
+                connection.query("SELECT coalesce(queryRev.idmodificaciones_concat, 'false') AS idmodificaciones_concat, odc.* FROM odc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente " +
+                    " LEFT JOIN (SELECT group_concat(DISTINCT idmodificacion) as idmodificaciones_concat, pedido.idodc FROM modificacion_oc left join pedido on pedido.idpedido = modificacion_oc.idpedido group by pedido.idodc) AS queryRev ON queryRev.idodc = odc.idodc " +
+                    " WHERE odc.idodc = ?",[idodc], function(err, odc){
                     if(err) console.log("Select Error: %s",err);
+
+                    console.log(odc);
+                    var modificaciones;
                     connection.query("SELECT fabricaciones.restantes as restantes_fabricaciones, pedido.*,pedido.precio as precioOC, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
                         +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido WHERE pedido.idodc = ? ORDER BY (pedido.numitem*1)",[idodc], function(err ,ped){
-                            if(err) console.log("Select Error: %s",err);
-                            
-                            console.log(req.session);
-                            res.render('plan/page_oc', {odc: odc[0], ped: ped, username: req.session.userData.nombre});
+                        if(err) console.log("Select Error: %s",err);
+
+                        if( odc[0].idmodificaciones_concat === 'false'){
+                            res.render('plan/page_oc', {odc: odc[0], ped: ped, username: req.session.userData.nombre, rev: []});
+                        }else{
+                            modificaciones = odc[0].idmodificaciones_concat;
+                            connection.query("SELECT * FROM modificacion_oc WHERE idmodificacion IN ("+modificaciones+")", function(err, mod){
+                                if(err) console.log("Select Error: %s",err);
+
+                                console.log(mod);
+                                var obj = {};
+                                for( var w=0; w < mod.length; w++ ){
+                                    if( Object.keys(obj).indexOf(mod[w].idpedido.toString()+"-"+mod[w].idmodificacion.toString()) === -1  ){
+                                        obj[mod[w].idpedido.toString()+"-"+mod[w].idmodificacion.toString()] = [[mod[w].ajuste, mod[w].param.toString()]];
+                                    }else{
+                                        obj[mod[w].idpedido.toString()+"-"+mod[w].idmodificacion.toString()].push([mod[w].ajuste, mod[w].param.toString()]);
+                                    }
+                                }
+                                obj = JSON.stringify(obj);
+                                res.render('plan/page_oc', {odc: odc[0], ped: ped, username: req.session.userData.nombre, rev: obj});
+                            });
+                        }
                     });
                 });
             });
@@ -1517,10 +1548,10 @@ router.post('/buscar_mat', function(req, res, next){
             {
                 if(err)
                     console.log("Error Selecting : %s ",err );
+
                 res.render('plan/prepeds_stream',{data:rows},function(err,html){if(err)console.log(err);res.send(html)});
 
             });
-            //console.log(query.sql);
         });
     } else res.redirect("/bad_login");
 
@@ -1747,7 +1778,7 @@ router.post('/view_ordenpdf', function(req,res,next){
                 phantom.create().then(function(ph) {
                     ph.createPage().then(function(page) {
                         page.property('viewportSize',{width:612,height:792});
-                        page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
+                        page.open("http://"+res.req.headers.host+"/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
                             page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
                                 console.log('Page Rendered');
                                 ph.exit();
@@ -1790,7 +1821,7 @@ router.post('/view_ordenpdf_first', function(req,res,next){
                     phantom.create().then(function(ph) {
                         ph.createPage().then(function(page) {
                             page.property('viewportSize',{width:612,height:792});
-                            page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
+                            page.open("http://"+res.req.headers.host+"/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
                                 page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
                                     console.log('Page Rendered');
                                     ph.exit();
@@ -1836,8 +1867,6 @@ router.get('/show_pdf_first/:numoda', function(req,res,next){
 router.get('/show_pdf/:numoda', function(req,res,next){
     var fs = require('fs');
     var filePath = '\\pdf\\odc'+req.params.numoda+'.pdf';
-    console.log(__dirname.replace('routes','public') + filePath);
-
     fs.readFile(__dirname.replace('routes','public') + filePath, (err, data) => {
         if(err) {
             console.log('error: ', err);
@@ -1845,21 +1874,16 @@ router.get('/show_pdf/:numoda', function(req,res,next){
             res.redirect('/plan/view_ordenpdf_after/'+req.params.numoda);
         } else {
             var r = __dirname.replace('routes','public') + filePath;
-            console.log( r );
-            console.log(data);
             console.log("ARCHIVO SI EXISTE");
             if(req.session.booleanPDFgen) {
-                fs.readFile(__dirname.replace('routes', 'public') + filePath, function (err, data) {
+                fs.readFile(r, function (err, data) {
                     res.contentType("application/pdf");
-                    console.log(data);
                     req.session.booleanPDFgen = false;
                     res.send(data);
                 });
             }else{
                 fs.unlink(r, function (err, data) {
-                    if (err) {
-                        console.log("Ha Ocurrido un error : %s", err);
-                    }
+                    if (err) {console.log("Ha Ocurrido un error : %s", err);}
                     req.session.booleanPDFgen = true;
                     res.redirect('/plan/show_pdf/' + req.params.numoda);
                 });
@@ -1872,7 +1896,6 @@ router.get('/show_pdf/:numoda', function(req,res,next){
 //A ESTA RUTA SE LLAMA CUANDO SE QUIERE CREAR EL ARCHIVO PDF DE LA ODA TIEMPO DESPUES DE REGISTRARLA
 router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
     var idoda = req.params.idoda;
-
 
     req.getConnection(function(err, connection){
         if(err)
@@ -1890,21 +1913,19 @@ router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
                     phantom.create().then(function(ph) {
                         ph.createPage().then(function(page) {
                             page.property('viewportSize',{width:612,height:792});
-                            page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
+                            console.log("obteniendo pdf");
+                            console.log( res.req.headers.host);
+
+                            page.open("http://"+res.req.headers.host+"/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
                                 page.render('public/pdf/odc'+oda[0].idoda+'.pdf').then(function() {
                                     console.log('Page Rendered');
                                     ph.exit();
                                     var fs = require('fs');
                                     var filePath = '\\pdf\\odc'+oda[0].numoda+'.pdf';
-                                    console.log(__dirname.replace('routes','public') + filePath);
                                     fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
                                         res.contentType("application/pdf");
-                                        console.log(data);
                                         res.redirect('/plan/show_pdf/'+oda[0].numoda);
-                                        //res.send(data);
                                     });
-                                    //res.send('/Users/dagui/Desktop/siderval/pdfs/odc'+oda[0].numoda+'-'+oda[0].idoda+'.pdf');
-                                    //res.redirect("/plan/view_ordenpdf_get/"+oda[0].idoda);
                                 });
                             });
                         });
@@ -1919,12 +1940,9 @@ router.get('/view_ordenpdf_after/:idoda', function(req,res,next){
 //ESTA RUTA SE USA CUANDO SE QUIERE DESCARGAR EL PDF
 router.get('/view_ordenpdf_after_d/:idoda', function(req,res,next){
     var idoda = req.params.idoda;
-
-
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Connection : %s", err);
-
         connection.query('select material.detalle, material.precio, abastecimiento.cantidad from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on material.idmaterial=abastecimiento.idmaterial where oda.idoda=?', [idoda],
             function(err, mats){
                 if(err)
@@ -1937,21 +1955,18 @@ router.get('/view_ordenpdf_after_d/:idoda', function(req,res,next){
                     phantom.create().then(function(ph) {
                         ph.createPage().then(function(page) {
                             page.property('viewportSize',{width:612,height:792});
-                            page.open("http://localhost:4300/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
+                            page.open("http://"+res.req.headers.host+"/plan/view_ordenpdf_get/"+oda[0].idoda).then(function(status) {
                                 page.render('public/pdf/odc'+oda[0].numoda+'.pdf').then(function() {
                                     console.log('Page Rendered');
-                                    ph.exit();
                                     var fs = require('fs');
                                     var filePath = '\\pdf\\odc'+oda[0].numoda+'.pdf';
                                     console.log(__dirname.replace('routes','public') + filePath);
                                     fs.readFile(__dirname.replace('routes','public') + filePath , function (err,data){
                                         res.contentType("application/pdf");
-                                        console.log(data);
+                                        ph.exit();
                                         res.redirect('/plan/download_pdf/'+oda[0].numoda);
-                                        //res.send(data);
+
                                     });
-                                    //res.send('/Users/dagui/Desktop/siderval/pdfs/odc'+oda[0].numoda+'-'+oda[0].idoda+'.pdf');
-                                    //res.redirect("/plan/view_ordenpdf_get/"+oda[0].idoda);
                                 });
                             });
                         });
@@ -1964,7 +1979,6 @@ router.get('/download_pdf/:numoda', function(req,res,next){
     var fs = require('fs');
     var filePath = '\\pdf\\odc'+req.params.numoda+'.pdf';
     console.log(__dirname.replace('routes','public') + filePath);
-
     fs.readFile(__dirname.replace('routes','public') + filePath, (err, data) => {
         if(err) {
             console.log('error: ', err);
@@ -1996,7 +2010,10 @@ router.get('/view_ordenpdf_get/:idoda', function(req,res,next){
                 connection.query("SELECT * FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor WHERE oda.idoda = ?", [req.params.idoda], function(err, oda){
                     if(err)
                         console.log("Error Selecting : %s", err);
-                    console.log(mats[0].idcombustible);
+
+                    console.log("orden pdf get");
+                    console.log(mats);
+                    console.log(oda);
                     res.render('plan/template_oda', {oda: oda,mats: mats,tipo: 'oda'});
                 });
             });
@@ -2026,7 +2043,7 @@ router.post('/view_PLpdf', function(req,res,next){
              phantom.create().then(function(ph) {
                  ph.createPage().then(function(page) {
                      page.property('viewportSize',{width:612,height:792});
-                     page.open("http://localhost:4300/plan/view_PLpdf_get/"+oda[0].idpackinglist).then(function(status) {
+                     page.open("http://"+res.req.headers.host+"/plan/view_PLpdf_get/"+oda[0].idpackinglist).then(function(status) {
                          page.render('public/pdf/pl'+oda[0].idpackinglist+'.pdf').then(function() {
                              console.log('Page Rendered');
                              ph.exit();
@@ -2089,7 +2106,7 @@ router.get('/view_PLpdf_after/:numpl', function(req,res,next){
             phantom.create().then(function(ph) {
                 ph.createPage().then(function(page) {
                     page.property('viewportSize',{width:612,height:792});
-                    page.open("http://localhost:4300/plan/view_PLpdf_get/"+oda[0].idpackinglist).then(function(status) {
+                    page.open("http://"+res.req.headers.host+"/plan/view_PLpdf_get/"+oda[0].idpackinglist).then(function(status) {
                         page.render('public/pdf/pl'+oda[0].idpackinglist+'.pdf').then(function() {
                             console.log('Page Rendered');
                             ph.exit();
@@ -2177,7 +2194,7 @@ router.get('/view_ofpdf/:idof', function(req,res,next){
                     //Setea las propiedades de la pagina donde se pegara el html
                     page.property('viewportSize',{width:612,height:792});
                     //Cargar html a pegar desde un request http
-                    page.open("http://localhost:4300/plan/view_ofpdf_get/"+req.params.idof).then(function(status) {
+                    page.open("http://"+res.req.headers.host+"/plan/view_ofpdf_get/"+req.params.idof).then(function(status) {
                         // Guardar pdf en el 'path' especificado
                         page.render('public' + path).then(function() {
                             ph.exit();
@@ -3089,22 +3106,23 @@ router.get('/xlsx_desp', function(req,res){
 router.post('/editar_oc_save', function(req,res){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         if(typeof input['idpedido[]'] === 'string'){
             input['idmaterial[]'] = [input['idmaterial[]']];
             input['idpedido[]'] = [input['idpedido[]']];
             input['cantidad_a[]'] = [input['cantidad_a[]']];
             input['cantidad[]'] = [input['cantidad[]']];
             input['precio[]'] = [input['precio[]']];
+            input['precio_a[]'] = [input['precio_a[]']];
         }
         var idodc = input['idodc[]'];
+        console.log(input);
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connection : %s", err);}
             //STOCK DISPONIBLE = STOCK BODEGA + STOCK PRODUCCION  - POR DESPACHAR
             //SE OBTIENE EL STOCK DISPONIBLE PARA SABER QUE CANTIDAD SE NECESITA FABRICAR (CARGAR A fabricaciones)
             connection.query("select " +
                 "material.idmaterial, " +
-                "material.stock + queryProd.enproduccion  - queryPed.xdespachar as disponible" +
+                "material.stock + coalesce(queryProd.enproduccion,0) - coalesce(queryPed.xdespachar,0) as disponible" +
                 " from material " +
                 "left join (select pedido.idmaterial, sum(pedido.cantidad - pedido.despachados) AS xdespachar " +
                 "from pedido where pedido.cantidad > pedido.despachados group by pedido.idmaterial) as queryPed ON " +
@@ -3113,11 +3131,11 @@ router.post('/editar_oc_save', function(req,res){
                 "WHERE material.idmaterial in ("+input['idmaterial[]'].join(',')+")", function(err, disp){
                 if(err){console.log("Error Selecting : %s", err);}
 
-                console.log(disp);
                 var queryFabCant;
                 var queryFabRest;
                 var queryPedCant;
                 var queryPedCost;
+                var rev = [];
                 for(var w=0; w < input['idpedido[]'].length; w++){
                     if(w===0){
                         queryPedCant = "UPDATE pedido SET cantidad = CASE";
@@ -3128,14 +3146,20 @@ router.post('/editar_oc_save', function(req,res){
                     queryPedCant += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN "+input['cantidad[]'][w];
                     queryFabCant += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN "+input['cantidad[]'][w];
                     queryPedCost += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN "+input['precio[]'][w];
+
+                    if(parseFloat(input['precio[]'][w]) !== parseFloat(input['precio_a[]'][w])){
+                        rev.push([input['idpedido[]'][w], parseFloat(input['precio[]'][w]) - parseFloat(input['precio_a[]'][w]), 'cost']);
+                    }
+                    if(parseInt(input['cantidad[]'][w]) !== parseInt(input['cantidad_a[]'][w]) ){
+                        rev.push([input['idpedido[]'][w], parseInt(input['cantidad[]'][w]) - parseInt(input['cantidad_a[]'][w]), 'cant']);
+                    }
+
                     if(parseInt(input['cantidad[]'][w]) < parseInt(input['cantidad_a[]'][w]) ){
                         queryFabRest += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN restantes - "+( parseInt(input['cantidad_a[]'][w]) - parseInt(input['cantidad[]'][w]) );
                     }
                     else{
                         for(var q=0; q < disp.length; q++){
-                            console.log(disp[q].idmaterial +"==="+ input['idmaterial[]'][w]);
                             if(disp[q].idmaterial == input['idmaterial[]'][w]){
-                                console.log("si");
                                 if(parseInt(disp[q].disponible) >= (parseInt(input['cantidad[]'][w]) - parseInt(input['cantidad_a[]'][w])) || disp[q].disponible < 0 ){
                                     queryFabRest += " WHEN idpedido = "+input['idpedido[]'][w]+" THEN restantes + 0";
                                 }else{
@@ -3163,9 +3187,84 @@ router.post('/editar_oc_save', function(req,res){
                             //SE ACTUALIZAN LAS FABRICACIONES - restantes
                             connection.query(queryFabRest, function(err, data){
                                 if(err){console.log("Error Selecting : %s", err);}
-                                res.redirect('/plan/page_oc/'+idodc);
+                                connection.query("SELECT coalesce(MAX(idmodificacion),0) AS id FROM modificacion_oc", function(err, lastMod){
+                                    if(err){console.log("Error Selecting : %s", err);}
+                                    var l = parseInt(lastMod[0].id) + 1;
+                                    for(var w=0; w < rev.length; w++ ){
+                                        rev[w][3] = l;
+                                    }
+                                    connection.query("INSERT INTO modificacion_oc(idpedido, ajuste, param, idmodificacion) VALUES ?",[rev],function(err, newModi){
+                                        if(err){console.log("Error Selecting : %s", err);}
+
+                                        console.log("IDODC : "+idodc);
+                                        res.redirect('/plan/page_oc/'+idodc);
+                                    });
+                                });
                             });
                         });
+                    });
+                });
+            });
+        });
+    }
+    else res.redirect('/bad_login');
+});
+
+
+
+
+router.post('/editar_of_save', function(req,res){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
+        if(typeof input['idfabricaciones[]'] === 'string'){
+            input['cantidad[]'] = [input['cantidad[]']];
+            input['cantidad_a[]'] = [input['cantidad_a[]']];
+            input['idfabricaciones[]'] = [input['idfabricaciones[]']];
+        }
+        var idof = input['idof[]'];
+        console.log(input);
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connection : %s", err);}
+            //STOCK DISPONIBLE = STOCK BODEGA + STOCK PRODUCCION  - POR DESPACHAR
+            //SE OBTIENE EL STOCK DISPONIBLE PARA SABER QUE CANTIDAD SE NECESITA FABRICAR (CARGAR A fabricaciones)
+            connection.query("select " +
+                "material.idmaterial, " +
+                "material.stock + coalesce(queryProd.enproduccion,0) - coalesce(queryPed.xdespachar,0) as disponible" +
+                " from material " +
+                "left join (select pedido.idmaterial, sum(pedido.cantidad - pedido.despachados) AS xdespachar " +
+                "from pedido where pedido.cantidad > pedido.despachados group by pedido.idmaterial) as queryPed ON " +
+                "queryPed.idmaterial = material.idmaterial " +
+                "left join (select fabricaciones.idmaterial, sum(produccion.1 + produccion.2 + produccion.3 + produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion from produccion left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones where produccion.1 + produccion.2 + produccion.3 + produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as queryProd ON queryProd.idmaterial = material.idmaterial ",
+                function(err, disp){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                var queryFabCant;
+                var queryFabRest;
+                var rev = [];
+                for(var w=0; w < input['idfabricaciones[]'].length; w++){
+                    if(w===0){
+                        queryFabCant = "UPDATE fabricaciones SET cantidad = CASE";
+                        queryFabRest = "UPDATE fabricaciones SET restantes = CASE";
+                    }
+                    queryFabCant += " WHEN idfabricaciones = "+input['idfabricaciones[]'][w]+" THEN "+input['cantidad[]'][w];
+                    queryFabRest += " WHEN idfabricaciones = "+input['idfabricaciones[]'][w]+" THEN restantes - "+( parseInt(input['cantidad_a[]'][w]) - parseInt(input['cantidad[]'][w]) );
+
+
+                    if(w===input['idfabricaciones[]'].length-1){
+                        queryFabCant += " ELSE cantidad END WHERE idfabricaciones IN ("+input['idfabricaciones[]'].join(',')+")";
+                        queryFabRest += " ELSE restantes END WHERE idfabricaciones IN ("+input['idfabricaciones[]'].join(',')+")";
+                    }
+                }
+                //SE ACTUALIZAN LAS FABRICACIONES - cantidad
+                connection.query(queryFabCant, function(err, data){
+                    if(err){console.log("Error Selecting : %s", err);}
+                    //SE ACTUALIZAN LAS FABRICACIONES - restantes
+                    connection.query(queryFabRest, function(err, data){
+                        if(err){console.log("Error Selecting : %s", err);}
+
+                        console.log("IDOF : "+idof);
+                        res.redirect('/plan/page_of/'+idof);
                     });
                 });
             });
