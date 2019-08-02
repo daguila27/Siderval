@@ -3,7 +3,12 @@ function fechaLatino(string){
     return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
 }
 %>
-<div class="o_view_manager_content">
+
+
+<div class="o_view_manager_content" style="padding-top: 3%">
+    <div class="pull-left" style="font-size: 150%; margin-left: 20px" onclick="change_gdd(-1)"><i class="fa fa-arrow-left"></i>Anterior</div>
+    <div class="pull-right" style="font-size: 150%; margin-right: 20px" onclick="change_gdd(1)">Siguiente <i class="fa fa-arrow-right"></i></div>
+
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
             <div class="o_form_sheet_bg">
@@ -109,75 +114,52 @@ function fechaLatino(string){
                                         </div>
                                     </div>
                                     <div class="table-responsive">
+                                        <!-- Boton actualizar datos de factura -->
+                                        <div class="form-group" style="margin: 0px; margin-left: 45%; position: absolute; z-index: 15">
+                                            <button id="actualizar" class="btn btn-warning" type="submit"><i class="glyphicon glyphicon-refresh"></i> Actualizar</button>
+                                        </div>
                                         <table id="tablaODA" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                             <tr>
+                                                <th class="o_column_sortable" style="text-align: left;">#Item</th>
                                                 <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                 <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                 <th class="o_column_sortable">Cantidad</th>
-                                                <!--<th class="o_column_sortable">Impuestos</th>
-                                                <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
+                                                <th class="o_column_sortable">N° OF</th>
+                                                <th class="o_column_sortable">N° OC</th>
+                                                <th class="o_column_sortable">Factura</th>
+                                                <th class="o_column_sortable">Conector (MIGO)</th>
                                             </tr>
                                             </thead>
-                                            <tbody class="ui-sortable">
-                                            <%for(var e=0; e < abast.length; e++){%>
-                                            <tr class="o_data_row text-info danger">
-                                                <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
-                                                <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
-                                                <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
-                                                <!--<td class="o_data_cell o_many2many_tags_cell">
-                                                    <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
-                                                </td>
-                                                <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier">
-                                                    <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="price_subtotal">7.290,00&nbsp;$</span>
-                                                </td>-->
-                                            </tr>
-                                            <%}%>
+                                            <tbody class="ui-sortable" id="data_gdd">
+                                                <%for(var e=0; e < abast.length; e++){%>
+                                                <tr class="o_data_row text-info danger">
+                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].numitem%></td>
+                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=abast[e].detalle%></td>
+                                                    <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=abast[e].u_medida%></td>
+                                                    <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].cantidad%></td>
+                                                    <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].idorden_f%></td>
+                                                    <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=abast[e].numoc%></td>
+                                                    <td style="padding: 2px; width: 100px"><input data-gdd="<%=abast[e].iddespacho%>" data-tipo="numfac" style="width: 100px" type="text" class="form-control" value="<%= abast[e].numfac%>"></td>
+                                                    <td style="padding: 2px; width: 100px"><input data-gdd="<%=abast[e].iddespacho%>" data-tipo="conector" style="width: 100px" type="text" class="form-control" value="<%= abast[e].conector%>"></td>
+                                                </tr>
+                                                <%}%>
                                             </tbody>
                                             <tfoot>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
                                             </tfoot>
                                         </table>
                                     </div>
                                 </div>
-                                <!--<table class="o_group o_inner_group oe_subtotal_footer oe_right">
-                                    <tbody>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_readonly_modifier" for="o_field_input_1076">Base imponible</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_untaxed">7.315,00&nbsp;$</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="o_td_label">
-                                                <label class="o_form_label o_readonly_modifier" for="o_field_input_1077">Impuestos</label>
-                                            </td>
-                                            <td style="width: 100%;">
-                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_tax">0,00&nbsp;$</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width: 50%;">
-                                                <div class="oe_subtotal_footer_separator oe_inline o_td_label">
-                                                    <label class="o_form_label" for="o_field_input_1078">Total</label>
-                                                </div>
-                                            </td>
-                                            <td style="width: 50%;">
-                                                <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier oe_subtotal_footer_separator" name="amount_total">7.315,00&nbsp;$</span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>-->
                                 <span class="o_field_text o_field_widget o_field_empty oe_inline" name="note"></span>
                                 <div class="oe_clear"></div>
                             </div>
@@ -195,9 +177,50 @@ function fechaLatino(string){
 </div>
 
 <script>
+    var idgd = parseInt('<%= oda.idgd%>');
+
+    //d = es la diferencia que se aplica al id de guía de despacho , por lo general es +1 o -1 (siguiente o anterior)
+    function change_gdd(d){
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/page_gdd/'+(parseInt(idgd)+parseInt(d)).toString(),
+            beforeSend: function(){
+                destroyDataTable();
+            },
+            success: function(data){
+                $(".main-page").html(data);
+            }
+        });
+    }
+    setDataTableSmall('#tablaODA');
     $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
-        setDataTable2('#tablaODA');
+    });
+
+    // Actualiza los campos ingresados en la tabla despachos
+    $("#actualizar").on('click', function(e){
+        e.preventDefault();
+        var numfac = [];
+        var conector = [];
+        $("#data_gdd input.form-control").each(function(e){
+            if(this.value != ""){
+                if($(this).data("tipo") == "numfac") {
+                numfac.push([ $(this).data("gdd"), this.value]);
+                } else{
+                    conector.push([ $(this).data("gdd"), this.value]);
+                }
+            }
+        });
+        $.ajax({
+            type: 'POST',
+            data: {numfac: JSON.stringify(numfac), conector: JSON.stringify(conector)},
+            url: '/bodega/page_gdd_update',
+            success: function(data){
+                if(data == "ok"){
+                    alert("Los datos se han actualizado con exito.");
+                }
+            }
+        });
     });
 
 </script>

@@ -1,0 +1,376 @@
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+
+    /* Notificacion emergente inferior */
+    #snackbar,#snackbar2 {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        opacity: 0.8;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 70%;
+        bottom: 30px;
+        font-size: 17px;
+    }
+
+    #snackbar.show, #snackbar2.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @-webkit-keyframes fadein {
+        from {bottom: 0; opacity: 0;} 
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @-webkit-keyframes fadeout {
+        from {bottom: 30px; opacity: 1;} 
+        to {bottom: 0; opacity: 0;}
+    }
+
+    @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+    }
+</style>
+
+
+<style>
+    .busc-din-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 90%;
+        transition:0.5s;
+        z-index: 9;
+    }
+    .busc-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 100%;
+        transition:0.5s;
+        z-index: 9;
+    }
+</style>
+<%
+var clase;
+if(username == 'gestionpl'){clase='busc-din-menu';}
+else{clase='busc-menu';}%>
+<div id="up-fills" class="row up-fills <%=clase%>">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+            <li class="active">Pedidos sin Despachar</li>
+            <!-- Mostrar cantidad de datos -->
+            <div style="display: flex;">
+                <div id="indicador_paginas" data-total="0" style="margin-right: 3px"></div>
+                <div id="pedidos"></div>
+            </div>
+        </ol>
+        <div style="width: 50%; margin-right: 4%;">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+            </div>
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+            <div style="display: flex">
+                <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
+                    <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista" style="display: flex"></button>
+                </div>
+                <div style="padding: 5px; margin-left: 15px">
+                    <ul class="nav nav-pills"  style="display: flex;">
+                        <li class="pill-vista active" data-name="pedido-view"><a style="padding: 6px" href="#">Pedidos</a></li>
+                        <li class="pill-vista" data-name="palets-view"><a style="padding: 6px" href="#">Palets</a></li>
+                    </ul>
+                </div>
+
+                <div class="filters" style="margin-top: 5px">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+
+<button id="newpl_button" style="position: fixed; bottom: -50px; right: 20px; z-index: 12; transition: 0.5s" class="btn btn-lg btn-primary btn-circle"><i class="fa fa-plus"></i></button>
+
+<!-- Modal de Items de palet -->
+<div id="items_palet-content" style="z-index: 5;"></div>
+
+<!-- Notificacion de pedido sin stock o de otra ODC -->
+<div id="snackbar"><span class="glyphicon glyphicon-alert"></span> Debe seleccionar pedidos de la misma Orden de compra o que tengan stock suficiente.</div>
+
+<!-- Notificacion limite de peso en palet -->
+<div id="snackbar2" style="background-color: red; right: 1%; z-index: 5000"><span class="glyphicon glyphicon-alert"></span> ¡El palet no debe exceder los 1200 Kg!</div>
+
+<style>
+    .ch_page:hover{
+        cursor:pointer;
+        color: black;
+        font-size: 15px;
+    }
+</style>
+<script type="text/javascript">
+    //var seleccionados = [];
+    // Ej: matriz_seleccionados = [idoc,[idpedido1, idpedido2]]
+    var matriz_seleccionados = [];
+    var array_fill = [
+        "OC@default",
+        "Detalle@primary",
+        "Cliente@success"
+    ];
+    var filtros_seleccionados = [];
+    function refreshTable(){
+        $.ajax({
+            type: 'POST',
+            data: {clave: $("#buscar_pendientes").val(), orden: $(".o_cp_switch_buttons .active").data('view').split('/')[1], tipo: $("#select_tipo_despacho").val()},
+            url: '/bodega/table_pendientes',
+            beforeSend: function(){
+                $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+            },
+            success: function(data){
+                $(".main-page").html(data);
+                //Muestra la cantidad de despachos
+                $("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+            }
+        });
+    }
+    var busc = new Buscador("buscar_pendientes", ".o_searchview", array_fill, "/bodega/table_pendientes", "despachosTable", false, true, ".filters","pedido.f_entrega");
+    busc.add_cond = "pedido.cantidad > pedido.despachados";
+
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        var array_pedidos = [];
+        if(matriz_seleccionados.length != 0){
+            array_pedidos = matriz_seleccionados[1];
+            busc.extraInfo.push(matriz_seleccionados[1]);
+        }
+        if(array_pedidos.length>0){
+            //SE CONCATENAN LOS PEDIDOS EN SELECCIÓN, LUEGO SE NORMALIZA EN EL CONTROLADOR
+            busc.extraInfo.push(array_pedidos.join('-'));
+        }
+        busc.buscar_action();
+
+    });
+
+
+
+
+    function refreshTablaDespachos(yo){
+        if($(".o_cp_switch_buttons .active").data('original-title') == 'Lista' ){
+            $.ajax({
+                type: 'POST',
+                data: {clave: $("#buscar_pendientes").val(), orden: '', tipo: $("#select_tipo_despacho").val()},
+                url: '/bodega/table_pendientes',
+                beforeSend: function(){
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                },
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de despachos
+                    $("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+                }
+            });
+        }
+        else{
+            $.ajax({
+                type: 'POST',
+                data: {clave: $("#buscar_pendientes").val(), tipo: $("#select_tipo_despacho").val()},
+                url: '/bodega/item_gd',
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de despachos
+                    $("#despachos").html("<h5><small>Mostrando " + $("#registros").text() + " despacho(s)</small></h5>");
+                }
+            });
+        }
+    }
+
+
+
+
+    $('.view-option').on('click', function(e){
+        e.preventDefault();
+        $('.view-option').removeClass('active');
+        $(this).addClass('active');
+        if($(this).data('view') == 'table_pendientes'){
+            $.ajax({
+                type: 'POST',
+                data: {clave: $("#buscar_pendientes").val(), orden: 'despacho.fecha-DESC', tipo: $("#select_tipo_despacho").val()},
+                url: '/bodega/table_pendientes',
+                beforeSend: function(){
+                    $(".main-page").html("<div style='width: 100%; height:100%;text-align: center;'><img style='width: 20%;margin: 11%;' src='/loading.gif'></div>");
+                },
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de despachos
+                    $("#despachos").html("<h5><small>Mostrando " + $("#registros").text().split(" ")[0] + " despacho(s), " +$("#registros").text().split(" ")[1] + " materiales</small></h5>");
+                }
+            });
+        }
+        else if($(this).data('view') == 'item_gd'){
+            $.ajax({
+                type: 'POST',
+                data: {clave: $("#buscar_pendientes").val(), tipo: $("#select_tipo_despacho").val()},
+                url: '/bodega/'+$(this).data('view'),
+                success: function(data){
+                    $(".main-page").html(data);
+                    //Muestra la cantidad de despachos
+                    $("#despachos").html("<h5><small>Mostrando " + $("#registros").text() + " despacho(s)</small></h5>");
+                }
+            });
+        }
+
+    });
+
+
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
+
+    });
+
+
+    $("#newpl_button").on('click', function(e){
+        e.preventDefault();
+        var array_pedidos = [];
+        if(matriz_seleccionados.length != 0){
+            array_pedidos = matriz_seleccionados[1];
+        }
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/get_session_peds/' + array_pedidos.join('-'),
+            success: function(data){
+                $("#newPLModal-content").html(data);
+                $("#newPLModal").modal('show');
+            }
+        });
+    });
+
+    $(".pill-vista").on('click', function(e){
+        e.preventDefault();
+        if(!$(this).hasClass('active')){
+            $('.pill-vista').removeClass('active');
+            $(this).addClass('active');
+            render_view($(this).data('name'));
+        }
+    });
+
+
+
+    function render_view(clase){
+        if(clase == 'pedido-view'){
+            $.ajax({
+                type: 'GET',
+                url: '/bodega/view_pendientes',
+                beforeSend: function(){
+                    destroyDataTable();
+                    $("#page-wrapper").css('display', 'none');
+                },
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                    $("#page-wrapper").fadeIn();
+
+                }
+            });
+        }
+        else if(clase == 'palets-view'){
+            $.ajax({
+                type: 'GET',
+                url: '/bodega/view_palets',
+                beforeSend: function(){
+                    destroyDataTable();
+                    $("#page-wrapper").css('display', 'none');
+                },
+                success: function(data){
+                    $("#page-wrapper").html(data);
+                    $("#page-wrapper").fadeIn();
+                }
+            });
+        }
+        else{
+            alert("NO");
+        }
+    }
+
+    // Notificaciones
+    function notification_pendientes() {
+        var x = document.getElementById("snackbar");
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+    function notification_limite_palet() {
+        var x = document.getElementById("snackbar2");
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
+</script>
+
+
+<script src="/buscador_funciones.js"></script>

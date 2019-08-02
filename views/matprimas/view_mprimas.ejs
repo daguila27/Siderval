@@ -1,0 +1,127 @@
+
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
+            <li class="active">Stock de Bodega de Materiales e Insumos</li>
+            <div style="display: flex;">
+                <div id="indicador_paginas" data-total="0" style="margin-right: 3px"></div>
+            </div>
+        </ol>
+        <div style="width: 50%;">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+            </div>
+            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
+                <div class="date-fill" style="display: flex;">
+
+                </div>
+            </div>
+            <div class="form-group pull-right filtro_estado" style="width: 100%; margin-top: 10px; display: flex; padding-left: 30%">
+                <div style="display: flex; width: 70%;">
+                    <label class="checkbox-inline checkmaterial"><input onchange="changeTipoProducto();busc.buscar_action()" checked="true" type="checkbox" value="table_query.codigo LIKE 'I%'">Insumos</label>
+                    <label class="checkbox-inline checkmaterial"><input onchange="changeTipoProducto();busc.buscar_action()" checked="true" type="checkbox" value="table_query.codigo LIKE 'M%'">Materiales</label>
+                    <label class="checkbox-inline checkmaterial"><input onchange="changeTipoProducto();busc.buscar_action()" checked="true" type="checkbox" value="table_query.codigo LIKE 'O%'">Otros</label>
+                </div>
+                <select class="form-control" id="filtro_estado" style="width: 30%">
+                    <option value="true" selected>Todos</option>
+                    <option value="(table_query.stock<=table_query.stock_c)">Crítico</option>
+                    <option value="(table_query.stock<=table_query.stock_i and table_query.stock>table_query.stock_c)">Aviso</option>
+                    <option value="(table_query.stock>table_query.stock_i)">Abastecido</option>
+
+                </select>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+
+<style>
+    .ch_page:hover{
+        cursor:pointer;
+        color: black;
+        font-size: 15px;
+    }
+</style>
+<script type="text/javascript">
+
+    function changeTipoProducto(){
+        var t = [];
+        $(".checkmaterial input").each(function(){
+            if($(this).prop('checked') === true){
+                t.push($(this).val());
+            }
+        });
+        if(t.length>0){
+            t = "("+t.join(' OR ')+")";
+        }else{t="true ";}
+        busc.add_cond = "((table_query.show_mp is true) and "+$("#filtro_estado").val()+") AND "+t;
+    }
+
+
+    var array_fill = [
+        "Detalle@success",
+        "Unidad@warning",
+        "Proveedor@info"
+    ];
+    var busc = new Buscador("buscar_mprimas", ".o_searchview", array_fill, "/matprimas/table_mprimas", "tablaStock", false, false, '', '', 'Mostrando%Sitem');
+
+    //busc.add_cond = "(table_query.show_mp is true)";
+    changeTipoProducto();
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        busc.buscar_action();
+    });
+    //PARA QUE EL FILTRO NO SE CIERRE AL SELECCIONAR ALGUNA OPCION
+    $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+
+    $("#filtro_estado").on('change', function(e){
+        e.preventDefault();
+        changeTipoProducto();
+        //busc.add_cond = "((table_query.show_mp is true) and "+$(this).val()+")";
+        busc.buscar_action();
+    });
+
+    $('.view-option').on('click', function(e){
+        e.preventDefault();
+        $('.view-option').removeClass('active');
+        $(this).addClass('active');
+        if($(this).data('view') == 'table_movimientos'){
+            $.ajax({
+                type: 'POST',
+                data: {orden: 'movimiento_detalle.idmovimiento-DESC', clave: $("#buscar_movimiento").val()},
+                url: '/matprimas/table_movimientos',
+                success: function(data){
+                    $(".main-page").html(data);
+                }
+            });
+        }
+
+    });
+
+    function fill_oda_cc(yo){
+        $('.dropdown.open .dropdown_btn_ccfill').dropdown('toggle');
+    }
+
+    function change_mulselected(yo){
+        var beforeCheck = $(yo).data('allbeforecheck');
+        if($("#all_option_cc").is(':selected') && !beforeCheck){
+            $(yo).data('allbeforecheck', 1);
+            $(".option_multiple_select").prop("selected", true);
+        }
+        else if(!$("#all_option_cc").is(':selected')){
+            $(yo).data('allbeforecheck', 0);
+        }
+    }
+
+
+
+</script>
+<script src="/buscador_funciones.js"></script>

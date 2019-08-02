@@ -2,19 +2,11 @@ var express = require('express');
 var router = express.Router();
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
-
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
 router.use(
 
-    connection(mysql,{
-
-        host: '127.0.0.1',
-        user: 'user',
-        password : '1234',
-        port : 3306,
-        database:'siderval',
-        insecureAuth : true
-
-    },'pool')
+    connection(mysql,dbCredentials,'pool')
 
 );
 
@@ -23,7 +15,6 @@ router.use(
 router.get('/', function(req, res, next) {
   res.render('login');
 });
-
 router.post('/handler', function(req,res){
     var input = JSON.parse(JSON.stringify(req.body));
 
@@ -61,8 +52,6 @@ router.post('/handler', function(req,res){
 
         //console.log(query.sql);
     });
-
-
 });
 router.post('/handler_faena', function(req,res){
     var input = JSON.parse(JSON.stringify(req.body));
@@ -70,7 +59,7 @@ router.post('/handler_faena', function(req,res){
     var username = input.username;
     var password = input.password;
     var etapa = input.etapa;
-    var pin = input.pin
+    var pin = input.pin;
     console.log(input);
     req.getConnection(function(err,connection){
         if(err)
@@ -86,6 +75,10 @@ router.post('/handler_faena', function(req,res){
             }
 
             if(rows.length == 1){
+                console.log("PIN");
+                console.log(pin);
+                console.log("ETAPA");
+                console.log(etapa);
                 connection.query("SELECT * FROM etapaFaena WHERE pin = ? AND value = ?", [pin, etapa], function(err, proc){
                     if(err)
                         console.log("Error Selecting : %s", err);

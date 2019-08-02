@@ -16,7 +16,9 @@ for(var t=0; t < data.length; t++ ){%>
       		<div class="dropdown" style="position: absolute; top: 15px; right: 30px;">
       		  <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
       		  <ul class="dropdown-menu dropdown-menu-right">
-          		<li><a class="editClient" data-idcl="<%=data[t].idcliente%>">Editar</a></li>
+              <%if(user.nombre != 'siderval'){%>
+          		  <li><a class="editClient" data-idcl="<%=data[t].idcliente%>">Editar</a></li>
+              <%}%>
     			    <li><a class="odcClient" data-idcl="<%=data[t].idcliente%>">Ver Ordenes de Compra</a></li>
     			  </ul>
           </div>

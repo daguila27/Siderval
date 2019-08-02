@@ -1,5 +1,5 @@
-<div class="row" style=" margin: 0 ;padding-top: 3%; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
-<h1 class="page-header" style="margin: 0; padding-top: 5%">Malla de clientes:</h1>
+<div class="row" style=" margin: 0 ; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
+<h1 class="page-header" style="margin: 0; padding-top: 3%">Malla de clientes:</h1>
 
 	
 
@@ -18,8 +18,10 @@
 		        </ul>
 		    </nav>
 	  	</div>
-
+	  	<%if(user.nombre != 'siderval'){%>
 	  	<button style="position: fixed; z-index: 5; bottom: 50px;right: 50px;box-shadow: 7px 5px 10px #888888;" class="btn btn-success btn-circle btn-lg" data-toggle="modal" data-target="#newCliente"><i class="glyphicon glyphicon-plus"></i></button>
+	  	<%}%>
+
 	  	<div class="pagina">
 	  		<!-- No borrar este div -->
 	  	</div>

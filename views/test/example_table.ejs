@@ -1,0 +1,16 @@
+<thead>
+<tr>
+    <th>Código</th>
+    <th>Detalle</th>
+    <th>Unidad</th>
+</tr>
+</thead>
+<tbody>
+<%for(var e = 0 ; e < datos.length; e++){%>
+    <tr>
+        <td><%= datos[e].codigo%></td>
+        <td><%= datos[e].detalle%></td>
+        <td><%= datos[e].unidad%></td>
+    </tr>
+<%}%>
+</tbody>

@@ -86,7 +86,7 @@
                     <th>Aleación</th>
                     <th>Fecha de Entrega</th>
                     <th>Cantidad</th>
-                    <th>Stock</th>
+                    <th>Stock Disponible</th>
                     <th>Precio Unitario</th>
                     <th>Bloquear</th>
                     <th></th>
@@ -102,6 +102,7 @@
                     if(data['idm[]']){
                         var fabricacion = '';
                         var color = '';
+                        console.log(data);
                         for(var e=0; e < data['idm[]'].length; e++){
                             if(data['prov[]'][e] == '-1'){
                                 fabricacion = 'Interna';
@@ -113,12 +114,12 @@
                             }
                         %>                
                         <tr class="<%= color%>">
-                            <td><%=data['dets[]'][e]%><input type="hidden" name="idm" value="<%=data['idm[]'][e]%>"><input type="hidden" name="idp" value="<%=data['idp[]'][e]%>"></td>
+                            <td><%=data['dets[]'][e]%><input type="hidden" name="idm" value="<%=data['idm[]'][e]%>"><input type="hidden" name="idp" value="<%=data['idp[]'][e]%>"><input type='hidden' name='disp' value="<%= data['stock[]'][e]%>"></td>
                             <td><strong><%=fabricacion%></strong></td>
                             <td><input type="text" value="<%=data['prov[]'][e]%>" name="prov" style="display:none;"> <%=data['alea[]'][e]%></td>
                             <td style="padding: 3px"><input type="date" name="fechas" class="form-control" min="<%= new Date().toLocaleDateString()%>" required="" value="<%= data['fechas[]'][e]%>"></td>
                             <td style="width: 12%; padding: 3px"><input class="form-control" type="number" name="cants" min="1" required="" value="<%= data['cants[]'][e]%>"></td>
-                            <td class="parsear_nro"><%= data['stock[]'][e]%></td>
+                            <td class="parsear_nro" data-cs="0" style="text-align: center"><%= data['stock[]'][e]%></td>
                             <td style="width: 12%; padding: 3px"><input type="number" name="precio" class="form-control" min="0" placeholder="Precio" value="<%= data['precio[]'][e]%>"></td>
                             <td style="text-align: center; padding: 5px"><input class="form-control" style="margin-left: 30%; width: 20px; height: 20px;" type="checkbox" name="lock"></td>
                             <td><a onclick="drop(this)" class="btn btn-danger btn-xs"><i class="fa fa-remove"></i></a></td>
@@ -142,7 +143,7 @@
     </div>
 
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js""></script>
+<script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
     $(document).ready(function(){
@@ -219,7 +220,8 @@
             factor_item: $("input[name='factor_item']:checked").val(),
             prov: [],
             precio: [],
-            lock: []
+            lock: [],
+            disp: []
         }
         for(var i =0;i<$(this).serializeArray().length;i++){
             if(lista[i].name != 'nroordenfabricacion'){
@@ -243,8 +245,7 @@
            }
            //console.log($(this).val());
         });
-        console.log(data);
-        if(confirm("¿Esta seguro que desea crear la OC?")){
+        if(confirm("¿Esta seguro que desea crear la OC?.\n Se creará una OF con los productos que se necesitan fabricar.")){
             $.ajax({
                 type: 'POST',
                 data: data,

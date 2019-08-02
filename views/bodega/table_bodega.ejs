@@ -1,0 +1,96 @@
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"><%= data.length %></div>
+
+<table id="DataTableBodega" class="o_list_view table table-condensed table-striped" style="width: 100%; margin-top: 0 !important;">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Detalle</th>
+            <th>En Planta</th>
+            <th>Stock</th>
+            <% if( tipo == 'inv'){%>
+                <th>Inventario</th>
+            <%}%>
+            <th>Stock Aviso</th>
+            <th>Stock Crítico</th>
+            <% if( tipo == 'inv'){%>
+                <th>Diferencias</th>
+            <%}%>
+
+        </tr>
+    </thead>
+    <tbody class="ui-sortable">
+        <%for(var i=0; i < data.length; i++){
+            if(data[i].inventariados != null){
+                if(data[i].inventariados - data[i].stock == 0){%>
+                    <tr class="o_data_row success">
+                <%}else{%>
+                    <tr class="o_data_row danger">
+                <%}
+            }else{%>
+                    <tr class="o_data_row">
+            <%}%>
+                <td style="text-align: center" data-toggle="tooltip" title="Código"><%= data[i].codigo%></td>
+                <td data-toggle="tooltip" title="Detalle"><%= data[i].detalle%></td>
+                <td style="text-align: center" data-toggle="tooltip" title="En Planta"><%= data[i].enplanta%></td>
+                <td style="text-align: center" class="stock-inv" data-toggle="tooltip" title="Stock Actual" data-idmaterial="<%= data[i].idmaterial%>" data-stock="<%= data[i].stock%>"><%= data[i].stock%></td>
+                <% if( tipo == 'inv'){%>
+                    <td style="text-align: center" data-toggle="tooltip" title="Ingresar Inventario" class="inv-col">
+                        <input type="number" class="form-control" data-idmaterial="<%= data[i].idmaterial%>" value="<%= data[i].inventariados%>"
+                               onchange="$(this).parent().parent().children('.dif-inv').html( $(this).val() - $(this).parent().parent().children('.stock-inv').data('stock') ); changeStateInventario(this)"
+                               onkeyup="$(this).parent().parent().children('.dif-inv').html( $(this).val() - $(this).parent().parent().children('.stock-inv').data('stock') ); changeStateInventario(this)">
+                    </td>
+                <%}%>
+                <td style="text-align: center" data-toggle="tooltip" title="Stock Aviso"><%= data[i].stock_i%></td>
+                <td style="text-align: center" data-toggle="tooltip" title="Stock Crítico"><%= data[i].stock_c%></td>
+                <% if( tipo == 'inv'){
+                    if(data[i].inventariados != null){%>
+                        <td class="dif-inv" data-idmaterial="<%= data[i].idmaterial%>" style="text-align: center" data-toggle="tooltip" title="Diferencias" data-order="<%= data[i].inventariados - data[i].stock%>">
+                            <%= data[i].inventariados - data[i].stock%>
+                        </td>
+                    <%}else{%>
+                        <td class="dif-inv" data-idmaterial="<%= data[i].idmaterial%>" style="text-align: center" data-toggle="tooltip" title="Diferencias" data-order="0">
+                            -
+                        </td>
+                    <%}
+                }%>
+            </tr>
+        <%}%>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <% if( tipo == 'inv'){%>
+                <td></td>
+            <%}%>
+            <td></td>
+            <td></td>
+            <% if( tipo == 'inv'){%>
+                <td></td>
+            <%}%>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    setDataTableFixed("#DataTableBodega");
+
+    $("#pedidos").data('total', parseInt('<%= largoData%>'));
+    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#pedidos");
+</script>
+
+<% if( tipo == 'inv'){%>
+    <script>
+        $(".hidden-inv-buttons").removeClass('hidden');
+
+        $(".change-inv-title").html("Inventario N° <%=idinv%>");
+        idinventario = parseInt('<%=idinv%>');
+
+    </script>
+<%}%>

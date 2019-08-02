@@ -1,0 +1,238 @@
+
+
+        <!DOCTYPE html>
+    <html>
+        <head>
+
+
+             <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="description" content="">
+                <meta name="author" content="">
+
+                <title><%=page_title%></title>
+                <link rel="shortcut icon" href="/assets/img/logomin.png">
+
+
+                <!-- Bootstrap Core CSS -->
+                <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+                <!-- MetisMenu CSS -->
+                <link href="/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+                <!-- Custom CSS -->
+                <link href="/dist/css/sb-admin-2.css" rel="stylesheet">
+
+                <!-- Morris Charts CSS -->
+                <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+
+               <!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+                <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>-->
+
+
+                <link rel="stylesheet" type="text/css" href="/assets/css/jquery.dataTables.min.css">
+                <link rel="stylesheet" type="text/css" href="/assets/css/fixedHeader-dataTables.min.css">
+                <!-- jQuery -->
+                <script src="/vendor/jquery/jquery.min.js"></script>
+
+
+            <!-- Advance Table CSS-->
+                <link href="/assets/css/dataTables-bootstrap.min.css" rel="stylesheet">
+
+                <!-- Custom Fonts -->
+                <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+                <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+                <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+                <!--[if lt IE 9]>
+                 <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+                 <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+                <![endif]-->
+
+                <!-- jQuery Load -->
+                <script src="/js/jquery-3.1.1.min.js"></script>
+                <script src="/js/jquery-1.11.3.min.js"></script>
+                <script src="/js/socket.io.js"></script>
+
+                <!-- Google Fonts -->
+                <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Arimo" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Julee" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Chicle" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet">
+
+
+
+
+               <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_common.0.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.0.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.1.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
+               <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
+
+
+
+
+                   <!--[if lt IE 10]>
+                       <body class="ie9">
+                   <![endif]-->
+
+               <script type="text/javascript">
+
+               </script>
+
+        </head>
+
+
+        <body class="o_web_client">
+                
+            
+            
+            
+
+            <nav id="oe_main_menu_navbar" class="navbar navbar-inverse">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                        </div>
+            
+                    <div class="navbar-collapse collapse">
+                                    
+                        <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
+                        
+                            <li>
+                                    
+                            
+                                <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    <!--Debates-->
+                                </span>
+                                </a>
+                    
+                            <li>
+                        
+                            <li>
+                                    
+                        
+                            <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    
+                                </span>
+                            </a>
+                    
+                            </li>
+                        
+                        
+                        </ul>
+
+                        <%function show_user(usename){
+                            if(username == 'bodega'){
+                                return "Bodega Productos Terminados";
+                            }
+                        }%>
+
+                        <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
+                                <li>
+                                    <div style="font-family: 'Lobster'; font-size: 15px; color: white;">Bienvenido <%=show_user(username)%></div>
+                                </li>
+                                <li>
+                                    <div><a href="../user/log_out">Cerrar sesión</a></div>
+                                </li>   
+                        </ul>
+
+                        <!--<ul class="nav navbar-nav navbar-right oe_user_menu_placeholder"></ul>
+                        <ul class="nav navbar-nav navbar-right oe_systray"></ul>-->
+
+
+                        <ul class="nav navbar-right o_mail_navbar_item open">
+                            <li class="dropdown">
+                                <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
+                                    <i class="fa fa-envelope fa-fw"></i>
+                                    <i class="fa fa-caret-down"></i>
+                                    <span class="badge badge-notificaciones"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
+                                    
+                                </ul>
+                            </li>
+                        </ul> 
+
+
+                    
+                    </div>
+            </nav>
+
+
+
+
+            <div class="o_main">
+                <div class="o_sub_menu">
+                    <a class="o_sub_menu_logo" href="/web" style="background-color: white">
+                        <img src="/assets/img/logo.png" style="margin: 0; padding: 0;">
+                    </a>
+                    <div class="o_sub_menu_content">
+                            
+                        <style type="text/css">
+                            .oe_secondary_menu_section{
+                                margin-top: 5px;
+                            }
+                            
+                        </style>
+                        <div class="oe_secondary_menu">
+                            <div class="oe_secondary_menu_section">
+                                Despachos
+                            </div>
+                            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                                <li class="active" onclick="ajax(this)" data-link="/bodega/crear_gdd" id="view_movimientos">
+                                    <a class="oe_menu_leaf active">
+                                        <span class="oe_menu_text">
+                                            Crear Guía de Despacho
+                                        </span>
+                                    </a>
+                                </li>
+                               <li  onclick="ajax(this)" data-link="/bodega/view_despachos">
+                                    <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Ver Guías
+                                        </span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                                        
+                        </div>
+
+                        <div class="oe_secondary_menu_section">
+                            Stock
+                        </div>
+
+                        <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                            <li onclick="ajax(this)" data-link="/bodega/show_stock">
+                                <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Materias Primas
+                                        </span>
+                                </a>
+                            </li>
+                           <li onclick="ajax(this)" data-link="/bodega/view_pendientes">
+                                <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Pendientes
+                                        </span>
+                                </a>
+                            </li>
+                        </ul>
+
+                
+                    </div>
+
+                </div>
+                    <div id="wrapper" style="background-color: white; overflow-x: hidden">
+                        <div id="page-wrapper"  style="padding:0;margin: 0; overflow-x: hidden">
+                          
+

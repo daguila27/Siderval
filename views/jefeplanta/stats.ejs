@@ -1,0 +1,123 @@
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+<div style="margin: 10px">
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <div class="panel panel-primary">
+                <div class="panel-heading">Despachos</div>
+                <div class="panel-body" id="despachos_chart" style="height: 400px">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10" style="display: flex;">
+            <div class="panel panel-primary" style="width: 50%;">
+                <div class="panel-heading">Liberaciones desde Tratamiento Térmico (kg):</div>
+                <div class="panel-body" style="height: 400px;">
+                    <div id="produccion_tto">
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-primary" style="width: 50%;">
+                <div class="panel-heading">Liberaciones desde Terminación (kg):</div>
+                <div class="panel-body" style="height: 400px;">
+                    <div id="produccion_ter">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--<ul class="col-md-offset-2 col-md-10 nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#home">Tratamiento Térmico</a></li>
+            <li><a data-toggle="tab" href="#menu1">Terminacion</a></li>
+        </ul>
+        <div class="col-md-offset-1 col-md-10 tab-content">
+            <div id="home" class="tab-pane fade in active panel panel-primary">
+                    <div class="panel-heading">Liberaciones Tratamiento Térmico</div>
+                    <div class="panel-body" id="produccion_tto" style="height: 400px">
+                    </div>
+            </div>
+            <div id="menu1" class="tab-pane fade panel panel-primary">
+                    <div class="panel-heading">Liberaciones Terminación</div>
+                    <div class="panel-body" id="produccion_ter" style="height: 400px">
+                    </div>
+            </div>
+        </div>-->
+    </div>
+</div>
+<script type="text/javascript">
+    function parseNumero(x){
+        var parts = x.toString().split(".");
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        if(parts.length > 1){
+            if(parts[1].length > 2){
+                parts[1] = parts[1].substring(0,2);
+            }
+        }
+        var num =  parts.join(",");
+        return num;
+    }
+    new Morris.Line({
+        // ID of the element in which to draw the chart.
+        element: 'despachos_chart',
+        // Chart data records -- each entry in this array corresponds to a point on
+        // the chart.
+        data: [
+            <% if(data.length){
+                for(var i = 0;i<data.length;i++){%>
+            {
+                fecha:'<%=data[i].fecha%>',
+                peso: <%=data[i].peso%>,
+                cantidad: <%= data[i].cantidad%>
+            }
+            <% if(i != data.length -1){%>
+            ,
+            <%}%>
+            <%  }
+               }%>
+        ],
+        // The name of the data record attribute that contains x-values.
+        xkey: 'fecha',
+        // A list of names of data record attributes that contain y-values.
+        ykeys: ['peso'],
+        // Labels for the ykeys -- will be displayed when you hover over the
+        // chart.
+        labels: ['Peso Total'],
+        smooth: false,
+        hoverCallback:function(index,option,content,row){
+            console.log(row);
+            var html ="<ul><li><b>Guía Emitidas:</b>" +
+                    parseNumero(row.cantidad) +
+                "</li><li><b>Mes:</b> " +
+                    [row.fecha.split("-")[1],row.fecha.split("-")[0]].join('-') +
+                "</li><li><b>Peso:</b>" +
+                    parseNumero(row.peso) + " kg" +
+                "</li></ul>";
+            return html;
+        },
+        postUnits: 'Kg'
+    });
+    new Morris.Donut({
+        element: 'produccion_tto',
+        data: [
+            <%for(var q=0; q < tto.length; q++){%>
+                {label: '<%= tto[q].etapa%>', value: parseInt('<%= tto[q].enviados%>')}
+                <%if(tto.length > q-1){%>
+                    ,
+                <%}%>
+            <%}%>
+        ]
+    });
+    new Morris.Donut({
+        element: 'produccion_ter',
+        data: [
+            <%for(var q=0; q < ter.length; q++){%>
+                {label: '<%= ter[q].etapa%>', value: parseInt('<%= ter[q].enviados%>')}
+                <%if(ter.length > q-1){%>
+                ,
+                <%}%>
+            <%}%>
+        ]
+    });
+</script>

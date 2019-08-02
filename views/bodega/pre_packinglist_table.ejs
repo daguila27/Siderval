@@ -1,0 +1,144 @@
+
+<!-- Modal content-->
+<div class="modal-content">
+    <form id="PL_form2">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Crear Packing List</h4>
+        </div>
+        <div class="modal-body" id="newPLModal-body" style="padding: 0">
+            <table id="palet_list_table" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;top: -7px">
+                <thead>
+                <tr>
+                    <th class="o_column_sortable" style="text-align: center">#Palet</th>
+                    <th class="o_column_sortable" style="text-align: center">Peso Palet</th>
+                    <th class="o_column_sortable">Entrega</th>
+                    <th class="o_column_sortable"></th>
+                </tr>
+                </thead>
+                <tbody class="ui-sortable">
+                <%
+                var pesototal = 0;
+                for(var i=0; i < xdesp.length; i++){
+                    pesototal += xdesp[i].peso_palet;
+                %>
+                <tr class="o_data_row pedido_preparar" data-idpalet="<%=xdesp[i].idpalet%>">
+                    <input type="hidden" value="<%=xdesp[i].idpalet%>" name="idpalet">
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=xdesp[i].idpalet%></td>
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier pesopalet" data-peso="<%=xdesp[i].peso_palet%>"><%=xdesp[i].peso_palet%></td>
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><%=new Date(xdesp[i].f_entrega).toLocaleDateString()%></td>
+                    <td style="text-align: center" class="o_data_cell o_readonly_modifier o_required_modifier"><button class="btn btn-xs btn-danger" onclick="removeItemPL(this)"><i class="fa fa-times"></i></button></td>
+                </tr>
+                <%}%>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th></th>
+                    <th style="text-align: center" class="pesototal"><%=pesototal%></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <div class="form-group">
+                <label for="idpackinglist">
+                    Número de P.L:
+                </label>
+                <input type="text" class="form-control" style="width: 20%; display: inline-block;" value="<%= idpl%>" id="idpackinglist" min="1" placeholder="# Número de Packinglist" disabled required>
+                <button type="submit" class="btn btn-primary">Crear Packing List</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="form-hidden hidden"></div>
+
+
+<script>
+    var form = [];
+    $(".pedido_preparar").each(function(){
+        form.push([$(this).data('idpalet'),$(this).children(".cantidad_preparar")]);
+    });
+
+    function removeItemPL(yo){
+        $(".select-desp[data-idpalet='" + $(yo).parent().parent().data('idpalet') +"']").toggleClass('danger');
+        $(".select-desp[data-idpalet='" + $(yo).parent().parent().data('idpalet') +"']").data('state', 'noselec');
+        seleccionados.splice(seleccionados.indexOf( $(this).data('idpalet') ), 1);
+        check_session();
+        //act_session('rm', ".select-desp[data-idpalet='" + $(yo).parent().parent().data('idpalet') +"']");
+        $(yo).parent().parent().remove();
+        refreshCount();
+        var peso = 0;
+        $(".pesopalet").each(function(){
+            peso += parseFloat($(this).data('peso'));
+        });
+        $(".pesototal").html(peso);
+
+    }
+
+    $("form#PL_form2").submit(function(e){
+        e.preventDefault();
+        var object = {
+            idpalet: []
+        };
+        var array = $( this ).serializeArray();
+        for(var t=0; t < array.length; t++){
+            object[array[t].name].push(array[t].value);
+        }
+        console.log(object.idpalet);
+        console.log($("#idpackinglist").val());
+        $.ajax({
+            type: 'POST',
+            data: {idpalet: object.idpalet.join('-'), idpackinglist: $("#idpackinglist").val()},
+            url: '/bodega/create_packinglist',
+            success: function(data){
+                if(data=='ok'){
+                    seleccionados = [];
+                    $(".form-hidden").html("<form method='POST' action='/plan/view_PLpdf' target='_blank'><input type='hidden' name='idoda' value='"+$("#idpackinglist").val()+"'></form>");
+
+                    $(".form-hidden form").submit();
+                    busc.buscar_action();
+                    $("#newPLModal").modal('hide');
+                } else if("error"){
+                    alert("Este número de Packinglist ya existe, ingrese uno nuevo.");
+                }
+            }
+        });
+    });
+    
+    $("#palet_list_table").DataTable( {
+        paging: false,
+        fixedColumns: true,
+        responsive: true,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    } );
+
+
+</script>

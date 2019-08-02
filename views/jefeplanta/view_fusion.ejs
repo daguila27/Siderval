@@ -1,0 +1,219 @@
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+    .etiqueta-filtro-cha:hover{
+        cursor: pointer;
+    }
+    .filters{
+        display: flex;
+    }
+</style>
+
+<%
+function getMonday(d) {
+    d = new Date(d);
+    var day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+    return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
+}
+function getSunday(d) {
+    d = new Date(d);
+    var day = d.getDay(),
+            diff = d.getDate() - day + (day == 0 ? -6:1) + 6; // adjust when day is sunday
+    return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
+}
+%>
+<div class="hidden tipovista listafusion"></div>
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+            <li class="active" style="display: flex; vertical-align: middle">
+                Seleccionar Etapa:
+                <!--          Moldeo	1
+                Tratamiento Térmico	5
+                Quiebre	3
+                Fusión	2
+                Terminación	4
+                Control de Calidad	7
+                Maestranza	6-->
+                <div class="form-group" style="margin-left: 15px;margin-bottom: 10px; display: flex;">
+                    <select class="form-control seleccionar-proceso" style="background-color: rgb(249,249,249); border-radius: 0;">
+                        <option value="1">Moldeo</option>
+                        <option value="2" selected>Fusión</option>
+                        <option value="3">Quiebre</option>
+                        <option value="4">Temrinación</option>
+                        <option value="5">Tratamiento Térmico</option>
+                        <option value="6">Maestranza</option>
+                        <option value="7">Control de Calidad</option>
+                    </select>
+                </div>
+            </li>
+            <!-- Mostrar cantidad de datos -->
+            <div id="pedidos" class="indicador_paginas" data-total="0" style="margin-top: 8px"><h5><small>Mostrando 0 pedido(s)</small></h5></div>
+        </ol>
+        <div style="width: 50%; margin-right: 4%">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+            </div>
+
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+            <!--<input type="text" id="buscar_fusion" name="" class="form-control pull-right" placeholder="Buscar...">-->
+
+            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
+                <button type="button" accesskey="l" aria-label="list" data-viewtype="list" title="" data-view='table_fusion/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                <button type="button" accesskey="2" aria-label="graph" data-viewtype="graph" title="" data-view='table_fusion/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-bar-chart view-option" data-original-title="Graph"></button>
+                <div class="filters">
+                    <!--<div style="display: flex">
+                        <label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
+                        <input type="checkbox" id="pend" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px" onchange="buscar_despachositem()">
+                    </div>-->
+                    <div class="dropdown date-fill" style="margin-left: 15px">
+
+                    </div>
+                    <h5 style="margin-left: 10px" class="indicator-of-check indicador_busqueda"><small>Mostrando Fusiones de este Mes</small></h5>
+                    <div class="form-group pull-right filtro_graph hidden" style="margin-left: 15px; display: flex;">
+                        <label for="filtro_graph">Filtro por:</label>
+                        <select class="form-control" id="filtro_graph" onchange="busc.buscar_action()">
+                            <option value="cliente" selected>Cliente</option>
+                            <option value="producto">Producto</option>
+                            <option value="of">Orden de Fabricación (OF)</option>
+                        </select>
+
+                        <div class="radio option_graph" style="margin-left: 10px;margin-top: 0">
+                            <label><input type="radio" name="optdata" value="pi" checked>Piezas Procesadas</label>
+                            <label><input type="radio" name="optdata" value="kg">Kilos Procesados</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var array_fill = [
+        "OF@default",
+        "Descripción@primary",
+        "Cliente@success"
+    ];
+    var busc = new Buscador("buscar_fusion", ".o_searchview", array_fill, "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val(), "DataTableFabs", false, true, ".date-fill","produccion_history.fecha");
+    busc.add_cond = "";
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        $(".setdates-buttons.mes").click();
+    });
+
+
+    $(".seleccionar-proceso").on('change', function(e){
+       e.preventDefault();
+       busc.url = "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val();
+       busc.buscar_action();
+    });
+
+
+    function buscar_stats(){
+        busc.add_cond = "";
+    }
+
+
+    $(".getcsvof").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/jefeplanta/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
+
+    });
+
+
+    $('.option_graph').change(function() {
+        busc.extraInfo = [$(this).val()];
+        busc.buscar_action();
+    });
+    $("#filtro_graph").on('change', function(e){
+        e.preventDefault();
+        busc.url = "/jefeplanta/stats_fusion/"+$(this).val()+"/"+$(".seleccionar-proceso").val();
+        busc.buscar_action();
+    });
+
+    $(".view-option").on('click', function(e){
+        e.preventDefault();
+        $(".view-option").removeClass('active');
+        $(this).addClass('active');
+
+        if($(this).data("viewtype") === "graph" ){
+            busc.extraInfo = ["pi"];
+            busc.url = "/jefeplanta/stats_fusion/cliente/"+$(".seleccionar-proceso").val();
+            $(".filtro_graph").removeClass('hidden');
+        }
+        else{
+            busc.url = "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val();
+            $(".filtro_graph").addClass('hidden');
+        }
+        busc.buscar_action();
+    });
+
+
+    function getRidOffAutocomplete(){
+        var timer = window.setTimeout( function(){
+            $('#buscar_fusion-value, #buscar_fusion').prop('disabled',false);
+            clearTimeout(timer);
+        }, 800);
+    }
+
+    // Invoke the function
+    getRidOffAutocomplete();
+
+</script>
+
+
+<script src="/buscador_funciones.js"></script>

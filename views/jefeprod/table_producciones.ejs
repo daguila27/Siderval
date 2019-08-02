@@ -11,61 +11,111 @@ function fechaLatino(string){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"></div>
 
-<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin:0; padding: 0;width: 100%;">
+<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
     <thead>
-    <tr>
-        <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="N° OF" style="text-align: center">N° OP</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="N° OF" style="text-align: center">N° OF</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-        <!--<th data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center">Abastecidos</th>-->
-        <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">MOL</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center">FUS</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center">QUI</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center">TER</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" style="text-align: center">BPT</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">Rch</th>
-        <th class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center">TRA</th>
-    </tr>
+        <tr>
+            <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="N° OP" style="text-align: center">N° OP</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="N° OF" style="text-align: center">N° OF</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">MOL</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Fusion" style="text-align: center">FUS</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Quiebre" style="text-align: center">QUI</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Terminación" style="text-align: center">TER</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">Rch</th>
+            <th class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center">TRA</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center">Creación</th>
+        </tr>
     </thead>
-    <tbody id="todosbody">
+    <tbody>
     <%
+    var to_can = 0;
+    var to_mol = 0;
+    var to_fus = 0;
+    var to_qui = 0;
+    var to_ter = 0;
+    var to_tra = 0;
+    var to_mae = 0;
+    var to_con = 0;
+    var to_rec = 0;
     if(datalen.length){
     for(var i = 0; i< datalen.length; i++){
+            to_can += datalen[i].cantidad - datalen[i]['8'];
+            to_mol += datalen[i]['1'];
+            to_fus += datalen[i]['2'];
+            to_qui += datalen[i]['3'];
+            to_ter += datalen[i]['4'];
+            to_tra += datalen[i]['5'];
+            to_mae += datalen[i]['6'];
+            to_con += datalen[i]['7'];
+            to_rec += datalen[i].standby;
     %>
     <tr>
         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
-        <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].idordenproduccion %></td>
-        <td  style="text-align: center; cursor: default; align-content: center;" title="OP N°" data-content="<%= datalen[i].tok%>" data-toggle="popover" data-placement="top"><%= datalen[i].numordenfabricacion %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad %></td>
-        <!--<td data-toggle="tooltip" data-placement="bottom" title="Abastecidos" style="text-align: center"><%= datalen[i].abastecidos %></td>-->
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= datalen[i]['4'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Producto Terminado" id="prod<%=datalen[i].idproduccion%>-8" style="text-align: center"><%= datalen[i]['8'] %></td>
-        <td class="parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
-        <td class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
+        <td style="text-align: center"><%= datalen[i].idordenproduccion %></td>
+        <td style="text-align: center"><%= datalen[i].numordenfabricacion %></td>
+        <td data-cs="0" class="col-can parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] %></td>
+        <td data-cs="0" class="col-mol parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
+        <td data-cs="0" class="col-fus parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
+        <td data-cs="0" class="col-qui parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
+        <td data-cs="0" class="col-ter parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Terminación" id="prod<%=datalen[i].idproduccion%>-4" style="text-align: center"><%= datalen[i]['4'] %></td>
+        <td data-cs="0" class="col-tra parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
+        <td data-cs="0" class="col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
+        <td data-cs="0" class="col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
+        <td data-cs="0" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
+        <td data-cs="0" class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
+        <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center" data-order="<%=new Date(datalen[i].creacion).getTime()%>"><%= new Date(datalen[i].creacion).toLocaleDateString() %></td>
     </tr>
     <%  }
     } else {
     %>
-        <tr><td>No hay nada por producir</td></tr>
-    <%
-    }
-    %>
+
+    <tr>
+        <td>No hay nada por producir</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <%}%>
     </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_can%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_mol%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_fus%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_qui%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_ter%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_tra%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_mae%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_con%></td>
+            <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_rec%></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tfoot>
 </table>
 
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableMain("#prodTable");
+        setDataTableFixed("#prodTable");
+
+
 </script>

@@ -28,6 +28,14 @@
 		}
 
 	}
+	function textoCorto(str){
+	    if(str.length > 9){
+	        return str.substring(0,6)+"...";
+		}
+		else{
+		    return str;
+		}
+	}
 %>
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
@@ -49,84 +57,98 @@
 	}
 </style>
 
-<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;font-size: 12px" id="dataTableOdoo">
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: 0px !important;" id="dataTableOdoo">
 	<thead>
 		<tr>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.idabast-ASC">N° OC</th>
-			<th class="cabecera o_column_sortable" data-order="oda.creacion-ASC">Creación</th>
-			<th class="cabecera o_column_sortable">Facturas</th>
-			<th class="cabecera o_column_sortable">Guías</th>
-			<th class="cabecera o_column_sortable" data-order="cliente.sigla-ASC" style="text-align: center ;">Proveedor</th>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.cantidad-ASC">Solicitados</th>
-			<th class="cabecera o_column_sortable" data-order="material.detalle-ASC">Detalle</th>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.recibidos-ASC">Recibidos</th>
-			<th class="cabecera o_column_sortable" data-order="abastecimiento.recibidos-ASC">Facturados</th>
-			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo-ASC">Costo</th>
-			<th class="cabecera o_column_sortable" style="text-align: center" data-order="abastecimiento.costo*abastecimiento.cantidad-ASC">Total</th>
-			<th class="cabecera o_column_sortable" style="text-align: center ;">CC</th>
-			<th class="cabecera o_column_sortable order-column" style="text-align: right;" data-order="material.u_medida-ASC">Unidad</th>
+			<th>OC</th>
+			<th>Creación</th>
+			<th>Facturas</th>
+			<th>Guías</th>
+			<th>Proveedor</th>
+			<th>Solicitados</th>
+			<th>Detalle</th>
+			<th>Recibidos</th>
+			<th>Facturados</th>
+			<th>Costo</th>
+			<th>Total</th>
+			<th>CC</th>
+			<th>Unidad</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody class="ui-sortable">
 		<%
 		var lista = [];
+		var anulados = [];
 		var gd_lista = [];
 		var lista2 = [];
 		var lista3 = [];
 		for(var i=0; i < data.length; i++){
 		    if(data[i].factura_token != null){
 				lista = data[i].factura_token.split(",");
+				anulados = data[i].fanulado_token.split(",");
 				if(lista.length > 1){
-					lista.map(function(e){
-					    lista2.push(e.split("@"));
-						return e;
-					});
-					lista = lista2;
-				} else lista[0] = lista[0].split("@");
+					for(var e=0; e < lista.length; e++){
+					    lista[e] = lista[e].split('@');
+					}
+				} else{
+				    lista[0] = lista[0].split("@");
+					anulados[0] = anulados[0];
+				}
 			} else {
 		        lista = [];
+				anulados = [];
 			}
 			if(data[i].gd_token != null){
 				gd_lista = data[i].gd_token.split(",");
 				if(gd_lista.length > 1){
-					gd_lista.map(function(e){
-						lista3.push(e.split("@"));
-						return e;
-					});
-					gd_lista = lista3;
+					for(var e=0; e < gd_lista.length; e++){
+						gd_lista[e] = gd_lista[e].split('@');
+					}
 				} else gd_lista[0] = gd_lista[0].split("@");
 			} else {
 				gd_lista = [];
 			}%>
 			<tr class="o_data_row">
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"><%=data[i].idoda%></td>
-				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" onclick="submit_form(this)" data-order="<%=new Date(data[i].creacion).getTime()%>"  style="text-align: center;" data-idoda="<%= data[i].idoda%>">
+				<td class="o_data_cell o_readonly_modifier o_required_modifier"> <button class="btn btn-xs btn-primary" onclick="submit_form(this)" data-idoda="<%= data[i].idoda%>"><%=data[i].idoda%></button></td>
+				<td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier"  data-order="<%=new Date(data[i].creacion).getTime()%>"  style="text-align: center;" data-idoda="<%= data[i].idoda%>">
 					<span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].creacion).toLocaleDateString() )%></span>
 				</td>
 				<td class="o_data_cell" style="text-align: center; width: 13%">
-					<%if(lista.length>2){
-						for(var j=0;j<2;j++){%>
-							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
-						<%}%>
+					<%if(lista.length>3){
+						for(var j=0; j<3; j++){
+							if(anulados[j] === '1'){%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-danger" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}else{%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+						<%}}%>
 					    <a class="label label-primary pull-right" type="button"  onclick="changeIcon(this)" data-toggle="collapse" data-target="#collapseFactura<%=i%>" aria-expanded="false" aria-controls="collapseFactura<%=i%>" data-state="close">
 							<i class="fa fa-arrow-down"></i>
 						</a>
 					    <div class="collapse collapseLabel" id="collapseFactura<%=i%>">
-							<%for(var j=3; j<lista.length; j++){%>
-								<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1] %>" ><%= lista[j][0]%></a>
-							<%}%>
+							<%
+							for(var j=3; j<lista.length; j++){%>
+								<%if(anulados[j] === '1'){%>
+									<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-danger" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+								<%}else{%>
+									<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%=lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}}%>
 						</div>
 					<%}else{
-					    for(var j=0; j<lista.length; j++){%>
-							<a class="label label-primary" onclick="modal_fact(this)" href="#" data-idfactura="<%= lista[j][1]%>" ><%= lista[j][0]%></a>
+					    for(var j=0; j<lista.length; j++){
+					        if(anulados[j] === '1'){%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-danger" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}else{%>
+								<a data-toggle="tooltip" title="<%=lista[j][0]%>" class="label label-primary" onclick="modal_fact(this)"  data-idfactura="<%= lista[j][1]%>" ><%= textoCorto(lista[j][0])%></a>
+							<%}%>
 						<%}
 					}%>
 				</td>
 				<td class="o_data_cell" style="text-align: center; width: 13%">
-					<%if(gd_lista.length>2){
-						for(var j=0;j<2;j++){%>
-							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" >
-								<%= gd_lista[j][0]%>
+					<%if(gd_lista.length>3){
+						for(var j=0;j<3;j++){%>
+							<a data-toggle="tooltip" title="<%=gd_lista[j][0]%>" class="label label-success" onclick="modal_guia(this)"  data-idgd="<%= gd_lista[j][1] %>" >
+								<%= textoCorto(gd_lista[j][0])%>
 							</a>
 						<%}%>
 							<a class="label label-success pull-right" type="button" onclick="changeIcon(this)" data-toggle="collapse" data-target="#collapseExample<%= i%>" aria-expanded="false" aria-controls="collapseExample" data-state="close">
@@ -134,28 +156,50 @@
 							</a>
 							<div class="collapse collapseLabel" id="collapseExample<%= i%>">
 								<%for(var j=3; j<gd_lista.length; j++){%>
-									<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" ><%= gd_lista[j][0]%></a>
+									<a data-toggle="tooltip" title="<%=gd_lista[j][0]%>" class="label label-success" onclick="modal_guia(this)"  data-idgd="<%= gd_lista[j][1] %>" ><%= textoCorto(gd_lista[j][0])%></a>
 								<%}%>
 							</div>
 					<%}else{
 						for(var j=0; j<gd_lista.length; j++){%>
-							<a class="label label-success" onclick="modal_guia(this)" href="#" data-idgd="<%= gd_lista[j][1] %>" ><%= gd_lista[j][0]%></a>
+							<a data-toggle="tooltip" title="<%=gd_lista[j][0]%>" class="label label-success" onclick="modal_guia(this)"  data-idgd="<%= gd_lista[j][1] %>" ><%= textoCorto(gd_lista[j][0])%></a>
 					<%}
 					}%>
 				</td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].sigla)%>" style="text-align: center;"><%=truncateWord(textFormat( data[i].sigla),10)%></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].cantidad %></td>
-				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" data-toggle="tooltip" title="<%= data[i].detalle%>" style="white-space: nowrap;"><%= truncateWord(data[i].detalle,25)%></td>
-				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].recib %></td>
-				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].facturados %></td>
-				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= data[i].costo %></td>
-				<td class="o_data_cell parsear_nro" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)"  data-toggle="tooltip" title="<%= textFormat(data[i].cuenta)%>" style="text-align: center; white-space: nowrap"><%=truncateWord( textFormat(data[i].cuenta),7)%></td>
-				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>" onclick="submit_form(this)" style="text-align: center;"><%=data[i].u_medida%></td>
+				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>"   data-toggle="tooltip" title="<%= textFormat(data[i].sigla)%>" style="text-align: center;"><%=truncateWord(textFormat( data[i].sigla),10)%></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" data-cs="1" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= data[i].cantidad %></td>
+				<td class="o_data_cell o_readonly_modifier o_required_modifier" data-idoda="<%= data[i].idoda%>"  data-toggle="tooltip" title="<%= data[i].detalle%>" style="white-space: nowrap;"><%= truncateWord(data[i].detalle,25)%></td>
+				<td class="o_data_cell parsear_nro" data-cs="1" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= data[i].recibidos %></td>
+				<td class="o_data_cell parsear_nro" data-cs="1" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= data[i].facturados %></td>
+				<td class="o_data_cell parsear_nro" data-cs="2" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= data[i].costo %></td>
+				<td class="o_data_cell parsear_nro" data-cs="2" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%= parseInt(data[i].cantidad*data[i].costo) %></td>
+				<td class="o_data_cell cc_data_cell" data-idoda="<%= data[i].idoda%>"   data-toggle="tooltip" title="<%= textFormat(data[i].cuenta)%>" style="text-align: center; white-space: nowrap" onclick="verCCdetalle(this)" data-cuentag="<%=data[i].cuenta_g%>" data-cuenta="<%=data[i].cuenta%>" data-subcuenta="<%=data[i].subcuenta%>"><%= data[i].idccontable %></td>
+				<style>
+					.cc_data_cell:hover{
+						text-decoration-line: underline;
+						color: blue;
+					}
+				</style>
+
+				<script>
+					function verCCdetalle(yo){
+                        $("#cuenta-modal").html($(yo).data('cuentag'));
+                        $("#subcuenta-modal").html($(yo).data('cuenta'));
+                        $("#especificacion-modal").html("<b>Especificación: </b>"+$(yo).data('subcuenta'));
+                        $("#ccModalInfo").modal('show');
+					}
+
+				</script>
+				<td class="o_data_cell" data-idoda="<%= data[i].idoda%>"  style="text-align: center;"><%=data[i].u_medida%></td>
+				<td class="o_data_cell">
+					<div style="display: flex;">
+						<button class="btn btn-xs btn-primary" data-idoda="<%= data[i].idoda%>" data-numoda="<%= data[i].idoda%>" data-view="lista" onclick="setFactuNum(this)"><i class="fa fa-money"></i></button>
+						<button class="btn btn-xs btn-success" data-numoda="<%= data[i].idoda%>" data-idoda="<%= data[i].idoda%>" onclick="verPdf(this)"><i class="fa fa-file-pdf-o"></i></button>
+					</div>
+				</td>
 			</tr>
-		<%}%>
+		<%} %>
 	</tbody>
-	<tfoot>
+	<!--<tfoot>
 		<tr>
 			<td></td>
 			<td></td>
@@ -169,17 +213,21 @@
 			<td></td>
 			<td></td>
 			<td></td>
+			<td></td>
+			<td></td>
 		</tr>
-	</tfoot>
+	</tfoot>-->
 </table>
 
 
-
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js" type="text/javascript"></script>
+<script src="/assets/parsear_nro.js" type="text/javascript"></script>
 
 <script type="text/javascript">
-	function changeIcon(yo){
+    setDataTableFixed("#dataTableOdoo");
+    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#indicador_paginas");
+
+    function changeIcon(yo){
 	    if($(yo).data('state') == 'open' ){
             $(yo).children('i').removeClass('fa-arrow-up');
             $(yo).children('i').addClass('fa-arrow-down');
@@ -194,7 +242,6 @@
 	$(".collapseLabel").each(function(){
 		$(this).parent().css('width', $(this).css('width'));
 	});
-    setDataTableMain("#dataTableOdoo");
     $(document).ready(function(){
         /*$('[data-toggle="tooltip"]').tooltip({
             container: 'body'
@@ -233,9 +280,13 @@
 		$.ajax({
 			type: 'GET',
 			url: '/abastecimiento/page_oda/'+$(yo).data('idoda'),
+            beforeSend: function(){
+                destroyDataTable();
+            },
 			success: function(data){
+                ocultar_buscador();
 				$(".main-page").html(data);	
 			}
 		});
-	}
+	};
 </script>

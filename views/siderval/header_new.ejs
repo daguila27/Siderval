@@ -152,7 +152,7 @@
                         <li onclick="ajax(this)" data-link="/plan/all_prod">
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Ver Productos
+                                    Ver Stock de Productos
                                 </span>
                             </a>
                         </li>
@@ -171,7 +171,7 @@
 
                     <div class="oe_secondary_menu_section">Materias Primas</div>
                     <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                        <li onclick="ajax(this)" data-link="/faena/procesos">
+                        <li onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Materias Primas
@@ -228,22 +228,6 @@
 
                     <div class="oe_secondary_menu_section">Bodega</div>
                     <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                        
-                    </ul>
-
-                    <div class="oe_secondary_menu_section">Clientes y Proveedores</div>
-                    <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                        <li onclick="ajax(this)" data-link="/plan/all_clientes">
-                            <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Clientes y Proveedores
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <div class="oe_secondary_menu_section">Guía de Despacho</div>
-                    <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                         <li onclick="ajax(this)" data-link='bodega/view_despachos'>
                             <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
@@ -252,6 +236,44 @@
                             </a>
                         </li>
                     </ul>
+
+                    <div class="oe_secondary_menu_section">Informes</div>
+                    <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                        <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/1">
+                            <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Producción
+                                        </span>
+                            </a>
+                        </li>
+                        <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/2">
+                            <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Materias Primas e Insumos
+                                        </span>
+                            </a>
+                        </li>
+                        <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/0">
+                            <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Todos
+                                        </span>
+                            </a>
+                        </li>
+
+                    </ul>
+                    <div class="oe_secondary_menu_section">Clientes y Proveedores</div>
+                    <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                        <li onclick="ajax(this)" data-link="/plan/all_clientes">
+                            <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Ver Todos
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+
+
                 </div>
             </div>
         </div>
