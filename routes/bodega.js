@@ -1496,11 +1496,11 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                             neto += rows[j].precioPedido*rows[j].cantidad;
                             count++;
                         }
+                        sheet.mergeCells('B32:H32');
                         sheet.mergeCells('B33:H33');
-                        sheet.mergeCells('B34:H34');
-                        if(rows[0].estado == 'Traslado'){
-                            sheet.getCell('B33').value = "NO CONSTITUYE VENTA SOLO TRASLADO";
-                            sheet.getCell('B34').value = "En virtud del Art. 55 D.L. 825";
+                        if(rows[0].estado === 'Traslado'){
+                            sheet.getCell('B32').value = "NO CONSTITUYE VENTA";
+                            sheet.getCell('B33').value = "En virtud del Art. 55 D.L. 825";
                         }
                         sheet.mergeCells('C35:D35');
                         sheet.mergeCells('F35:G35');
@@ -1515,8 +1515,8 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                         sheet.getCell('H38').value = "IVA";
                         sheet.getCell('H41').value = "TOTAL";
 
-                        sheet.getCell('E33').value = "PL:";
-                        sheet.getCell('F33').value = rows[0].idpackinglist;
+                        sheet.getCell('E34').value = "PL:";
+                        sheet.getCell('F34').value = rows[0].idpackinglist;
 
                         sheet.getCell('I37').value = neto;
                         sheet.getCell('I38').value = neto*0.19;
