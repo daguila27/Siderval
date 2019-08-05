@@ -25,9 +25,10 @@ function fechaLatino(string){
             <th data-toggle="tooltip" data-placement="bottom" title="Tratamiento Termico" style="text-align: center">TTO</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Maestranza" style="text-align: center">MTR</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" style="text-align: center">CAL</th>
-            <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">Rch</th>
             <th class='info' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center">TRA</th>
-            <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center">Creación</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Bodega Productos Terminados" style="text-align: center">BPT</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Externalizados" style="text-align: center">EXT</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">RCH</th>
             <% if(user === 'jefeprod'){%>
             <th data-toggle="tooltip" data-placement="bottom" title="Anular Producción" style="text-align: center">Anular</th>
             <%}%>
@@ -44,6 +45,7 @@ function fechaLatino(string){
     var to_mae = 0;
     var to_con = 0;
     var to_rec = 0;
+    var to_ext = 0;
     if(datalen.length){
     for(var i = 0; i< datalen.length; i++){
             to_can += datalen[i].cantidad - datalen[i]['8'];
@@ -54,6 +56,7 @@ function fechaLatino(string){
             to_tra += datalen[i]['5'];
             to_mae += datalen[i]['6'];
             to_con += datalen[i]['7'];
+            to_ext += datalen[i]['e'];
             to_rec += datalen[i].standby;
     %>
     <tr class="column-prods">
@@ -68,9 +71,10 @@ function fechaLatino(string){
         <td data-cs="0" class="col-tra parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5" style="text-align: center"><%= datalen[i]['5'] %></td>
         <td data-cs="0" class="col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
         <td data-cs="0" class="col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
-        <td data-cs="0" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
         <td data-cs="0" class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
-        <td data-toggle="tooltip" data-placement="bottom" title="Fecha de Creación" style="text-align: center" data-order="<%=new Date(datalen[i].creacion).getTime()%>"><%= new Date(datalen[i].creacion).toLocaleDateString() %></td>
+        <td data-cs="0" class='col-rec parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Bodega Productos Terminados" style="text-align: center"><%=  datalen[i]['8'] %></td>
+        <td data-cs="0" class='col-rec parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Externalizados" style="text-align: center"><%=  datalen[i]['e'] %></td>
+        <td data-cs="0" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
         <% if(user === 'jefeprod' ){
             if(datalen[i].anulable){%>
             <td data-order='1' data-toggle="tooltip" data-placement="bottom" title="Anular Producción" style="text-align: center" >
@@ -89,6 +93,7 @@ function fechaLatino(string){
 
     <tr>
         <td>No hay nada por producir</td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -121,9 +126,10 @@ function fechaLatino(string){
             <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_tra%></td>
             <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_mae%></td>
             <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_con%></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_rec%></td>
-            <td></td>
-            <td></td>
             <% if(user === 'jefeprod'){%>
                 <td></td>
             <%}%>

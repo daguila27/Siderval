@@ -3,6 +3,132 @@
 </div>
 
 
+<div class="modal fade" id="rechazoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">¿Qué desea hacer? </h4>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h4 style="margin: 0; padding: 5% 5%; width: 100%; cursor: pointer;" data-toggle="collapse" data-target="#opcion1">Añadir nueva Producción a la OP</h4>
+                        <form class="form-newp">
+                            <input type="hidden" class="idProd" name="idProd">
+                            <input type="hidden" class="porReponer" name="porReponer">
+                            <div id="opcion1" class="collapse">
+                                <label>Se añadirá lo siguiente a la OP:</label>
+                                <div>
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>N° OP</th>
+                                            <th>N° OF</th>
+                                            <th>Detalle</th>
+                                            <th>Cantidad</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="new_op">
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <input type="hidden" name="etapas" value="1">
+                                <input type="hidden" class="idnotif" name="idnotif">
+                                <button type="submit" class="btn btn-primary">Crear</button>
+                            </div>
+                        </form>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 style="margin: 0; padding: 5% 5%; width: 100%; cursor: pointer;" data-toggle="collapse" data-target="#opcion2">Retornar producto a etapa previa</h4>
+                        <form class="form-newp">
+                            <input type="hidden" class="idProd" name="idProd">
+                            <input type="hidden" class="porReponer" name="porReponer">
+                            <div id="opcion2" class="form-group collapse">
+                                <label for="etapas">Seleccione Etapa:</label>
+                                <select class="form-control" name="etapas">
+                                    <%for(var t=0; t < etapas.length; t++){%>
+                                        <option value="<%= etapas[t].value%>"><%= etapas[t].nombre_etapa%></option>
+                                    <%}%>
+                                </select>
+                                <button type="submit" class="btn btn-primary" style="margin-top: 10px">Enviar</button>
+                            </div>
+                            <input type="hidden" class="idnotif" name="idnotif">
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default cerrarRechazoModal" data-dismiss="modal">Cerrar</button>
+            </div><!-- /.modal -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<div class="modal fade" id="rechazoModalExt" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"> ¡Se ha Rechazado un Producto Externalizado! </h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer panel-footer">
+                <button type="button" class="btn btn-primary" id="botonContinuarModal"
+                        data-cont="0"
+                        data-idop=""
+                        data-idp=""
+                        data-idph=""
+                        data-id=""
+                        data-cant="">Enviar</button>
+                <button type="button" class="btn btn-default cerrarRechazoModal" data-dismiss="modal">Cerrar</button>
+            </div><!-- /.modal -->
+            <script>
+                $("#botonContinuarModal").on('click', function (e) {
+                    e.preventDefault();
+                    if($(this).data('cont') === '1'){
+                        //PROCEDIMIENTO NORMAL PARA CUALQUIER RECHAZO
+                        $(".idProd").val($(this).data('idp'));
+                        $(".porReponer").val($(this).data('cant'));
+                        $(".idnotif").val($(this).data('id'));
+                        var reponer = $(this).data('cant');
+                        $.ajax({
+                            type: 'POST',
+                            data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph')},
+                            url: 'jefeprod/predict_newop',
+                            success: function(data){
+                                $("#rechazoModalExt").modal('hide');
+                                $("#rechazoModal").modal('show');
+                                $("#rechazoModal .new_op").text("");
+                                $("#rechazoModal .new_op").append("<td>"+data.newop[0].idordenproduccion+"</td><td>"+data.newop[0].numordenfabricacion+"</td><td>"+data.newop[0].detalle+"</td><td>"+reponer+"</td>");
+                            }
+                        });
+                    }else{
+                        //SE CREA LA NOTIFICACION INFORMANDO A ABASTECIMIENTO
+                        if(confirm("¿Está Seguro?")){
+                            $.ajax({
+                                type: 'POST',
+                                data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph'), coment: $("#comentRech").val()},
+                                url: 'jefeprod/save_notificacion_abastecimiento',
+                                success: function(data){
+                                    $("#rechazoModalExt").modal('hide');
+                                }
+                            });
+                        }
+                    }
+                });
+            </script>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 <style type="text/css">
     /* The snackbar - position it at the bottom and in the middle of the screen */
     #snackbar {
@@ -187,6 +313,15 @@
     io.on('notif-sol-abast', function(){
 
     });
+
+    $.ajax({
+        type: 'GET',
+        url: 'gestionpl/render_notificaciones',
+        success: function(data){
+            $(".notificaciones").html(data);
+        }
+    });
+
     $.ajax({
         type: 'GET',
         url: "/gestionpl/create_production_history",

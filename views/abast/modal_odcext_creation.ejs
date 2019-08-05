@@ -97,7 +97,7 @@ function fechaLatina(date){
                         </div>
                         <div style="width: 50%">
                             <label for="dest">Descuento (%):</label>
-                            <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" onkeyup="refreshAllCostModal()">
+                            <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" max="100" onkeyup="refreshAllCostModal()">
                             <input type="hidden" class="form-control" name='idnotif' value="<%= idnotificacion%>">
                         </div>
                     </div>

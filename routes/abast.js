@@ -825,8 +825,12 @@ router.post('/loadStateODABD', function(req,res,next){
 				                    numero = 1;
 			                    	
 			                    }
-								res.render('abast/formoda_state',{data: datos, last: numero});
-                                
+			                    connection.query("SELECT * FROM cliente", function(err, cli){
+			                    	if(err){console.log("Error Selecting : %s", err);}
+
+
+                                    res.render('abast/formoda_state',{data: datos, last: numero, cli: cli});
+                                });
                             });
                         });
              
@@ -856,9 +860,12 @@ router.post('/loadStateODABD', function(req,res,next){
 				       numero = 1;
 			       	
 			       }
-			       console.log(numero);
-                    res.render('abast/formoda_state',{data: datos, last: numero});
-                    
+                    connection.query("SELECT * FROM cliente", function(err, cli){
+                        if(err){console.log("Error Selecting : %s", err);}
+
+                    	res.render('abast/formoda_state',{data: datos, last: numero, cli: cli});
+
+                    });
                 });    
             }
         }); 
@@ -984,7 +991,7 @@ router.post('/crear_oda', function(req, res, next){
         	input.exento = 'off';
         }
         var token = input.obs+"@"+input.dest+"@"+input.plae+"@"+input.pag+"@"+input.entr+"@"+input.cuent+"@"+input.money+"@"+input.exento+"@"+input.desc;
-        var idprov = input['prov[]'].split(' - ')[0];
+        var idprov = input.cliente;
         req.getConnection(function(err,connection){
         	if(err)
         		console.log("Error Connection : %s", err);
@@ -1257,10 +1264,10 @@ router.post('/get_table_fact', function(req, res, next){
         	if(err)
         		console.log("Error Connection : %s", err);
         	// Se consigue cada fila de la OCA, acompaada del nombre del material de cada fila y la cantidad ya facturada por fila, además de la razón
-        	connection.query("select abastecimiento.idabast,abastecimiento.fd, oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
+        	connection.query("select abastecimiento.idproduccion IS NOT NULL as esExterno, abastecimiento.idabast,abastecimiento.fd, oda.idoda,cliente.sigla,cliente.razon, material.detalle, abastecimiento.cantidad,"
         		+" abastecimiento.costo,abastecimiento.recibidos, abastecimiento.costo*(abastecimiento.cantidad - SUM(COALESCE(facturacion.cantidad,0))) as odacosto,"
         		+" oda.tokenoda,SUM(COALESCE(facturacion.cantidad,0)) AS facturados from abastecimiento left join oda on oda.idoda=abastecimiento.idoda"
-        		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor" +
+        		+" left join material on material.idmaterial=abastecimiento.idmaterial left join cliente on cliente.idcliente=oda.idproveedor " +
 				" LEFT JOIN facturacion ON abastecimiento.idabast = facturacion.idabast WHERE abastecimiento.idoda = ? GROUP BY abastecimiento.idabast",[idoda],
         		function(err, oda){
         		if(err)
@@ -1280,13 +1287,13 @@ router.post('/get_table_fact', function(req, res, next){
 					}
                     res.render('abast/table_factura', {oda: oda},function(err,html){
                         if(err) console.log(err);
-                        res.send({html:html,isfacturable: isfacturable})
+                        res.send({html:html,isfacturable: isfacturable});
                     });
 				} else {
         			console.log('EMPTY');
                     res.render('abast/table_factura', {oda: []},function(err,html){
                         if(err) console.log(err);
-                        res.send({html:html,isfacturable: isfacturable})
+                        res.send({html:html,isfacturable: isfacturable});
                     });
 				}
         	});

@@ -94,7 +94,14 @@ function parsear_crl(nro){
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     if(verificar(req.session.userData)){
-        res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre});}
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err){console.log("Error Selecting : %s", err);}
+                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp});
+            });
+        });
+    }
     else{res.redirect('bad_login');}
 });
 router.post('/save_production_history_state', function(req, res, next){
@@ -114,6 +121,57 @@ router.post('/save_production_history_state', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
+
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
+router.get('/render_notificaciones', function(req, res, next){
+    req.getConnection(function(err,connection){
+        connection.query("SELECT " +
+            "notificacion.*," +
+            "material.detalle," +
+            "etapafaena.nombre_etapa " +
+            "from notificacion " +
+            "LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial " +
+            "LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value " +
+            "WHERE (SUBSTRING(notificacion.descripcion,1,3) = 'jfp' OR SUBSTRING(notificacion.descripcion,1,3) = 'idm') AND notificacion.active = true", function(err, notif){
+            if(err){console.log("Error Selecting : %s", err);}
+            var idprods = [];
+            for(var e=0; e < notif.length; e++){
+                for(var w=0; w < notif[e].descripcion.split('@')[4].split('-').length; w++){
+                    idprods.push(notif[e].descripcion.split('@')[4].split('-')[w]);
+                }
+            }
+            connection.query("SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ("+idprods.join(',')+")", function(err, ext){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                for(var e=0; e < notif.length; e++){
+                    for(var w=0; w < notif[e].descripcion.split('@')[4].split('-').length; w++){
+                        for(var q=0; q < ext.length; q++){
+                            if(ext[q].idproduccion.toString() === notif[e].descripcion.split('@')[4].split('-')[w]){
+                                //SE CREA
+                                if(notif[e].externo === undefined || !notif[e].externo){
+                                    notif[e].externo = ext[q].externo;
+                                }
+                            }
+                        }
+                    }
+                }
+                console.log("GESTIONPL notificacion");
+                console.log(notif);
+                res.render('gestionpl/notificaciones', {notif: notif});
+            });
+
+        });
+    });
+});
+
 
 router.get('/load_production_history_state', function(req, res, next){
     if(verificar(req.session.userData)){
