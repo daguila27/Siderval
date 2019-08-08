@@ -39,10 +39,7 @@ function letraMayus(string) {
                 <div class="panel-heading" style="display: flex;">
                 <div style="width: 50%">
                     <h3>Crear Guía de Despacho N° <%=num%></h3>
-
-                    <%
-                    console.log(blanco === 1);
-                    if(blanco === 1){%>
+                    <%if(blanco === 1){%>
                         <input type="hidden" name="idguia" id="idguia" value="<%=num%>">
                     <%}else{%>
                         <input type="hidden" name="idguia" id="idguia" value="0">
@@ -196,8 +193,7 @@ function letraMayus(string) {
 
                                 <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= Math.min(  data[i].cantidad - data[i].despachados, data[i].stock - data[i].pl_cantidad) %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" data-idpaletitem="0"  data-idpalet='0' class="form-control" value="1" style="width: 80px;margin: 0"></td>
                                 
-                                <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= data[i].cantidad - data[i].despachados %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" class="form-control" value="1" style="width: 80px;margin: 0"></td>
-https://github.com/daguila27/Siderval"
+                               
                                 
                                 <td id="date<%= data[i].idpedido%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
 
@@ -577,7 +573,6 @@ https://github.com/daguila27/Siderval"
         });*/
     }
 
-https://github.com/daguila27/Siderval"
 
     $("form#send_gdd").on('submit',function(e){
         e.preventDefault();
@@ -599,31 +594,14 @@ https://github.com/daguila27/Siderval"
             if(aux.length == 0){
                 conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
                 est = "Blanco";
-            } else {
+            }else{
                 conf = confirm("¿Esta seguro que desea crear esta GDD?");
             }
         }
         else{
             alert("Seleccione Cliente.");
         }
-        else{
-            pl = $(".num_pl_input input").val();
-        }
-
-        if(comprobarCliente()){
-            if(aux.length == 0){
-                conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
-                est = "Blanco";
-            } else {
-                conf = confirm("¿Esta seguro que desea crear esta GDD?");
-            }
-        }
-        /*else if(!comprobarCliente()){
-            alert("Seleccione Cliente.");
-        }*/
-        else{
-            alert("No es posible crear la GDD. \n ¡Uno de los pedidos a despachar supera el stock disponible en Bodega!");
-        }
+        
 
         if(conf){
             $.ajax({
