@@ -11,7 +11,7 @@ router.use(
 var conn = mysql.createConnection(dbCredentials);
 
 function verificar(usr){
-    if(usr.nombre == 'gestionpl'){
+    if(usr.nombre === 'gestionpl'){
         return true;
     }else{
         return false;

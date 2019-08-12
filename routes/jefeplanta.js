@@ -67,7 +67,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
     return [where, limit];
 }
 function verificar(usr){
-    if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'dt'){
+    if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'dt' || usr.nombre === 'plan'){
         return true;
     }else{
         return false;
