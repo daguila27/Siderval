@@ -8,14 +8,7 @@ router.use(
     connection(mysql,dbCredentials,'pool')
 );
 
-var conn = mysql.createConnection({
-    host: 'localhost',
-    user: 'admin',
-    password : 'tempo123',
-    port : 3306,
-    database:'siderval',
-    insecureAuth : true
-});
+var conn = mysql.createConnection(dbCredentials);
 
 function verificar(usr){
     if(usr.nombre == 'gestionpl'){
