@@ -280,6 +280,7 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
             "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial order by produccion.idproduccion ASC", [idmat], function(err, rows){
             if(err) throw err;
 
+            console.log(rows);
             /*
             * { idprod: '22725-22716-22717',
                   cantprod: '400-391-300',
