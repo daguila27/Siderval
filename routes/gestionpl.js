@@ -272,12 +272,14 @@ router.post('/save_production_history', function(req, res, next){
 
 function recursive_save_ph(idmat,env,from,to,obs, req){
     if(conn){
-        conn.query("select " +
+        var q = "select " +
             "material.detalle,material.idmaterial,group_concat(produccion.idproduccion SEPARATOR '-') as idprod, group_concat(produccion."+from+" SEPARATOR '-') as cantprod " +
             "from produccion " +
             "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
             "left join material on material.idmaterial=fabricaciones.idmaterial " +
-            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial order by produccion.idproduccion ASC", [idmat], function(err, rows){
+            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial order by produccion.idproduccion ASC";
+        console.log(q);
+        conn.query(q, [idmat], function(err, rows){
             if(err) throw err;
 
             console.log(rows);
