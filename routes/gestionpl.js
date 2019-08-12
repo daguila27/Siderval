@@ -277,9 +277,9 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
             "from produccion " +
             "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
             "left join material on material.idmaterial=fabricaciones.idmaterial " +
-            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial order by produccion.idproduccion ASC";
+            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = "+idmat+" group by material.idmaterial order by produccion.idproduccion ASC";
         console.log(q);
-        conn.query(q, [idmat], function(err, rows){
+        conn.query(q, function(err, rows){
             if(err) throw err;
 
             console.log(rows);
