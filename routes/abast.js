@@ -3520,7 +3520,7 @@ router.get('/all_proveedores', function(req, res, next){
                             if(err) console.log("Select Error: %s",err);
                         
                             //console.log(client);
-                            res.render('abast/proveedor_list',{largo: client.length});
+                            res.render('abast/proveedor_list',{largo: client.length, username: req.session.userData.username});
                 });
             });
         } else res.redirect("/bad_login");

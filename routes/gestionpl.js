@@ -148,7 +148,14 @@ router.get('/render_notificaciones', function(req, res, next){
                     idprods.push(notif[e].descripcion.split('@')[4].split('-')[w]);
                 }
             }
-            connection.query("SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ("+idprods.join(',')+")", function(err, ext){
+            var q;
+            if(idprods.length === 0){
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ('0')";
+            }else{
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ("+idprods.join(',')+")";
+            }
+            console.log(q);
+            connection.query(q, function(err, ext){
                 if(err){console.log("Error Selecting : %s", err);}
 
                 for(var e=0; e < notif.length; e++){
@@ -167,7 +174,6 @@ router.get('/render_notificaciones', function(req, res, next){
                 console.log(notif);
                 res.render('gestionpl/notificaciones', {notif: notif});
             });
-
         });
     });
 });

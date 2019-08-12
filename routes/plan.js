@@ -694,7 +694,7 @@ router.get('/all_clientes', function(req, res, next){
                     +" as queryodc on queryodc.idcliente=cliente.idcliente",
                         function (err,client){
                             if(err) console.log("Select Error: %s",err);
-                            res.render('plan/client_list',{largo: client.length, user: req.session.userData});
+                            res.render('plan/client_list',{largo: client.length, user: req.session.userData,  username: req.session.userData.username});
                 });
             });
         } else res.redirect("/bad_login");
