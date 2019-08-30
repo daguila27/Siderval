@@ -561,11 +561,12 @@ router.get('/abast_myself', function(req, res, next) {
 
 					connection.query("select subcuenta from material where subcuenta!=null or subcuenta!='' group by subcuenta", function(err, subc){
 						if(err)
-							console.log("Error Selecting : %s", err);					
+							console.log("Error Selecting : %s", err);
+
 						connection.query("select " +
 							"material.*,coalesce(caracteristica.cnom,'Sin Característica') as cnom from material " +
 							"left join caracteristica on caracteristica.idcaracteristica = SUBSTRING(material.codigo, 4, 2) " +
-							"where codigo like 'C%' or codigo like 'M%' or codigo like 'I%' or codigo like 'O%'", function(err, mats){
+                            "where codigo like 'C%' or codigo like 'M%' or codigo like 'I%' or codigo like 'O%'", function(err, mats){
                             if(err)
                                 console.log("Error Selecting : %s", err);
 							connection.query("SELECT idoda FROM oda WHERE idoda=(SELECT max(idoda) FROM oda)", function(err, id){
@@ -1080,7 +1081,8 @@ router.get('/notif_abast', function(req, res, next){
         			if(err){
         				console.log("Error Selecting : %s", err);
         			}
-					console.log(notif);
+
+
         			res.render('abast/notificaciones', {notif: notif});
 
         		});
@@ -1097,7 +1099,6 @@ router.get('/drop_notifof/:idnotif', function(req, res, next){
         			if(err){
         				console.log("Error Selecting : %s", err);
         			}
-        			//res.render('abast/notificaciones', {notif: notif});
         			res.redirect('/abastecimiento/notif_abast');
         		});
         });
@@ -1459,19 +1460,18 @@ router.get('/get_dataodc/:idodc', function(req, res, next){
         		connection.query("select idcliente, sigla,pago, razon from cliente", function(err, proveedor){
 	        		if(err){console.log("Error Selecting : %s", err);}
 	        		connection.query("SELECT odc.numoc,concat(cliente.sigla, ' - ',cliente.razon) as client ,"
-	        			+"group_concat(pedido.idpedido) as idp_token, group_concat(fabricaciones.idfabricaciones) as idf_token, group_concat(coalesce(fabricaciones.restantes,0)) as cant_token, group_concat(pedido.f_entrega) as date_token,"
-	        			+" group_concat(material.u_medida) as uni_token,group_concat(material.u_compra) as ucompra_token,group_concat(coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.')) as cc,"
+	        			+"group_concat(pedido.idpedido) as idp_token,group_concat(pedido.externo=true) as ext_ped, group_concat(pedido.bmi=true) as bmi_ped, group_concat(fabricaciones.idfabricaciones) as idf_token, group_concat(coalesce(fabricaciones.restantes,0)) as cant_token, group_concat(pedido.f_entrega) as date_token,"
+	        			+" group_concat(coalesce(material.u_medida,'und')) as uni_token,group_concat(material.u_compra) as ucompra_token,group_concat(coalesce(concat(cuenta.subcuenta,'-',material.subcuenta,'-',coalesce(subcuenta.detalle,cuenta.detalle)),'N.D.')) as cc,"
 	        			+"group_concat(material.detalle separator '@') as mat_token FROM notificacion left join odc"
 	        			+" on odc.idodc = substring_index(substring_index(notificacion.descripcion, '@', 2),'@',-1) left"
 	        			+" join pedido on pedido.idodc = odc.idodc LEFT JOIN fabricaciones ON fabricaciones.idpedido=pedido.idpedido LEFT JOIN material ON material.idmaterial = pedido.idmaterial"
 	        			+" left join cliente on odc.idcliente = cliente.idcliente LEFT JOIN subcuenta ON subcuenta.subcuenta = material.subcuenta LEFT JOIN cuenta ON cuenta.subcuenta = concat(substring(material.subcuenta, 1,2),'000') WHERE notificacion.descripcion LIKE 'aoc@%' AND"
-	        			+" pedido.externo=true AND pedido.idproveedor = 0 AND pedido.idodc=?",
+	        			+" (pedido.externo=true || pedido.bmi=true) AND pedido.idproveedor = 0 AND pedido.idodc=?",
 		        		[idodc],function(err, oda){
 		        		if(err)
 		        			console.log("Error Selecting : %s", err);
 
-
-		        		console.log(oda);
+						console.log(oda);
 		        		res.render('abast/modal_odc_creation', {data: oda, provs: proveedor, last: last[0].num + 1});
 		        	});	
 	        	});
@@ -3579,6 +3579,7 @@ router.get('/search_proveedor/:key', function(req, res, next){
 router.post('/newoc_ped', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log('/newoc_ped');
         console.log(input);
         if(input.desc == '' || input.desc == undefined){
         	input.desc = 0;
@@ -3602,66 +3603,130 @@ router.post('/newoc_ped', function(req, res, next){
         			if(err)
         				console.log("Error Selecting : %s", err);
         			
-        			connection.query("SELECT * FROM pedido "+where, function(err, mats){
+        			connection.query("SELECT pedido.*, fabricaciones.restantes FROM pedido LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido "+where, function(err, mats){
         				if(err)
         					console.log("Error Selecting : %s", err);
-        				console.log(mats);
         				var idorden = mats[0].idodc;
         				var idODC = odc.insertId;
                         var prod = [];
+                        var makeOP = false;
+						var upFabs = "UPDATE fabricaciones SET restantes = CASE ";
         				if(mats.length>0){
-		        			for(var e=0; e < mats.length; e++){
+        					//array CONTIENE LOS DATOS QUE LUEGO SE INSERTAN EN abastecimiento
+        					for(var e=0; e < mats.length; e++){
 		        				for(var w=0; w < input.idped.split("@").length; w++){
-		        					if(input.idped.split("@")[w]==mats[e].idpedido){
-		        						if(input.ex_iva.split('@')[w] == 'on'){
-		        							array.push([odc.insertId,mats[e].idmaterial,mats[e].cantidad, input.costo.split("@")[w].replace(',','.'), true, input.centroc.split('@')[w], input.idfab.split('@')[w]]);
+		        					if(parseInt(input.idped.split("@")[w]) === mats[e].idpedido){
+		        						upFabs += " WHEN fabricaciones.idfabricaciones = "+input.idfab.split('@')[w]+" THEN fabricaciones.restantes - "+input.cant_compra.split("@")[w];
+		        						if(input.ex_iva.split('@')[w] === 'on'){
+		        							array.push([odc.insertId,mats[e].idmaterial,input.cant_compra.split("@")[w], input.costo.split("@")[w].replace(',','.'), true, input.centroc.split('@')[w], input.idfab.split('@')[w],mats[e].externo]);
 		        						}
 		        						else{
-		        							array.push([odc.insertId,mats[e].idmaterial,mats[e].cantidad, input.costo.split("@")[w].replace(',','.'), false, input.centroc.split('@')[w], input.idfab.split('@')[w]]);
+                                            array.push([odc.insertId,mats[e].idmaterial,input.cant_compra.split("@")[w], input.costo.split("@")[w].replace(',','.'), false, input.centroc.split('@')[w], input.idfab.split('@')[w],mats[e].externo]);
 		        						}
-                                        //LA CANTIDAD TOTAL A PRODUCIR SE INICIA DESDE LA SEGUNDA ETAPA
-                                        //idfabricaciones  cantidad_recibida etapa2
-                                        prod.push([input.idfab.split('@')[w], mats[e].cantidad, mats[e].cantidad]);
+
+		        						//SI EL PEDIDO ES externo SE CREA PRODUCCIÓN
+		        						if(mats[e].externo){
+                                            //LA CANTIDAD TOTAL A PRODUCIR SE INICIA DESDE LA SEGUNDA ETAPA
+                                            //idfabricaciones  cantidad_recibida etapa2
+                                            prod.push([input.idfab.split('@')[w], mats[e].cantidad, mats[e].cantidad]);
+											makeOP = true;
+		        						}
 		        					}
 		        				}
 		        			}
 	        			}
-	        			console.log(array);
+	        			upFabs += " ELSE fabricaciones.restantes END " +
+                            "WHERE idfabricaciones IN ("+  input.idfab.split('@').join(',') +")";
+        				console.log(upFabs);
+	        			//EXISTEN PEDIDOS EXTERNALIZADOS, POR LO TANTO ES NECESARIO CREAR OP
+						if(makeOP){
+                            connection.query("INSERT INTO ordenproduccion() VALUES ()", function(err, inOp){
+                                if(err){console.log("Error Inserting : %s", err);}
 
-						connection.query("INSERT INTO ordenproduccion() VALUES ()", function(err, inOp){
-							if(err){console.log("Error Inserting : %s", err);}
-							for(var p=0; p < prod.length; p++){
-								prod[p].push(inOp.insertId);
-                                prod[p].push(true);
-							}
-							connection.query("INSERT INTO produccion(idfabricaciones, cantidad, `e`, idordenproduccion, externo) VALUES ?", [prod], function(err, inProd){
-								if(err){console.log("Error Inserting : %s", err);}
+                                for(var p=0; p < prod.length; p++){
+                                    prod[p].push(inOp.insertId);
+                                    prod[p].push(true);
+                                }
+                                connection.query("INSERT INTO produccion(idfabricaciones, cantidad, `e`, idordenproduccion, externo) VALUES ?", [prod], function(err, inProd){
+                                    if(err){console.log("Error Inserting : %s", err);}
 
-								for(var e=0; e < array.length; e++){
-									array[e][6] = inProd.insertId+e;
-								}
-								console.log(array);
-								connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc, idproduccion) VALUES ?", [array], function(err, ped){
-									if(err){
-										console.log("Error Selecting : %s", err);
-										res.send('error');
-									}
-									else{
-										var wh = " WHERE";
-										for(var y=0; y < input.idped.split('@').length; y++){
-											wh += " idpedido="+input.idped.split('@')[y]+" OR";
+                                    //SE INGRESA EL idproduccion A abastecimiento
+                                    var c=0;
+									for(var e=0; e < array.length; e++){
+										//SI ES EXTERNO
+                                    	if(array[e][7]){
+                                            array[e][7] = inProd.insertId+c;
+                                            c++;
 										}
-										wh = wh.substring(0,wh.length-2);
-										connection.query("UPDATE pedido SET idproveedor = ? "+wh, [odc.insertId], function(err, upData){
-											if(err){
+										//SI NO ES EXTERNO => ES BMI (no tiene producción)
+										else{
+                                            array[e][7] = null;
+										}
+                                    }
+                                    connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc, idfabricacion, idproduccion) VALUES ?", [array], function(err, ped){
+                                        if(err){
+                                            console.log("Error Selecting : %s", err);
+                                            res.send('error');
+                                        }
+                                        else{
+                                            var wh = [];
+                                            for(var y=0; y < input.idped.split('@').length; y++){
+                                                wh.push(input.idped.split('@')[y]);
+                                            }
+                                            wh = " WHERE pedido.idpedido IN ("+wh.join(',')+")";
+                                            connection.query("UPDATE pedido SET idproveedor = ? "+wh, [odc.insertId], function(err, upData){
+                                                if(err){
+                                                    console.log("Error Selecting :%s", err);
+                                                }
+
+                                                //SE ACTUALIZAN LOS restantes DE fabricaciones
+                                                connection.query(upFabs, function(err, upDataFabs){
+                                                    if(err){
+                                                        console.log("Error Selecting :%s", err);
+                                                    }
+                                                    res.send(idorden+'@'+idODC);
+                                                });
+                                            });
+                                        }
+                                    });
+                                });
+                            });
+						}
+						//NO ES NECESARIO CREAR OP
+						else{
+							console.log(array);
+                            for(var e=0; e < array.length; e++){
+                            	//SE ELIMINA ES BOOLEAN externo A array
+                                array[e][7] = null;
+                            }
+                            connection.query("INSERT INTO abastecimiento (idoda, idmaterial, cantidad, costo, exento, cc, idfabricacion, idproduccion) VALUES ?", [array], function(err, ped){
+                                if(err){
+                                    console.log("Error Selecting : %s", err);
+                                    res.send('error');
+                                }
+                                else{
+                                    var wh = [];
+                                    for(var y=0; y < input.idped.split('@').length; y++){
+                                        wh.push(input.idped.split('@')[y]);
+                                    }
+                                    wh = " WHERE pedido.idpedido IN ("+wh.join(',')+")";
+                                    connection.query("UPDATE pedido SET idproveedor = ? "+wh, [odc.insertId], function(err, upData){
+                                        if(err){
+                                            console.log("Error Selecting :%s", err);
+                                        }
+
+                                        //SE ACTUALIZAN LOS restantes DE fabricaciones
+                                        connection.query(upFabs, function(err, upDataFabs){
+                                            if(err){
                                                 console.log("Error Selecting :%s", err);
-											}
-											res.send(idorden+'@'+idODC);
-										});
-									}
-								});
-								});
-							});
+                                            }
+                                            res.send(idorden+'@'+idODC);
+                                        });
+                                    });
+                                }
+                            });
+						}
+
 						});
         	});
         });
@@ -3753,7 +3818,7 @@ router.get('/comprobar_notificaciones/:idorden', function(req, res, next){
 					+"odc.idodc = substring_index(substring_index"
 					+"(descripcion, '@', 2),'@',-1) LEFT JOIN pedido "
 					+"ON pedido.idodc = odc.idodc WHERE descripcion "
-					+"LIKE 'aoc@%' AND odc.idodc = ? AND pedido.externo=true AND pedido.idproveedor = 0",
+					+"LIKE 'aoc@%' AND odc.idodc = ? AND (pedido.externo=true OR pedido.bmi=true) AND pedido.idproveedor = 0",
 					[req.params.idorden], function(err, notif){
 					if(err)
 						console.log("Error Selecting : %s", err);
@@ -3872,5 +3937,8 @@ router.get('/visualizar_ofs', function(req, res, next) {
         });
     });
 });
+
+
+
 
 module.exports = router;

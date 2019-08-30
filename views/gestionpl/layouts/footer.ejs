@@ -3,6 +3,14 @@
 </div>
 
 
+<!-- Modal Crear GDD-->
+<div id="crearGddModal" class="modal fade" role="dialog">
+
+</div>
+
+
+
+
 <div class="modal fade" id="rechazoModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -375,4 +383,47 @@
             }
         });
     }
+
+    //FUNCION QUE RENDERIZA LA ALERTA DE NOTIFICACION EN LA ESQUINA INFERIOR DERECHA DE LA PANTALLA
+    function mostrarAlertaNotificacion(idnotif){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/render_alert_notificacion/'+idnotif,
+            success: function(data){
+                $('.notif-alert-ul').append(data);
+                setTimeout(function(){
+                    $(".notif-alert-ul li[data-idkey='idkey"+idnotif+"']").remove();
+                }, 10000);
+            }
+        });
+    }
+    //SOCKET QUE RENDERIZA LA NOTIFICACIONES
+    io.on('refreshGestionplNotif', function(idnotif){
+        $.ajax({
+            type: 'GET',
+            url: 'gestionpl/render_notificaciones',
+            success: function(data){
+                $(".notificaciones").html(data);
+                idnotif.map(function(id){
+                    mostrarAlertaNotificacion(id);
+                });
+            }
+        });
+
+    });
+
+
+    function alertAccionGDD(yo){
+        $(yo).parent().parent().parent().remove();
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/get_pedido_gdd/'+ $(yo).data('idodc') +'/'+$(yo).data('idped'),
+            success: function(data){
+                $('#crearGddModal').html(data);
+                $('#crearGddModal').modal('show');
+            }
+        });
+    }
+
+
 </script>

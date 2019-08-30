@@ -881,7 +881,7 @@
     }
 
 
-
+    //ENVIA EL FORMULARIO DEL MODAL PARA CREA OC MEDIANTE NOTIFICACIÓN
     $("#odcForm").submit(function(e){
         e.preventDefault();
         var array = $(this).serializeArray();
@@ -889,29 +889,33 @@
         var data = {};
         var idp = '';
         var idf = '';
+        var cant = '';
         var cost = '';
         var cc = '';
         var boolNull = false;
         for(var i=0; i < array.length; i++){
-            if(array[i].name == 'idpedido'){
+            if(array[i].name === 'idpedido'){
                 idp += array[i].value + '@';
                 boolNull = true;
                 //data.push(array[i].value);
             }
-            else if(array[i].name == 'idfabricaciones'){
+            else if(array[i].name === 'idfabricaciones'){
                 idf += array[i].value + '@';
                 //boolNull = true;
                 //data.push(array[i].value);
             }
-            else if(array[i].name == 'costo'){
+            else if(array[i].name === 'cant_compra'){
+                cant += array[i].value + '@';
+            }
+            else if(array[i].name === 'costo'){
                 cost += array[i].value + '@';
                 //boolNull = true;
                 //data.push(array[i].value);
             }
-            else if(array[i].name == 'centroc'){
+            else if(array[i].name === 'centroc'){
                 cc += array[i].value + '@';
             }
-            else if(array[i].name != 'hab'){
+            else if(array[i].name !== 'hab'){
                 data[array[i].name] = array[i].value;
                 //data.push(array[i].value);
             }
@@ -934,6 +938,7 @@
         cc = cc.substring(0, cc.length-1);
         data['idped'] = idp;
         data['idfab'] = idf;
+        data['cant_compra'] = cant;
         data['costo'] = cost;
         data['centroc'] = cc;
         console.log(data);

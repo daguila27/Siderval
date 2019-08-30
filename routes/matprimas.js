@@ -83,7 +83,12 @@ router.get("/crear_movimiento",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE ((codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND material.detalle != '') OR codigo in ('P02000063001','P02000063002','P01020704006' ,'P01043604003' ,'P01054104002' ,'P01043004004' ,'P01043004001' ,'P01054104007' ) GROUP BY material.detalle",function (err,materiales) {
+            connection.query("SELECT " +
+                "material.idmaterial, material.codigo, material.detalle, material.stock, material.u_medida as u_compra, COALESCE(query_reserv.reservados, 0) AS reservados " +
+                "FROM material " +
+                "LEFT JOIN (select fabricaciones.idmaterial, SUM(reservacion_detalle.cantidad) AS reservados from reservacion_detalle LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones \n" +
+                "WHERE reservacion_detalle.estado = 0 GROUP BY fabricaciones.idmaterial) AS query_reserv ON query_reserv.idmaterial = material.idmaterial " +
+                "WHERE ((codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND material.detalle != '') OR codigo in ('P02000063001','P02000063002','P01020704006' ,'P01043604003' ,'P01054104002' ,'P01043004004' ,'P01043004001' ,'P01054104007' ) GROUP BY material.detalle",function (err,materiales) {
                 if(err) console.log(err);
                 res.render("matprimas/create_retiro",{mat: materiales});
             });
@@ -95,7 +100,12 @@ router.get("/crear_movimiento_dev",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("SELECT idmaterial,codigo,detalle,stock,u_medida as u_compra FROM material WHERE ((codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND material.detalle != '') OR codigo in ('P02000063001','P02000063002','P01020704006' ,'P01043604003' ,'P01054104002' ,'P01043004004' ,'P01043004001' ,'P01054104007' ) GROUP BY material.detalle",function (err,materiales) {
+            connection.query("SELECT " +
+                "material.idmaterial, material.codigo, material.detalle, material.stock, material.u_medida as u_compra, COALESCE(query_reserv.reservados, 0) AS reservados " +
+                "FROM material " +
+                "LEFT JOIN (select fabricaciones.idmaterial, SUM(reservacion_detalle.cantidad) AS reservados from reservacion_detalle LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones \n" +
+                "WHERE reservacion_detalle.estado = 0 GROUP BY fabricaciones.idmaterial) AS query_reserv ON query_reserv.idmaterial = material.idmaterial " +
+                "WHERE ((codigo LIKE 'I%' OR codigo LIKE 'O%' OR codigo LIKE 'M%' OR tipo = 'X' OR tipo = 'S' OR tipo = 'C') AND material.detalle != '') OR codigo in ('P02000063001','P02000063002','P01020704006' ,'P01043604003' ,'P01054104002' ,'P01043004004' ,'P01043004001' ,'P01054104007' ) GROUP BY material.detalle",function (err,materiales) {
                 if(err) console.log(err);
 
                 console.log(materiales.length);
@@ -240,7 +250,7 @@ router.post('/table_registros', function(req,res,next){
                         obj = {
                             "idregistro": recep[e].idregistro,
                             "fecha": recep[e].fecha,
-                            "tipo": '2',
+                            "tipo": 2,
                             "responsable": recep[e].responsable,
                             "detalle": recep[e].detalle,
                             "u_medida": recep[e].u_medida,
@@ -314,8 +324,11 @@ router.get("/busq_oda",function(req,res,next){
         req.getConnection(function (err,connection) {
            if (err) {console.log('We got a problem dude');}
            else {
-               connection.query('SELECT abastecimiento.*, material.detalle, material.stock FROM abastecimiento '+
-                   'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial WHERE abastecimiento.cantidad > abastecimiento.recibidos AND !abastecimiento.fd',
+               connection.query('SELECT abastecimiento.*, material.detalle, COALESCE(pedido.bmi, false) AS bmi, material.stock FROM abastecimiento '+
+                   'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial ' +
+                   'LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = abastecimiento.idfabricacion ' +
+                   'LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido ' +
+                   'WHERE abastecimiento.cantidad > abastecimiento.recibidos AND !abastecimiento.fd',
                    function(err, abast) {
                    //console.log(abast);
                    res.render("matprimas/search_oda", {abast: abast});
@@ -333,9 +346,13 @@ router.post("/search_oca",function(req,res,next){
     if(req.session.userData){
         req.getConnection(function(err,connection){
             if(err) console.log(err);
-            connection.query("select oda.numoda,abastecimiento.idabast,material.idmaterial,material.detalle,coalesce(material.u_medida,'und') AS umed,abastecimiento.cantidad,abastecimiento.recibidos"
-                    + " from abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
-                    + "abastecimiento.idmaterial = material.idmaterial WHERE oda.idoda = ? and abastecimiento.recibidos < abastecimiento.cantidad group by abastecimiento.idabast",[req.body.numoda],function(err,rows){
+            connection.query("select oda.numoda,COALESCE(pedido.bmi, false) AS bmi,abastecimiento.idabast,material.idmaterial,material.detalle," +
+                "coalesce(material.u_medida,'und') AS umed,abastecimiento.cantidad,abastecimiento.recibidos"
+                    + " FROM abastecimiento left join oda on abastecimiento.idoda=oda.idoda left join material on "
+                    + "abastecimiento.idmaterial = material.idmaterial " +
+                "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = abastecimiento.idfabricacion " +
+                "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
+                "WHERE oda.idoda = ? and abastecimiento.recibidos < abastecimiento.cantidad GROUP BY abastecimiento.idabast",[req.body.numoda],function(err,rows){
                 if(err) console.log(err);
 
                 console.log(rows);
@@ -369,29 +386,54 @@ Object.size = function(obj) {
 router.post("/save_recepcion",function(req,res,next){
     if(req.session.userData){
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log(input);
         var recep = [[input.numgdd, new Date().toLocaleDateString()]];
         var recep_d = [];
-        var ids = '';
-        var idsm = '';
+        var ids = [];
+        var idsm = [];
+        var idsm_c = [];
+        var recep_bmi = [];
 
         var query = "UPDATE abastecimiento SET recibidos = CASE";
         var query2 = "UPDATE material SET stock = CASE";
-
+        console.log("here");
         for(var e=1; e < Object.size(input); e++){
             recep_d.push([0, input['detalle['+(e-1)+'][]'][0], input['detalle['+(e-1)+'][]'][1] ]);
-            ids +=  input['detalle['+(e-1)+'][]'][0]+",";
-            idsm +=  input['detalle['+(e-1)+'][]'][2]+",";
-
+            ids.push(input['detalle['+(e-1)+'][]'][0]);
+            //SE ACUMULAN LOS STOCK DE MATERIALES
+            if(idsm.indexOf(input['detalle['+(e-1)+'][]'][2]) === -1){
+                idsm.push(input['detalle['+(e-1)+'][]'][2]);
+                idsm_c.push(parseInt(input['detalle['+(e-1)+'][]'][1]));
+            }else{
+                idsm_c[idsm.indexOf(input['detalle['+(e-1)+'][]'][2])] += idsm_c[idsm.indexOf(input['detalle['+(e-1)+'][]'][2])] + parseInt(input['detalle['+(e-1)+'][]'][1]);
+            }
             query += " WHEN idabast = "+input['detalle['+(e-1)+'][]'][0]+" THEN recibidos+"+parseInt(input['detalle['+(e-1)+'][]'][1]);
-            query2 += " WHEN idmaterial = "+input['detalle['+(e-1)+'][]'][2]+" THEN stock+"+parseInt(input['detalle['+(e-1)+'][]'][1]);
-
+            //query2 += " WHEN idmaterial = "+input['detalle['+(e-1)+'][]'][2]+" THEN stock+"+parseInt(input['detalle['+(e-1)+'][]'][1]);
+            if(input['detalle['+(e-1)+'][]'][3] === '1'){
+                recep_bmi.push(input['detalle['+(e-1)+'][]'][0]);
+            }
         }
-        query += " ELSE recibidos END WHERE idabast IN ("+ids.substring(0,ids.length-1)+")";
-        query2 += " ELSE stock END WHERE idmaterial IN ("+idsm.substring(0,idsm.length-1)+")";
+        console.log("here 2");
+
+
+        for(var e=0; e < idsm.length; e++){
+            query2 += " WHEN idmaterial = "+idsm[e]+" THEN stock+"+idsm_c[e];
+        }
+        console.log("here 3");
+
+        query += " ELSE recibidos END WHERE idabast IN ("+ids.join(',')+")";
+        query2 += " ELSE stock END WHERE idmaterial IN ("+idsm.join(',')+")";
 
         console.log(query);
         console.log(query2);
+        var notif_tokens = [];
+        //EN recep_bmi ESTAN TODOS LOS oca_items (abastecimiento) VINCULADOS CON UN pedido DE TIPO bmi
+        recep_bmi.map(function(idabast){
+            notif_tokens.push(["bmiReserv@"+idabast+"@"+ new Date().toLocaleString()]);
+        });
+        console.log("here 4");
 
+        console.log(notif_tokens);
         req.getConnection(function(err, connection){
             if(err){ console.log("Error Connection : %s", err);}
 
@@ -415,7 +457,20 @@ router.post("/save_recepcion",function(req,res,next){
                             if(err) {console.log("Error Insert : %s", err);}
 
                             console.log(upMat);
-                            res.redirect('/matprimas/busq_oda');
+                            if(notif_tokens.length > 0){
+                                console.log(notif_tokens);
+                                connection.query("INSERT INTO notificacion (descripcion) VALUES ?", [notif_tokens], function(err, inNotif){
+                                    if(err) {console.log("Error Insert : %s", err);}
+
+                                    var idnotif = [];
+                                    for(var t=0; t < notif_tokens.length; t++){idnotif.push( t + inNotif.insertId );}
+                                    res.send(JSON.stringify(idnotif));
+
+                                });
+                            }else{
+                                res.send(JSON.stringify([]));
+
+                            }
                         });
                     });
                 });
@@ -848,7 +903,196 @@ router.post("/anular_recepcion",function(req,res,next){
 
 
 
+router.get("/view_reservaciones",function(req,res,next){
+    if(req.session.userData){
+        res.render('matprimas/view_reservaciones');
+    } else res.redirect("/bad_login");
+});
+
+router.post("/table_reservaciones",function(req,res,next){
+    if(req.session.userData){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var array_fill = [
+            "reservacion.idreservacion",
+            "material.detalle"
+        ];
+        var object_fill = {
+            "reservacion.idreservacion-off": [],
+            "material.detalle-off": [],
+            "reservacion.idreservacion-on": [],
+            "material.detalle-on": []
+        };
+        var condiciones_where = [];
+        console.log(input.cond);
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
+            }
+        }
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        var where = result[0];
+        var limit = result[1];
+        console.log(result);
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("SELECT reservacion_detalle.*, reservacion.fecha AS fecha_reserv, odc.numoc, fabricaciones.idorden_f, material.detalle, material.idmaterial, pedido.cantidad AS cantidad_ped FROM reservacion_detalle \n" +
+                "LEFT JOIN reservacion ON reservacion.idreservacion = reservacion_detalle.idreservacion \n" +
+                "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones \n" +
+                "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido \n" +
+                "LEFT JOIN odc ON odc.idodc = pedido.idodc \n" +
+                "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial "+ where +" "+ limit, function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                console.log(rows);
+                res.render('matprimas/table_reservaciones', {data: rows});
+            });
+        });
+    } else res.redirect("/bad_login");
+});
 
 
+router.get("/crear_movimiento_vista/:idreservaciones_det",function(req,res,next){
+    if(req.session.userData){
+        console.log(req.params.idreservaciones_det);
+        req.getConnection(function (err, connection) {
+            if(err){console.log("Error Connecting : %s", err);}
 
+            connection.query("SELECT MAX(idmovimiento)+1 AS new_id FROM movimiento", function(err, mov){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                connection.query("SELECT odc.*, cliente.*, fabricaciones.idorden_f AS idof  FROM reservacion_detalle \n" +
+                    "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones \n" +
+                    "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido \n" +
+                    "LEFT JOIN odc ON odc.idodc = pedido.idodc \n" +
+                    "LEFT JOIN cliente ON cliente.idcliente = odc.idcliente \n" +
+                    "WHERE reservacion_detalle.idreservacion_d IN ("+req.params.idreservaciones_det.split('-').join(',')+")", function(err, odc){
+
+                    if(err){console.log("Error Selecting : %s", err);}
+                    //LA PRIMERA PETICION ENTREGA LOS DATOS DE LA OC (COMO CLIENTE,NUMERO,ETC).
+                    //SE TOMA SOLO EL PRIMER REGISTRO PUES EL MOVMIENTO SOLO PUEDE CORRESPONDER A UNA OC
+                    if(odc){odc = odc[0];}
+                    connection.query("SELECT " +
+                        "reservacion_detalle.*, reservacion.fecha AS fecha_reserv,material.stock, " +
+                        "odc.numoc, fabricaciones.idorden_f, material.detalle, material.idmaterial, " +
+                        "pedido.cantidad AS cantidad_ped, pedido.idpedido " +
+                        "FROM reservacion_detalle \n" +
+                        "LEFT JOIN reservacion ON reservacion.idreservacion = reservacion_detalle.idreservacion \n" +
+                        "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones \n" +
+                        "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido \n" +
+                        "LEFT JOIN odc ON odc.idodc = pedido.idodc \n" +
+                        "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
+                        "WHERE reservacion_detalle.idreservacion_d IN ("+req.params.idreservaciones_det.split('-').join(',')+")",
+                        function(err, rows){
+                            if(err){console.log("Error Selecting : %s", err);}
+
+                            res.render('matprimas/crear_movimiento_vista', {data: rows, odc: odc, mov: mov[0].new_id});
+                    });
+                });
+            });
+        });
+    } else res.redirect("/bad_login");
+});
+
+
+router.post("/crear_movimiento_reserva",function(req,res,next){
+    if(req.session.userData){
+        //[[idmaterial, idreservacion_d, cantidad, idpedido],...]
+        var input = JSON.parse(JSON.parse(JSON.stringify(req.body)).data);
+        var mov = [];
+        var idmat = [];
+        var idped = [];
+        var idreserv = [];
+        var upStock = "";
+        var upReserv = "";
+        var msg = 'ok';
+        /*
+        * UPDATE `table` SET `uid` = CASE
+            WHEN id = 1 THEN 2952
+            WHEN id = 2 THEN 4925
+            WHEN id = 3 THEN 1592
+            ELSE `uid`
+            END
+        WHERE id  in (1,2,3)
+        * */
+        for(var e=0; e < input.length; e++){
+            mov.push([input[e][0], parseInt(input[e][2]) ]);
+            idreserv.push(input[e][1]);
+            if(idmat.indexOf(input[e][0]) === -1){
+                idmat.push([input[e][0], parseInt(input[e][2])]);
+            }else{
+                idmat[idmat.indexOf(input[e][0])][1] = idmat[idmat.indexOf(input[e][0])][1] + parseInt(input[e][2]);
+            }
+
+            if(idped.indexOf(input[e][3]) === -1){
+                idped.push(input[e][3]);
+            }
+        }
+        for(var m=0; m < idmat.length; m++){
+            upStock += " WHEN material.idmaterial = "+idmat[m][0]+" THEN material.stock - "+idmat[m][1];
+            //ARMANDO ARREGLO SOLO CON idmaterial
+            idmat[m] = idmat[m][0];
+        }
+        upStock = "UPDATE material SET material.stock = CASE "+upStock+" ELSE material.stock END WHERE material.idmaterial IN ("+idmat.join(',')+")";
+        req.getConnection(function (err, connection) {
+            if(err){
+                console.log("Error Connecting : %s", err);
+                msg = "error";
+            }
+
+            //INSERT INTO `siderval`.`movimiento` (`etapa`, `receptor`, `tipo`, `esanulacion`) VALUES ('11', 'Retiro por Reservación', '1', '0');
+            connection.query("INSERT INTO movimiento (etapa, receptor, tipo, esanulacion) VALUES ('11', 'Retiro por Reservación', '1', '0')",
+                function(err, inMov){
+                if(err){console.log("Error Inserting : %s", err);
+                    msg = "error";
+                }
+
+                for(var e=0; e < mov.length; e++){
+                    mov[e].push(inMov.insertId);
+                }
+                connection.query("INSERT INTO movimiento_detalle (idmaterial, cantidad, idmovimiento) VALUES ?", [mov], function(err, inMovDet){
+                    if(err){console.log("Error Inserting : %s", err);
+                        msg = "error";
+                    }
+
+                    connection.query(upStock, function(err, upSt){
+                        if(err){console.log("Error Updating : %s", err);
+                            msg = "error";
+                        }
+                        //SE ENLAZA LA RESERVACIÓN CON UN NUMERO DE MOVIMIENTO, ES POSIBLE IDENTIFICAR EL MOVIMIENTO ESPECIFICO MEDIANTE idmaterial
+                        connection.query("UPDATE " +
+                            "reservacion_detalle SET reservacion_detalle.idmov = '"+inMov.insertId+"',reservacion_detalle.estado = 1 " +
+                            "WHERE reservacion_detalle.idreservacion_d IN ("+idreserv.join(',')+")",
+                            function(err, upReservQ){
+                            if(err){console.log("Error Updating : %s", err);
+                                msg = "error";
+                            }
+                            //CREAR NOTIFICACION A BODEGA PARA DESPACHAR PRODUCTOS
+                            //token : crgdd@idped@fecha
+                            var tokens = [];
+                            idped.map(function(item){
+                                tokens.push(["crgdd@"+item+"@"+new Date().toLocaleString()]);
+                            });
+                            connection.query("INSERT INTO notificacion (descripcion) VALUES ?", [tokens],function(err, inNotif){
+                                if(err){console.log("Error Inserting : %s", err);
+                                    msg = "error";
+                                }
+                                console.log(inNotif);
+                                var idn_array = [];
+                                for(var e=0; e < tokens.length; e++){
+                                    idn_array.push(e + inNotif.insertId );
+                                }
+                                //ARREGLO CON LOS ID DE NOTIFICACION RECIEN INGRESADOS
+                                console.log(JSON.stringify(idn_array));
+                                //SE CONCATENA EL MENSAJE DE RESPUESTE JUNTO CON EL JSON DE idn_array
+                                res.send(msg +"@"+ JSON.stringify(idn_array) );
+                            });
+                        });
+                    });
+                });
+
+            });
+        });
+    } else{ res.redirect("/bad_login"); }
+});
 module.exports = router;

@@ -1,0 +1,102 @@
+<div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Cargar Plantilla de OC</h4>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <p style="margin-left: 10px">
+                    Se ha recepcionado el stock necesario para OC <%= numoc%>:
+                </p>
+                <div style="overflow: hidden; padding: 0px 5%" class="list-group" id="contReservModal-list">
+                    <% for(var e=0; e < data.length; e++ ){%>
+                        <a class='list-group-item itemhover row' data-idped="<%= data[e].idpedido%>">
+                            <div class="col-md-5"><%= data[e].detalle%></div>
+                            <div class="col-md-4">Solicitados: <%= data[e].cantidad%></div>
+                            <div class="col-md-3">Reservados: <%= data[e].reservados%></div>
+                        </a>
+                    <%}%>
+                </div>
+                <style>
+                    .list-group-item.active{
+                        color: white;
+                        background-color: rgb(124,123,173);
+                    }
+
+                    .list-group-item.active:hover{
+                        color: white;
+                        background-color: rgb(124,123,173);
+                    }
+
+                    .list-group-item:hover{
+                        color: white !important;
+                        background-color: rgb(124,123,173) !important;
+                        cursor: pointer;
+                    }
+                </style>
+                <script>
+
+                    /*FUNCIONES NECESARIAS PARA DESTACAR COLUMNAS CON EL MOUSE*/
+                    $(".itemhover").attr('unselectable','on')
+                        .css({'-moz-user-select':'-moz-none',
+                            '-moz-user-select':'none',
+                            '-o-user-select':'none',
+                            '-khtml-user-select':'none', /* you could also put this in a class */
+                            '-webkit-user-select':'none',/* and add the CSS class here instead */
+                            '-ms-user-select':'none',
+                            'user-select':'none'
+                        }).bind('selectstart', function(){ return false; });
+
+                    var mouseDown = 0;
+                    document.body.onmousedown = function() {
+                        mouseDown = 1;
+                    }
+                    document.body.onmouseup = function() {
+                        mouseDown = 0;
+                    }
+
+                    $(".itemhover").mouseenter(function(){
+                        if(mouseDown === 1){
+                            $(this).toggleClass('active');
+                        }
+                    });
+                    $(".itemhover").mousedown(function(){
+                        $(this).toggleClass('active');
+                    });
+
+                    /*FUNCIONES NECESARIAS PARA DESTACAR COLUMNAS CON EL MOUSE --- FIN*/
+                </script>
+                <h4 class="pull-right" style="margin-right: 10px"><small><i class="fa fa-exclamation-triangle"></i> Seleccione los pedido que desea Despachar </small></h4>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" onclick="irCrearGdd()">Ir a Crear GDD</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div>
+
+</div>
+<script>
+    function irCrearGdd(){
+        var idped = [];
+        $(".itemhover.active").each(function(){
+            idped.push($(this).data('idped'));
+        });
+        $.ajax({
+            type: 'POST',
+            data: {idped: JSON.stringify(idped)},
+            url: '/bodega/crear_gdd_post',
+            beforeSend: function(){
+                showLoad();
+                $('#crearGddModal').modal('hide');
+            },
+            success: function(data){
+                $("#page-wrapper").html(data);
+                hideLoad();
+            }
+        });
+    }
+</script>

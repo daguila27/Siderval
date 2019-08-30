@@ -1,0 +1,170 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+
+var etapas = [
+    "Jefe de Producción",
+    "Moldeo",
+    "Fusión",
+    "Quiebre",
+    "Terminación",
+    "Tratamiento Térmico",
+    "Maestranza",
+    "Control de Calidad",
+    "Mantención",
+    "Externo",
+    "Otros"
+];
+%>
+<table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" id="tablaReservaciones" style="width: 100%;margin-top: 0px !important;">
+    <thead>
+    <tr>
+        <th>N° Reservación</th>
+        <th>OC</th>
+        <th>OF</th>
+        <th>Descripción</th>
+        <th>Reservados</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+    </tr>
+    </thead>
+    <tbody class="ui-sortable">
+    <% for(var i=0; i < data.length; i++){%>
+        <tr class="o_data_row select-desp" data-state="noselec" data-hab="true" data-id="<%= data[i].idreservacion_d%>">
+            <td class="hover-select" style="text-align: center"><%= data[i].idreservacion%></td>
+            <td class="hover-select" style="text-align: center"><%= data[i].numoc%></td>
+            <td class="hover-select" style="text-align: center"><%= data[i].idorden_f%></td>
+            <td class="hover-select"><%= data[i].detalle%></td>
+            <td class="hover-select" style="text-align: center"><%= data[i].cantidad%></td>
+            <td class="hover-select" style="text-align: center" data-order="<%= new Date(data[i].fecha_reserv).getTime()%>"><%=fechaLatino(new Date(data[i].fecha_reserv).toLocaleDateString())%></td>
+            <!--
+               estado:
+               0: Sin Retirar de BMI
+               1: Retirado de BMI
+               2: Despachado
+            -->
+            <td class="hover-select" style="text-align: center">
+                <%
+                    switch (data[i].estado) {
+                        case 0:%>
+                            <%= 'Sin Retirar'%>
+                            <%break;
+                        case 1:%>
+                            <%= 'Retirado'%>
+                            <%break;
+                        case 2:%>
+                            <%= 'Despachado'%>
+                            <%break;
+                        default:%>
+                            <%= 'Invalido'%>
+                            <%break;
+                        }%>
+            </td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    /*FUNCIONES NECESARIAS PARA DESTACAR COLUMNAS CON EL MOUSE*/
+    $("#tablaReservaciones tbody").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+
+    $(".nav-pills").attr('unselectable','on')
+        .css({'-moz-user-select':'-moz-none',
+            '-moz-user-select':'none',
+            '-o-user-select':'none',
+            '-khtml-user-select':'none', /* you could also put this in a class */
+            '-webkit-user-select':'none',/* and add the CSS class here instead */
+            '-ms-user-select':'none',
+            'user-select':'none'
+        }).bind('selectstart', function(){ return false; });
+    var mouseDown = 0;
+    document.body.onmousedown = function() {
+        mouseDown = 1;
+    }
+
+    document.body.onmouseup = function() {
+        mouseDown = 0;
+    }
+
+    $(".select-desp").mouseenter(function(){
+        if( $(this).data('hab') === true ) {
+            if (mouseDown == '1') {
+                $(this).toggleClass('danger');
+                if ($(this).hasClass('danger')) {
+                    $(this).data('state', 'selec');
+                    seleccionados.push( $(this).data('id') );
+                }
+                else {
+                    $(this).data('state', 'noselec');
+                    seleccionados.splice(seleccionados.indexOf( $(this).data('id') ), 1);
+                }
+            }
+        }
+    });
+    $(".select-desp").mousedown(function(){
+        if( $(this).data('hab') === true ){
+            $(this).toggleClass('danger');
+            if($(this).hasClass('danger')){
+                $(this).data('state', 'selec');
+                seleccionados.push( $(this).data('id') );
+            } else{ //Deselecciona y elimina del array
+                $(this).data('state', 'noselec');
+                seleccionados.splice(seleccionados.indexOf( $(this).data('id') ), 1);
+            }
+        }
+    });
+
+    /*FUNCIONES NECESARIAS PARA DESTACAR COLUMNAS CON EL MOUSE --- FIN*/
+
+
+
+    setDataTableFixed("#tablaReservaciones");
+    $("#indicador_paginas").data('total', parseInt('<%= data.length%>'));
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), "#indicador_paginas");
+    cambiarInteraccion("#selectTipoReserv");
+
+    function renderMovMaker(){
+        $.ajax({
+            type: 'GET',
+            url: '/matprimas/crear_movimiento_vista/'+seleccionados.join('-'),
+            beforeSend: function(){
+                destroyDataTable();
+            },
+            success: function(data){
+                ocultar_buscador();
+                $(".main-page").html(data);
+            }
+        });
+    }
+
+
+</script>

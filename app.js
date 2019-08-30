@@ -140,7 +140,8 @@ io.on('connection', function (socket) {
              dataInsert.descripcion = "jfp@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop+"@"+input.razon+"@"+input.etapa;
              connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                  if(err){console.log("Error Selecting : %s", err);}
-                 io.sockets.emit("notif");
+                 io.sockets.emit("refreshBodegaNotif", [rows.insertId]);
+                 io.sockets.emit("refreshGestionplNotif", [rows.insertId]);
              });
          });
      });
@@ -167,7 +168,8 @@ io.on('connection', function (socket) {
                   dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                   connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                       if(err){console.log("Error Selecting : %s", err);}
-                        io.sockets.emit("notif");
+                        io.sockets.emit("refreshBodegaNotif", [rows.insertId]);
+                        io.sockets.emit("refreshGestionplNotif", [rows.insertId]);
                   });
 
                 }
@@ -257,7 +259,7 @@ io.on('connection', function (socket) {
             
       });
       socket.on('abastNotificacion', function(input){ 
-          connection.query("select * from pedido left join odc on odc.idodc = pedido.idodc where odc.numoc = ? and odc.idcliente = ? and pedido.externo = true", [input[1],input[0]],function(err, oc){
+          connection.query("select * from pedido left join odc on odc.idodc = pedido.idodc where odc.numoc = ? and odc.idcliente = ? and (pedido.externo = true || pedido.bmi = true)", [input[1],input[0]],function(err, oc){
             if(err)
               console.log("Error Selecting : %s", err);
             if(oc.length > 0){
@@ -279,6 +281,23 @@ io.on('connection', function (socket) {
           console.log(id);
           io.sockets.emit("refreshProduccion", {info : id});
       });
+       //SOCKET ACTUALIZA NOTIFICACIONES EN USUARIO BODEGA
+      socket.on('actNotifBodega', function(idnotifs){
+          console.log('Actualizando notificaciones [Bodega]...');
+          io.sockets.emit("refreshBodegaNotif", idnotifs);
+      });
+
+    //SOCKET ACTUALIZA NOTIFICACIONES EN USUARIO BODEGA
+    socket.on('actNotifGestionPl', function(idnotifs){
+        console.log('Actualizando notificaciones [Gestion Planta]...');
+        io.sockets.emit("refreshGestionplNotif", idnotifs);
+    });
+    //SOCKET ACTUALIZA NOTIFICACIONES EN USUARIO Planificación
+    socket.on('actNotifPlan', function(idnotifs){
+        console.log('Actualizando notificaciones [Planificación]...');
+        console.log(idnotifs);
+        io.sockets.emit("refreshPlanNotif", idnotifs);
+    });
       app.locals.socket = socket;
 });
 app.locals.io = io;

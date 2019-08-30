@@ -143,12 +143,6 @@ function letraMayus(string) {
                         </style>
                         <script>
                             var c = 0;
-                            /*$(".selector-buscador li").each(function(){
-                                if(c > 5){
-                                    $(this).addClass('hidden');
-                                }
-                                c++;
-                            });*/
                             $(".selector-buscador input").on('keyup', function(e){
                                 e.preventDefault();
                                 var valor = $(this).val();
@@ -178,6 +172,7 @@ function letraMayus(string) {
                         <th>Detalle</th>
                         <th>Sin Despachar</th>
                         <th>En Stock</th>
+                        <th>Retirados BMI</th>
                         <th></th>
                         <th></th>
                     </tr>
@@ -246,6 +241,14 @@ function letraMayus(string) {
     .dataTables_filter#label#input{
        width: 150%;
     }
+
+    .nav-tabs > li.active > a{
+        background-color: rgb(245,245,245);
+    }
+
+    .nav-tabs > li.active > a:focus{
+        background-color: rgb(245,245,245);
+    }
 </style>
 
 <div class="col-sm-12 col-md-12 col-md-offset-0">
@@ -255,12 +258,14 @@ function letraMayus(string) {
         <li class="pestana_insumos" onclick="tab_insum()"><a data-toggle="tab" href="#insum">Insumos</a></li>
         <li class="pestana_palets" onclick="tab_palets()"><a data-toggle="tab" href="#palets">Palets</a></li>
     </ul>
-
     <div class="tab-content">     
         <div class="tab-pane fade in active" id="prodxdeps">
             <div class="panel panel-default">
-                <div class="panel-body" style="padding: 0; padding-top: 10px">
-                    <table id="DataTableGD" class="o_list_view table table-condensed table-striped o_list_view_ungrouped DataTableGD_new" style="width: 100%;">
+                <div class="panel-heading" style="display: flex;">
+                    <label>Buscar:<input type="search" class="form-control input-sm" id="buscadorDataTableGD" placeholder=""></label>
+                </div>
+                <div class="panel-body" style="padding: 0">
+                    <table id="DataTableGD" class="o_list_view table table-condensed table-striped o_list_view_ungrouped DataTableGD_new" style="width: 100%; margin-top: 0px !important;">
                         <thead>
                             <tr>
                                 <th>N°OC</th>
@@ -269,8 +274,9 @@ function letraMayus(string) {
                                 <th>Item</th>
                                 <th>Detalle</th>
                                 <th>Sin Despachar</th>
-                                <th>En Stock (Sin Paletizar)</th>
+                                <th>En Stock <br>(Sin Paletizar)</th>
                                 <th>Paletizado</th>
+                                <th>Retirados de BMI</th>
                                 <th class="hidden">A Enviar</th>
                                 <th>Fecha de Entrega</th>
                                 <th></th>
@@ -285,7 +291,7 @@ function letraMayus(string) {
                             if(data[i].stock <= 0){
                                 stateButton = 'false';
                             }%>
-                            <tr class="mat_desp" id="<%=data[i].idpedido%>">
+                            <tr class="mat_desp" id="<%=data[i].idpedido%>" data-idped="<%=data[i].idpedido%>" data-bmi="<%=data[i].bmi%>">
                                 <td><%= largeID(data[i].numordenfabricacion, 6)%></td>
                                 <td><%= data[i].cliente%></td>
                                 <td id="nof<%=data[i].idpedido%>"><%= largeID(data[i].numof, 6)%></td>
@@ -297,13 +303,26 @@ function letraMayus(string) {
                                 <td style="text-align: center;" class="parsear_nro mat_stock"><%= data[i].stock - data[i].pl_cantidad%></td>
 
                                 <td id="pl<%=data[i].idpedido%>" style="text-align: center;" class="parsear_nro pl_cantidad"><%= data[i].pl_cantidad %></td>
+                                <!--
+                                  bmi INDICA SI EL pedido IMPLICA UNA RESERVACIÓN
+                                  SI ES ASI, SOLO SE PUEDE DESPACHAR LA CANTIDAD QUE HAYA SIDO RESERVADA
+                                  Y POSTERIORMENTE RETIRADA DE B.M.I.
+                                  ESTE VALOR SE ALMACENA EN data[i].reservados
+                                -->
+                                <% if(data[i].bmi){%>
+                                <!--SOLO PUEDES DESPACHAR LA TOTALIDAD DE LOS PRODUCTOS RESERVADOS (Y RETIRADOS) DE BMI
+                                  ESO FACILITARA LA TAREA A LA HORA DE CAMBIAR EL ESTADO DE LAS RESERVACIONES-->
+                                    <td id="reserv<%=data[i].idpedido%>" style="text-align: center;" class="mat_reserv"><%= data[i].reservados%></td>
+                                    <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="<%= data[i].reservados%>" max="<%= data[i].reservados%>" data-bmi="true" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" data-idpaletitem="0"  data-idpalet='0' class="form-control" value="1" style="width: 80px;margin: 0"></td>
+                                <%}else{%>
+                                    <td id="reserv<%=data[i].idpedido%>" style="text-align: center;"> - </td>
+                                    <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= Math.min(  data[i].cantidad - data[i].despachados, data[i].stock - data[i].pl_cantidad) %>" data-bmi="false" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" data-idpaletitem="0"  data-idpalet='0' class="form-control" value="1" style="width: 80px;margin: 0"></td>
+                                <%}%>
 
-                                <td class="hidden data_gdd" id="in<%= data[i].idpedido%>" style="padding: 2px"><input type="number" min="1" max="<%= Math.min(  data[i].cantidad - data[i].despachados, data[i].stock - data[i].pl_cantidad) %>" data-idpedido="<%= data[i].idpedido%>" data-idmat="<%= data[i].idmaterial%>" data-idpaletitem="0"  data-idpalet='0' class="form-control" value="1" style="width: 80px;margin: 0"></td>
-                                
                                 <td id="date<%= data[i].idpedido%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
 
                                 <td class="mat_butt" id="add<%= data[i].idpedido%>">
-                                    <a data-idpedido="<%= data[i].idpedido%>" aria-disabled="false" class="btn btn-success btn-xs addrow"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
+                                    <a data-idpedido="<%= data[i].idpedido%>" data-bmi="<%= data[i].bmi%>" aria-disabled="false" class="btn btn-success btn-xs addrow"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
                                 </td>
                                 
                                 <td class="hidden" id="rmv<%= data[i].idpedido%>">
@@ -346,11 +365,13 @@ function letraMayus(string) {
             </div>
             </div>
         </div>
-
         <div class="tab-pane fade" id="palets" style="display: block; margin: 0 ; padding: 0">
             <div class="panel panel-default">
-                <div class="panel-body">
-                    <table id="DataTablePalets" class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" style="padding: 0; margin: 0; width: 100% !important;">
+                <div class="panel-heading">
+                    <label>Buscar:<input type="search" class="form-control input-sm" id="buscadorDataTablePalets" placeholder=""></label>
+                </div>
+                <div class="panel-body" style="padding: 0px">
+                    <table id="DataTablePalets" class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" style="padding: 0; margin: 0 !important; width: 100% !important;">
                         <thead>
                         <tr>
                             <th>#Packing List</th>
@@ -435,11 +456,22 @@ function letraMayus(string) {
 
     $(".mat_desp").each(function(){
         var stock = parseInt($(this).children('.mat_stock').html());
-        if(stock <= 0){
-            $(this).children('.mat_butt').children('a').removeClass('btn-success');
-            $(this).children('.mat_butt').children('a').addClass('btn-danger');
-            $(this).children('.mat_butt').children('a').removeClass('addrow');
-            $(this).children('.mat_butt').children('a').html("<span class='fa fa-ban' style='padding-left: 2px'></span>");
+        var reservados;
+        if($(this).data('bmi') === 1){
+            reservados = parseInt($(this).children('.mat_reserv').html());
+            if(reservados <= 0){
+                $(this).children('.mat_butt').children('a').removeClass('btn-success');
+                $(this).children('.mat_butt').children('a').addClass('btn-danger');
+                $(this).children('.mat_butt').children('a').removeClass('addrow');
+                $(this).children('.mat_butt').children('a').html("<span class='fa fa-ban' style='padding-left: 2px'></span>");
+            }
+        }else{
+            if(stock <= 0){
+                $(this).children('.mat_butt').children('a').removeClass('btn-success');
+                $(this).children('.mat_butt').children('a').addClass('btn-danger');
+                $(this).children('.mat_butt').children('a').removeClass('addrow');
+                $(this).children('.mat_butt').children('a').html("<span class='fa fa-ban' style='padding-left: 2px'></span>");
+            }
         }
     });
 
@@ -485,7 +517,11 @@ function letraMayus(string) {
     // Oculta la seccion de insumos
     $(document).ready(function(){
         $("#insum").css("display","none");
-
+        if('<%= redirect%>' === 'true'){
+            <% for(var e = 0; e < sel.length; e++){%>
+                $(".mat_desp[data-idped="+parseInt('<%= sel[e]%>')+"]").children('td.mat_butt').children('a.btn-success').click();
+            <%}%>
+        }
     });
 
     // Muestra el tab presionado y oculta el otro
@@ -544,18 +580,26 @@ function letraMayus(string) {
 
 
     // Tabla inferior(TI)
-    $('#DataTableGD').DataTable( {
+    var GDTable = $('#DataTableGD').DataTable( {
         "lengthChange": false,
         "paging": false,
         "language": idioma_español
     });
 
 
-    $('#DataTablePalets').DataTable( {
+    $("#DataTableGD_filter").parent().parent().addClass('hidden');
+    $("#DataTableGD_wrapper").css('margin-top', '0px !important');
+
+
+
+    var PaletTable = $('#DataTablePalets').DataTable( {
         "lengthChange": false,
         "paging": false,
         "language": idioma_español
     });
+    $("#DataTablePalets_filter").parent().parent().addClass('hidden');
+    $("#DataTablePalets_wrapper").css('margin-top', '0px !important');
+
 
 
 
@@ -571,6 +615,8 @@ function letraMayus(string) {
         $("#nof" + row.data('idpedido')).addClass("hidden");       //Oculta el N°OF en TS
         $("#anom" + row.data('idpedido')).addClass("hidden");      //Oculta la Aleacion en TS
         $("#date" + row.data('idpedido')).addClass("hidden");      //Oculta la fecha en TS
+        //$("#reserv" + row.data('idpedido')).addClass("hidden");
+        //Oculta los reservados en TS
         $("#add" + row.data('idpedido')).addClass("hidden");       //Oculta el boton agregar en TS
         $("#pl" + row.data('idpedido')).addClass("hidden");     //Oculta cantidad paletizada en TS
         $("#in" + row.data('idpedido')).removeClass("hidden");     //Muestra input en TS
@@ -641,6 +687,8 @@ function letraMayus(string) {
         $("#nof" + row.data('idpedido')).removeClass("hidden");    //Muestra el N°OF en TS
         $("#anom" + row.data('idpedido')).removeClass("hidden");   //Muestra la Aleacion en TS
         $("#date" + row.data('idpedido')).removeClass("hidden");   //Muestra la fecha en TS
+        //$("#reserv" + row.data('idpedido')).removeClass("hidden");
+        //Oculta los reservados en TS
         $("#add" + row.data('idpedido')).removeClass("hidden");    //Muestra el boton agregar en TS
         $("#pl" + row.data('idpedido')).removeClass("hidden");    //Muestra cantidad paletizada en TS
         $("#in" + row.data('idpedido')).addClass("hidden");        //Oculta input en TS
@@ -684,7 +732,8 @@ function letraMayus(string) {
         $(this).serializeArray();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
-            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value, $(this).data('idpalet')+"-"+$(this).data('idpaletitem')]);
+            //NO SE ENVIARÁ LA idreservacion_d YA QUE SE ESTA
+            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value, $(this).data('idpalet')+"-"+$(this).data('idpaletitem'), $(this).data('bmi') ]);
         });
         var est = $("#estadoselect").val();
         var pl;
@@ -718,7 +767,7 @@ function letraMayus(string) {
                     estado: est,
                     pl: pl,
                     obs:$("#gddobs .form-control").val(),
-                    idcliente: $("#cliente_gd").val(),
+                    idcliente: $("#cliente").val(),
                     idgd: $("#idguia").val()
                 },
                 url: 'bodega/save_gdd',
@@ -748,7 +797,7 @@ function letraMayus(string) {
         e.preventDefault();
         var aux = [];
         $("#session_prod input.form-control").each(function(e){
-            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value, $(this).data('idpalet')+"-"+$(this).data('idpaletitem')]);
+            aux.push([$(this).data("idpedido"), $(this).data("idmat"), this.value, $(this).data('idpalet')+"-"+$(this).data('idpaletitem'), $(this).data('bmi')]);
         });
         var conf = true;
         var est = $("#estadoselect").val();
@@ -760,7 +809,7 @@ function letraMayus(string) {
                 estado: est,
                 idgdd: <%= num%>,
                 obs:$("#gddobs .form-control").val(),
-                idcliente: $("select[name = 'cliente_gd']").val()
+                idcliente: $("#cliente").val()
             },
             url: 'bodega/act_gdd',
             success: function(data){
@@ -769,6 +818,18 @@ function letraMayus(string) {
             }
         });
     });
+
+
+
+
+
+    $('#buscadorDataTableGD').keyup(function(){
+        GDTable.search($(this).val()).draw() ;
+    });
+    $('#buscadorDataTablePalets').keyup(function(){
+        PaletTable.search($(this).val()).draw() ;
+    });
+
 
   </script>  
 </div>

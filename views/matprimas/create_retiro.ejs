@@ -3,8 +3,16 @@
 		padding: 1%;
 	}
 </style>
-<form id="session_form">
-	<div class="panel panel-info" id="sess_panel" style="padding-top: 25px">
+
+<%
+var key = new Date().toLocaleString();
+key = key.split(' ');
+key[0] = key[0].split('-').join('');
+key[1] = key[1].split(':').join('');
+key = key.join('');
+%>
+<form id="session_form_ret<%=key%>">
+	<div class="panel panel-info" id="sess_panel" style="margin: 50px 25px !important;">
 			<div class="panel-heading">
 				<h1 id="sess_titulo" >Registrar Retiro: </h1>
 			</div>
@@ -32,17 +40,18 @@
 				</div>
 				<div class="col-md-1" style="margin-top: 12px">
 					<div class="form-group" style="margin-top: 10px">
-						<button class="btn btn-success pull-right" type="submit">Registrar</button>
+						<button class="btn btn-success pull-right" onclick="crear_retiro_f()" type="button">Registrar</button>
 					</div>
 				</div>
 			</div>
-			<table id="tabla_session" class="o_list_view table table-condensed table-striped" cellspacing="0" width="100%">
+			<table id="tabla_session" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" cellspacing="0" width="100%">
 				<thead>
 
 					<tr>
-						<th>Código</th>
 						<th>Descripción</th>
-						<th>Stock</th>
+                        <th>Stock</th>
+                        <th>Reservados</th>
+                        <th>Disponibles (Sin Reservar)</th>
 						<th>Eliminar</th>
 						<th>A Enviar</th>
 						<th>Unidad</th>
@@ -54,45 +63,84 @@
 			</table>
 	</div>
 </form>
-<div class="panel panel-default" style="padding: 0;">
-	<table id="tablaStock" class="o_list_view table table-condensed table-striped" cellspacing="0" width="100%" style="margin: 0; padding: 0;">
-		<thead>
-			<tr>
-				<th>Código</th>
-				<th>Descripción</th>
-				<th>Stock</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-        <%if(mat.length > 0){
-		for(var j=0; j < mat.length; j++){%>
-		<tr id="row<%= mat[j].idmaterial%>">
-			<td><%= mat[j].codigo%></td>
-			<td><%= mat[j].detalle%></td>
-			<td class="parsear_nro"><%= mat[j].stock %></td>
-			<td style="text-align: center"><a href="#" class="selector btn btn-success btn-xs" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
-		</tr>
-        <%}
-		}
-		else{%>
-		<tr>
-			No hay materiales registrados.
-		</tr>
-        <%}%>
-		</tbody>
-	</table>
+<div class="panel panel-info" style="padding: 0;margin: 50px 25px !important;">
+    <div class="panel-heading">
+        <h3 style="display: flex">
+            <label style="width: 75%">Añadir Productos : </label>
+            <label style="display: flex; width: 25%; vertical-align: middle">Buscar : <input type="search" class="form-control input-sm" id="buscadortablaStock" style="width: 75%; margin-left: 10px;" ></label>
+        </h3>
+    </div>
+
+    <div class="panel-body" style="padding: 0 !important; margin: 0px !important;">
+        <table id="tablaStock" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" cellspacing="0" width="100%" style="margin: 0 !important; padding: 0 !important;">
+            <thead>
+                <tr>
+                    <th>Descripción</th>
+                    <th>Stock</th>
+                    <th>Reservados</th>
+                    <th>Disponibles (Sin Reservar)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            <%if(mat.length > 0){
+            for(var j=0; j < mat.length; j++){%>
+            <tr id="row<%= mat[j].idmaterial%>">
+                <td><%= mat[j].detalle%></td>
+                <td class="parsear_nro" style="text-align: center;"><%= mat[j].stock %></td>
+                <td class="parsear_nro" style="text-align: center;"><%= mat[j].reservados %></td>
+                <td class="parsear_nro" style="text-align: center;"><%= mat[j].stock - mat[j].reservados %></td>
+                <td style="text-align: center"><a href="#" class="selector btn btn-success btn-xs" onclick="add_session(<%= mat[j].idmaterial%>,<%= mat[j].stock - mat[j].reservados%>,'<%= mat[j].u_compra%>')"><i class="fa fa-plus"></i></a></td>
+            </tr>
+            <%}
+            }
+            else{%>
+            <tr>
+                No hay materiales registrados.
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js""></script>
+<script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
     //setDataTable("#tablaStock");
-    $('#tablaStock').DataTable( {
+    var stockTable = $('#tablaStock').DataTable( {
         "scrollCollapse": true,
-        "paging":         false
+        "paging":         false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
     } );
+    $("#tablaStock_filter").parent().parent().addClass('hidden');
+    $("#tablaStock_wrapper").css('margin-top', '0px !important');
+    $("#tablaStock_wrapper").css('padding', '0px');
+
+    $('#buscadortablaStock').keyup(function(){
+        stockTable.search($(this).val()).draw() ;
+    });
     //  mat[Math.floor((Math.random()*mat.length)+1) - 1].detalle"
 	// Quitar de la sesión
     function drop_session(idmaterial){
@@ -108,34 +156,46 @@
         $("#sess" + string_idm + " > td > .selector > i").attr("class","fa fa-remove");
         $("#row" + idmaterial.toString()).addClass("hidden");
     }
-    $("#session_form").submit(function (e){
+
+    function crear_retiro_f(){
+        showLoad();
+        setTimeout(function(){ $("#session_form_ret<%=key%>").submit(); }, 1000);
+	}
+   $("#session_form_ret<%=key%>").submit(function (e){
         e.preventDefault();
-        var lista_m = [];
-        var lista_v = [];
-        $("#session_rows > tr > td > input").each(function(e){
+       var lista_m = [];
+       var lista_v = [];
+       $("#session_rows > tr > td > input").each(function(e){
            lista_m.push($(this).data('idmaterial'));
            lista_v.push(this.value);
-		});
-        if(lista_m.length){
-            if(confirm("¿Está seguro?")) {
-                $.ajax({
-                    type: 'post',
-                    data: {
-                        lista_m: lista_m,
-                        lista_v: lista_v,
-                        tipo: 0,
-                        etapa: $("#etapa_r").val(),
-                        receptor: $("#receptor_r").val()
-                    },
-                    url: '/matprimas/save_movimiento',
-                    success: function (data) {
-                        if (!data.err) {
-                            alert(data.msg);
-                            $("#create_retiro").trigger("click");
-                        } else alert(data.msg);
-                    }
-                });
-            }
-		} else alert("No hay Materiales seleccionados")
-	})
+       });
+       if(lista_m.length){
+           if(true) {
+               $.ajax({
+                   type: 'post',
+                   data: {
+                       lista_m: lista_m,
+                       lista_v: lista_v,
+                       tipo: 0,
+                       etapa: $("#etapa_r").val(),
+                       receptor: $("#receptor_r").val()
+                   },
+                   url: '/matprimas/save_movimiento',
+                   success: function (data) {
+                       if (!data.err) {
+                           //alert(data.msg);
+                           $("#create_retiro").trigger("click");
+                           hideLoad();
+                       } else {
+                           alert(data.msg);
+                           hideLoad();
+                       }
+                   }
+               });
+           }
+       } else {
+           alert("No hay Materiales seleccionados");
+           hideLoad();
+       }
+	});
 </script>

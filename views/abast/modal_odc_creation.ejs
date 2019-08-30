@@ -3,23 +3,36 @@
           return date.split('-')[2]+'-'+date.split('-')[1]+'-'+date.split('-')[0];
       }
     %>
-    <div class="modal-header">
-       	<button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Orden de Compra: #<%=last%></h4>
-        <ul class="nav nav-tabs segm-pill">
-            <li class="active"><a data-toggle="tab" href="#peds">Pedidos</a></li>
-            <li><a data-toggle="tab" href="#infog">Información General</a></li>
-        </ul>
-    </div>
-      <div class="modal-body sliderModal" style="overflow: hidden; width: 95%; padding: 0; margin: 10px;position:relative;">
+    <style>
+        .segm-pill{
+            margin-top: 10px;
+        }
+        .segm-pill li a{
+            color: white;
+        }
+        .segm-pill li:hover a{
+            color: rgb(98, 101,103) !important;
+        }
+        .segm-pill li.active a{
+            color: rgb(98, 101,103) !important;
+        }
+    </style>
+    <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading" style="padding-bottom: 0px !important;">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Orden de Compra: #<%=last%> <small style="color: white">Cliente : <%= data[0].client%></small> </h4>
+            <ul class="nav nav-tabs segm-pill">
+                <li style="color: white" class="active"><a data-toggle="tab" href="#peds">Pedidos</a></li>
+                <li><a data-toggle="tab" href="#infog" style="color: white">Información General</a></li>
+            </ul>
+        </div>
+        <div class="modal-body sliderModal" style="overflow: hidden; width: 100%; padding: 0; margin: 0px !important; position:relative;">
             <div style="margin: 0; width: 100%; display: flex; transition: 0.5s">
                 <div style="width: 100%;">
-          			<h5><b>Cliente:</b> <%= data[0].client%></h5>
-
                     <div class="tab-content">
                         <div id="peds" class="tab-pane fade in active">
                             <div style="max-height: 300px; overflow-y: scroll; padding: 0; width: 100%">
-                                <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin: 0">
+                                <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="margin: 0 !important;">
                                     <thead>
                                     <tr>
                                         <th></th>
@@ -31,11 +44,14 @@
                                         <th>Total</th>
                                         <th>C.C.</th>
                                         <th>Exento</th>
+                                        <th>Abastecimiento</th>
                                     </tr>
                                     </thead>
                                     <tbody id="t<%= data[0].idodc%>">
                                     <%
                                     if(data[0].mat_token){
+                                        console.log("data[0]");
+                                        console.log(data[0]);
                                         data[0].mat_token = data[0].mat_token.split('@');
                                         data[0].date_token = data[0].date_token.split(',');
                                         data[0].cant_token = data[0].cant_token.split(',');
@@ -43,22 +59,48 @@
                                         data[0].idf_token = data[0].idf_token.split(',');
                                         data[0].uni_token = data[0].uni_token.split(',');
                                         data[0].ucompra_token = data[0].ucompra_token.split(',');
+                                        data[0].ext_ped = data[0].ext_ped.split(',');
+                                        data[0].bmi_ped = data[0].bmi_ped.split(',');
                                         data[0].cc = data[0].cc.split(',');
-                                    for(var j = 0;j< data[0].mat_token.length;j++){%>
-                                    <tr style="align-content: center;" data-content="Fecha de Entrega: <%=fechaLatina(new Date(data[0].date_token[j]).toLocaleDateString())%>" data-toggle="popover" data-placement="bottom">
-                                        <td class="ped-hab">
+                                        console.log("data[0]");
+                                        console.log(data[0]);
+                                        for(var j = 0;j< data[0].mat_token.length;j++){%>
+                                    <tr
+                                            <%if(data[0].bmi_ped[j] === '1'){%>
+                                                class="warning"
+                                            <%}else if (data[0].ext_ped[j] === '1'){%>
+                                                class="info"
+                                            <%}else{%>
+                                                class="success"
+                                            <%}%>
+                                            style="align-content: center;"
+                                            data-content="Fecha de Entrega: <%=fechaLatina(new Date(data[0].date_token[j]).toLocaleDateString())%>"
+                                            data-toggle="popover"
+                                            data-placement="bottom">
+
+                                    <td class="ped-hab">
                                             <input type="checkbox" name="hab" onchange="habInId(this)" class="check-ped">
-                                            <input class="idped" type="hidden" name="idpedido" value="<%=data[0].idp_token[j]%>">
-                                            <input class="idfab" type="hidden" name="idfabricaciones" value="<%=data[0].idf_token[j]%>">
+                                            <input class="idped" type="hidden" name="idpedido" value="<%=data[0].idp_token[j]%>" disabled>
+                                            <input class="idfab" type="hidden" name="idfabricaciones" value="<%=data[0].idf_token[j]%>" disabled>
                                         </td>
                                         <td><%= data[0].mat_token[j].substring(0,1).toUpperCase() + data[0].mat_token[j].substring(1,data[0].mat_token[j].lenght).toLowerCase()%></td>
                                         <td style="text-align: center;"><%= data[0].ucompra_token[j]%></td>
-                                        <td class="td-cant"><input type="number" class="form-control cant_compra cantCompraModal" value="<%= data[0].cant_token[j]%>" min="0" step="<%= data[0].ucompra_token[j]%>" disabled></td>
+                                        <td class="td-cant">
+                                            <!-- data[0].cant_token[j] ES fabricaciones.restantes-->
+                                            <input type="number" class="form-control cant_compra cantCompraModal" name="cant_compra" value="<%= data[0].cant_token[j]%>" min="0" step="<%= data[0].ucompra_token[j]%>" disabled>
+                                        </td>
                                         <td style="text-align: center;"><%= data[0].uni_token[j]%></td>
                                         <td class="td-costo td-money"><input class="form-control costo moneda key_money" type="float" name="costo" onkeyup="refreshAllCostModal()" disabled></td>
                                         <td class="costo-total"></td>
                                         <td class="td-cc"><input type="hidden" name="centroc" class="cc" id="extCC<%=j%>" disabled><a class="setCC" onclick='selectCCModal(this)' data-toggle="modal" data-target="#ccModal"><%= data[0].cc[j]%></a></td>
                                         <td class="td-ex"><input type="checkbox" name="ex_iva" class="checkEx" onchange="refreshAllCostModal()" disabled></td>
+                                        <%if(data[0].bmi_ped[j] === '1'){%>
+                                            <td>BMI</td>
+                                        <%}else if (data[0].ext_ped[j] === '1'){%>
+                                            <td>Proveedor</td>
+                                        <%}else{%>
+                                            <td>Indefinido</td>
+                                        <%}%>
                                     </tr>
                                     <%}
                                     }%>
@@ -75,6 +117,7 @@
                                         <th><b>Total:</b></th>
                                         <th></th>
                                         <th></th>
+                                        <th></th>
                                     </tr>
                                     <tr>
                                         <td></td>
@@ -86,11 +129,12 @@
                                         <td class="total-total-modal">0</td>
                                         <td></td>
                                         <td></td>
+                                        <td></td>
                                     </tr>
                                     </tfoot>
                                 </table>
                             </div>
-                            <div class="form-group" style="display: flex; width: 100%; margin-top: 15px">
+                            <div class="form-group" style="display: flex; width: 100%; margin-top: 15px; padding: 10px">
                                 <div style="width: 100%;">
                                     <label>Moneda: </label>
                                     <select class="form-control" name="money" id="money" onchange="conversor(this)">
@@ -106,7 +150,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="infog" class="tab-pane fade">
+                        <div id="infog" class="tab-pane fade" style="padding: 10px">
                             <div style="width: 100%">
                                 <div class="form-group" style="width: 100%">
                                     <label for="prov">Seleccione Proveedor:</label>
@@ -166,16 +210,17 @@
                     </div>
                 </div>
             </div>
-            <div class="pull-right">
+            <div class="pull-right" style="margin: 0px 10px 10px 0px;">
                 <button type="button" class="btn btn-primary atr-canv">&laquo; Atras</button>
                 <button type="button" class="btn btn-primary sig-canv">Siguiente &raquo;</button>
             </div>
         </div>
-    <div class="modal-footer">
+        <div class="modal-footer">
         <button type="submit" class="btn btn-primary send-newOC">Enviar</button>
    		 <button type="button" class="btn btn-default cerrarNewOC" data-dismiss="modal">Cerrar</button>
 	     <!--<button type="button" class="btn btn-default" onclick="showForm()">Show</button>-->
-  </div> 
+  </div>
+    </div>
 
     <script type="text/javascript">
       $(document).ready(function(){
@@ -203,7 +248,8 @@
         if($(yo).prop('checked')){
             $(yo).parent().parent().children('.td-cant').children('.cantCompraModal').removeAttr('disabled');
             $(yo).parent().parent().children('.td-costo').children('.costo').removeAttr('disabled');
-            $(yo).parent().children('.idped').removeAttr('disabled');    
+            $(yo).parent().children('.idped').removeAttr('disabled');
+            $(yo).parent().children('.idfab').removeAttr('disabled');
             $(yo).parent().parent().children('.td-ex').children('.checkEx').removeAttr('disabled');
             $(yo).parent().parent().children('.td-cc').children('.cc').removeAttr('disabled');
         }
@@ -211,6 +257,7 @@
             $(yo).parent().parent().children('.td-cant').children('.cantCompraModal').removeAttr('disabled', true);
             $(yo).parent().parent().children('.td-costo').children('.costo').attr('disabled', true);
             $(yo).parent().children('.idped').attr('disabled', true);
+            $(yo).parent().children('.idfab').attr('disabled', true);
             $(yo).parent().parent().children('.td-ex').children('.checkEx').attr('disabled',true);
             $(yo).parent().parent().children('.td-cc').children('.cc').attr('disabled', true);
             

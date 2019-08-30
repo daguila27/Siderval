@@ -84,7 +84,10 @@
 
     </div>
 </div>
+<!-- Modal Crear Reservación -->
+<div id="contReservModal" class="modal fade" role="dialog">
 
+</div>
 <!-- Modal -->
 <div id="loadplantModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -230,8 +233,16 @@
             success: function(data){
                 $("#page-wrapper").html(data);
                 $("#page-wrapper").fadeIn();
+                $.ajax({
+                    type: 'GET',
+                    url: '/plan/notif_plan',
+                    success: function(data){
+                        $(".notificaciones").html(data);
+                    }
+                });
             }
         });
+
     });
 
     function  setDataTableFixed(str){
@@ -413,7 +424,36 @@
 
 
     });
+
+    //FUNCION QUE RENDERIZA LA ALERTA DE NOTIFICACION EN LA ESQUINA INFERIOR DERECHA DE LA PANTALLA
+    function mostrarAlertaNotificacion(idnotif){
+        $.ajax({
+            type: 'GET',
+            url: 'plan/render_alert_notificacion/'+idnotif,
+            success: function(data){
+                $('.notif-alert-ul').append(data);
+                setTimeout(function(){
+                    $(".notif-alert-ul li[data-idkey='idkey"+idnotif+"']").remove();
+                }, 10000);
+            }
+        });
+    }
     var io = io();
+
+    //SOCKET QUE RENDERIZA LA NOTIFICACIONES
+    io.on('refreshPlanNotif', function(idnotif){
+        $.ajax({
+            type: 'GET',
+            url: 'plan/notif_plan',
+            success: function(data){
+                $(".notificaciones").html(data);
+                idnotif.map(function(id){
+                    mostrarAlertaNotificacion(id);
+                });
+            }
+        });
+
+    });
     function emitToast(idOF){
         io.emit('showToast', idOF);
         io.emit('showToastnotif', idOF);

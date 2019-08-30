@@ -158,11 +158,15 @@
         type: 'GET',
         url: '/matprimas/view_mprimas',
         beforeSend: function(){
-            $("#page-wrapper").css('display', 'none');
+            showLoad();
+            //$("#page-wrapper").css('display', 'none');
         },
         success: function(data){
-            $("#page-wrapper").html(data);
-            $("#page-wrapper").fadeIn();
+            setTimeout(function(){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+                hideLoad();
+            }, 500);
         }
     });
     function show_menu(){
@@ -414,15 +418,21 @@
             url: $(yo).data('link'),
             beforeSend: function(){
                 destroyDataTable();
-                $("#page-wrapper").css('display', 'none');
+                showLoad();
                 close_menu();
             },
             success: function(data){
-                $("#page-wrapper").html(data);
-                $("#page-wrapper").fadeIn();
-
+                setTimeout(function(){
+                    $("#page-wrapper").html(data);
+                    $("#page-wrapper").fadeIn();
+                    hideLoad();
+                }, 500);
             }
         });
     }
+
+
+
+    var io = io();
 </script>
 </html>

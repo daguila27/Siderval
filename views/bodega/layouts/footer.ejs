@@ -1,6 +1,16 @@
 
 </div>
 </div>
+
+
+
+<!-- Modal Crear GDD-->
+<div id="crearGddModal" class="modal fade" role="dialog">
+
+</div>
+
+
+
 <!-- Modal -->
 <div id="newPLModal" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg" id="newPLModal-content" >
@@ -230,20 +240,47 @@
     }
 
 
+    //FUNCION QUE RENDERIZA LA ALERTA DE NOTIFICACION EN LA ESQUINA INFERIOR DERECHA DE LA PANTALLA
+    function mostrarAlertaNotificacion(idnotif){
+        $.ajax({
+           type: 'GET',
+           url: 'bodega/render_alert_notificacion/'+idnotif,
+           success: function(data){
+                $('.notif-alert-ul').append(data);
+               setTimeout(function(){
+                   $(".notif-alert-ul li[data-idkey='idkey"+idnotif+"']").remove();
+               }, 10000);
+           }
+        });
+    }
 
     var io = io();
-    io.on('notif', function(){
+    io.on('refreshBodegaNotif', function(idnotif){
         $.ajax({
             type: 'GET',
             url: 'bodega/render_notificaciones',
             success: function(data){
                 $(".notificaciones").html(data);
+                idnotif.map(function(id){
+                    mostrarAlertaNotificacion(id);
+                });
             }
         });
 
     });
 
 
+    function alertAccionGDD(yo){
+        $(yo).parent().parent().parent().remove();
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/get_pedido_gdd/'+ $(yo).data('idodc') +'/'+$(yo).data('idped'),
+            success: function(data){
+                $('#crearGddModal').html(data);
+                $('#crearGddModal').modal('show');
+            }
+        });
+    }
 
 </script>
 </body>

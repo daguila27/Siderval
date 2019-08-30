@@ -297,25 +297,9 @@
 						if(oda[0].tokenoda[7] == 'off'){
                  		    if(oda[0].tokenoda[6] == 'clp'){
 								if(combustible){
-									console.log("SUMA");
-									console.log(suma_combustible);
-									console.log("utm");
-									console.log(utm);
-									console.log("MONTO");
-									console.log(total-monto_descontado);
 									iva  = (0.19 + (6*utm*suma_combustible/(1000*(total-monto_descontado))))
-									console.log("IVA");
-									console.log(iva);
 								}else{
-									console.log("SUMA");
-									console.log(suma_combustible);
-									console.log("utm");
-									console.log(utm);
-									console.log("MONTO");
-									console.log(total-monto_descontado);
 									iva = 0.19;
-									console.log("IVA");
-									console.log(iva);
 								}%>
 								<td class='fund' style="text-align: right;">
 									<%= ((total-monto_descontado)*iva).toLocaleString().split('.')[0].split(',').join('.')%>
@@ -323,26 +307,10 @@
 								<%total += ((total-monto_descontado)*iva);
                  		    }else{
 								if(combustible){
-									console.log("SUMA");
-									console.log(suma_combustible);
-									console.log("utm");
-									console.log(utm);
-									console.log("MONTO");
-									console.log(total-monto_descontado);
 									iva  = (0.19 + (6*utm*suma_combustible/(1000*(total-monto_descontado))));
-									console.log("IVA");
-									console.log(iva);
 
 								}else{
-									console.log("SUMA");
-									console.log(suma_combustible);
-									console.log("utm");
-									console.log(utm);
-									console.log("MONTO");
-									console.log(total-monto_descontado);
 									iva = 0.19;
-									console.log("IVA");
-									console.log(iva);
 								}%>
 								<%if((total*iva).toLocaleString().split('.').length > 1){%>
 	                 				<td class='fund' style="text-align: right;">

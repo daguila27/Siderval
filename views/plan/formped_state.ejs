@@ -1,5 +1,4 @@
-    <%console.log(data)%>
-        <div class="panel panel-primary cargando-panel" style="display: none;">
+     <div class="panel panel-primary cargando-panel" style="display: none;">
             <div class="panel-heading">
                 <div style="width: 100%;text-align: center;">
                     <img style="width: 25%" src="/loading.gif">
@@ -11,8 +10,7 @@
                 cursor: pointer;
             }
         </style>
-        <div class="guardado_automatico" style="width: 100%;height: 20px"></div>
-        <div class="panel panel-primary panel-defecto">
+        <div class="panel panel-primary panel-defecto" style="margin-top: 35px">
             <div class="panel-heading">
                 <div class="dropdown pull-right">
                   <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></button>
@@ -25,7 +23,8 @@
                 </div>
                 <div style="display: flex;">
                 <div style="width: 50%">
-                        <h3 style="width: 100%">Registrar Orden de Compra: 
+                        <h3 style="width: 100%">Registrar Orden de Compra:
+                            <small class="guardado_automatico" style="width: 100%;height: 20px; color: white;" style="display: none;"></small></h3>
                     <!--<div>
                         <button class="btn btn-primary" onclick="saveState(this)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
                         <button class="btn btn-primary" onclick="loadState(this)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
@@ -64,7 +63,7 @@
                     </div>
                     <div class="form-group" style="width: 100%">
                         <ul class="selector-buscador" role="navigation">
-                            <input type="hidden" id="cliente" onchange="compNum(this)">
+                            <input type="hidden" id="cliente" onchange="compNum(this)" value="0">
                             <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Cliente<b class="caret caret-select"></b></a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
                                     <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
@@ -154,12 +153,6 @@
                         </style>
                         <script>
                             var c = 0;
-                            /*$(".selector-buscador li").each(function(){
-                                if(c > 5){
-                                    $(this).addClass('hidden');
-                                }
-                                c++;
-                            });*/
                             $(".selector-buscador input").on('keyup', function(e){
                                 e.preventDefault();
                                 var valor = $(this).val();
@@ -209,14 +202,23 @@
                         var fabricacion = '';
                         var color = '';
                         for(var e=0; e < data['idm[]'].length; e++){
-                            if(data['prov[]'][e] == '-1'){
+                            //PRODUCIDO
+                            if(data['prov[]'][e] === 'producido'){
                                 fabricacion = 'Interna';
                                 color = 'success';
                             }
-                            else{
+                            //PRODUCTO
+                            else if(data['prov[]'][e] === 'producto'){
                                 fabricacion = 'Externa';
                                 color = 'warning';
-                            }%>
+                            }
+                            //OTRO
+                            else{
+                                fabricacion = 'Bodega B.I.';
+                                color = 'info';
+                            }
+
+                    %>
                         <tr class="<%= color%>">
                             <td><%=data['dets[]'][e]%><input type="hidden" name="idm" value="<%=data['idm[]'][e]%>"><input type="hidden" name="idp" value="<%=data['idp[]'][e]%>"><input type='hidden' name='disp' value="<%= data['stock[]'][e]%>"></td>
                             <td><strong><%=fabricacion%></strong></td>
@@ -253,6 +255,7 @@
     $(document).ready(function(){
         compNum("#cliente");
     });
+
     function compNum(yo){
         if($("#num").val() != ''){
                 $.ajax({
@@ -271,12 +274,13 @@
                         }
                     }
                 });
-            }
-            else{
-                $(".contenedor").css('height', '0px');
-                $("#of_submit").prop('disabled', false);
-            }
+        }
+        else{
+            $(".contenedor").css('height', '0px');
+            $("#of_submit").prop('disabled', false);
+        }
     }
+
     $("#num").on('keyup', function(e){
             e.preventDefault();
             if($(this).val() != ''){
@@ -302,6 +306,7 @@
                 $("#of_submit").prop('disabled', false);
             }
     });
+
     $("#setdates").on('change',function(){
         var valor = $(this).val();
         $("input[type=date]").each(function(e){
@@ -313,7 +318,6 @@
     $("#send_of").submit(function(e){
         e.preventDefault();
         lista = $(this).serializeArray();
-        console.log(lista);
         var data = {
             idm: [],
             idp: [],
@@ -322,6 +326,7 @@
             cliente: $("#cliente").val(),
             moneda: $("#moneda").val(),
             factor_item: $("input[name='factor_item']:checked").val(),
+            //prov INDICA EL TIPO DE FABRICACION
             prov: [],
             precio: [],
             lock: [],
@@ -347,7 +352,6 @@
            else{
              data.lock.push('0');  
            }
-           //console.log($(this).val());
         });
         if(confirm("¿Esta seguro que desea crear la OC?.\n Se creará una OF con los productos que se necesitan fabricar.")){
             $.ajax({
@@ -361,7 +365,7 @@
                     else{
                         var input = [$("#cliente").val(), $("#num").val()];
                         io.emit('abastNotificacion', input);
-                        if(data != 'none'){
+                        if(data !== 'none'){
                             data = [data, $("#cliente").val()];
                             emitToast(data);
                         }
