@@ -637,9 +637,9 @@ router.post('/save_gdd', function (req, res, next) {
         //Insertamos los valores de una GD
         let values;
         var query;
-        if(input.idgd == '0'){
+        if(input.idgd === '0'){
             //INSERT INTO `siderval`.`gd` (`estado`, `obs`, `idcliente`) VALUES ('venta', 'xxx', '555');
-            query = "INSERT INTO gd (estado, fecha, last_mod, obs,idcliente) VALUES ('"+input.estado+"',now(), now(), '"+input.obs+"', '"+input.idcliente+"')";
+            query = "INSERT INTO gd (estado, fecha, last_mod, obs,idcliente) VALUES ('"+input.estado+"',now(), now(), '"+input.obs+" ', '"+input.idcliente+"')";
             values = [[input.estado, new Date(), new Date() , input.obs,input.idcliente]];
         }
         else{
@@ -698,6 +698,11 @@ router.post('/save_gdd', function (req, res, next) {
                     case_gdd = "UPDATE gd SET gd.idpackinglist = '"+input.pl+"' where gd.idgd in ("+idgd+")" ;
                 }
 
+                var despachos_bmi = [];
+                for(var e=0; e < despachos.length; e++){
+                    despachos_bmi.push(despachos[e][4]);
+                    despachos[e] = [ despachos[e][0],despachos[e][1],despachos[e][2],despachos[e][3] ]
+                }
                 //Insertamos cada Despacho asociado a la GD
                 connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?", [despachos], function (err, rows) {
                     if (err) {throw err;}
@@ -714,9 +719,14 @@ router.post('/save_gdd', function (req, res, next) {
                     let update_stock = 'UPDATE material SET material.stock = CASE ';
                     var array_material = [];
                     var array_stock = [];
+                    var c_aux = 0;
                     for (var i = 0; i < despachos.length; i++) {
                         //SI SE DESPACHA DESDE RESERVACION NO REQUIERE MODIFICAR STOCK
-                        if(despachos[i][4] === 'false' ){
+                        console.log("Tipo de Pedido");
+                        console.log(typeof despachos_bmi[i]);
+                        console.log(despachos_bmi[i]);
+
+                        if(despachos_bmi[i] === 'false' ){
                             if( array_material.indexOf(despachos[i][2]) === -1 ){
                                 array_material.push(despachos[i][2]);
                                 array_stock.push(parseInt(despachos[i][3]));
@@ -724,6 +734,7 @@ router.post('/save_gdd', function (req, res, next) {
                             else{
                                array_stock[array_material.indexOf(despachos[i][2])] += parseInt(despachos[i][3]);
                             }
+                            c_aux++;
                         }
                     }
 
@@ -733,7 +744,7 @@ router.post('/save_gdd', function (req, res, next) {
                     update_stock += 'ELSE material.stock END WHERE material.idmaterial IN (' + array_material.join(',')+')';
                     //Se actualiza el stock de material
                     connection.query(update_stock, function (err, rows) {
-                        if (err) {throw err;}
+                        if (err && c_aux>0) {throw err;}
 
                         //Si la operacion es de Traslado, no existen pedidos.
                         if (input.estado !== "Traslado") {
@@ -2622,8 +2633,11 @@ router.get('/get_pedido_gdd/:idodc/:idped', function(req, res, next) {
             "WHERE reservacion_detalle.estado = 1 GROUP BY reservacion_detalle.idfabricaciones) AS reservaciones ON reservaciones.idfabricaciones = fabricaciones.idfabricaciones " +
             "WHERE pedido.idodc = ? AND pedido.bmi AND COALESCE(reservaciones.reservados,0) > 0 ", [req.params.idodc], function (err, rows){
             if (err) console.log("Error Selecting : %s", err);
+            var numoc = 'Desconocido';
+            if(rows.length > 0){
+                numoc = rows[0].numoc;
+            }
 
-            var numoc = rows[0].numoc;
             res.render('bodega/modal_notif_gdd', {data: rows, numoc: numoc});
         });
     });
