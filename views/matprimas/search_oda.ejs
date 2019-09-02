@@ -5,6 +5,13 @@
                 <h3>Registrar Recepción de materiales</h3>
             </div>
             <div class="panel-body">
+                <%
+                var key = new Date().toLocaleString();
+                key = key.split(' ');
+                key[0] = key[0].split('-').join('');
+                key[1] = key[1].split(':').join('');
+                key = key.join('');
+                %>
                 <form id="oda_form">
                     <div class="form-inline input-group">
                         <input type="text" id="oda_input" class="form-control" name="numoda">
@@ -13,7 +20,7 @@
                         </div>
                     </div>
                 </form>
-                <form id="gdd_form">
+                <form id="gdd_form<%= key%>">
                     <div id="oda_gdd" class="well" style="margin-top: 20px">
                         No se ha seleccionado ninguna OC
                     </div>
@@ -94,7 +101,7 @@
     });
 
     //Formulario de Recepcion
-    $("#gdd_form").submit(function(e){
+    $("#gdd_form<%= key%>").submit(function(e){
         e.preventDefault();
         var detalle = [];
         $("#confirmar_gdd").modal("toggle");
