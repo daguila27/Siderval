@@ -3370,7 +3370,7 @@ router.get('/crear_reservacion', function(req, res){
                 "pedido.idpedido, " +
                 "cliente.sigla, " +
                 "pedido.idodc,odc.numoc,material.stock," +
-                "fabricaciones.idfabricaciones, " +
+                "fabricaciones.idfabricaciones, coalesce(queryDisp.nodisponible, 0) as nodisponible, " +
                 "fabricaciones.idorden_f AS idof, " +
                 "COALESCE(abastecimiento.recibidos,0) as xabastecer, " +
                 "pedido.cantidad , " +
@@ -3382,6 +3382,7 @@ router.get('/crear_reservacion', function(req, res){
                 "LEFT JOIN material ON material.idmaterial = pedido.idmaterial " +
                 "LEFT JOIN odc ON odc.idodc = pedido.idodc " +
                 "LEFT JOIN cliente ON cliente.idcliente = odc.idcliente " +
+                "LEFT JOIN (select fabricaciones.idmaterial, coalesce(coalesce(reservacion_detalle.sin_prep,0) + coalesce(reservacion_detalle.prep,0), 0) AS nodisponible from reservacion_detalle left join fabricaciones on fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones) AS queryDisp ON queryDisp.idmaterial = fabricaciones.idmaterial " +
                 "LEFT JOIN (" +
                 "SELECT abastecimiento.idfabricacion, sum(abastecimiento.cantidad) AS abastecidos FROM " +
                 "abastecimiento " +
@@ -3527,7 +3528,7 @@ router.post('/crear_reservacion_post', function(req, res){
             "pedido.idpedido, " +
             "cliente.sigla, " +
             "pedido.idodc,odc.numoc,material.stock," +
-            "fabricaciones.idfabricaciones, " +
+            "fabricaciones.idfabricaciones, coalesce(queryDisp.nodisponible, 0) as nodisponible, " +
             "fabricaciones.idorden_f AS idof, " +
             "COALESCE(abastecimiento.recibidos,0) as xabastecer, " +
             "pedido.cantidad , " +
@@ -3539,6 +3540,7 @@ router.post('/crear_reservacion_post', function(req, res){
             "LEFT JOIN material ON material.idmaterial = pedido.idmaterial " +
             "LEFT JOIN odc ON odc.idodc = pedido.idodc " +
             "LEFT JOIN cliente ON cliente.idcliente = odc.idcliente " +
+            "LEFT JOIN (select fabricaciones.idmaterial, coalesce(coalesce(reservacion_detalle.sin_prep,0) + coalesce(reservacion_detalle.prep,0), 0) AS nodisponible from reservacion_detalle left join fabricaciones on fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones) AS queryDisp ON queryDisp.idmaterial = fabricaciones.idmaterial " +
             "LEFT JOIN (" +
             "SELECT abastecimiento.idfabricacion, sum(abastecimiento.cantidad) AS abastecidos FROM " +
             "abastecimiento " +

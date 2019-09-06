@@ -60,6 +60,7 @@
                         <th>Recibidos OCA</th>
                         <th>Reservados</th>
                         <th>Stock</th>
+                        <th>Disponible</th>
                         <th>Adjuntar</th>
                     </tr>
                     </thead>
@@ -76,7 +77,9 @@
                             <td style="text-align: center"><%= data[e].sigla%></td>
                             <td><%= data[e].detalle%></td>
                             <td style="text-align: center"><%= data[e].cantidad%></td>
-                            <% if(data[e].stock >= (data[e].cantidad-data[e].reservados) ){%>
+                            <% if(data[e].stock - data[e].nodisponible > 0){%>
+
+                            <!--<# if(data[e].stock >= (data[e].cantidad - data[e].reservados) ){#>-->
                                 <td data-name="enviar" style="text-align: center">
                                     <div><%= data[e].xabastecer%></div>
                                     <input type="number" name="env" min="1" class="hidden form-control" max="<%= Math.min(data[e].stock - data[e].reservados, data[e].cantidad - data[e].reservados)%>" style="width: 80%;margin-left: 25%" required>
@@ -86,10 +89,10 @@
                             <%}%>
                             <td style="text-align: center"><%= data[e].reservados%></td>
                             <td style="text-align: center"><%= data[e].stock%></td>
+                            <td style="text-align: center"><%= data[e].stock - data[e].nodisponible%></td>
 
                             <td style="text-align: center; align-content: center">
-                                <%
-                                if(data[e].stock >= (data[e].cantidad-data[e].reservados) ){%>
+                                <% if(data[e].stock - data[e].nodisponible > 0 ){%>
                                     <button onclick="addReserv(this); return false;" class="btn btn-xs btn-success" style="display: flex;">
                                         <i class="fa fa-arrow-up" style="margin-right: 2px"></i>
                                         <i class="fa fa-plus"></i>
