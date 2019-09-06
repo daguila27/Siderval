@@ -38,7 +38,7 @@
 </div>
 </div>
 <div class="modal-footer">
-    <button type="button" data-target="#confirmar_gdd" data-toggle="modal" class="btn btn-primary">Registrar</button>
+    <button type="button" data-target="#confirmar_gdd" data-toggle="modal" onclick="checkBMI()" class="btn btn-primary">Registrar</button>
 </div>
 <div id="confirmar_gdd" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -50,6 +50,9 @@
                     <h4 class="modal-title">Confirmar Recepción</h4>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-warning" id="alerta-reservacion">
+                        <strong>¡Atención!</strong> Está a punto de recepcionar productos necesarios para una Reservación.
+                    </div>
                     <p>¿ Confirma que todos los datos están correctos y que no hay inconvenientes ?</p>
                 </div>
                 <div class="modal-footer">

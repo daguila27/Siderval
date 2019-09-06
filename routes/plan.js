@@ -3418,6 +3418,8 @@ Usages:
 router.post('/save_reservacion', function(req, res){
     if(verificar(req.session.userData)) {
         var data = JSON.parse(JSON.parse(JSON.stringify(req.body)).data);
+        console.log('/SAVE_RESERVACION');
+        console.log(data);
         var idreserv = JSON.parse(JSON.stringify(req.body)).idreserv;
         var idRev;
         req.getConnection(function (err, connection) {
@@ -3429,13 +3431,26 @@ router.post('/save_reservacion', function(req, res){
                     if(rows){
                         for(var t=0; t < data.length; t++){
                             data[t].push(rows.insertId);
+                            data[t].push(data[t][1]);
                         }
                     }
                     console.log(data);
-                    connection.query("INSERT INTO reservacion_detalle (idfabricaciones, cantidad, idreservacion) VALUES ?", [data], function(err, reserv){
+                    connection.query("INSERT INTO reservacion_detalle (idfabricaciones, cantidad, idreservacion, sin_prep) VALUES ?", [data], function(err, inReserv){
                         if(err){console.log("Error Inserting : %s", err);}
+                        var notif_tokens_bmi = [];
+                        for(var u=0; u < data.length; u++){
+                            notif_tokens_bmi.push(["bmiOca@"+( u + parseInt(inReserv.insertId) )+"@"+ new Date().toLocaleString()]);
+                        }
+                        //SE REGISTRA NOTIFICACIÓN A Bodega Materias Primas PARA QUE PREPARE LA RESERVACIÓN.
+                        connection.query("INSERT INTO notificacion (descripcion) VALUES ?", [notif_tokens_bmi], function(err, inNotif){
+                            if(err){console.log("Error Inserting : %s", err);}
 
-                        res.redirect('/plan/crear_reservacion');
+                            console.log("NOTIFICACIONES A BMI");
+                            console.log(inNotif);
+                            console.log(notif_tokens_bmi);
+                            res.redirect('/plan/crear_reservacion');
+
+                        });
                     });
                 });
         });

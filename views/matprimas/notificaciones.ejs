@@ -2,16 +2,16 @@
 for(var u=0; u < notif.length; u++){
     var desc = notif[u].descripcion.split('@');
     var hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];
-if(desc[0] === 'bmiReserv'){%>
+if(desc[0] === 'bmiOca'){%>
     <li style="cursor: pointer; display: flex;">
-        <a class="notificacion-bmiReserv" data-idodc="<%= notif[u].idodc%>" data-idped="<%= notif[u].idpedido%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" style="width: 100%">
+        <a class="notificacion-bmiOca" data-id="<%= notif[u].idnotificacion%>" data-idreserv="<%= notif[u].idreservacion%>" data-idreservd="<%= notif[u].idreservacion_d%>" style="width: 100%">
             <div>
                 <small style="margin: 0; margin-bottom: 10px; font-size: 125%; color: rgb(119, 119, 119)">Stock para Reserva: </small>
                 <span class="pull-right text-muted" style="top: 0px">
                     <em><%= hora%></em>
                 </span>
             </div>
-            <div style="margin-left: 10px">Ya es posible realizar reserva para <b>OC <%= notif[u].numoc%> - Item <%= notif[u].numitem%> : <%= notif[u].detalle%></b></div>
+            <div style="margin-left: 10px">Ya es posible preparar reserva para <b>OC <%= notif[u].numoc%> - Item <%= notif[u].numitem%> : <%= notif[u].detalle%></b></div>
         </a>
         <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
     </li>
@@ -47,24 +47,27 @@ if(desc[0] === 'bmiReserv'){%>
     else
         $(".badge-notificaciones").css('display', 'block');
 
-
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
     function removeNotif(yo){
         $.ajax({
             type: 'GET',
-            url: '/plan/drop_notif/'+$(yo).data('id'),
+            url: '/matprimas/drop_notif/'+$(yo).data('id'),
             success: function(data){
                 $(".notificaciones").html(data);
             }
         });
     }
-    $(".notificacion-bmiReserv").on('click', function(e){
+    $(".notificacion-bmiOca").on('click', function(e){
+        //SE OBTIENE LA DATA SOBRE LA RESERVACIÓN QUE SE DEBE PREPARAR
         e.preventDefault();
         $.ajax({
             type: 'GET',
-            url: '/plan/get_reserv_info/'+$(this).data('idodc')+"/"+$(this).data('idped'),
+            url: '/matprimas/get_reserv_info/'+$(this).data('idreserv')+'/'+$(this).data('idreservd')+'/'+$(this).data('id'),
             success: function(data){
-                $('#contReservModal').html(data);
-                $('#contReservModal').modal('show');
+                $('#prepReservModal').html(data);
+                $('#prepReservModal').modal('show');
             }
         });
     });

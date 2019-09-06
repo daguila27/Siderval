@@ -772,7 +772,7 @@ function letraMayus(string) {
                 },
                 url: 'bodega/save_gdd',
                 success: function(data){
-                    if(est != 'Blanco'){
+                    if(est !== 'Blanco'){
                         $.ajax({
                             type: 'GET',
                             url: 'bodega/gen_pdfgdd/'+idgdd,

@@ -65,7 +65,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
     return [where, limit,condiciones_where.join('@')];
 }
 function verificar(usr){
-	if(usr.nombre == 'matprimas' || usr.nombre == 'siderval'){
+	if(usr.nombre === 'matprimas' || usr.nombre === 'siderval'){
 		return true;
 	}else{
 		return false;
@@ -74,10 +74,22 @@ function verificar(usr){
 /* GET users listing. */
 router.get('/', function(req, res, next) {
 	if(req.session.userData.nombre == 'matprimas'){
-    	res.render('matprimas/indx_new', {page_title: "Materias Primas", username: req.session.userData.nombre});
+    	res.render('matprimas/indx_new', {page_title: "Materias Primas", username: req.session.userData.nombre, route: '/matprimas/view_mprimas'});
 	}
 	else{res.redirect('bad_login');}	
 });
+
+
+router.post('/indx', function(req, res, next) {
+    var r = req.body.route.split('%').join('/');
+    if(req.session.userData.nombre === 'matprimas'){
+        res.render('matprimas/indx_new', {page_title: "Materias Primas", username: req.session.userData.nombre, route: r});
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
 // Enviar la vista para registrar un movimiento
 router.get("/crear_movimiento",function(req,res,next){
     if(req.session.userData){
@@ -324,7 +336,7 @@ router.get("/busq_oda",function(req,res,next){
         req.getConnection(function (err,connection) {
            if (err) {console.log('We got a problem dude');}
            else {
-               connection.query('SELECT abastecimiento.*, material.detalle, COALESCE(pedido.bmi, false) AS bmi, material.stock FROM abastecimiento '+
+               connection.query('SELECT abastecimiento.*, material.detalle, COALESCE(pedido.bmi, false) AS bmi, COALESCE(pedido.externo, false) AS externo, material.stock FROM abastecimiento '+
                    'LEFT JOIN material ON abastecimiento.idmaterial = material.idmaterial ' +
                    'LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = abastecimiento.idfabricacion ' +
                    'LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido ' +
@@ -396,9 +408,8 @@ router.post("/save_recepcion",function(req,res,next){
 
         var query = "UPDATE abastecimiento SET recibidos = CASE";
         var query2 = "UPDATE material SET stock = CASE";
-        console.log("here");
         for(var e=1; e < Object.size(input); e++){
-            recep_d.push([0, input['detalle['+(e-1)+'][]'][0], input['detalle['+(e-1)+'][]'][1] ]);
+            recep_d.push([0, input['detalle['+(e-1)+'][]'][0], input['detalle['+(e-1)+'][]'][1]]);
             ids.push(input['detalle['+(e-1)+'][]'][0]);
             //SE ACUMULAN LOS STOCK DE MATERIALES
             if(idsm.indexOf(input['detalle['+(e-1)+'][]'][2]) === -1){
@@ -413,7 +424,6 @@ router.post("/save_recepcion",function(req,res,next){
                 recep_bmi.push(input['detalle['+(e-1)+'][]'][0]);
             }
         }
-        console.log("here 2");
 
 
         for(var e=0; e < idsm.length; e++){
@@ -427,9 +437,13 @@ router.post("/save_recepcion",function(req,res,next){
         console.log(query);
         console.log(query2);
         var notif_tokens = [];
+        //var notif_tokens_bmi = [];
         //EN recep_bmi ESTAN TODOS LOS oca_items (abastecimiento) VINCULADOS CON UN pedido DE TIPO bmi
         recep_bmi.map(function(idabast){
+            //bmiReserv : Notificaciones para Planificación informando la llegada de los productos con el fin de que cree la reservación
+            //bmiOca: Notificación a Bodega Materias Primas informando la llegada de los productos con el fin de que prepare la reservación
             notif_tokens.push(["bmiReserv@"+idabast+"@"+ new Date().toLocaleString()]);
+            //notif_tokens_bmi.push(["bmiOca@"+idabast+"@"+ new Date().toLocaleString()]);
         });
         console.log("here 4");
 
@@ -905,7 +919,7 @@ router.post("/anular_recepcion",function(req,res,next){
 
 router.get("/view_reservaciones",function(req,res,next){
     if(req.session.userData){
-        res.render('matprimas/view_reservaciones');
+        res.render('matprimas/view_reservaciones', {sel: [],redirect: false});
     } else res.redirect("/bad_login");
 });
 
@@ -933,27 +947,46 @@ router.post("/table_reservaciones",function(req,res,next){
         var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
         var where = result[0];
         var limit = result[1];
-        console.log(result);
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connecting : %s", err);}
-            connection.query("SELECT reservacion_detalle.*, reservacion.fecha AS fecha_reserv, odc.numoc, fabricaciones.idorden_f, material.detalle, material.idmaterial, pedido.cantidad AS cantidad_ped FROM reservacion_detalle \n" +
+            connection.query("SELECT COALESCE(queryOCA.recibidos,0) AS recibidos_oca, reservacion_detalle.*, reservacion.fecha AS fecha_reserv, odc.numoc, fabricaciones.idorden_f, material.detalle, material.idmaterial, pedido.cantidad AS cantidad_ped FROM reservacion_detalle \n" +
                 "LEFT JOIN reservacion ON reservacion.idreservacion = reservacion_detalle.idreservacion \n" +
                 "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones \n" +
                 "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido \n" +
                 "LEFT JOIN odc ON odc.idodc = pedido.idodc \n" +
+                "LEFT JOIN (SELECT fabricaciones.idfabricaciones, sum(abastecimiento.recibidos) AS recibidos FROM abastecimiento INNER JOIN fabricaciones ON fabricaciones.idfabricaciones = abastecimiento.idfabricacion GROUP BY fabricaciones.idfabricaciones) AS queryOCA ON queryOCA.idfabricaciones = fabricaciones.idfabricaciones \n" +
                 "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial "+ where +" "+ limit, function(err, rows){
                 if(err){console.log("Error Selecting : %s", err);}
 
-                console.log(rows);
                 res.render('matprimas/table_reservaciones', {data: rows});
             });
         });
     } else res.redirect("/bad_login");
 });
 
-
-router.get("/crear_movimiento_vista/:idreservaciones_det",function(req,res,next){
+//SI estado ES 0 SIGNIFICA QUE SE ESTA POR PREPARAR LA RESERVACION
+//SI estado ES 1 SIGNIFICA QUE SE ESTA POR RETIRAR LA RESERVACION
+//ADEMAS INDICA A DONDE REDIRECCIONARÁ LUEGO DE CONFIRMAR LA TRANSACCIÓN
+router.get("/crear_movimiento_vista/:idreservaciones_det/:estado",function(req,res,next){
     if(req.session.userData){
+        var cant = "0 AS cant_reserv,";
+        var url = '/matprimas/preparar_reserva';
+        var titulo = 'Preparando Reservación';
+        var msg = '¡Reservación Preparada con Exito!';
+        console.log(typeof req.params.estado);
+        if(req.params.estado === '0'){
+            cant = "COALESCE(reservacion_detalle.sin_prep, 0) AS cant_reserv,";
+            url = '/matprimas/preparar_reserva';
+            titulo = 'Preparando Reservación';
+            msg = '¡Reservación Preparada con Exito!';
+        }
+        else if(req.params.estado === '1'){
+            cant = "COALESCE(reservacion_detalle.prep, 0) AS cant_reserv,";
+            url = '/matprimas/crear_movimiento_reserva';
+            titulo = 'Retirando Reservación';
+            msg = '¡Reservación Retirada con Exito!';
+        }
+
         console.log(req.params.idreservaciones_det);
         req.getConnection(function (err, connection) {
             if(err){console.log("Error Connecting : %s", err);}
@@ -973,7 +1006,7 @@ router.get("/crear_movimiento_vista/:idreservaciones_det",function(req,res,next)
                     //SE TOMA SOLO EL PRIMER REGISTRO PUES EL MOVMIENTO SOLO PUEDE CORRESPONDER A UNA OC
                     if(odc){odc = odc[0];}
                     connection.query("SELECT " +
-                        "reservacion_detalle.*, reservacion.fecha AS fecha_reserv,material.stock, " +
+                        "reservacion_detalle.*, "+cant+"  reservacion.fecha AS fecha_reserv,material.stock, " +
                         "odc.numoc, fabricaciones.idorden_f, material.detalle, material.idmaterial, " +
                         "pedido.cantidad AS cantidad_ped, pedido.idpedido " +
                         "FROM reservacion_detalle \n" +
@@ -986,7 +1019,7 @@ router.get("/crear_movimiento_vista/:idreservaciones_det",function(req,res,next)
                         function(err, rows){
                             if(err){console.log("Error Selecting : %s", err);}
 
-                            res.render('matprimas/crear_movimiento_vista', {data: rows, odc: odc, mov: mov[0].new_id});
+                            res.render('matprimas/crear_movimiento_vista', {titulo: titulo,data: rows, odc: odc, mov: mov[0].new_id, url: url, msg: msg});
                     });
                 });
             });
@@ -1005,6 +1038,7 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
         var idreserv = [];
         var upStock = "";
         var upReserv = "";
+        var upReserv2 = "";
         var msg = 'ok';
         /*
         * UPDATE `table` SET `uid` = CASE
@@ -1016,6 +1050,10 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
         WHERE id  in (1,2,3)
         * */
         for(var e=0; e < input.length; e++){
+            if(e === 0){
+                upReserv += "UPDATE reservacion_detalle SET ret = CASE ";
+                upReserv2 += "UPDATE reservacion_detalle SET prep = CASE ";
+            }
             mov.push([input[e][0], parseInt(input[e][2]) ]);
             idreserv.push(input[e][1]);
             if(idmat.indexOf(input[e][0]) === -1){
@@ -1027,7 +1065,18 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
             if(idped.indexOf(input[e][3]) === -1){
                 idped.push(input[e][3]);
             }
+
+
+            upReserv += " WHEN idreservacion_d = "+input[e][1]+" THEN ret + "+input[e][2];
+            upReserv2 += " WHEN idreservacion_d = "+input[e][1]+" THEN prep - "+input[e][2];
+
+            if(e === input.length - 1){
+                upReserv += " ELSE ret END WHERE idreservacion_d IN ("+idreserv.join(',')+")";
+                upReserv2 += " ELSE prep END WHERE idreservacion_d IN ("+idreserv.join(',')+")";
+            }
         }
+        console.log(upReserv);
+        console.log(upReserv2);
         for(var m=0; m < idmat.length; m++){
             upStock += " WHEN material.idmaterial = "+idmat[m][0]+" THEN material.stock - "+idmat[m][1];
             //ARMANDO ARREGLO SOLO CON idmaterial
@@ -1060,32 +1109,39 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
                             msg = "error";
                         }
                         //SE ENLAZA LA RESERVACIÓN CON UN NUMERO DE MOVIMIENTO, ES POSIBLE IDENTIFICAR EL MOVIMIENTO ESPECIFICO MEDIANTE idmaterial
-                        connection.query("UPDATE " +
-                            "reservacion_detalle SET reservacion_detalle.idmov = '"+inMov.insertId+"',reservacion_detalle.estado = 1 " +
-                            "WHERE reservacion_detalle.idreservacion_d IN ("+idreserv.join(',')+")",
+                        //SE ACTUALIZA LA CANTIDAD DESDE prep A ret
+                        connection.query(upReserv,
                             function(err, upReservQ){
                             if(err){console.log("Error Updating : %s", err);
                                 msg = "error";
                             }
-                            //CREAR NOTIFICACION A BODEGA PARA DESPACHAR PRODUCTOS
-                            //token : crgdd@idped@fecha
-                            var tokens = [];
-                            idped.map(function(item){
-                                tokens.push(["crgdd@"+item+"@"+new Date().toLocaleString()]);
-                            });
-                            connection.query("INSERT INTO notificacion (descripcion) VALUES ?", [tokens],function(err, inNotif){
-                                if(err){console.log("Error Inserting : %s", err);
-                                    msg = "error";
-                                }
-                                console.log(inNotif);
-                                var idn_array = [];
-                                for(var e=0; e < tokens.length; e++){
-                                    idn_array.push(e + inNotif.insertId );
-                                }
-                                //ARREGLO CON LOS ID DE NOTIFICACION RECIEN INGRESADOS
-                                console.log(JSON.stringify(idn_array));
-                                //SE CONCATENA EL MENSAJE DE RESPUESTE JUNTO CON EL JSON DE idn_array
-                                res.send(msg +"@"+ JSON.stringify(idn_array) );
+                            connection.query(upReserv2,
+                                function(err, upReservQ2) {
+                                    if (err) {
+                                        console.log("Error Updating : %s", err);
+                                        msg = "error";
+                                    }
+                                    //CREAR NOTIFICACION A BODEGA PARA DESPACHAR PRODUCTOS
+                                    //token : crgdd@idped@fecha
+                                    var tokens = [];
+                                    idped.map(function (item) {
+                                        tokens.push(["crgdd@" + item + "@" + new Date().toLocaleString()]);
+                                    });
+                                    connection.query("INSERT INTO notificacion (descripcion) VALUES ?", [tokens], function (err, inNotif) {
+                                        if (err) {
+                                            console.log("Error Inserting : %s", err);
+                                            msg = "error";
+                                        }
+                                        console.log(inNotif);
+                                        var idn_array = [];
+                                        for (var e = 0; e < tokens.length; e++) {
+                                            idn_array.push(e + inNotif.insertId);
+                                        }
+                                        //ARREGLO CON LOS ID DE NOTIFICACION RECIEN INGRESADOS
+                                        console.log(JSON.stringify(idn_array));
+                                        //SE CONCATENA EL MENSAJE DE RESPUESTE JUNTO CON EL JSON DE idn_array
+                                        res.send(msg + "@" + JSON.stringify(idn_array));
+                                    });
                             });
                         });
                     });
@@ -1095,4 +1151,142 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
         });
     } else{ res.redirect("/bad_login"); }
 });
+
+
+router.post("/preparar_reserva",function(req,res,next){
+    if(req.session.userData){
+        //[[idmaterial, idreservacion_d, cantidad, idpedido],...]
+        var input = JSON.parse(JSON.parse(JSON.stringify(req.body)).data);
+        //NO PUEDE HABER IN idreservacion_d REPETIDO.
+        console.log("PREPARANDO RESERVA ...");
+        console.log(input);
+        var updateReserv = "";
+        var updateReserv2 = "";
+        /*
+        * UPDATE `table` SET `uid` = CASE
+            WHEN id = 1 THEN 2952
+            WHEN id = 2 THEN 4925
+            WHEN id = 3 THEN 1592
+            ELSE `uid`
+            END
+        WHERE id  in (1,2,3)
+        * */
+        var id_rd = [];
+        console.log(input.length );
+        for(var e=0; e < input.length; e++){
+            console.log(e);
+            if(e === 0){
+                updateReserv+="UPDATE reservacion_detalle SET prep = CASE ";
+                updateReserv2+="UPDATE reservacion_detalle SET sin_prep = CASE ";
+            }
+            updateReserv += " WHEN idreservacion_d = "+input[e][1]+" THEN prep + "+input[e][2];
+            updateReserv2 += " WHEN idreservacion_d = "+input[e][1]+" THEN sin_prep - "+input[e][2];
+            id_rd.push(input[e][1]);
+            if(e === input.length - 1){
+                updateReserv += " ELSE prep END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
+                updateReserv2 += " ELSE sin_prep END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
+            }
+        }
+        console.log(updateReserv);
+        console.log(updateReserv2);
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query(updateReserv, function(err, upReserv){
+                if(err){console.log("Error Updating : %s", err);}
+
+                console.log(upReserv);
+                connection.query(updateReserv2, function(err, upReserv2){
+                    if(err){console.log("Error Updating : %s", err);}
+
+                    console.log(upReserv2);
+                    res.send("ok@0");
+
+                });
+
+            });
+        });
+
+    } else{ res.redirect("/bad_login"); }
+});
+
+
+
+router.get('/notif_bmi', function(req, res, next){
+    req.getConnection(function(err,connection){
+        if(err){
+            console.log("Error Connection : %s", err);
+        }
+        connection.query("SELECT notificacion.*, reservacion_detalle.*,odc.numoc,odc.idodc,material.detalle, pedido.numitem,pedido.idpedido FROM notificacion " +
+            "LEFT JOIN reservacion_detalle ON reservacion_detalle.idreservacion_d = substring_index(substring_index(descripcion, '@', 2),'@',-1) " +
+            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones " +
+            "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
+            "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
+            "LEFT JOIN odc ON odc.idodc = pedido.idodc " +
+            "WHERE (descripcion LIKE 'bmiOca@%' AND active = true)",
+            function(err, notif){
+                if(err){
+                    console.log("Error Selecting : %s", err);
+                }
+
+                res.render('matprimas/notificaciones', {notif: notif});
+
+            });
+    });
+});
+
+
+
+router.get('/get_reserv_info/:idreserv/:idreservd/:idnotif', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+        connection.query("SELECT reservacion_detalle.idreservacion_d, material.detalle, odc.numoc, reservacion_detalle.sin_prep FROM reservacion_detalle \n" +
+            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones \n" +
+            "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido \n" +
+            "LEFT JOIN odc ON odc.idodc = pedido.idodc \n" +
+            "LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial \n" +
+            "WHERE idreservacion IN (?) AND reservacion_detalle.sin_prep>0", [req.params.idreserv], function (err, reserv) {
+
+            if (err) console.log("Error Selecting : %s", err);
+
+            var numoc;
+            if(reserv.length > 0){
+                numoc = reserv[0].numoc;
+            }else{
+                numoc = "Desconocido";
+            }
+
+            res.render('matprimas/modal_notif_reserv', {data: reserv, numoc: numoc, idnotif: req.params.idnotif});
+        });
+    });
+});
+
+
+
+
+router.post('/view_reservaciones_post', function(req, res){
+    if(verificar(req.session.userData)) {
+        var input = JSON.parse(JSON.parse(JSON.stringify(req.body)).idreservd);
+        console.log("/view_reservaciones_post");
+        console.log(input);
+        res.render('matprimas/view_reservaciones', {sel: input, redirect: true});
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.get('/drop_notif/:idnotif', function(req, res, next){
+    req.getConnection(function(err,connection){
+        if(err){
+            console.log("Error Connection : %s", err);
+        }
+        connection.query("UPDATE notificacion SET active = false WHERE idnotificacion = ?",[req.params.idnotif],
+            function(err, notif){
+                if(err){
+                    console.log("Error Selecting : %s", err);
+                }
+                res.redirect('/matprimas/notif_bmi');
+            });
+    });
+});
+
 module.exports = router;

@@ -249,8 +249,8 @@ router.get('/crear_gdd', function(req, res, next){
                         +" left join odc on odc.idodc=pedido.idodc" +
                         " left join cliente on cliente.idcliente=odc.idcliente" +
                         " left join producido on producido.idmaterial=material.idmaterial" +
-                        " left join fabricaciones on fabricaciones.idpedido = pedido.idpedido LEFT JOIN (SELECT fabricaciones.idfabricaciones, SUM(reservacion_detalle.cantidad) AS reservados FROM reservacion_detalle " +
-                        " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones WHERE reservacion_detalle.estado = 1 GROUP BY fabricaciones.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
+                        " left join fabricaciones on fabricaciones.idpedido = pedido.idpedido LEFT JOIN (SELECT fabricaciones.idfabricaciones, SUM(reservacion_detalle.ret) AS reservados FROM reservacion_detalle " +
+                        " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones WHERE reservacion_detalle.ret > 0 GROUP BY fabricaciones.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
                         " left join ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
                         +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
                         function(err, rows){
@@ -307,8 +307,8 @@ router.post('/crear_gdd_post', function(req, res, next){
                         +" left join odc on odc.idodc=pedido.idodc" +
                         " left join cliente on cliente.idcliente=odc.idcliente" +
                         " left join producido on producido.idmaterial=material.idmaterial" +
-                        " left join fabricaciones on fabricaciones.idpedido = pedido.idpedido LEFT JOIN (SELECT fabricaciones.idfabricaciones, SUM(reservacion_detalle.cantidad) AS reservados FROM reservacion_detalle " +
-                        " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones WHERE reservacion_detalle.estado = 1 GROUP BY fabricaciones.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
+                        " left join fabricaciones on fabricaciones.idpedido = pedido.idpedido LEFT JOIN (SELECT fabricaciones.idfabricaciones, SUM(reservacion_detalle.ret) AS reservados FROM reservacion_detalle " +
+                        " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones WHERE reservacion_detalle.ret > 0 GROUP BY fabricaciones.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
                         " left join ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
                         +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
                         function(err, rows){
@@ -663,6 +663,8 @@ router.post('/save_gdd', function (req, res, next) {
                 //matriz que contiene los id de palet
                 var ids_palets = [];
                 var ids_palet_item = [];
+                var up_reserv = "";
+                var up_reserv2 = "";
                 //array que almacena los idpedido que tienen reservaciones vinculadas
                 var act_reserv = [];
                 for (let i = 0; i < Object.keys(input).length - 5 ; i++) {
@@ -678,10 +680,39 @@ router.post('/save_gdd', function (req, res, next) {
                     if (despachos[i][1] === "0") {
                         despachos[i][1] = null;
                     }
+                    /*
+                    * UPDATE reservacion_detalle
+                    * LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.desp = CASE
+                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
+                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
+                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
+                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
+                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
+                        ELSE reservacion_detalle.desp
+                        END
+                        WHERE fabricaciones.idpedido  in (?);
+                    * */
+                    if(i === 0){
+                        up_reserv += "UPDATE reservacion_detalle" +
+                            " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.desp = CASE ";
+
+                        up_reserv2 += "UPDATE reservacion_detalle" +
+                            " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.ret = CASE ";
+                    }
                     if(input['list[' + i + '][]'][4] === 'true'){
+                        up_reserv += " WHEN fabricaciones.idpedido = "+input['list[' + i + '][]'][0]+" THEN reservacion_detalle.desp + "+parseInt(input['list[' + i + '][]'][2]) ;
+                        up_reserv2 += " WHEN fabricaciones.idpedido = "+input['list[' + i + '][]'][0]+" THEN reservacion_detalle.ret - "+parseInt(input['list[' + i + '][]'][2]) ;
                         act_reserv.push(input['list[' + i + '][]'][0]);
                     }
                 }
+                up_reserv += " ELSE reservacion_detalle.desp" +
+                    " END" +
+                    " WHERE fabricaciones.idpedido  in ("+act_reserv.join(',')+")";
+
+
+                up_reserv2 += " ELSE reservacion_detalle.ret " +
+                    " END" +
+                    " WHERE fabricaciones.idpedido IN ("+act_reserv.join(',')+")";
                 //SE IDENTIFICA SI EXISTEN CONDICIONES PARA CREAR LA QUERY UPDATE CASE
                 // Y ACTUALIZAR CANTIDADES EN PALET Y NÚMERO DE PACKING LIST
                 var update_bool = false;
@@ -788,17 +819,21 @@ router.post('/save_gdd', function (req, res, next) {
                                                     if (err) {throw err;}
 
                                                     console.log("act_reserv");
-                                                    console.log(act_reserv);
+                                                    console.log(up_reserv);
+                                                    console.log(up_reserv2);
                                                     if(act_reserv.length > 0){
                                                         //UPDATE reservacion_detalle left join fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.estado = 2 WHERE fabricaciones.idpedido IN (11125)
-                                                        connection.query("UPDATE reservacion_detalle " +
-                                                            "left join fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones " +
-                                                            "SET reservacion_detalle.estado = 2 " +
-                                                            "WHERE fabricaciones.idpedido IN ("+act_reserv.join(',')+")",
+
+                                                        connection.query(up_reserv,
                                                             function(err, actReserv){
                                                                 if (err) {console.log("Error Selecting : %s", err);}
 
-                                                                res.redirect('/bodega/crear_gdd');
+                                                                connection.query(up_reserv2,
+                                                                    function(err, actReserv){
+                                                                        if (err) {console.log("Error Selecting : %s", err);}
+                                                                    res.redirect('/bodega/crear_gdd');
+                                                                    });
+
                                                         });
                                                     }
                                                     else{
@@ -813,17 +848,21 @@ router.post('/save_gdd', function (req, res, next) {
                                 }
                                 else{
                                     console.log("act_reserv");
-                                    console.log(act_reserv);
+                                    console.log(up_reserv);
+                                    console.log(up_reserv2);
                                     if(act_reserv.length > 0){
-                                        //UPDATE reservacion_detalle left join fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.estado = 2 WHERE fabricaciones.idpedido IN (11125)
-                                        connection.query("UPDATE reservacion_detalle " +
-                                            "left join fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones " +
-                                            "SET reservacion_detalle.estado = 2 " +
-                                            "WHERE fabricaciones.idpedido IN ("+act_reserv.join(',')+")",
+                                        connection.query(up_reserv,
                                             function(err, actReserv){
                                                 if (err) {console.log("Error Selecting : %s", err);}
 
-                                                res.redirect('/bodega/crear_gdd');
+                                                connection.query(up_reserv2,
+                                                    function(err, actReserv){
+                                                        if (err) {console.log("Error Selecting : %s", err);}
+
+
+                                                        res.redirect('/bodega/crear_gdd');
+                                                    });
+
                                             });
                                     }
                                     else{
@@ -2629,8 +2668,8 @@ router.get('/get_pedido_gdd/:idodc/:idped', function(req, res, next) {
             "LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido " +
             "LEFT JOIN (SELECT " +
             "reservacion_detalle.idfabricaciones, " +
-            "SUM(COALESCE(reservacion_detalle.cantidad,0) ) AS reservados FROM reservacion_detalle " +
-            "WHERE reservacion_detalle.estado = 1 GROUP BY reservacion_detalle.idfabricaciones) AS reservaciones ON reservaciones.idfabricaciones = fabricaciones.idfabricaciones " +
+            "SUM(COALESCE(reservacion_detalle.ret,0) ) AS reservados FROM reservacion_detalle " +
+            "WHERE reservacion_detalle.ret > 0 GROUP BY reservacion_detalle.idfabricaciones) AS reservaciones ON reservaciones.idfabricaciones = fabricaciones.idfabricaciones " +
             "WHERE pedido.idodc = ? AND pedido.bmi AND COALESCE(reservaciones.reservados,0) > 0 ", [req.params.idodc], function (err, rows){
             if (err) console.log("Error Selecting : %s", err);
             var numoc = 'Desconocido';

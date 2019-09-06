@@ -13,7 +13,14 @@
                         </div>
                     </div>
                 </form>
-                <form id="gdd_form">
+                <%
+                var key = new Date().toLocaleString();
+                key = key.split(' ');
+                key[0] = key[0].split('-').join('');
+                key[1] = key[1].split(':').join('');
+                key = key.join('');
+                %>
+                <form id="gdd_form<%= key%>">
                     <div id="oda_gdd" class="well" style="margin-top: 20px; padding: 0px !important;">
                         <p style="padding: 20px">
                             No se ha seleccionado ninguna OC
@@ -35,25 +42,36 @@
             <div class="panel-body" style="padding: 0 !important; margin: 0px !important;">
                 <table id="odaTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" cellspacing="0" width="100%" style="margin: 0 !important; padding: 0 !important;">
                     <thead>
-                    <tr>
-                        <th>ID OCA</th>
-                        <th>Descripción</th>
-                        <th>Stock Mat.</th>
-                        <th>Pedidos</th>
-                        <th>Recibidos</th>
-                        <th></th>
-                    </tr>
+                        <tr>
+                            <th>OCA</th>
+                            <th>Descripción</th>
+                            <th>Stock Mat.</th>
+                            <th>Pedidos</th>
+                            <th>Recibidos</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
                     </thead>
 
                     <tbody>
                     <%for (var i = 0; i < abast.length; i++){ %>
                     <tr>
-                        <td><%=abast[i]['idoda']%></td>
+                        <td style="text-align: center"><%=abast[i]['idoda']%></td>
                         <td><%=abast[i]['detalle']%></td>
-                        <td><%=abast[i]['stock']%></td>
-                        <td><%=abast[i]['cantidad']%></td>
-                        <td><%=abast[i]['recibidos']%></td>
-                        <!--<td><%#abast[i]['bmi']%></td>-->
+                        <td style="text-align: center"><%=abast[i]['stock']%></td>
+                        <td style="text-align: center"><%=abast[i]['cantidad']%></td>
+                        <td style="text-align: center"><%=abast[i]['recibidos']%></td>
+                        <td style="text-align: center">
+
+                            <%
+                            if(abast[i]['bmi'] === 1){%>
+                                Reservación
+                            <%}else if(abast[i]['externo'] === 1){%>
+                                Producción
+                            <%}else{%>
+                                -
+                            <%}%>
+                        </td>
                         <td><a class="btn btn-success btn-xs" onclick="send_search( <%= abast[i].idoda%> )"><i class="fa fa-plus"></i></a></td>
                     </tr>
                     <%}%>
@@ -101,13 +119,6 @@
         odaTable.search($(this).val()).draw() ;
     });
 
-    /*function goToByScroll(id) {
-        // Scroll
-        $('html,#page-wrapper').animate({
-            scrollTop: $("#" + id).offset().top
-        }, 'slow');
-    }*/
-
     function send_search(numero){
         $("#oda_input").val(numero);
         $("#oda_form button").trigger("click");
@@ -130,15 +141,20 @@
     });
 
     //Formulario de Recepcion
-    $("#gdd_form").submit(function(e){
+    $("#gdd_form<%= key%>").submit(function(e){
         e.preventDefault();
         var detalle = [];
+        var bmi = false;
         $("#confirmar_gdd").modal("toggle");
         //revisar todos los inputs de la tabla
         $("input[name = 'rec']").each(function(e){
             //Agregar a la lista sólo los inputs que sean distintos de cero.
             if($(this).val() != 0){
                 detalle.push([$(this).data('idabast'),$(this).val(),$(this).data('idmat'), $(this).data('bmi')]);
+                alert(typeof $(this).data('bmi'));
+                if($(this).data('bmi')){
+                    bmi = true;
+                }
             }
         });
 
@@ -165,4 +181,17 @@
             }
         });
     });
+    //RECORRE EL FORMULARIO EN BUSCA DE ALGUN PEDIDO TIPO BMI, PARA SABER SI MOSTRAR LA ALERTA O NO.
+    function checkBMI(){
+        var bmi = false;
+        $("input[name = 'rec']").each(function(e){
+            if($(this).val() != 0){
+                if($(this).data('bmi') === 1){
+                    bmi = true;
+                }
+            }
+        });
+        if(bmi){$("#alerta-reservacion").removeClass('hidden');}
+        else{$("#alerta-reservacion").addClass('hidden');}
+    }
 </script>

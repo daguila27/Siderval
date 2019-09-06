@@ -65,7 +65,7 @@ class Buscador{
 
     //add_cond es un string con la concatenación en sql de cualquier filtro adicional que se desea incluir
     //Ejemplo: "material.detalle>0@gd.tipo='Blanco'";
-    buscar_action(forpageoc){
+    buscar_action(forpageoc, callback){
         var t = this.idtabla;
         var ispage = this.ispage;
         $.ajax({
@@ -85,6 +85,9 @@ class Buscador{
                 $("#"+t).css('font-family', '12px');
                 $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height());
+                if(callback){
+                    callback();
+                }
 
             }
         });

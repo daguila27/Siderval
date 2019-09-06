@@ -31,7 +31,7 @@ function fechaLatino(string){
                     <div class="oe_title" style="display: flex; margin: 0; width: 100%">
                         <h1>
                             <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name" style="display: flex">
-                                <small style="font-size: 25px"><%= titulo%> : </small>
+                                <small style="font-size: 25px">Creando Movimiento N°<%= mov%></small>
                             </span>
                         </h1>
                     </div>
@@ -77,23 +77,23 @@ function fechaLatino(string){
                         </table>
                     </div>
                     <form id="reservForm">
-                    <div class="o_notebook">
-                        <h2><span><small>Se realizará el Retiro de lo siguiente: </small></span></h2>
-                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%">
-                            <thead>
-                            <tr>
-                                <th>N° Reservación</th>
-                                <th>Descripción</th>
-                                <th>Reservados</th>
-                                <th>Stock Actual</th>
-                            </tr>
-                            </thead>
-                            <tbody class="ui-sortable">
-                            <% for(var e=0; e < data.length; e++){
-                                    if(data[e].stock >= data[e].cantidad){%>
-                                    <tr class="success">
+                        <div class="o_notebook">
+                            <h2><span><small>Se realizará el Retiro de lo siguiente: </small></span></h2>
+                            <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%">
+                                <thead>
+                                <tr>
+                                    <th>N° Reservación</th>
+                                    <th>Descripción</th>
+                                    <th>Reservados</th>
+                                    <th>Stock Actual</th>
+                                </tr>
+                                </thead>
+                                <tbody class="ui-sortable">
+                                <% for(var e=0; e < data.length; e++){
+                                if(data[e].stock >= data[e].cantidad){%>
+                                <tr class="success">
                                     <%}else{%>
-                                    <tr class="danger">
+                                <tr class="danger">
                                     <%}%>
                                     <td style="text-align: center">
                                         <input type="hidden" name="idmat" value="<%= data[e].idmaterial%>">
@@ -102,28 +102,29 @@ function fechaLatino(string){
                                     </td>
                                     <td><%= data[e].detalle%></td>
                                     <td style="text-align: center; width: 30%">
-                                        <input class="form-control" type="number" name="reserv" value="<%= data[e].cant_reserv%>" min="1" max="<%= data[e].cant_reserv%>">
+                                        <input class="form-control" type="number" value="<%= data[e].cantidad%>" min="1" max="<%= data[e].cantidad%>">
+                                        <input class="form-control" type="hidden" name="reserv" value="<%= data[e].cantidad%>">
                                         <input type="hidden" name="idped" value="<%= data[e].idpedido%>">
                                     </td>
                                     <td style="text-align: center"><%= data[e].stock%></td>
                                 </tr>
-                            <%}%>
-                            </tbody>
-                            <tfoot>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                                <%}%>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
 
-                    <div class="button-group" style="width: 100%; padding-left: 80%; padding-top: 10px">
-                        <button class="btn btn-default" onclick="volver_tabla()">Cancelar</button>
-                        <button class="btn btn-primary">Crear</button>
-                    </div>
+                        <div class="button-group" style="width: 100%; padding-left: 80%; padding-top: 10px">
+                            <button class="btn btn-default" onclick="volver_tabla()">Cancelar</button>
+                            <button class="btn btn-primary">Crear</button>
+                        </div>
 
                     </form>
                 </div>
@@ -153,12 +154,12 @@ function fechaLatino(string){
         $.ajax({
             type: 'POST',
             data: {data: array},
-            url: '<%= url%>',
+            url: '/matprimas/crear_movimiento_reserva',
             success: function(data){
                 var idnotifs = JSON.parse(data.split('@')[1]);
                 data = data.split('@')[0];
                 if(data === 'ok'){
-                    alert("<%= msg%>");
+                    alert("¡Movimiento Registrado con Exito!");
 
                     //EMIT ACTUALIZA NOTIFICACIONES EN USUARIO BODEGA Y GESTIONPL
                     io.emit('actNotifBodega', idnotifs);

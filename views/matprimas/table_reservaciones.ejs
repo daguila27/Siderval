@@ -30,8 +30,11 @@ var etapas = [
         <th>OF</th>
         <th>Descripción</th>
         <th>Reservados</th>
+        <th>Recibidos OCA</th>
+        <th>Sin Preparar</th>
+        <th>Preparados</th>
+        <th>Retirados</th>
         <th>Fecha</th>
-        <th>Estado</th>
     </tr>
     </thead>
     <tbody class="ui-sortable">
@@ -42,35 +45,19 @@ var etapas = [
             <td class="hover-select" style="text-align: center"><%= data[i].idorden_f%></td>
             <td class="hover-select"><%= data[i].detalle%></td>
             <td class="hover-select" style="text-align: center"><%= data[i].cantidad%></td>
+            <td class="hover-select" style="text-align: center"><%= data[i].recibidos_oca%></td>
+            <td class="hover-select" style="text-align: center"><%= data[i].sin_prep%></td>
+            <td class="hover-select" style="text-align: center"><%= data[i].prep%></td>
+            <td class="hover-select" style="text-align: center"><%= data[i].ret%></td>
             <td class="hover-select" style="text-align: center" data-order="<%= new Date(data[i].fecha_reserv).getTime()%>"><%=fechaLatino(new Date(data[i].fecha_reserv).toLocaleDateString())%></td>
-            <!--
-               estado:
-               0: Sin Retirar de BMI
-               1: Retirado de BMI
-               2: Despachado
-            -->
-            <td class="hover-select" style="text-align: center">
-                <%
-                    switch (data[i].estado) {
-                        case 0:%>
-                            <%= 'Sin Retirar'%>
-                            <%break;
-                        case 1:%>
-                            <%= 'Retirado'%>
-                            <%break;
-                        case 2:%>
-                            <%= 'Despachado'%>
-                            <%break;
-                        default:%>
-                            <%= 'Invalido'%>
-                            <%break;
-                        }%>
-            </td>
         </tr>
     <%}%>
     </tbody>
     <tfoot>
         <tr>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
@@ -152,10 +139,10 @@ var etapas = [
     busc.setIndicadorPaginas(parseInt('<%= data.length%>'), "#indicador_paginas");
     cambiarInteraccion("#selectTipoReserv");
 
-    function renderMovMaker(){
+    function renderMovMaker(yo){
         $.ajax({
             type: 'GET',
-            url: '/matprimas/crear_movimiento_vista/'+seleccionados.join('-'),
+            url: '/matprimas/crear_movimiento_vista/'+seleccionados.join('-')+'/'+$(yo).data('estado'),
             beforeSend: function(){
                 destroyDataTable();
             },

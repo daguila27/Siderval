@@ -1471,8 +1471,7 @@ router.get('/get_dataodc/:idodc', function(req, res, next){
 		        		if(err)
 		        			console.log("Error Selecting : %s", err);
 
-						console.log(oda);
-		        		res.render('abast/modal_odc_creation', {data: oda, provs: proveedor, last: last[0].num + 1});
+		        		res.render('abast/modal_odc_creation', {data: oda, cli: proveedor, last: last[0].num + 1});
 		        	});	
 	        	});
         	});
