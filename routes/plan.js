@@ -3489,7 +3489,7 @@ router.get('/get_reserv_info/:idodc/:idped', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);
         connection.query("select " +
-            "material.detalle, pedido.cantidad, pedido.idpedido, coalesce(odc.numoc, 'Desconocido') as numoc " +
+            "material.detalle, pedido.cantidad, material.stock, pedido.idpedido, coalesce(odc.numoc, 'Desconocido') as numoc " +
             "from pedido " +
             "LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido " +
             "LEFT JOIN odc on odc.idodc = pedido.idodc " +
