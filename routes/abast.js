@@ -3945,7 +3945,7 @@ const fs = require('fs-extra');
 const fsf = require('fs');
 
 //PROMESA
-let compile = async function(templateName, data) {
+const compile = async function(templateName, data) {
 	const filePath = path.join(process.cwd() , 'templates', `${templateName}.hbs`);
     const html = await fs.readFile(filePath, 'utf-8');
 	return hbs.compile(html)(data);
