@@ -38,6 +38,12 @@
 
 <!-- Custom Theme JavaScript -->
 <script src="/dist/js/sb-admin-2.js"></script>
+
+
+<form action="/jefeplanta/indx" method="post" class="hidden render-form">
+    <input type="hidden" name="route" id="route" value="/plan/view_pedidos">
+</form>
+
 <script>
     function show_menu(){
         $('.o_sub_menu').css('left', '0%');
@@ -65,6 +71,17 @@
     function ajax(yo){
         $(".active").removeClass('active');
         $(yo).addClass('active');
+        var l = $(yo).data('link').split('/').join('%');
+        //var l = "/abastecimiento/indx/";
+
+        $(".render-form input#route").val(l);
+        $(".render-form input#tipo").val($(yo).data('tipo'));
+
+        $(".render-form").submit();
+
+
+        /*$(".active").removeClass('active');
+        $(yo).addClass('active');
         $.ajax({
             type: 'GET',
             url: $(yo).data('link'),
@@ -77,7 +94,7 @@
                 $("#page-wrapper").html(data);
                 $("#page-wrapper").fadeIn();
             }
-        });
+        });*/
     }
     function setDataTable(str){
         return $(str).DataTable({
@@ -327,6 +344,11 @@
     });
 
 
+
+    $(".oe_secondary_submenu li").removeClass('active');
+    $(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").addClass('active');
+    $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
+    $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
 </script>
 </body>
 </html>

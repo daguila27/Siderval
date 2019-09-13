@@ -73,14 +73,12 @@
 </style>
 <body style="padding: 5% !important;">
 <div class='headerss' style="width: 90%; margin-bottom: 20px;float: left;">
-    {{#if logo}}
-    <img src='{{logo}}' alt=""/>
-    {{/if}}
+    <img style='width: 30%; margin: 0;float:left;' src='{{logo}}' alt=""/>
     <!--<div style="width: 30%; height: 10px; margin: 0; float:left; background-color: black;"></div>-->
     <p style='text-align: center; width: 40%; font-size: 15px;margin:0;float:left;font-weight: 200;'>
         Fundición y Maestranza<br> Calle Décima - Parcela N° 474 <br> Placilla - Valparaíso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
     </p>
-    <p style='padding-top: 2%;margin: 0;width: 29%;float:left; text-align: center;font-weight: 500; font-size: 25px; border: 1px solid;'>
+    <p style='padding-top: 2%;margin: 0;width: 29%;float:left; vertical-align: central;text-align: center;font-weight: 500; font-size: 25px; border: 1px solid;'>
         Orden de Compra <br> <b>N° {{oda.idoda}} </b>
     </p>
 
@@ -204,7 +202,7 @@
         <div>LUGAR DE ENTREGA: Siderval</div>
     </div>
     <div class='firma' style='width: 100%; padding-left: 75%; padding-top: 2%'>
-        <img style='width: 100%' src='/assets/img/firma.png'>
+        <img style='width: 25%' src='{{firma}}'>
     </div>
 </div>
 

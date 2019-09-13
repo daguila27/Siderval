@@ -761,9 +761,18 @@
         $.ajax({
            type: 'GET',
            url: '/abastecimiento/new_pdf_oca/'+$(yo).data('idoda'),
+           beforeSend: function(){
+                $(yo).children('i').removeClass('fa-file-pdf-o');
+                $(yo).children('i').addClass('fa-spinner');
+                $(yo).children('i').addClass('fa-spin');
+           },
            success: function(data){
-               alert(data);
+
                jQuery('<form action="'+data+'" target="_blank"></form>').appendTo('body').submit().remove();
+
+               $(yo).children('i').removeClass('fa-spinner');
+               $(yo).children('i').removeClass('fa-spin');
+               $(yo).children('i').addClass('fa-file-pdf-o');
                //window.open(data, '_blank');
 
            }

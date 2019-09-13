@@ -67,7 +67,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
     return [where, limit,condiciones_where.join('@')];
 }
 function verificar(usr){
-	if(usr.nombre == 'abastecimiento' || usr.nombre == 'matprimas' || usr.nombre == 'plan' || usr.nombre == 'siderval'){
+	if(usr.nombre === 'abastecimiento' || usr.nombre === 'matprimas' || usr.nombre === 'plan' || usr.nombre === 'siderval'){
 		return true;
 	}else{
 		return false;
@@ -3939,12 +3939,13 @@ router.get('/visualizar_ofs', function(req, res, next) {
 
 
 const hbs = require('handlebars');
+const base64img = require('base64-img');
 const path = require('path');
 const fs = require('fs-extra');
 const fsf = require('fs');
 
 //PROMESA
-const compile = async function(templateName, data) {
+let compile = async function(templateName, data) {
 	const filePath = path.join(process.cwd() , 'templates', `${templateName}.hbs`);
     const html = await fs.readFile(filePath, 'utf-8');
 	return hbs.compile(html)(data);
@@ -4151,7 +4152,8 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                                     "oda":oda[0],
                                     "mats":mats,
                                     "vacio": array_vacio,
-									"logo": base64img.base64Sync('./assets/img/logo.png')
+									"logo": base64img.base64Sync('./public/assets/img/logo.png'),
+                                    "firma": base64img.base64Sync('./public/assets/img/firma.png')
                                 }
                             );
 
