@@ -466,9 +466,13 @@
     var io = io();
 
 
+
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR  -- INICIO */
     $(".oe_secondary_submenu li").removeClass('active');
     $(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").addClass('active');
     $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
     $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR -- FIN */
 </script>
+
 </html>

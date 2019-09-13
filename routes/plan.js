@@ -85,9 +85,19 @@ function parsear_crl(nro){
 /* GET users listing. */
 router.get('/', function(req, res) {
     if(req.session.userData.nombre === 'plan'){
-        res.render('plan/indx_new',{page_title:"Planificación",username: req.session.userData.nombre});}
+        res.render('plan/indx_new',{page_title:"Planificación",username: req.session.userData.nombre,  route: '/plan/lanzar_of/pedido'});}
     else{res.redirect('bad_login');}
 });
+
+
+router.post('/indx', function(req, res, next) {
+    var r = req.body.route.split('%').join('/');
+    if(req.session.userData.nombre === 'plan'){
+        res.render('plan/indx_new', {page_title: "Planificación", username: req.session.userData.nombre, route: r});
+    }
+    else{res.redirect('bad_login');}
+});
+
 
 /*
 Desc:

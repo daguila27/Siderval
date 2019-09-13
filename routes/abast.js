@@ -3938,6 +3938,268 @@ router.get('/visualizar_ofs', function(req, res, next) {
 });
 
 
+const hbs = require('handlebars');
+const path = require('path');
+const fs = require('fs-extra');
+const fsf = require('fs');
+
+//PROMESA
+const compile = async function(templateName, data) {
+	const filePath = path.join(process.cwd() , 'templates', `${templateName}.hbs`);
+    const html = await fs.readFile(filePath, 'utf-8');
+	return hbs.compile(html)(data);
+};
+
+function parsear_nro_routes(x, cs){
+    var parts = x.toString().split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    if(cs === undefined){
+        cs = 2;
+    }
+    if(parts.length > 1){
+        if(parts[1].length >= cs){
+            parts[1] = parts[1].substring(0,cs);
+        }
+        else{
+            parts[1] = parts[1]+'0'.repeat(cs-parts[1].length);
+        }
+    }
+    else{
+        parts[1] = '0'.repeat(cs);
+    }
+    var num;
+
+    if(cs === 0){
+        num =  parts[0];
+    }
+    else{
+        num =  parts.join(",");
+    }
+    return num;
+}
+
+router.get('/new_pdf_factura/:idfactura', function(req, res, next) {
+	const puppeteer = require('puppeteer');
+
+
+
+
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+
+        connection.query('select material.detalle,abastecimiento.cc as subcuenta, facturacion.cantidad*facturacion.costo as preciototal,  facturacion.costo as precio, facturacion.cantidad,' +
+            ' abastecimiento.exento FROM facturacion LEFT JOIN abastecimiento ON facturacion.idabast = abastecimiento.idabast' +
+            ' LEFT JOIN  material on material.idmaterial=abastecimiento.idmaterial WHERE facturacion.idfactura = ?', [req.params.idfactura],
+            function(err, mats){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                connection.query("SELECT oda.*,cliente.*,factura.fecha,factura.numfac as numfactura FROM factura" +
+                    " LEFT JOIN oda ON factura.idoda = oda.idoda" +
+                    " LEFT JOIN cliente ON cliente.idcliente = oda.idproveedor WHERE factura.idfactura = ?", [req.params.idfactura], function(err, oda){
+                    if(err)
+                        console.log("Error Selecting : %s", err);
+
+					var array_vacio = [];
+					var numfac = oda[0].numfactura;
+					oda[0].moneda = oda[0].tokenoda.split('@')[6].toUpperCase();
+                    oda[0].neto = 0;
+					for(var e=0; e < mats.length; e++){
+                        oda[0].neto += mats[e].preciototal;
+						mats[e].indice = e+1;
+						mats[e].cantidad = parsear_nro_routes(mats[e].cantidad);
+                        mats[e].preciototal = parsear_nro_routes(mats[e].preciototal);
+                        mats[e].precio = parsear_nro_routes(mats[e].precio);
+					}
+
+					if( mats.length < 15  ){
+						for(var t=mats.length; t < 15 ; t++){
+                            array_vacio.push({
+                                indice: t+1
+                            });
+						}
+
+					}
+					oda[0].iva = oda[0].neto*0.19;
+                    oda[0].total = oda[0].neto+oda[0].iva;
+
+                    oda[0].iva = parsear_nro_routes(oda[0].iva);
+                    oda[0].total = parsear_nro_routes(oda[0].total);
+                    oda[0].neto = parsear_nro_routes(oda[0].neto);
+
+                    oda[0].fecha = new Date(oda[0].fecha);
+                    oda[0].fecha = oda[0].fecha.getDate()+"/"+(parseInt(oda[0].fecha.getMonth()) + 1)+"/"+oda[0].fecha.getFullYear();
+
+                    (async function(){
+                        try{
+                            const browser = await puppeteer.launch()
+                            const page = await browser.newPage();
+
+                            const content = await compile('factura',
+                                {
+                                    "oda":oda[0],
+                                    "mats":mats,
+									"vacio": array_vacio
+                                }
+								);
+
+                            await page.setContent(
+                                content
+							);
+                            await page.emulateMedia('screen');
+                            try{
+                            	console.log("Creando pdf");
+                                await page.pdf({
+                                    path : 'public/pdf/fact_N'+numfac+'.pdf',
+                                    format: 'Letter',
+                                    printBackground : true
+                                });
+							}catch(e){
+                            	console.log("Error Archivo Ocupado");
+								var file = path.join(process.cwd() , 'public/pdf/facturaPrueba.pdf');
+                                console.log(file);
+								await fsf.unlink(file, function(err){
+                                    if (err) throw err;
+
+									console.log("Archivo Eliminado");
+
+								});
+
+                                await page.pdf({
+                                    path : 'public/pdf/fact_N'+numfac+'.pdf',
+                                    format: 'Letter',
+                                    printBackground : true
+                                });
+                            }
+
+                            console.log('done');
+                            res.send('public/pdf/fact_N'+numfac+'.pdf');
+                        }
+                        catch(e){
+                            console.log("Error al generar PDF : %s", e);
+                        }
+                    })();
+
+
+                });
+            });
+    });
+});
+
+
+
+
+router.get('/new_pdf_oca/:idoca', function(req, res, next) {
+    const puppeteer = require('puppeteer');
+
+
+    req.getConnection(function(err, connection){
+        if(err)
+            console.log("Error Connection : %s", err);
+
+        connection.query('select material.detalle, coalesce(abastecimiento.costo,0) as precio, coalesce(abastecimiento.cantidad,0) as cantidad, coalesce(abastecimiento.costo,0)*coalesce(abastecimiento.cantidad,0) as preciototal ' +
+			'from abastecimiento ' +
+			'left join oda on abastecimiento.idoda=oda.idoda ' +
+			'left join material on material.idmaterial=abastecimiento.idmaterial where oda.idoda=?', [req.params.idoca],
+            function(err, mats){
+                if(err)
+                    console.log("Error Selecting : %s", err);
+                connection.query("SELECT * FROM oda LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor WHERE oda.idoda = ?", [req.params.idoca], function(err, oda){
+                    if(err)
+                        console.log("Error Selecting : %s", err);
+
+
+                    console.log(oda);
+
+                    console.log(mats);
+                    var array_vacio = [];
+                    oda[0].moneda = oda[0].tokenoda.split('@')[6].toUpperCase();
+                    oda[0].neto = 0;
+                    for(var e=0; e < mats.length; e++){
+                        oda[0].neto += mats[e].preciototal;
+                        mats[e].indice = e+1;
+                        mats[e].cantidad = parsear_nro_routes(mats[e].cantidad);
+                        mats[e].preciototal = parsear_nro_routes(mats[e].preciototal);
+                        mats[e].precio = parsear_nro_routes(mats[e].precio);
+                    }
+
+                    if( mats.length < 15  ){
+                        for(var t=mats.length; t < 15 ; t++){
+                            array_vacio.push({
+                                indice: t+1
+                            });
+                        }
+
+                    }
+                    oda[0].iva = oda[0].neto*0.19;
+                    oda[0].total = oda[0].neto+oda[0].iva;
+
+                    oda[0].iva = parsear_nro_routes(oda[0].iva);
+                    oda[0].total = parsear_nro_routes(oda[0].total);
+                    oda[0].neto = parsear_nro_routes(oda[0].neto);
+
+                    oda[0].creacion = new Date(oda[0].creacion);
+                    oda[0].creacion = oda[0].creacion.getDate()+"/"+(parseInt(oda[0].creacion.getMonth()) + 1)+"/"+oda[0].creacion.getFullYear();
+
+                    (async function(){
+                        try{
+                            const browser = await puppeteer.launch()
+                            const page = await browser.newPage();
+
+                            const content = await compile('oca',
+                                {
+                                    "oda":oda[0],
+                                    "mats":mats,
+                                    "vacio": array_vacio,
+									"logo": base64img.base64Sync('./assets/img/logo.png')
+                                }
+                            );
+
+                            await page.setContent(
+                                content
+                            );
+                            await page.emulateMedia('screen');
+                            try{
+                                console.log("Creando pdf");
+                                await page.pdf({
+                                    path : 'public/pdf/odc'+req.params.idoca+'.pdf',
+                                    format: 'Letter',
+                                    printBackground : true
+                                });
+                            }catch(e){
+                                console.log("Error Archivo Ocupado");
+                                var file = path.join(process.cwd() , 'public/pdf/facturaPrueba.pdf');
+                                console.log(file);
+                                await fsf.unlink(file, function(err){
+                                    if (err) throw err;
+
+                                    console.log("Archivo Eliminado");
+
+                                });
+
+                                await page.pdf({
+                                    path : 'public/pdf/odc'+req.params.idoca+'.pdf',
+                                    format: 'Letter',
+                                    printBackground : true
+                                });
+                            }
+
+                            console.log('done');
+
+                            res.send( res.req.headers.host+'/pdf/odc'+req.params.idoca+'.pdf');
+                        }
+                        catch(e){
+                            console.log("Error al generar PDF : %s", e);
+                        }
+                    })();
+
+
+                });
+            });
+    });
+});
+
+
 
 
 module.exports = router;

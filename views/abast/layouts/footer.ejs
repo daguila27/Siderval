@@ -557,36 +557,49 @@
             }
         }
     }
+
+
     function rutFormat(yo){
         var v = $(yo).val();
         v = v.replace('-','');
-        if(v===''){
+        if(v === ''){
             $(yo).val("")
         }
         else{
             $(yo).val(v.substring(0, v.length-1)+"-"+v.substring(v.length-1, v.length))
         }
     }
+
+    //NO FUNCIONA PORQUE EL RUT NO TIENE EL GUIÓN?
     function validarRut(rut){
         rut = rut.split('-');
+        var op = [];
+        var op2;
+        var op3;
         var c = 0;
         var m = 2;
         for(var e=rut[0].length-1; e >= 0; e--){
+            op.push(m.toString()+"*"+rut[0][e].toString());
             c += m*parseInt(rut[0][e]);
             m++;
             if(m === 8){
                 m = 2;
             }
         }
+        op = "("+op.join(' + ')+") = "+c.toString();
+        op2 = c.toString() + "%11 = "+(c%11).toString();
         c = c%11;
+        op3 = "11 - "+c.toString() + " = "+(11 - c).toString() + " (Si es 10 se reemplaza por k o por 0 si es 11)";
         c = 11 - c;
         if(c===10){
             c='k';
+        }else if(c===11){
+            c=0;
         }
         if(c.toString() === rut[1]){
             return true;
         }else{
-            alert("Rut inválido.")
+            alert("Rut inválido.\n"+op+"\n"+op2+"\n"+op3+"\n"+c.toString() +" <> "+ rut[1]);
             return false;
         }
     }
@@ -745,7 +758,16 @@
 
 
     function verPdf(yo){
-        window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
+        $.ajax({
+           type: 'GET',
+           url: '/abastecimiento/new_pdf_oca/'+$(yo).data('idoda'),
+           success: function(data){
+               alert(data);
+               jQuery('<form action="'+data+'" target="_blank"></form>').appendTo('body').submit().remove();
+               //window.open(data, '_blank');
+
+           }
+        });
     }
 
 

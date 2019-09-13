@@ -91,12 +91,33 @@ router.get('/', function(req, res, next) {
             if(err){console.log("Error Connecting : %s", err);}
             connection.query("SELECT * FROM etapafaena", function(err, etp){
                 if(err){console.log("Error Selecting : %s", err);}
-                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp});
+                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp, route: '/gestionpl/create_production_history'});
             });
         });
     }
     else{res.redirect('bad_login');}
 });
+
+router.post('/indx', function(req, res, next) {
+    var r = req.body.route.split('%').join('/');
+    console.log("rutaaaa");
+    console.log(r);
+
+
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err){ console.log("Error Selecting : %s", err);}
+                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp, route: r});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
 router.post('/save_production_history_state', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));

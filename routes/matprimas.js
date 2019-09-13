@@ -65,7 +65,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
     return [where, limit,condiciones_where.join('@')];
 }
 function verificar(usr){
-	if(usr.nombre === 'matprimas' || usr.nombre === 'siderval'){
+	if(usr.nombre === 'matprimas' || usr.nombre === 'siderval' || usr.nombre === 'gestionpl'){
 		return true;
 	}else{
 		return false;
@@ -73,7 +73,7 @@ function verificar(usr){
 }
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-	if(req.session.userData.nombre == 'matprimas'){
+	if(req.session.userData.nombre === 'matprimas'){
     	res.render('matprimas/indx_new', {page_title: "Materias Primas", username: req.session.userData.nombre, route: '/matprimas/view_mprimas'});
 	}
 	else{res.redirect('bad_login');}	

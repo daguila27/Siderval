@@ -1,4 +1,4 @@
-<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;margin-top: 20px">
+﻿<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;margin-top: 20px">
 <!--<h1 class="page-header">Crear Guía de Despacho:</h1>-->
 <%
 function largeID(string, large){
@@ -187,6 +187,7 @@ function letraMayus(string) {
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td></td>
                     </tr>
                 </tbody>
             </table>
@@ -322,7 +323,7 @@ function letraMayus(string) {
                                 <td id="date<%= data[i].idpedido%>" style="text-align: center;"><%= new Date(data[i].f_entrega).toLocaleDateString()%></td>
 
                                 <td class="mat_butt" id="add<%= data[i].idpedido%>">
-                                    <a data-idpedido="<%= data[i].idpedido%>" data-bmi="<%= data[i].bmi%>" aria-disabled="false" class="btn btn-success btn-xs addrow"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
+                                    <a data-idpedido="<%= data[i].idpedido%>" data-idcliente="<%= data[i].idcliente%>" data-bmi="<%= data[i].bmi%>" aria-disabled="false" class="btn btn-success btn-xs addrow"><span class="glyphicon glyphicon-plus" style="padding-left: 2px"></span></a>
                                 </td>
                                 
                                 <td class="hidden" id="rmv<%= data[i].idpedido%>">
@@ -621,6 +622,9 @@ function letraMayus(string) {
         $("#pl" + row.data('idpedido')).addClass("hidden");     //Oculta cantidad paletizada en TS
         $("#in" + row.data('idpedido')).removeClass("hidden");     //Muestra input en TS
         $("#session_prod").append("<tr id='TS" + row.data('idpedido') + "'>"+$("#" + row.data('idpedido')).html()+"</tr>"); //Agrega fila de TI en TS
+
+        //SELECCIONAR DETERMINADO CLIENTE MEDIANTE EL idcliente
+        $(".selector-buscador .dropdown-menu li a[data-value='"+row.data('idcliente')+"']").click();
     }
     function add_row_palet(yo){
         if(confirm("Se adjuntaran todos los productos del palet a la GDD. ¿Está seguro?")){

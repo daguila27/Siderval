@@ -11,8 +11,29 @@ key[0] = key[0].split('-').join('');
 key[1] = key[1].split(':').join('');
 key = key.join('');
 %>
+<div id="confirmar_retiro_modal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Confirmar Retiro</h4>
+                </div>
+                <div class="modal-body">
+                    <p>¿ Confirma que todos los datos están correctos y que no hay inconvenientes ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="crear_retiro_f()">Confirmar Registro</button>
+                    <button type="button" class="btn btn-default closeModal" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+    </div>
+</div>
+
 <form id="session_form_ret<%=key%>">
-	<div class="panel panel-info" id="sess_panel" style="margin: 50px 25px !important;">
+	<div class="panel panel-info" id="sess_panel" style="margin: 50px 25px !important;-webkit-box-shadow: 6px -3px 12px -1px rgba(0,0,0,0.75);
+-moz-box-shadow: 6px -3px 12px -1px rgba(0,0,0,0.75);
+box-shadow: 6px -3px 12px -1px rgba(0,0,0,0.75);">
 			<div class="panel-heading">
 				<h1 id="sess_titulo" >Registrar Retiro: </h1>
 			</div>
@@ -40,7 +61,7 @@ key = key.join('');
 				</div>
 				<div class="col-md-1" style="margin-top: 12px">
 					<div class="form-group" style="margin-top: 10px">
-						<button class="btn btn-success pull-right" onclick="crear_retiro_f()" type="button">Registrar</button>
+						<button class="btn btn-success pull-right" onclick="$('#session_form_ret<%=key%>').serializeArray();$('#confirmar_retiro_modal').modal('show');" type="button">Registrar</button>
 					</div>
 				</div>
 			</div>
@@ -63,7 +84,9 @@ key = key.join('');
 			</table>
 	</div>
 </form>
-<div class="panel panel-info" style="padding: 0;margin: 50px 25px !important;">
+<div class="panel panel-info" style="padding: 0;margin: 50px 25px !important; -webkit-box-shadow: 6px -3px 12px -1px rgba(0,0,0,0.75);
+-moz-box-shadow: 6px -3px 12px -1px rgba(0,0,0,0.75);
+box-shadow: 6px -3px 12px -1px rgba(0,0,0,0.75);">
     <div class="panel-heading">
         <h3 style="display: flex">
             <label style="width: 75%">Añadir Productos : </label>
@@ -157,6 +180,7 @@ key = key.join('');
         $("#row" + idmaterial.toString()).addClass("hidden");
     }
 
+
     function crear_retiro_f(){
         showLoad();
         setTimeout(function(){ $("#session_form_ret<%=key%>").submit(); }, 1000);
@@ -181,6 +205,9 @@ key = key.join('');
                        receptor: $("#receptor_r").val()
                    },
                    url: '/matprimas/save_movimiento',
+                   beforeSend: function(){
+                       $("#confirmar_retiro_modal").modal('hide');
+                   },
                    success: function (data) {
                        if (!data.err) {
                            //alert(data.msg);

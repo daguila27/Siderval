@@ -226,7 +226,9 @@
 <!-- The actual snackbar -->
 <div id="snackbar" data-newid="0" onclick="clickSnackbar(this)" style="cursor: pointer;">Se ha creado una nueva OF. <button class="btn btn-success">RECARGAR</button></div>
 
-
+<form action="/gestionpl/indx" method="post" class="hidden render-form">
+    <input type="hidden" name="route" id="route" value="create_production_history">
+</form>
 </body>
 </html>
 <script>
@@ -297,7 +299,17 @@
 
 
     function ajax(yo){
+
+
         $(".active").removeClass('active');
+        $(yo).addClass('active');
+        var l = $(yo).data('link').split('/').join('%');
+        $(".render-form input#route").val(l);
+        $(".render-form input#tipo").val($(yo).data('tipo'));
+        $(".render-form").submit();
+
+
+        /*$(".active").removeClass('active');
         $(yo).addClass('active');
         $.ajax({
             type: 'GET',
@@ -312,7 +324,7 @@
                 $("#page-wrapper").fadeIn();
 
             }
-        });
+        });*/
     }
     var io = io();
 
@@ -330,7 +342,7 @@
         }
     });
 
-    $.ajax({
+    /*$.ajax({
         type: 'GET',
         url: "/gestionpl/create_production_history",
         beforeSend: function(){
@@ -343,7 +355,7 @@
             $("#page-wrapper").fadeIn();
 
         }
-    });
+    });*/
 
 
     function  setDataTableFixed(str){
@@ -425,5 +437,14 @@
         });
     }
 
+
+
+
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR  -- INICIO */
+    $(".oe_secondary_submenu li").removeClass('active');
+    $(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").addClass('active');
+    $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
+    $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR -- FIN */
 
 </script>

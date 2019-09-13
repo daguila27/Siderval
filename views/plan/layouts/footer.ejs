@@ -199,6 +199,10 @@
 </style>
 <!-- Custom Theme JavaScript -->
 <script src="/dist/js/sb-admin-2.js"></script>
+
+<form action="/plan/indx" method="post" class="hidden render-form">
+    <input type="hidden" name="route" id="route" value="lanzar_of/pedido">
+</form>
 <script>
     function show_menu(){
         $('.o_sub_menu').css('left', '0%');
@@ -209,7 +213,15 @@
 
 
     function ajax(yo){
-        $(".active").removeClass('active');
+
+        //$(".active").removeClass('active');
+        //$(yo).addClass('active');
+        var l = $(yo).data('link').split('/').join('%');
+        $(".render-form input#route").val(l);
+        $(".render-form input#tipo").val($(yo).data('tipo'));
+        $(".render-form").submit();
+
+        /*$(".active").removeClass('active');
         $(yo).addClass('active');
         $.ajax({
             type: 'GET',
@@ -224,9 +236,9 @@
                 $("#page-wrapper").fadeIn();
 
             }
-        });
+        });*/
     }
-    $(document).ready(function(){
+    /*$(document).ready(function(){
         $.ajax({
             type: 'GET',
             url: '/plan/lanzar_of/pedido',
@@ -243,7 +255,7 @@
             }
         });
 
-    });
+    });*/
 
     function  setDataTableFixed(str){
         var tope = $('#up-fills').outerHeight() + $('#oe_main_menu_navbar').outerHeight() - 2;
@@ -466,6 +478,15 @@
         console.log(xhr.responseText);
         console.log(xhr);
     });
+
+
+
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR  -- INICIO */
+    $(".oe_secondary_submenu li").removeClass('active');
+    $(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").addClass('active');
+    $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
+    $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR -- FIN */
 </script>
 </body>
 </html>

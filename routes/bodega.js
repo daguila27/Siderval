@@ -69,15 +69,11 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
 }
 
 function verificar(usr){
-	if(usr.nombre === 'gestionpl' || usr.nombre === 'bodega' || usr.nombre === 'plan' || usr.nombre === 'siderval'|| usr.nombre === 'jefeplanta' || usr.nombre === 'test' || usr.nombre === 'matprimas'){
-		return true;
-	}else{
-		return false;
-	}
+	return usr.nombre === 'gestionpl' || usr.nombre === 'bodega' || usr.nombre === 'plan' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'test' || usr.nombre === 'matprimas';
 }
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-	if(req.session.userData.nombre == 'bodega'){
+	if(req.session.userData.nombre === 'bodega'){
     	res.render('bodega/index_new', {page_title: "Bodega", username: req.session.userData.nombre});
 	}
 	else{res.redirect('bad_login');}	

@@ -118,13 +118,13 @@ class Buscador{
                 $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
             }
             else if(this.page === 1){
-                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
             }
             else if(this.lastpage){
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
             }
             else{
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
             }
         }
         else{

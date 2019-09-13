@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Orden de Compra #{{oda.numoda}}</title>
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="/vendor/morrisjs/morris.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+</head>
+<style type='text/css'>
+    html{
+        padding: 0.5cm;
+    }
+    body{
+        display: block;
+        align-content: center;
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        padding: 0;
+    }
+    .headerss{
+        margin: 0;
+        padding: 0;
+    }
+    .fecha{
+        text-align: right;
+    }
+    .info{
+        border: 1px solid;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        padding-left:1%;
+    }
+    .cab_table th{
+        padding-left: 1%;
+        border: 1px solid;
+    }
+    .tabla tbody > tr td{
+        border: 1px solid;
+        text-align: center;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+
+
+    .tabla tfoot{
+        border: 1px solid;
+        text-align: center;
+    }
+    .fund{
+        border: 1px solid;
+    }
+    .obs{
+        margin-top: 2%;
+    }
+    .obs div{
+        border: 1px solid;
+    }
+</style>
+<body style="padding: 5% !important;">
+<div class='headerss' style="width: 90%; margin-bottom: 20px;float: left;">
+    {{#if logo}}
+    <img src='{{logo}}' alt=""/>
+    {{/if}}
+    <!--<div style="width: 30%; height: 10px; margin: 0; float:left; background-color: black;"></div>-->
+    <p style='text-align: center; width: 40%; font-size: 15px;margin:0;float:left;font-weight: 200;'>
+        Fundición y Maestranza<br> Calle Décima - Parcela N° 474 <br> Placilla - Valparaíso - Chile<br> Rut: 96.935.140-4<br> Fono: 032-3817000<br> 032-3817002<br> E-mail: abastecimiento@siderval.cl<br> www.siderval.cl<br>
+    </p>
+    <p style='padding-top: 2%;margin: 0;width: 29%;float:left; text-align: center;font-weight: 500; font-size: 25px; border: 1px solid;'>
+        Orden de Compra <br> <b>N° {{oda.idoda}} </b>
+    </p>
+
+</div>
+<div class='bodyss' style="width: 90%; font-size: 20px;font-weight: 600">
+    <div class='info' style="float: left">
+        <!-- Nombre y fecha -->
+        <div style="float: left; width: 100%">
+            <div style="float: left;">
+                <div class="columna">NOMBRE:</div>
+                <div style="float: left;font-weight: 400;margin-left: 10%"  class="columna2">{{oda.sigla}} - {{oda.razon}}</div>
+            </div>
+            <div style="float: right;">
+                Valparaíso, {{oda.creacion}}
+            </div>
+        </div>
+        <!-- Rut y Ciudad-->
+        <div style='width: 100%;float: left'>
+            <div style='width: 60%;float:left;'><div class="columna">RUT: </div><div  class="columna2" style="float: left;font-weight: 400;">{{oda.rut}}</div></div>
+            <div style='width: 38%;float:left;'>CIUDAD: <div style="font-weight: 400;">{{oda.ciudad}}</div></div>
+        </div>
+        <!-- Direccion -->
+        <div style="float:left;">
+            <div class="columna">DIRECCION:</div>
+            <div  class="columna2" style="float: left;font-weight: 400;margin-left:10%;">{{oda.direccion}}</div>
+        </div>
+        <!-- AT y FONO -->
+        <div style='width: 100%;float: left' >
+            <div style='width: 60%;float:left;'><div class="columna">AT:</div> <div class="columna2" style="float: left;margin-left:15px;font-weight: 400;">{{oda.contacto}}</div></div>
+            <div style='width: 38%;float:left;'>FONO: <div style="font-weight: 400;">{{oda.telefono}}</div></div>
+        </div>
+        <div style="float: left;"><div class="columna">GIRO: </div> <div  class="columna2" style="float: left;font-weight: 400;">{{oda.giro}}</div></div>
+    </div>
+    <div style="float: left; margin-top: 10px !important;">POR LO SIGUIENTE:</div>
+    <style type="text/css">
+        .columna{
+            float: left;
+            width: 70px;
+        }
+    </style>
+    <table style='width: 100%; font-size: 20px;font-weight: 700;' class='tabla' cellspacing="0">
+        <thead>
+        <tr class='cab_table'>
+            <th style='width: 5%;text-align: right;'>Item</th>
+            <th style='width: 11%;text-align: center;'>Cantidad</th>
+            <th style='width: 55%;text-align: center;'>Descripción</th>
+            <th style='text-align: center; '>Valor <br> Unitario</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {{#each mats}}
+            <tr style="min-height: 60px">
+                <td style="margin: 0 !important;padding: 2px !important;">{{indice}}</td>
+                <td style="margin: 0 !important;padding: 2px !important;">{{cantidad}}</td>
+                <td style="margin: 0 !important;padding: 2px !important;text-align: right;"><span style="float:left">{{detalle}}</span></td>
+                <td style="margin: 0 !important;padding: 2px !important;">{{precio}}</td>
+                <td style="margin: 0 !important;padding: 2px !important; text-align: right;">
+                    {{preciototal}}
+                </td>
+            </tr>
+        {{/each}}
+        {{#each vacio}}
+            <tr style="min-height: 60px">
+                <td style="margin: 0 !important;padding: 2px !important;">{{indice}}</td>
+                <td style="margin: 0 !important;padding: 2px !important;"></td>
+                <td style="margin: 0 !important;padding: 2px !important; text-align: right;" ><span style="float:left"></span></td>
+                <td style="margin: 0 !important;padding: 2px !important;"></td>
+                <td style="margin: 0 !important;padding: 2px !important; text-align: right;"></td>
+            </tr>
+        {{/each}}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class='fund'>DESCUENTO </td>
+            <td class='fund' style="text-align: right;">
+                0
+            </td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>NETO </td>
+            <td class='fund' style="text-align: right;">
+                {{oda.neto}}
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td style="text-align: left;">MONEDA {{oda.moneda}}</td>
+            <td class='fund'>IVA </td>
+            <td class='fund' style="text-align: right;">
+                {{oda.iva}}
+            </td>
+
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td style="text-align: left"></td>
+            <!--<td style="text-align: left">CUENTA: <%= oda[0].tokenoda[5]%></td>-->
+            <td class='fund'>TOTAL </td>
+            <td class='fund' style="text-align: right;">
+                {{oda.total}}
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+
+    <div class='obs'>
+        <div>OBSERVACIONES: OBS</div>
+        <div>DESTINO: </div>
+        <div>PLAZO DE ENTREGA: 30 días</div>
+        <div>FORMA DE PAGO: CONTADO</div>
+        <div>LUGAR DE ENTREGA: Siderval</div>
+    </div>
+    <div class='firma' style='width: 100%; padding-left: 75%; padding-top: 2%'>
+        <img style='width: 100%' src='/assets/img/firma.png'>
+    </div>
+</div>
+
+
+</body>
+
+</html>
