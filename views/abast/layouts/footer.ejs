@@ -584,6 +584,8 @@
         c = 11 - c;
         if(c===10){
             c='k';
+        }else if(c===1){
+            c=0;
         }
         if(c.toString() === rut[1]){
             return true;
