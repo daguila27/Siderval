@@ -8,7 +8,7 @@ router.use(
     connection(mysql,dbCredentials,'pool')
 );
 function verificar(usr){
-  if(usr.nombre == 'plan' || usr.nombre == 'gerencia' || usr.nombre == 'abastecimiento' || usr.nombre == 'siderval' || usr.nombre == 'jefeplanta' || usr.nombre == 'bodega'){
+  if(usr.nombre === 'plan' || usr.nombre === 'gerencia' || usr.nombre === 'abastecimiento' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'bodega'){
     return true;
   }else{
     return false;
@@ -3487,6 +3487,8 @@ router.get('/notif_plan', function(req, res, next){
                 if(err){
                     console.log("Error Selecting : %s", err);
                 }
+
+                console.log("NOTIFICACION");
                 console.log(notif);
 
                 res.render('plan/notificaciones', {notif: notif});

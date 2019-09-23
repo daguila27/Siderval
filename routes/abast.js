@@ -3937,7 +3937,7 @@ router.get('/visualizar_ofs', function(req, res, next) {
     });
 });
 
-
+/*
 const hbs = require('handlebars');
 const base64img = require('base64-img');
 const path = require('path');
@@ -4201,7 +4201,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
     });
 });
 
-
+*/
 
 
 module.exports = router;

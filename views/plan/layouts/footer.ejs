@@ -212,6 +212,14 @@
     }
 
 
+    $.ajax({
+        type: 'GET',
+        url: '/plan/notif_plan',
+        success: function(data){
+            $(".notificaciones").html(data);
+        }
+    });
+
     function ajax(yo){
 
         //$(".active").removeClass('active');
