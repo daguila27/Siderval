@@ -24,6 +24,7 @@
 				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">OC</th>
 				<th class="o_column_sortable order-column" data-order="cliente.razon-ASC">Cliente</th>
 				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Descripción</th>
+				<th class="o_column_sortable order-column" data-order="material.detalle-ASC">Aleación</th>
 				<th class="o_column_sortable order-column" data-order="odc.numoc-ASC">Unidad</th>
 				<th class="o_column_sortable order-column" data-order="pedido.cantidad-ASC">Solicitados</th>
 				<th class="o_column_sortable order-column" >Por Fabricar</th>
@@ -72,6 +73,7 @@
 			<td data-toggle="tooltip" title="OC" class="col-numoc o_data_cell o_readonly_modifier o_required_modifier" data-idodc="<%=data[i].idodc%>" onclick="submit_oc(this)" style="text-align: center"><button class="btn btn-primary btn-xs"><%=data[i].numoc%></button></td>
 			<td data-toggle="tooltip" title="Cliente" class="col-cliente o_data_cell o_readonly_modifier"><%=data[i].sigla%></td>
 			<td data-toggle="tooltip" title="Descripción" class="col-descrip o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].detalle%></td>
+			<td data-toggle="tooltip" title="Aleación" class="col-descrip o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].subaleacion%></td>
 			<td data-toggle="tooltip" title="Unidad" class="col-numoc o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center ;"><%=data[i].u_medida%></td>
 			<%
                 t_sol += data[i].cantidad;
@@ -110,6 +112,7 @@
 			<td id="col-numoc"></td>
 			<td id="col-cliente"></td>
 			<td id="col-descrip"></td>
+			<td id="col-subal"></td>
 			<td id="col-unidad"></td>
 			<td data-toggle="tooltip" title="Total Solicitado" style="text-align: center;" class="parsear_nro" data-cs="0" id="col-solic"><%=t_sol%></td>
 			<td data-toggle="tooltip" title="Total por Fabricar" style="text-align: center;" class="parsear_nro" data-cs="0"  id="col-xfabs"><%=t_xfabs%></td>

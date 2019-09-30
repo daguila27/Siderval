@@ -88,6 +88,7 @@ function fechaEspañol(date){
         <th id="cab-numitem">Item</th>
         <th id="cab-cliente">Cliente</th>
         <th id="cab-descrip">Descripción</th>
+        <th id="cab-subal">Aleación</th>
         <th id="cab-pesoxproducir" style="text-align: center;">Peso unitario</th>
         <th id="cab-solicitados">Solicitados</th>
         <th id="cab-sin_produccion">Por Despachar</th>
@@ -137,6 +138,7 @@ function fechaEspañol(date){
         <td data-toggle="tooltip" title="Item" class="numitem" style="text-align: center;"><%=data[i].numitem%></td>
         <td data-toggle="tooltip" title="Cliente" class="cliente" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
         <td data-toggle="tooltip" title="Descripción" class="descrip" ><%=data[i].detalle%></td>
+        <td data-toggle="tooltip" title="Aleación" class="subal" ><%=data[i].subaleacion%></td>
         <td data-toggle="tooltip" title="Peso Unitario" class="pesoxproducir parsear_nro" data-cs="0" style="text-align: center;"><%= data[i].peso%></td>
         <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
         <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion" class="checkFunction sin_produccion parsear_nro" data-cs="0" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
@@ -159,6 +161,7 @@ function fechaEspañol(date){
         <td id="numitem"></td>
         <td id="cliente"></td>
         <td id="descrip"></td>
+        <td id="subal"></td>
         <td id="pesoxproducir"></td>
         <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro" data-cs="0"><%=solic_total%></td>
         <td id="sin_produccion" data-toggle="tooltip" title="Totales por Despachar" style="text-align: center;" class="parsear_nro" data-cs="0"><%=xdesp_total%></td>
