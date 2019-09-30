@@ -1,0 +1,176 @@
+<%
+function fechaLatino(string){
+    return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
+}
+%>
+<style>
+    .volver-tabla:hover{
+        background-color: rgb(124,123,173);
+        color: white;
+        cursor: pointer;
+    }
+    .volver-tabla{
+        position: relative;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        border-radius: 25%;
+    }
+</style>
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+<div class="o_view_manager_content">
+    <i class="fa fa-arrow-left volver-tabla" id="ReservBack" onclick="volver_tabla()"></i>
+    <div>
+        <div class="o_form_view o_sale_order o_form_readonly">
+            <div class="o_form_sheet_bg">
+                <div class="o_form_sheet">
+                    <div class="o_not_full oe_button_box">
+
+                    </div>
+                    <div class="oe_title" style="display: flex; margin: 0; width: 100%">
+                        <h1>
+                            <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name" style="display: flex">
+                                <small style="font-size: 25px">Creando Movimiento N°<%= mov%></small>
+                            </span>
+                        </h1>
+                    </div>
+                    <div class="o_group">
+                        <table class="o_group o_inner_group o_group_col_8">
+                            <tbody>
+                            <tr>
+                                <td class="o_td_label" style="width: 40%;">
+                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Orden de Compra (OC)</label>
+                                </td>
+                                <td>
+                                    <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" id="o_field_input_1066">
+                                        <%= odc.numoc%>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="o_td_label">
+                                    <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Cliente</label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066">
+                                        <%= odc.sigla%> - <%= odc.razon%>
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table class="o_group o_inner_group o_group_col_8">
+                            <tbody>
+                            <tr>
+                                <td class="o_td_label" style="width: 40%;">
+                                    <label class="o_form_label o_readonly_modifier" for="o_field_input_1070" data-original-title="" title="">Orden de Fabricación (OF)
+                                    </label>
+                                </td>
+                                <td style="width: 100%;">
+                                    <span class="o_field_date o_field_widget o_readonly_modifier" name="confirmation_date">
+                                        <%= odc.idof%>
+                                    </span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <form id="reservForm">
+                        <div class="o_notebook">
+                            <h2><span><small>Se realizará el Retiro de lo siguiente: </small></span></h2>
+                            <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%">
+                                <thead>
+                                <tr>
+                                    <th>N° Reservación</th>
+                                    <th>Descripción</th>
+                                    <th>Reservados</th>
+                                    <th>Stock Actual</th>
+                                </tr>
+                                </thead>
+                                <tbody class="ui-sortable">
+                                <% for(var e=0; e < data.length; e++){
+                                if(data[e].stock >= data[e].cantidad){%>
+                                <tr class="success">
+                                    <%}else{%>
+                                <tr class="danger">
+                                    <%}%>
+                                    <td style="text-align: center">
+                                        <input type="hidden" name="idmat" value="<%= data[e].idmaterial%>">
+                                        <input type="hidden" name="idrev_d" value="<%= data[e].idreservacion_d%>">
+                                        <%= data[e].idreservacion%>
+                                    </td>
+                                    <td><%= data[e].detalle%></td>
+                                    <td style="text-align: center; width: 30%">
+                                        <input class="form-control" type="number" value="<%= data[e].cantidad%>" min="1" max="<%= data[e].cantidad%>">
+                                        <input class="form-control" type="hidden" name="reserv" value="<%= data[e].cantidad%>">
+                                        <input type="hidden" name="idped" value="<%= data[e].idpedido%>">
+                                    </td>
+                                    <td style="text-align: center"><%= data[e].stock%></td>
+                                </tr>
+                                <%}%>
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="button-group" style="width: 100%; padding-left: 80%; padding-top: 10px">
+                            <button class="btn btn-default" onclick="volver_tabla()">Cancelar</button>
+                            <button class="btn btn-primary">Crear</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="o_chatter oe_chatter">
+
+                <div class="o_mail_activity o_field_widget" name="activity_ids"></div>
+                <div class="o_mail_thread"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("form#reservForm").on('submit', function(e){
+        e.preventDefault();
+        var data = $(this).serializeArray();
+        var array = [];
+        //CANTIDAD DE INPUT DIFERENTES
+        var d = 4;
+        d = d-1;
+        for(var p=0; p < data.length ; p++ ){
+            array.push([data[p].value,data[p + 1].value,data[p + 2].value,data[p + 3].value]);
+            p = p+d;
+        }
+        array = JSON.stringify(array);
+        $.ajax({
+            type: 'POST',
+            data: {data: array},
+            url: '/matprimas/crear_movimiento_reserva',
+            success: function(data){
+                var idnotifs = JSON.parse(data.split('@')[1]);
+                data = data.split('@')[0];
+                if(data === 'ok'){
+                    alert("¡Movimiento Registrado con Exito!");
+
+                    //EMIT ACTUALIZA NOTIFICACIONES EN USUARIO BODEGA Y GESTIONPL
+                    io.emit('actNotifBodega', idnotifs);
+                    io.emit('actNotifGestionPl', idnotifs);
+
+                    volver_tabla();
+                }
+                else{
+                    alert("¡Ha Ocurrido un Error!");
+                }
+            }
+        });
+    });
+</script>

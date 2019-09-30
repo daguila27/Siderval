@@ -82,7 +82,23 @@ router.get('/', function(req, res, next){
             connection.query("SET lc_time_names = 'es_CL'", function(err, idm) {
                 if (err) throw err;
 
-                res.render('jefeplanta/indx_new', {page_title: "Jefe de Planta", username: req.session.userData.nombre});
+                res.render('jefeplanta/indx_new', {page_title: "Jefe de Planta", username: req.session.userData.nombre, route: '/plan/view_pedidos'});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.post('/indx', function(req, res, next) {
+    var r = req.body.route.split('%').join('/');
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            if (err) throw err;
+            connection.query("SET lc_time_names = 'es_CL'", function(err, idm) {
+                if (err) throw err;
+
+                res.render('jefeplanta/indx_new', {page_title: "Jefe de Planta", username: req.session.userData.nombre, route: r});
             });
         });
     }
@@ -321,7 +337,7 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
         req.getConnection(function(err, connection){
             if(err) throw err;
 
-                var consulta = "select " +
+                var consulta = "SELECT " +
                     "material.detalle, material.peso, " +
                     "produccion_history.*, produccion_history.fecha as mov_fecha,coalesce(odc.numoc, 'Producción para Stock') as numoc, " +
                     "fabricaciones.idorden_f, " +

@@ -1,0 +1,195 @@
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+</style>
+
+<div class="modal fade" id="reservacionModal" tabindex="-1" role="dialog">
+    <form class="form-inline" id="anuMovForm"></form>
+</div><!-- /.modal -->
+
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10; transition:0.5s;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
+            <li class="active">Reservaciones
+            </li>
+            <div style="display: flex;">
+                <div id="indicador_paginas" data-total="0" style="margin-right: 3px"></div>
+            </div>
+        </ol>
+        <div style="width: 50%;">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+            </div>
+            <div class="btn-group btn-group-sm o_cp_switch_buttons pull-right" style="display: flex;margin-top: 15px">
+                <!--<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_movimientos' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>-->
+                <div class="date-fill" style="display: flex; margin-right: 10px">
+
+                </div>
+                <div class="form-group" style="width: 35%;">
+                    <select class="form-control" id="selectTipoReserv" onchange="busc.add_cond = $('#selectTipoReserv').val(); busc.buscar_action();">
+                        <option value="reservacion_detalle.sin_prep>0" selected>Sin Preparar</option>
+                        <option value="reservacion_detalle.prep>0">Preparado</option>
+                        <option value="reservacion_detalle.ret>0">Retirados</option>
+                        <!--<option value="reservacion_detalle.desp>0">Despachados</option>
+                        <option value="true">Todos</option>-->
+                    </select>
+                    <h5 style=" display: none;margin-left: 10px"><small>¡Solo es posible selecccionar en la opción <b>Sin Preparar</b> o <b>Sin Retirar</b>!</small></h5>
+                </div>
+                <div class="form-group" style="margin-left: 10px">
+                    <button class="btn btn-primary btn-xs action-button hidden" id="preparar-boton" onclick="renderMovMaker(this)" data-estado="0">Preparar Reservación</button>
+                    <button class="btn btn-primary btn-xs action-button hidden" id="retirar-boton" onclick="renderMovMaker(this)" data-estado="1">Retirar Reservación</button>
+                    <h5 style="margin-left: 10px" class="hidden" id="indicator-option-select"><small>4 pedidos seleccionados</small></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+
+<style>
+    .ch_page:hover{
+        cursor:pointer;
+        color: black;
+        font-size: 15px;
+    }
+</style>
+<script type="text/javascript">
+    //ARRAY DONDE SE ALMACENAN idreservacion_d A MEDIDA QUE SE VAN SELECCIONADOS
+    var seleccionados = [];
+    var alto_buscador = $(".up-fills").height();
+    var margen_tabla = $('#fw-container').css('margin-top');
+    function mostrar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+    }
+    function restaurar_buscador(){
+        $('.up-fills').css('top', alto_buscador);
+        $('.up-fills').css('height', alto_buscador);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        busc.buscar_action(true);
+        $('.up-fills').css('transition', '0.5s');
+    }
+    function ocultar_buscador(){
+        $('.up-fills').css('z-index', '0');
+        $('.up-fills').css('top', '-'+$('.up-fills').height()+'px');
+        $('#fw-container').css('margin-top', '0px');
+        $('#fw-container').css('padding-top', '30px');
+        $("#pageView").val('1');
+        //busc.buscar_action();
+    }
+    function volver_tabla(){
+        $('.up-fills').css('z-index', '9');
+        $('.up-fills').css('top', 0);
+        $('#fw-container').css('margin-top', margen_tabla+'px');
+        $('#fw-container').css('padding-top', '0px');
+        $('.up-fills').removeClass('hidden');
+        busc.buscar_action(true);
+        $("#pageView").val('0');
+    }
+
+    var array_fill = [
+        "N° Reservación@success",
+        "Descripción@warning"
+    ];
+    var busc = new Buscador("buscar_reservacion", ".o_searchview", array_fill, "/matprimas/table_reservaciones", "tablaReservaciones", true, true, ".date-fill", "reservacion.fecha");
+    busc.add_cond = $("#selectTipoReserv").val();
+
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        busc.buscar_action(false, function(){
+            if('<%= redirect%>' === 'true' ){
+                <% for(var e = 0; e < sel.length; e++){%>
+                    $("#tablaReservaciones tbody tr[data-id="+parseInt('<%= sel[e]%>')+"]").toggleClass('danger');
+                    $("#tablaReservaciones tbody tr[data-id="+parseInt('<%= sel[e]%>')+"]").data('state', 'selec');
+                    seleccionados.push( $("#tablaReservaciones tbody tr[data-id="+parseInt('<%= sel[e]%>')+"]").data('id') );
+                <%}%>
+                $("#preparar-boton").click();
+            }
+        });
+    });
+    //PARA QUE EL FILTRO NO SE CIERRE AL SELECCIONAR ALGUNA OPCION
+    $(document).on('click', '.fill_cc .dropdown-menu', function (e) {
+        e.stopPropagation();
+    });
+
+    //FUNCION QUE CAMBIA LA INTERACCIÓN CON LA TABLA, PERMITIENDO SELECCIONAR ITEMS O NO
+    //SE EJECUTA EN /matprimas/table_reservaciones CADA VEZ QUE SE REDERIZA
+    function cambiarInteraccion(yo){
+        if( $(yo).val() === 'reservacion_detalle.sin_prep>0' || $(yo).val() === 'reservacion_detalle.prep>0'){
+            $(".select-desp").each(function(){
+                $(this).data('hab', true);
+            });
+            $("#indicator-option-select").removeClass('hidden');
+
+            if($(yo).val() === 'reservacion_detalle.sin_prep>0'){
+                $("#preparar-boton").removeClass('hidden');
+                $("#retirar-boton").addClass('hidden');
+                $("#preparar-boton").prop('disabled', false);
+                $("#retirar-boton").prop('disabled', true);
+            }else{
+                $("#preparar-boton").addClass('hidden');
+                $("#retirar-boton").removeClass('hidden');
+                $("#preparar-boton").prop('disabled', true);
+                $("#retirar-boton").prop('disabled', false);
+            }
+        }
+        else{
+            $(".select-desp").each(function(){
+                $(this).data('hab', false);
+            });
+            $("#preparar-boton").prop('disabled', true);
+            $("#retirar-boton").prop('disabled', true);
+            $("#preparar-boton").addClass('hidden');
+            $("#retirar-boton").addClass('hidden');
+            $("#indicator-option-select").addClass('hidden');
+        }
+    }
+
+
+
+
+
+</script>
+<script src="/buscador_funciones.js"></script>

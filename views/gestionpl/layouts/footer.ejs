@@ -3,6 +3,140 @@
 </div>
 
 
+<!-- Modal Crear GDD-->
+<div id="crearGddModal" class="modal fade" role="dialog">
+
+</div>
+
+
+
+
+<div class="modal fade" id="rechazoModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">¿Qué desea hacer? </h4>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h4 style="margin: 0; padding: 5% 5%; width: 100%; cursor: pointer;" data-toggle="collapse" data-target="#opcion1">Añadir nueva Producción a la OP</h4>
+                        <form class="form-newp">
+                            <input type="hidden" class="idProd" name="idProd">
+                            <input type="hidden" class="porReponer" name="porReponer">
+                            <div id="opcion1" class="collapse">
+                                <label>Se añadirá lo siguiente a la OP:</label>
+                                <div>
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>N° OP</th>
+                                            <th>N° OF</th>
+                                            <th>Detalle</th>
+                                            <th>Cantidad</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="new_op">
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <input type="hidden" name="etapas" value="1">
+                                <input type="hidden" class="idnotif" name="idnotif">
+                                <button type="submit" class="btn btn-primary">Crear</button>
+                            </div>
+                        </form>
+                    </li>
+                    <li class="list-group-item">
+                        <h4 style="margin: 0; padding: 5% 5%; width: 100%; cursor: pointer;" data-toggle="collapse" data-target="#opcion2">Retornar producto a etapa previa</h4>
+                        <form class="form-newp">
+                            <input type="hidden" class="idProd" name="idProd">
+                            <input type="hidden" class="porReponer" name="porReponer">
+                            <div id="opcion2" class="form-group collapse">
+                                <label for="etapas">Seleccione Etapa:</label>
+                                <select class="form-control" name="etapas">
+                                    <%for(var t=0; t < etapas.length; t++){%>
+                                        <option value="<%= etapas[t].value%>"><%= etapas[t].nombre_etapa%></option>
+                                    <%}%>
+                                </select>
+                                <button type="submit" class="btn btn-primary" style="margin-top: 10px">Enviar</button>
+                            </div>
+                            <input type="hidden" class="idnotif" name="idnotif">
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default cerrarRechazoModal" data-dismiss="modal">Cerrar</button>
+            </div><!-- /.modal -->
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<div class="modal fade" id="rechazoModalExt" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"> ¡Se ha Rechazado un Producto Externalizado! </h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer panel-footer">
+                <button type="button" class="btn btn-primary" id="botonContinuarModal"
+                        data-cont="0"
+                        data-idop=""
+                        data-idp=""
+                        data-idph=""
+                        data-id=""
+                        data-cant="">Enviar</button>
+                <button type="button" class="btn btn-default cerrarRechazoModal" data-dismiss="modal">Cerrar</button>
+            </div><!-- /.modal -->
+            <script>
+                $("#botonContinuarModal").on('click', function (e) {
+                    e.preventDefault();
+                    if($(this).data('cont') === '1'){
+                        //PROCEDIMIENTO NORMAL PARA CUALQUIER RECHAZO
+                        $(".idProd").val($(this).data('idp'));
+                        $(".porReponer").val($(this).data('cant'));
+                        $(".idnotif").val($(this).data('id'));
+                        var reponer = $(this).data('cant');
+                        $.ajax({
+                            type: 'POST',
+                            data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph')},
+                            url: 'jefeprod/predict_newop',
+                            success: function(data){
+                                $("#rechazoModalExt").modal('hide');
+                                $("#rechazoModal").modal('show');
+                                $("#rechazoModal .new_op").text("");
+                                $("#rechazoModal .new_op").append("<td>"+data.newop[0].idordenproduccion+"</td><td>"+data.newop[0].numordenfabricacion+"</td><td>"+data.newop[0].detalle+"</td><td>"+reponer+"</td>");
+                            }
+                        });
+                    }else{
+                        //SE CREA LA NOTIFICACION INFORMANDO A ABASTECIMIENTO
+                        if(confirm("¿Está Seguro?")){
+                            $.ajax({
+                                type: 'POST',
+                                data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph'), coment: $("#comentRech").val()},
+                                url: 'jefeprod/save_notificacion_abastecimiento',
+                                success: function(data){
+                                    $("#rechazoModalExt").modal('hide');
+                                }
+                            });
+                        }
+                    }
+                });
+            </script>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 <style type="text/css">
     /* The snackbar - position it at the bottom and in the middle of the screen */
     #snackbar {
@@ -92,7 +226,9 @@
 <!-- The actual snackbar -->
 <div id="snackbar" data-newid="0" onclick="clickSnackbar(this)" style="cursor: pointer;">Se ha creado una nueva OF. <button class="btn btn-success">RECARGAR</button></div>
 
-
+<form action="/gestionpl/indx" method="post" class="hidden render-form">
+    <input type="hidden" name="route" id="route" value="create_production_history">
+</form>
 </body>
 </html>
 <script>
@@ -107,7 +243,8 @@
             $("#page-wrapper").data('view') === "/bodega/view_despachos" ||
             $("#page-wrapper").data('view') === "/bodega/view_bodega"||
             $("#page-wrapper").data('view') === "/bodega/view_pendientes"||
-            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"
+            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"||
+            $("#page-wrapper").data('view') === "/bodega/view_externo"
         )){
             //ajax($(".oe_secondary_submenu li.active"));
             busc.hidden_screen();
@@ -131,9 +268,10 @@
         $("#up-fills").css('width', '100%');
         if( (
             $("#page-wrapper").data('view') === "/bodega/view_despachos" ||
-            $("#page-wrapper").data('view') === "/bodega/view_bodega"||
-            $("#page-wrapper").data('view') === "/bodega/view_pendientes"||
-            $("#page-wrapper").data('view') === "/jefeprod/view_producciones"
+            $("#page-wrapper").data('view') === "/bodega/view_bodega" ||
+            $("#page-wrapper").data('view') === "/bodega/view_pendientes" ||
+            $("#page-wrapper").data('view') === "/jefeprod/view_producciones" ||
+            $("#page-wrapper").data('view') === "/bodega/view_externo"
         )){
             //ajax($(".oe_secondary_submenu li.active"));
             busc.hidden_screen();
@@ -161,7 +299,17 @@
 
 
     function ajax(yo){
+
+
         $(".active").removeClass('active');
+        $(yo).addClass('active');
+        var l = $(yo).data('link').split('/').join('%');
+        $(".render-form input#route").val(l);
+        $(".render-form input#tipo").val($(yo).data('tipo'));
+        $(".render-form").submit();
+
+
+        /*$(".active").removeClass('active');
         $(yo).addClass('active');
         $.ajax({
             type: 'GET',
@@ -176,7 +324,7 @@
                 $("#page-wrapper").fadeIn();
 
             }
-        });
+        });*/
     }
     var io = io();
 
@@ -185,7 +333,16 @@
     io.on('notif-sol-abast', function(){
 
     });
+
     $.ajax({
+        type: 'GET',
+        url: 'gestionpl/render_notificaciones',
+        success: function(data){
+            $(".notificaciones").html(data);
+        }
+    });
+
+    /*$.ajax({
         type: 'GET',
         url: "/gestionpl/create_production_history",
         beforeSend: function(){
@@ -198,7 +355,7 @@
             $("#page-wrapper").fadeIn();
 
         }
-    });
+    });*/
 
 
     function  setDataTableFixed(str){
@@ -238,4 +395,56 @@
             }
         });
     }
+
+    //FUNCION QUE RENDERIZA LA ALERTA DE NOTIFICACION EN LA ESQUINA INFERIOR DERECHA DE LA PANTALLA
+    function mostrarAlertaNotificacion(idnotif){
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/render_alert_notificacion/'+idnotif,
+            success: function(data){
+                $('.notif-alert-ul').append(data);
+                setTimeout(function(){
+                    $(".notif-alert-ul li[data-idkey='idkey"+idnotif+"']").remove();
+                }, 10000);
+            }
+        });
+    }
+    //SOCKET QUE RENDERIZA LA NOTIFICACIONES
+    io.on('refreshGestionplNotif', function(idnotif){
+        $.ajax({
+            type: 'GET',
+            url: 'gestionpl/render_notificaciones',
+            success: function(data){
+                $(".notificaciones").html(data);
+                idnotif.map(function(id){
+                    mostrarAlertaNotificacion(id);
+                });
+            }
+        });
+
+    });
+
+
+    function alertAccionGDD(yo){
+        $(yo).parent().parent().parent().remove();
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/get_pedido_gdd/'+ $(yo).data('idodc') +'/'+$(yo).data('idped'),
+            success: function(data){
+                $('#crearGddModal').html(data);
+                $('#crearGddModal').modal('show');
+            }
+        });
+    }
+
+
+
+
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR  -- INICIO */
+    $(".oe_secondary_submenu li").removeClass('active');
+    $(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").addClass('active');
+    $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
+    $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR -- FIN */
+
 </script>

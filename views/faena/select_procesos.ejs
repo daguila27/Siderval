@@ -32,6 +32,8 @@
           <input type="hidden" id="cantprod" value="">
           <input type="hidden" id="e_act">
           <input type="hidden" id="sgt_etapa" value="">
+          <input type="hidden" id="p_act">
+          <input type="hidden" id="prev_etapa" value="">
           <p class="p-sigetp"></p>
         </div>
         <div class="modal-footer">
@@ -73,7 +75,6 @@
 		});
 	}
    function make_faena(){
-                
                 $.ajax({
                     type: 'GET',
                     url: 'faena/render_proceso/'+$("#proceso").val(),
@@ -101,7 +102,7 @@
         //STRING DE LAS CANTIDADES DE CADA PRODUCCION PARA APLICAR PEPS
         data.cantprod = $("#cantprod").val();
         //SIGUIENTE ETAPA
-        data.newetapa = $("#sgt_etapa").val();
+        data.newetapa = $("#etp-selector").val();
         //CANTIDAD ENVIADA
         data.sendnum = $("#sendnum").val();
         data.etapa_act = $("#e_act").val();
@@ -115,7 +116,9 @@
                     var input = {
                         idproduccion: $("#prod_id").val(),
                         cantidad: $("#sendnum").val(),
-                        key: 'fa'+$("#sgt_etapa").val()
+                        key: 'fa'+$("#sgt_etapa").val(),
+                        from: $("#e_act").val(),
+                        cantprod: $("#cantprod").val()
                     };
                     io.emit('addNotificacion', input);
                     show_faena();

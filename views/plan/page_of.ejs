@@ -3,7 +3,23 @@
         return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
     }
 %>
+
+<style>
+    .volver-tabla:hover{
+        background-color: rgb(124,123,173);
+        color: white;
+        cursor: pointer;
+    }
+    .volver-tabla{
+        position: relative;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        border-radius: 25%;
+    }
+</style>
 <div class="o_view_manager_content">
+    <i class="fa fa-arrow-left volver-tabla" id="odaBack" onclick="volver_tabla()"></i>
     <div>
         <div class="o_form_view o_sale_order o_form_readonly">
             <div class="o_form_sheet_bg">
@@ -26,16 +42,102 @@
                         </button>
                     </div>
                     <div class="row">
-                        <div class="col-md-11">
-                            <h1 style="margin-top: 0"><span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Orden de Fabricación N°<%=of.idordenfabricacion%></span></h1>
+                        <div class="col-md-10">
+                            <h1 style="margin-top: 0">
+                                <span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">
+                                    <% if(odv){%>
+                                            <small style="font-size: 25px">Orden de Venta N°<%= of.idordenfabricacion%></small>
+                                    <%}else{%>
+                                            <small style="font-size: 25px">Orden de Fabricación N°<%= of.idordenfabricacion%></small>
+                                    <%}%>
+                                </span>
+                            </h1>
                         </div>
-                        <div class="col-md-1">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-danger" onclick="mostrar_tabla()" type="button" style="align-content: center;"><i class="fa fa-close"></i>
+                        <script>
+                            function editarOC(){
+                                var n;
+                                $(".button-edit").toggleClass('hidden');
+                                var c = 0;
+                                $(".oc-edit-col").each(function(){
+                                    //CAMBIA EL TIPO DE INPUT
+                                    $(this).children('input').toggleClass('hidden');
+                                    $(this).children('div').toggleClass('hidden');
+                                    //$(this).children('input').attr('type', $(this).children('input').data('input'));
+                                });
+                            }
+
+                            function editarOCcancelar(){
+                                var n;
+                                $(".button-edit").toggleClass('hidden');
+
+                                $(".oc-edit-col").each(function(){
+                                    //CAMBIA EL TIPO DE INPUT
+                                    $(this).children('input').toggleClass('hidden');
+                                    $(this).children('div').toggleClass('hidden');
+                                    //$(this).children('input').attr('type', $(this).children('input').data('input'));
+                                });
+                            }
+                            $("form#formEditOF").submit(function(e){
+                                e.preventDefault();
+                                var a = $(this).serializeArray();
+                                var invalidForm = false;
+                                if( confirm("¿Está seguro?") ){
+                                    var array = {};
+                                    $(".oc-edit-col").each(function(){
+                                        if(Object.keys(array).indexOf($(this).children('input').data('name')) === -1 ){
+                                            array[$(this).children('input').data('name')] = [$(this).children('input').val()];
+                                        }else{
+                                            array[$(this).children('input').data('name')].push($(this).children('input').val());
+                                        }
+
+                                        //SI EL NUMERO NO CUMPLE CON MAX Y MIN
+                                        if(  parseInt($(this).children('input').val()) < parseInt($(this).children('input').data('min')) ){
+                                            invalidForm = true;
+                                            $(this).children('input').css('color', 'red');
+                                        }
+                                        else{
+                                            $(this).children('input').css('color', 'green');
+
+                                        }
+                                    });
+
+                                    if(invalidForm){
+                                        Alerta("¡Los Datos Ingresados son Incorrectos!");
+                                    }
+                                    else{
+                                        console.log(array);
+                                        $.ajax({
+                                            type: 'POST',
+                                            data: array,
+                                            url: '/plan/editar_of_save',
+                                            success: function(data){
+                                                Alerta("¡OF editada con Exito!");
+                                                $(".main-page").html(data);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                            function editarOCfinalizar(){
+                                $("form#formEditOF").submit();
+                            }
+                        </script>
+                        <% if(odv){%>
+                            <div class="btn-group" style="display: flex;">
+                                <button type="button" onclick="editarOC()" class="button-edit btn btn-xs btn-info" style="align-content: center;">
+                                    <i class="glyphicon glyphicon-pencil"></i> Editar
                                 </button>
                             </div>
-                        </div>
-                        
+                            <div class="btn-group" style="display: flex;">
+                                <button type="button" onclick="editarOCfinalizar()" class="button-edit hidden btn btn-xs btn-primary" style="align-content: center;height: 50%;">
+                                    <i class="fa fa-check"></i> Finalizar
+                                </button>
+                                <button type="button" onclick="editarOCcancelar()" class="button-edit hidden btn btn-xs btn-danger" style="align-content: center;height: 50%;">
+                                    <i class="fa fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        <%}%>
+
                     </div>
                     <div class="o_group">
                         <table class="o_group o_inner_group o_group_col_6">
@@ -45,8 +147,7 @@
                                         <label class="o_form_label o_readonly_modifier o_required_modifier" for="o_field_input_1066">Cliente</label>
                                     </td>
                                     <td style="width: 100%;">
-                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%=of.sigla%><br><%=of.razon%>
-                                        </a>
+                                        <a class="o_form_uri o_field_widget o_readonly_modifier o_required_modifier" href="#id=10&amp;model=res.partner" name="partner_id" id="o_field_input_1066"><%= of.sigla%><br><%= of.razon%></a>
                                     </td>
                                 </tr>
                                 <tr>
@@ -143,8 +244,6 @@
                                                     <span class="o_pager_value"></span> / <span class="o_pager_limit"></span>
                                                 </span>
                                                 <span class="btn-group btn-group-sm">
-                                        
-                                        
                                                     <button aria-label="Previous" class="fa fa-chevron-left btn btn-icon o_pager_previous" type="button"></button>
                                                     <button aria-label="Next" class="fa fa-chevron-right btn btn-icon o_pager_next" type="button"></button>
                                                 </span>
@@ -152,19 +251,22 @@
                                         </div>
                                     </div>
                                     <div class="table-responsive">
+                                        <form id="formEditOF">
                                         <table id="tablaOF" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                                             <thead>
                                                 <tr>
-                                                    <th class="o-sort-up o_column_sortable" style="text-align: right;"></th>
+                                                    <th class="o-sort-up o_column_sortable hidden" style="text-align: right;"></th>
                                                     <th class="o_column_sortable" style="text-align: left;">Item</th>
                                                     <th class="o_column_sortable" style="text-align: left;">Descripción</th>
                                                     <th class="o_column_sortable">Cantidad</th>
+                                                    <th class="o_column_sortable hidden">Cantidad Antes</th>
                                                     <th class="o_column_sortable" style="text-align: center;">A programar</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Unidad</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Fecha de Entrega</th>
                                                     <th class="o_column_sortable" style="text-align: center;">Días restantes</th>
-                                                    <!--<th class="o_column_sortable">Impuestos</th>
-                                                    <th class="o_column_sortable" style="text-align: right;">Subtotal</th>-->
+                                                    <th class="oc-edit-col hidden">
+                                                        <input type="hidden" data-name="idof" name="idof" min="0" data-input="hidden" data-valor="<%= of.idordenfabricacion%>" value="<%= of.idordenfabricacion%>">
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody class="ui-sortable">
@@ -175,32 +277,31 @@
                                                     <%}else{%>
                                                         <tr class="o_data_row text-info success">
                                                     <%}%>
-                                                        <td class="o_data_cell o_list_number o_handle_cell">
-                                                            <span class="o_row_handle fa fa-arrows o_field_widget ui-sortable-handle" name="sequence"></span>
+                                                        <td class="oc-edit-col hidden" style="text-align: center;">
+                                                            <input type="hidden" name="idfabricaciones<%= e%>" data-name="idfabricaciones" min="0" data-input="hidden" data-valor="<%=fabs[e].idfabricaciones%>" value="<%=fabs[e].idfabricaciones%>">
                                                         </td>
-                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].numitem%></td>
-                                                    <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].detalle%></td>
-                                                        <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=fabs[e].cantidad%></td>
+                                                        <td style="text-align: center;"><%=fabs[e].numitem%></td>
+                                                        <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].detalle%></td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier oc-edit-col" style="text-align: center;">
+                                                            <input class="form-control input-xs hidden" name="cantidad<%= e%>" type="number" value="<%=fabs[e].cantidad%>" data-name="cantidad" min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-input="number" data-valor="<%=fabs[e].cantidad%>"> <div><%= fabs[e].cantidad%></div>
+                                                        </td>
+                                                        <td class="o_data_cell o_list_number o_required_modifier oc-edit-col hidden" style="text-align: center;">
+                                                            <input type="hidden" name="cantidad_a<%= e%>" data-name="cantidad_a" min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-input="number" data-valor="<%=fabs[e].cantidad%>" value="<%=fabs[e].cantidad%>"> <div> <%= fabs[e].cantidad%> </div>
+                                                        </td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].restantes%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].u_medida%></td>
                                                         <td class="o_data_cell o_list_text o_required_modifier" style="text-align: center;"><%=fechaLatino(new Date(fabs[e].f_entrega).toLocaleDateString())%></td>
                                                         <td class="o_data_cell o_list_number o_required_modifier" style="text-align: center;"><%=fabs[e].dias%></td>
-                                                        <!--<td class="o_data_cell o_many2many_tags_cell">
-                                                            <div class="o_field_many2manytags o_field_widget o_field_empty" name="tax_id"></div>
-                                                        </td>
-                                                        <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier">
-                                                            <span class="o_field_monetary o_field_number o_field_widget o_readonly_modifier" name="price_subtotal">7.290,00&nbsp;$</span>
-                                                        </td>-->
                                                     </tr>
                                                 <%}%>
                                             </tbody>
                                             <tfoot>
                                                 <tr>
+                                                    <td class="hidden"></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
-                                                    <td></td>
-                                                    <td></td>
+                                                    <td class="hidden"></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
@@ -208,6 +309,7 @@
                                                 </tr>
                                             </tfoot>
                                         </table>
+                                        </form>
                                     </div>
                             </div>
                             <!--<table class="o_group o_inner_group oe_subtotal_footer oe_right">

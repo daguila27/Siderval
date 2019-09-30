@@ -1,0 +1,59 @@
+<style>
+
+</style>
+<div class="modal-dialog" role="document">
+    <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h3 class="modal-title">
+                Anular Existencia en Moldeo
+            </h3>
+            <h4 class="modal-title" style="text-align: right">Fecha: <%= new Date().toLocaleDateString()%></h4>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" name="idprod" value="<%= data[0].idproduccion%>">
+            <input type="hidden" name="idfab" value="<%= data[0].idfabricaciones%>">
+            <div class="row info-prod">
+                <div class="col-md-4">
+                    <div class="mycontent-left">
+                        <h3>
+                            <label for="of">
+                                N° OF: <small style="font-size: 16px"><%= data[0].idof%></small>
+                            </label>
+                        </h3>
+                        <h3>
+                            <label for="op">
+                                N° OP: <small style="font-size: 16px"><%= data[0].idordenproduccion%></small>
+                            </label>
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="mycontent-right">
+                        <h3>
+                            <label for="material">
+                                Descripción: <small style="font-size: 16px"><%= data[0].detalle%></small>
+                            </label>
+                        </h3>
+                        <h3>
+                            <div class="form-group">
+                                <label for="env">Cantidad a Retornar:</label>
+                                <input max="<%= data[0].moldeo%>" min="1" type="number" class="form-control input-sm" name="env" style="width: 150px">
+                            </div>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <style>
+                .mycontent-left {
+                    border-right: 1px dashed rgb(124,123,173);
+                }
+
+            </style>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Anular</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->

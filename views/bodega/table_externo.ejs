@@ -1,0 +1,74 @@
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"></div>
+
+<table id="DataTableExterno" class="o_list_view table table-condensed table-striped" style="width: 100%; margin-top: 0px !important;">
+    <thead>
+    <tr>
+        <th>OC</th>
+        <th>OF</th>
+        <th>OCA</th>
+        <th>GDD</th>
+        <th>Descripción</th>
+        <th>Cantidad</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <%
+    //idmaterial, numoc, idorden_f, detalle, idoda, idrecepcion, fecha, numgd, visible, anulado, idrecepcion_d, idrecepcion, idabast, cantidad, isanulable
+    for(var w=0; w < data.length; w++){ %>
+        <tr>
+            <td style="text-align: center"><%= data[w].numoc%></td>
+            <td style="text-align: center"><%= data[w].idorden_f%></td>
+            <td style="text-align: center"><%= data[w].idoda%></td>
+            <td style="text-align: center"><%= data[w].numgd%></td>
+            <td><%= data[w].detalle%></td>
+            <td style="text-align: center" class="parsear_nro" data-cs="0"><%= data[w].cantidad%></td>
+            <td style="text-align: center">
+            <% if(data[w].isanulable){%>
+                    <button class="btn btn-xs btn-danger anulRecep" data-idrecepcion="<%= data[w].idrecepcion%>"><i class="fa fa-ban" aria-hidden="true"></i></button>
+            <%}else if(data[w].anulado){%>
+                    <span class="label label-info">Anulado</span>
+            <%}else{%>
+                    <span class="label label-warning">No anulable</span>
+            <%}%>
+            </td>
+
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    setDataTableFixed("#DataTableExterno");
+
+    //$("#pedidos").data('total', parseInt());
+    //busc.setIndicadorPaginas(parseInt(), "#pedidos");
+
+
+    $(".anulRecep").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/anular_recepcion_externo_modal/'+$(this).data('idrecepcion'),
+            success: function(data){
+                $("#anuExtForm").html(data);
+                $("#anularExternoModal").modal('show');
+            }
+        });
+    });
+</script>

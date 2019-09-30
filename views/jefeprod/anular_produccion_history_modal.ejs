@@ -1,0 +1,121 @@
+<%
+var etapas = [
+    "Moldeo",
+    "Fusión",
+    "Quiebre",
+    "Terminación",
+    "Tratamiento Térmico",
+    "Maestranza",
+    "CC"
+];
+%>
+<div class="modal-dialog" role="document">
+    <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h3 class="modal-title">
+                Anular Movimiento N° :
+            </h3>
+            <h4 class="modal-title" style="text-align: right">Fecha de Movimiento: </h4>
+        </div>
+        <div class="modal-body">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>
+                        <label>
+                            <small style="font-size: 15px">Se anulará:</small>
+                        </label>
+                    </h4>
+                </div>
+                <div class="col-md-3">
+                    <div class="mycontent-left">
+                        <h4>
+                            <label for="of">
+                                N° OF: <small style="font-size: 14px"> <%= data.idof%></small>
+                            </label>
+                        </h4>
+                        <h4>
+                            <label for="op">
+                                N° OP: <small style="font-size: 14px"> <%= data.idop%></small>
+                            </label>
+                        </h4>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="mycontent-right">
+                        <h4>
+                            <label for="material">
+                                Descripción: <small style="font-size: 14px"><%= data.detalle%></small>
+                            </label>
+                        </h4>
+                        <h4>
+                            <div class="form-group">
+                                <label>
+                                    Movimiento: <small style="font-size: 14px"><%= data.enviados%> unidades desde <b style="text-decoration-line: underline"><%= etapas[parseInt(data.from)-1]%></b> a <b style="text-decoration-line: underline"><%= etapas[parseInt(data.to)-1]%></b></small>
+                                </label>
+
+                            </div>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top: 25px">
+                <div class="col-md-12">
+                    <h4>
+                        <label for="material">
+                            <small style="font-size: 15px">Mediante la creación del movimiento:</small>
+                        </label>
+                    </h4>
+
+
+                    <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                        <thead>
+                        <tr>
+                            <th>Enviados</th>
+                            <th style="text-align: center">Desde</th>
+                            <th style="text-align: center">Hacia</th>
+                            <th style="text-align: center">Comentario</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <input type="hidden" value="<%= data.idproduccion_history%>" name="idprodh">
+                        <input type="hidden" value="<%= data.idproduccion%>" name="idprod">
+                        <input type="hidden" value="<%= data.enviados%>" name="env">
+                        <input type="hidden" value="<%= data.from%>" name="from">
+                        <input type="hidden" value="<%= data.to%>" name="to">
+                        <tr>
+                            <td style="text-align: center"><%= data.enviados%></td>
+                            <td style="text-align: center"><%= etapas[parseInt(data.to)-1]%></td>
+                            <td style="text-align: center"><%= etapas[parseInt(data.from)-1]%></td>
+                            <td><input type="text" name="comentario"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-md-12" style="margin-top: 10px">
+                    <h4 class="pull-right"><small><i class="fa fa-exclamation-triangle"></i> Solo es posible anular el movimiento en su totalidad</small></h4>
+                </div>
+            </div>
+            <style>
+                .mycontent-right {
+                    border-left: 1px dashed rgb(124,123,173);
+                    padding-left: 25px;
+                }
+
+            </style>
+        </div>
+        <div class="modal-footer">
+            <h4 class="pull-left hidden" id="msjAlerta"><small style="color: rgb(255,0,0)"><i class="fa fa-exclamation-triangle"></i> Imposible crear Movimiento, existen movimientos posteriores para la misma Producción. </small></h4>
+            <button type="submit" class="btn btn-primary" id="buttonSubmit">Anular</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+<script>
+    if('<%=bloc%>' === 'false'){
+        $("#msjAlerta").toggleClass('hidden');
+        $("#buttonSubmit").attr('disabled', 'true');
+    }
+</script>

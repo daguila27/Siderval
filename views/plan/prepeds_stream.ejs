@@ -20,27 +20,25 @@ function letraMayus(string) {
         %>
     <tr>
         <td><%= data[i].detalle%></td>
-        <!--<td><%# data[i].cnom%></td>-->
         <td style="text-align: center"><%= data[i].stock%></td>
         <td style="text-align: center"><%= data[i].xdespachar%></td>
         <td style="text-align: center"><%= data[i].enproduccion%></td>
-        <% if( data[i].stock+data[i].enproduccion-data[i].xdespachar > 0 ){%>
+        <% if( data[i].stock + data[i].enproduccion - data[i].xdespachar > 0 ){%>
             <td style="text-align: center;"><%= data[i].stock+data[i].enproduccion-data[i].xdespachar%></td>
         <%}else{%>
             <td style="text-align: center;">0</td>
         <%}%>
         <td>
-            <div class="btn-group" style="display:flex;margin: 0 auto;">
+            <div class="btn-group" style="display:flex;margin: 0 auto">
                 <%
-                console.log(data[i].ruta);
                 if(data[i].idproducido != null){%>
                 <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducido%>" data-tipo="producido" class="btn btn-xs btn-primary" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Fabricar</a>
                 <%}%>
                 <% if(data[i].idproducto != null && data[i].ruta.substring(0,1) === 'e'){%>
                 <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idproducto%>" data-tipo="producto" class="btn btn-xs btn-info" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Externo</a>
                 <%}%>
-                <% if(typeof data[i].idotro != 'object'){%>
-                <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idotro%>" data-tipo="otro" class="btn btn-xs btn-warning" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> Otro</a>
+                <%if(data[i].idotro != null){%>
+                <a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idotro%>" data-tipo="otro" class="btn btn-xs btn-warning" onclick="add_prefabr(this)"><i class="fa fa-plus"></i> BMI</a>
                 <%}%>
             </div>
         </td>

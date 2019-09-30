@@ -24,11 +24,124 @@
             </div>
           </div>
           <div style="width: 20%">
-            <label>Proveedor: </label>
+            <!--<label>Proveedor: </label>
             <div class='predic_text' onkeyup='getPredictions(this)'>
               <input type='text' name='prov' class="form-control" autocomplete='off' required></input>
               <div></div>
-            </div>
+            </div>-->
+            <ul class="selector-buscador" role="navigation">
+              <input type="hidden" id="cliente" value="0" onchange="compNum(this)">
+              <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Cliente<b class="caret"></b></a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+                  <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
+                  <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Cliente seleccionado</a></li>
+                  <%for(var e=0; e < cli.length; e++){%>
+                  <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
+                  <%}%>
+                </ul>
+              </li>
+            </ul>
+            <p style="width: 100%; padding-left: 20px" id="cliente-caret">Sin Cliente seleccionado</p>
+            <style>
+              .selector-buscador{
+                margin-left: 0;
+                margin-bottom: 20px;
+                list-style: none;
+                width: 100%;
+              }
+
+              .selector-buscador ul, ol {
+                padding: 0;
+                margin: 0 0 10px 25px;
+              }
+
+              .selector-buscador .dropup, .dropdown {
+                position: relative;
+              }
+              .selector-buscador .dropup, .dropdown a{
+                color: white;
+              }
+
+              .selector-buscador .open>.dropdown-menu {
+                display: block;
+                max-height: 450px;
+                width: 400px;
+                overflow-y: scroll;
+              }
+
+              .selector-buscador>li>a {
+                display: block;
+              }
+
+              .selector-buscador .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                z-index: 1000;
+                display: none;
+                float: left;
+                min-width: 160px;
+                padding: 5px 0;
+                margin: 2px 0 0;
+                list-style: none;
+                background-color: #ffffff;
+                border: 1px solid #ccc;
+                border: 1px solid rgba(0, 0, 0, 0.2);
+                -webkit-border-radius: 6px;
+                -moz-border-radius: 6px;
+                border-radius: 6px;
+                -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                -webkit-background-clip: padding-box;
+                -moz-background-clip: padding;
+                background-clip: padding-box;
+              }
+
+              .selector-buscador .dropdown-menu .divider {
+                height: 1px;
+                margin: 9px 1px;
+                overflow: hidden;
+                background-color: #e5e5e5;
+                border-bottom: 1px solid #ffffff;
+              }
+
+              .selector-buscador .dropdown-menu>li>a {
+                display: block;
+                padding: 3px 20px;
+                clear: both;
+                font-weight: normal;
+                line-height: 20px;
+                color: #333333;
+                white-space: nowrap;
+              }
+            </style>
+            <script>
+                var c = 0;
+                /*$(".selector-buscador li").each(function(){
+                    if(c > 5){
+                        $(this).addClass('hidden');
+                    }
+                    c++;
+                });*/
+                $(".selector-buscador input").on('keyup', function(e){
+                    e.preventDefault();
+                    var valor = $(this).val();
+                    var res;
+                    $(".option-dropdown").addClass('hidden');
+                    $(".selector-buscador li a").each(function(){
+                        res = $(this).html().toUpperCase().includes(valor.toUpperCase());
+                        if(res){
+                            $(this).parent().removeClass('hidden');
+                        }
+                    });
+                });
+                $(".option-dropdown a").on('click', function(e){
+                    e.preventDefault();
+                    $("#cliente").val($(this).data('value'));
+                    $("#cliente-caret").html($(this).html());
+                });
+            </script>
           </div>
           <div style="width: 30%; margin-left: 2%">
             <label>Moneda: </label>
@@ -147,7 +260,7 @@
               </div>                  
               <div style="width: 50%">
                 <label for="dest">Descuento (%):</label>
-                <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()" value="<%= data.desc%>">
+                <input type="number" class="form-control descView" id="desc" name='desc' onkeyup="refreshAllCost()" max="100" value="<%= data.desc%>">
               </div>
             </div>
           </div>  
@@ -222,24 +335,29 @@ $("#send_of").submit(function(e){
     //console.log($(this).val());
   });
   console.log(data);
-  if(confirm("¿Esta segúro que desea crear la OC?")){
-    $.ajax({
-      type: 'POST',
-      data: data,
-      url: '/abastecimiento/crear_oda',
-      success: function(data){
-        if(data == 'error'){
-          alert("La OC que esta intentando crear es inválida.");
-        } else {
-          alert("La OC fue creada exitosamente.");
-          $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-          $(".form-pdf form").submit();
-          setTimeout(function(){
-              location.reload();
-          }, 500);
+  //COMPRUEBA SI SE HA SELECCIONADO UN CLIENTE, SI NO ES ASI NO PERMITE CREAR OCA
+  if($("#cliente").val() === '0'){
+      Alerta("¡Seleccione Proveedor!");
+  }else{
+    if(confirm("¿Esta segúro que desea crear la OC?")){
+      $.ajax({
+        type: 'POST',
+        data: data,
+        url: '/abastecimiento/crear_oda',
+        success: function(data){
+          if(data == 'error'){
+            alert("La OC que esta intentando crear es inválida.");
+          } else {
+            alert("La OC fue creada exitosamente.");
+            $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+            $(".form-pdf form").submit();
+            setTimeout(function(){
+                location.reload();
+            }, 500);
+          }
         }
-      }
-    });
+      });
+    }
   }
 });
 

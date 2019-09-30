@@ -29,8 +29,12 @@
         </tr>
         </thead>
         <tbody>
-        <%for(var e=0; e < of.length; e++){%>
-            <tr>
+        <%for(var e=0; e < of.length; e++){
+            if(of[e].encurso){%>
+                <tr class="encurso success hidden">
+            <%}else{%>
+                <tr class="warning">
+            <%}%>
                 <td style="text-align: center"><%= of[e].idordenfabricacion%></td>
                 <td><%= of[e].detalle%></td>
                 <td style="text-align: center"><%= of[e].cantidad%></td>
@@ -85,7 +89,7 @@
     $(document).ready(function() {
         $('#viewOF').DataTable({
             "lengthChange": false,
-            "paging": true,
+            "paging": false,
             order: [[ 0, "desc" ]],
             "language": {
                 "sProcessing":     "Procesando...",
@@ -128,7 +132,7 @@
         })
     }
     function renderBOM(yo){
-       $.ajax({
+        $.ajax({
            type: 'POST',
            data: {idmaterial: $(yo).data('idmat'), addOCA: true, cant: $(yo).data('cant')},
            url: '/abastecimiento/data_bom',

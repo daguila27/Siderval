@@ -116,6 +116,11 @@
                 </ul>
             </li>
         </ul>
+        <ul class="nav navbar-right ">
+            <li>
+                <div style=" font-size: 15px; color: red; margin-right: 20px">INFORMACIÓN DE TESTEO | NO REPRESENTA LA REALIDAD</div>
+            </li>
+        </ul>
 
 
 
@@ -150,7 +155,7 @@
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
 
 
-                    <li class="active"  onclick="ajax(this)" data-link="/plan/lanzar_of/pedido">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Crear OC" data-link="/plan/lanzar_of/pedido">
 
 
                         <a class="oe_menu_leaf">
@@ -163,21 +168,8 @@
 
 
                     </li>
-                    <!--<li onclick="ajax(this)" data-link="/plan/list_peds">
 
-
-                        <a class="oe_menu_leaf">
-                            <span class="oe_menu_text">
-                                Ver Todas
-                            </span>
-                        </a>
-
-
-
-
-                    </li>-->
-
-                    <li onclick="ajax(this)" data-link="/plan/view_pedidos">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Planificación - Ver Todas (OC)" data-link="/plan/view_pedidos">
 
 
                         <a class="oe_menu_leaf">
@@ -200,6 +192,15 @@
                     </li>
 
 
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Planificación - Listado Maestro" data-link="/jefeplanta/view_planta">
+                        <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Listado Maestro
+                                </span>
+                        </a>
+                    </li>
+
+
                 </ul>
                 <div class="oe_secondary_menu_section">
                     Orden de Fabricación
@@ -207,7 +208,7 @@
 
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
 
-                    <li onclick="ajax(this)" data-link="/plan/lanzar_of/of">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Crear OF" data-link="/plan/lanzar_of/of">
 
 
                         <a class="oe_menu_leaf">
@@ -231,7 +232,7 @@
 
                     </li>-->
 
-                    <li onclick="ajax(this)" data-link="/plan/view_fabricaciones">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Planificación - Ver Todas (OF)" data-link="/plan/view_fabricaciones">
 
 
                         <a class="oe_menu_leaf">
@@ -264,8 +265,7 @@
                 </div>
 
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-
-                    <li onclick="ajax(this)" data-link="/plan/show_prod/1">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Ver por OC" data-link="/plan/show_prod/1">
 
 
                         <a class="oe_menu_leaf">
@@ -275,7 +275,7 @@
                         </a>
 
                     </li>
-                    <li onclick="ajax(this)" data-link="/bodega/view_bodega">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Planificación - Bodega PT" data-link="/bodega/view_bodega">
 
 
                         <a class="oe_menu_leaf">
@@ -285,7 +285,7 @@
                         </a>
 
                     </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/1">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Planificación - Informe de Stock" data-link="/abastecimiento/fabrs_ids/1">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Informe de Stock
@@ -300,7 +300,7 @@
                 </div>
 
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/plan/all_clientes">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Clientes y Proveedores" data-link="/plan/all_clientes">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Ver Todos
@@ -312,14 +312,14 @@
                     Guía de Despacho
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link='bodega/crear_gdd'>
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Crear GDD" data-link='/bodega/crear_gdd'>
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Crear GD
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link='bodega/view_despachos'>
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Planificación - Ver Todas (GDD)" data-link='/bodega/view_despachos'>
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Ver Todos
@@ -328,7 +328,21 @@
                     </li>
                 </ul>
 
-                <!-- Facturas -->
+
+                <div class="oe_secondary_menu_section">
+                    Bodega Materias Primas e Insumos
+                </div>
+                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Crear Reservación" data-link='/plan/crear_reservacion'>
+                        <a class="oe_menu_leaf">
+                                        <span class="oe_menu_text">
+                                            Crear Reservación
+                                        </span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Facturas
                 <div class="oe_secondary_menu_section">
                     Facturas
                 </div>
@@ -340,10 +354,59 @@
                                         </span>
                         </a>
                     </li>
-                </ul>
+                </ul> -->
             </div>
 
         </div>
     </div>
+
+    <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA PANTALLA DE CARGA-->
+    <div class="load-screen" style="width: 100%; height: 100%; position: fixed; z-index: -10; color: white; background-color: white; transition: 0.5s">
+        <div style="height: 45%; width: 100%"></div>
+        <div style="width: 100%; text-align: center"><i class="fa fa-spinner fa-pulse"></i> Cargando</div>
+        <div style="height: 45%; width: 100%"></div>
+    </div>
+    <script>
+        function showLoad(){
+            $(".load-screen").css("background-color", "rgba(0,0,0,0.4)");
+            $(".load-screen").css('z-index', '100');
+        }
+        function hideLoad(){
+            $(".load-screen").css("background-color", "white");
+            $(".load-screen").css('z-index', '-10');
+        }
+    </script>
+    <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA PANTALLA DE CARGA [FIN] -->
+
+
+
     <script src="/buscador.js"></script>
-    <div id="page-wrapper" style="width: 100%;">
+
+
+    <style>
+        .notif-alert-ul{
+            position: fixed;
+            right: 10px;
+            bottom: 5px;
+            z-index: 100;
+            width: 30%;
+            background-color: rgb(220,220,220);
+            padding: 0;
+            -webkit-box-shadow: -8px 10px 13px 1px rgba(0,0,0,0.75);
+            -moz-box-shadow: -8px 10px 13px 1px rgba(0,0,0,0.75);
+            box-shadow: -8px 10px 13px 1px rgba(0,0,0,0.75);
+        }
+        .notif-alert-ul li{
+            cursor: pointer;
+            margin: 5px;
+            padding: 5px 2.5px;
+            padding-left: 10px;
+            background-color: white;
+            list-style: none;
+            border-radius: 2%;
+        }
+    </style>
+    <ul class="notif-alert-ul">
+
+    </ul>
+    <div id="page-wrapper" style="width: 100%;" data-tipo="0" data-view="/plan/lanzar_of/pedido">

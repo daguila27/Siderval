@@ -57,6 +57,12 @@ function getSunday(d) {
     return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
 }
 %>
+
+
+
+<div class="modal fade" id="anularProdHistModal" tabindex="-1" role="dialog">
+    <form class="form-inline" id="anuProdHistForm"></form>
+</div><!-- /.modal -->
 <div class="hidden tipovista listafusion"></div>
 <div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
@@ -142,7 +148,7 @@ function getSunday(d) {
         "Cliente@success"
     ];
     var busc = new Buscador("buscar_fusion", ".o_searchview", array_fill, "/jefeplanta/table_fusion/"+$(".seleccionar-proceso").val(), "DataTableFabs", false, true, ".date-fill","produccion_history.fecha");
-    busc.add_cond = "";
+    busc.add_cond = "!produccion_history.anulado";
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         $(".setdates-buttons.mes").click();
@@ -212,6 +218,39 @@ function getSunday(d) {
 
     // Invoke the function
     getRidOffAutocomplete();
+
+
+
+    $("form#anuProdHistForm").submit(function(e){
+        e.preventDefault();
+        if(confirm("¿Está seguro?")){
+            var array = $(this).serializeArray();
+            var datos = {};
+            for(var i=0; i < array.length; i++){
+                    if(datos[array[i].name]){
+                        datos[array[i].name].push(array[i].value);
+                    }else{
+                        datos[array[i].name] = [array[i].value];
+                    }
+            }
+            $.ajax({
+                type: 'POST',
+                data: datos,
+                url: '/jefeprod/anular_produccion_history',
+                success: function(data){
+                    if(data==='ok'){
+                        alert("¡Movimiento Anulado con exito!");
+                    }
+                    else{
+                        alert("¡Ha ocurrido un error!");
+                    }
+
+                    $("#anularProdHistModal").modal('hide');
+                    busc.buscar_action();
+                }
+            });
+        }
+    });
 
 </script>
 

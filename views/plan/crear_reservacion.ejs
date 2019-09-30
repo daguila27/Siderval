@@ -1,0 +1,209 @@
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%; margin-top: 20px;">
+    <div class="col-md-12 panel-creacion" style="margin-top: 20px">
+        <div class="panel panel-primary cargando-panel" style="display: none;">
+            <div class="panel-heading">
+                <div style="width: 100%;text-align: center;">
+                    <img style="width: 25%" src="/loading.gif">
+                </div>
+            </div>
+        </div>
+        <div class="guardado_automatico" style="width: 100%; height: 20px; display: none;"></div>
+        <form id="reservForm">
+            <div class="panel panel-primary panel-defecto">
+                <div class="panel-heading" style="display: flex">
+                    <div style="width: 100%">
+                        <h3>Reservar producto de BMI: </h3>
+                    </div>
+                </div>
+                <div class="panel-body" style="overflow-y: scroll; max-height: 300px;padding: 0">
+                    <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
+                        <thead>
+                        <tr>
+                            <th>OC</th>
+                            <th>OF</th>
+                            <th>ODA</th>
+                            <th>Cliente</th>
+                            <th>Descripción</th>
+                            <th>Solicitados</th>
+                            <th>Reservar</th>
+                            <th>Reservados</th>
+                            <th>Stock</th>
+                            <th>Disponible</th>
+                            <th>Eliminar</th>
+                        </tr>
+                        </thead>
+                        <tbody id="reservBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <button type="submit" class="btn btn-primary" style="position: relative; top 10px; left: 90%; right: 10px; bottom: 5px;">
+                        Crear Reserva
+                    </button>
+                    <!--<input type="submit" class="btn btn-primary">-->
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3>Añadir Productos</h3>
+            </div>
+            <div class="panel-body" style="padding: 0;">
+                <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" id="sessionReserv" style="margin-top: 0px !important; padding-top: 0px !important;">
+                    <thead>
+                    <tr>
+                        <th>OC</th>
+                        <th>OF</th>
+                        <th>OCA</th>
+                        <th>Cliente</th>
+                        <th>Descripción</th>
+                        <th>Solicitados</th>
+                        <th>Recibidos OCA</th>
+                        <th>Reservados</th>
+                        <th>Stock</th>
+                        <th>Disponible</th>
+                        <th>Adjuntar</th>
+                    </tr>
+                    </thead>
+                    <script>
+
+                    </script>
+                    <tbody id="preReservbody">
+                    <%for(var e=0; e < data.length; e++){%>
+                        <tr data-idped="<%= data[e].idpedido%>" data-idfab="<%= data[e].idfabricaciones%>">
+                            <input type="hidden" name="idfab" value="<%= data[e].idfabricaciones%>">
+                            <td style="text-align: center"><%= data[e].numoc%></td>
+                            <td style="text-align: center"><%= data[e].idof%></td>
+                            <td style="text-align: center"><%= data[e].idoda%></td>
+                            <td style="text-align: center"><%= data[e].sigla%></td>
+                            <td><%= data[e].detalle%></td>
+                            <td style="text-align: center"><%= data[e].cantidad%></td>
+                            <% if(data[e].stock - data[e].nodisponible > 0){%>
+
+                            <!--<# if(data[e].stock >= (data[e].cantidad - data[e].reservados) ){#>-->
+                                <td data-name="enviar" style="text-align: center">
+                                    <div><%= data[e].xabastecer%></div>
+                                    <input type="number" name="env" min="1" class="hidden form-control" max="<%= Math.min(data[e].stock - data[e].reservados, data[e].cantidad - data[e].reservados)%>" style="width: 80%;margin-left: 25%" required>
+                                </td>
+                            <%}else{%>
+                                <td style="text-align: center"> - </td>
+                            <%}%>
+                            <td style="text-align: center"><%= data[e].reservados%></td>
+                            <td style="text-align: center"><%= data[e].stock%></td>
+                            <td style="text-align: center"><%= data[e].stock - data[e].nodisponible%></td>
+
+                            <td style="text-align: center; align-content: center">
+                                <% if(data[e].stock - data[e].nodisponible > 0 ){%>
+                                    <button onclick="addReserv(this); return false;" class="btn btn-xs btn-success" style="display: flex;">
+                                        <i class="fa fa-arrow-up" style="margin-right: 2px"></i>
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                <%}else{%>
+                                     -
+                                <%}%>
+                                <button onclick="remReserv(this); return false;" class="btn btn-xs btn-danger hidden" style="display: flex;">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <%}%>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var idreservacion = 1;
+    $("form#reservForm").submit(function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        //idabast idfab env
+        var data = [];
+        //CANTIDAD DE <input> QUE SE PUSHEAN A data
+        var d = 2;
+        d=d-1;
+        for(var e = 0; e < array.length; e++){
+            data.push([array[e].value,array[e+1].value]);
+            e += d;
+        }
+        console.log(JSON.stringify(data));
+        $.ajax({
+            type: 'POST',
+            data: {data: JSON.stringify(data), idreserv: idreservacion},
+            url: '/plan/save_reservacion',
+            success: function(data){
+                alert("¡Reservación Registrada con Exito!");
+                $("#page-wrapper").html(data);
+            }
+        });
+    });
+
+
+    function remReserv(yo){
+        //SE UTILIZA idfabricacion PARA IDENTIFICAR LA FILA EN LA TABLA INFERIOR, QUE ESTA OCULTA
+        //SE INTERCAMBIA EL BOTON DE ELIMINAR
+        $("#preReservbody tr[data-idped="+$(yo).parent().parent().data('idped')+"] .btn-danger").toggleClass('hidden');
+        //POR ADJUNTAR
+        $("#preReservbody tr[data-idped="+$(yo).parent().parent().data('idped')+"] .btn-success").toggleClass('hidden');
+        //SE OCULTA CAMPO PARA MOSTRAR NUMERO
+        $("#preReservbody tr[data-idped="+$(yo).parent().parent().data('idped')+"] td[data-name='enviar'] div").toggleClass('hidden');
+        $("#preReservbody tr[data-idped="+$(yo).parent().parent().data('idped')+"] td[data-name='enviar'] input").toggleClass('hidden');
+        //REAPARECE LA FILA EN LA TABLA INFERIOR
+        $("#preReservbody tr[data-idped="+$(yo).parent().parent().data('idped')+"]").toggleClass('hidden');
+        $(yo).parent().parent().remove();
+
+    }
+    function addReserv(yo){
+        //SE INTERCAMBIA EL BOTON DE ADJUNTAR POR ELIMINAR
+        $(yo).toggleClass('hidden');
+        $(yo).parent().children('.btn-danger').toggleClass('hidden');
+        //SE OCULTA NUMERO PARA MOSTRAR CAMPO
+        $(yo).parent().parent().children("td[data-name='enviar']").children('div').toggleClass('hidden');
+        $(yo).parent().parent().children("td[data-name='enviar']").children('input').toggleClass('hidden');
+        $("#reservBody").append("<tr data-idped='"+$(yo).parent().parent().data('idped')+"' data-idfab='"+$(yo).parent().parent().data('idfab')+"'>"+$(yo).parent().parent().html()+"</tr>");
+        $(yo).parent().parent().toggleClass('hidden');
+    }
+    $('#sessionReserv').DataTable({
+        "lengthChange": false,
+        "paging": false,
+        "bInfo": false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sLengthMenu":     "Mostrar _MENU_ registros",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix":    "",
+            "sSearch":         "Buscar:",
+            "sUrl":            "",
+            "sInfoThousands":  ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+    $("#sessionReserv_wrapper").css('margin-top', '-41px');
+    if('<%= redirect%>' === 'true'){
+        $(document).ready(function(){
+            <% for(var e = 0; e < sel.length; e++){%>
+                $("#preReservbody tr[data-idped="+parseInt('<%= sel[e]%>')+"]").children('td').children('button.btn-success').click();
+            <%}%>
+        });
+    }
+</script>

@@ -6,9 +6,15 @@
     $.ajax({
         type: 'GET',
         url: '<%= route%>',
+        beforeSend: function(){
+            showLoad();
+        },
         success: function(data){
-            $("#page-wrapper").data('view', '<%= route%>');
-            $("#page-wrapper").html(data);
+            setTimeout(function(){
+                $("#page-wrapper").data('view', '<%= route%>');
+                $("#page-wrapper").html(data);
+                hideLoad();
+            }, 500);
         }
     });
 </script>

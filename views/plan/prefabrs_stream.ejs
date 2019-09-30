@@ -2,14 +2,22 @@
 <% 
 function letraMayus(string) {
      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-} 
-
-if(data.length){
+} %>
+<table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" id="sessionFabs">
+    <thead>
+    <tr>
+        <th>Descripción</th>
+        <th>Aleacion</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody id="prefabrs">
+<%if(data.length){
 for(var i = 0;i<data.length;i++){ %>
 <tr>
     <td><%= data[i].detalle%></td>
     <!--<td><%# data[i].cnom%></td>-->
-    <!--<td><%= data[i].nom%></td>-->
+    <!--<td><%# data[i].nom%></td>-->
     <td><%= data[i].subnom%></td>
     <td><a data-idm="<%= data[i].idmaterial%>" data-idp="<%= data[i].idprod%>" class="btn btn-success btn-xs" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></a></td>
 </tr>
@@ -21,3 +29,37 @@ for(var i = 0;i<data.length;i++){ %>
     <td>No Hay productos para mostrar</td>
 </tr>
 <%}%>
+
+    </tbody>
+</table>
+<script>
+
+    $("#sessionFabs").DataTable({
+        paging: false,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+</script>

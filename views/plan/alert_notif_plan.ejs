@@ -1,0 +1,28 @@
+<!--llave de notificaciones: bmiReserv-->
+
+<%
+if(notif.length > 0){
+    var desc = notif[0].descripcion.split('@');
+if( notif[0].descripcion.split('@')[0] === 'bmiReserv' ){%>
+    <li data-idkey="idkey<%= notif[0].idnotificacion%>" onclick="alertAccionReserv(this)">
+        <button type="button" class="close" onclick="$(this).parent().remove()" style="position: relative; top: 1px; right: 3px">&times;</button>
+        <a class="notificacion-bmiReserv" data-idodc="<%= notif[0].idodc%>" data-idped="<%= notif[0].idpedido%>" data-detalle="<%= notif[0].detalle%>" data-id="<%= notif[0].idnotificacion%>" style="width: 100%">
+            <div style="margin-left: 10px">Ya es posible realizar reserva para <b>OC <%= notif[0].numoc%> - Item <%= notif[0].numitem%> : <%= notif[0].detalle%></b></div>
+        </a>
+    </li>
+<%}
+}%>
+
+<script>
+    function alertAccionReserv(yo){
+        $(yo).remove();
+        $.ajax({
+            type: 'GET',
+            url: '/plan/get_reserv_info/'+$(this).data('idodc')+"/"+$(this).data('idped'),
+            success: function(data){
+                $('#contReservModal').html(data);
+                $('#contReservModal').modal('show');
+            }
+        });
+    }
+</script>

@@ -40,12 +40,15 @@ function fechaLatina(date){
                             <tr style="align-content: center;" data-content="Fecha de Entrega: Indefinida" data-toggle="popover" data-placement="bottom">
                                 <td class="ped-hab">
                                     <input type="checkbox" name="hab" onchange="habInId(this)" class="check-ped">
-                                    <input class="idped" type="hidden" name="idpedido" value="">
+
+                                    <input class="idprod" type="hidden" name="idproduccion" value="<%=data[j].idproduccion%>">
+                                    <input class="idmat" type="hidden" name="idmaterial" value="<%=data[j].idmaterial_ext%>">
+                                    <input class="idped" type="hidden" name="idpedido" value="<%=data[j].idpedido%>">
                                     <input class="idfab" type="hidden" name="idfabricaciones" value="<%=data[j].idfabricaciones%>">
                                 </td>
                                 <td><%= data[j].detalle_ext.substring(0,1).toUpperCase() + data[j].detalle_ext.substring(1,data[j].detalle_ext.length).toLowerCase()%></td>
                                 <td style="text-align: center;"><%= data[j].compra_ext%></td>
-                                <td class="td-cant"><input type="number" class="form-control cant_compra cantCompraModal" value="<%= cant%>" min="0" step="<%= data[j].compra_ext%>" disabled></td>
+                                <td class="td-cant"><input type="number" class="form-control cant_compra cantCompraModal" value="<%= cant[j]%>" min="<%= cant[j]%>" max="<%= cant[j]%>" step="<%= data[j].compra_ext%>" name="cantidad" disabled></td>
                                 <td style="text-align: center;"><%= data[j].medida_ext%></td>
                                 <td class="td-costo td-money"><input class="form-control costo moneda key_money" type="float" name="costo" onkeyup="refreshAllCostModal()" disabled></td>
                                 <td class="costo-total"></td>
@@ -94,7 +97,8 @@ function fechaLatina(date){
                         </div>
                         <div style="width: 50%">
                             <label for="dest">Descuento (%):</label>
-                            <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" onkeyup="refreshAllCostModal()">
+                            <input type="number" class="form-control descModal" id="desc" name='desc' placeholder="Ej: 20" max="100" onkeyup="refreshAllCostModal()">
+                            <input type="hidden" class="form-control" name='idnotif' value="<%= idnotificacion%>">
                         </div>
                     </div>
                 </div>

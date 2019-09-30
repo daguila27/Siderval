@@ -1,5 +1,4 @@
-    <%console.log(data)%>
-        <div class="panel panel-primary cargando-panel" style="display: none;">
+     <div class="panel panel-primary cargando-panel" style="display: none;">
             <div class="panel-heading">
                 <div style="width: 100%;text-align: center;">
                     <img style="width: 25%" src="/loading.gif">
@@ -11,8 +10,7 @@
                 cursor: pointer;
             }
         </style>
-        <div class="guardado_automatico" style="width: 100%;height: 20px"></div>
-        <div class="panel panel-primary panel-defecto">
+        <div class="panel panel-primary panel-defecto" style="margin-top: 35px">
             <div class="panel-heading">
                 <div class="dropdown pull-right">
                   <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></button>
@@ -25,7 +23,8 @@
                 </div>
                 <div style="display: flex;">
                 <div style="width: 50%">
-                        <h3 style="width: 100%">Registrar Orden de Compra: 
+                        <h3 style="width: 100%">Registrar Orden de Compra:
+                            <small class="guardado_automatico" style="width: 100%;height: 20px; color: white;" style="display: none;"></small></h3>
                     <!--<div>
                         <button class="btn btn-primary" onclick="saveState(this)"><i class="glyphicon glyphicon-floppy-save"></i> Guardar</button>
                         <button class="btn btn-primary" onclick="loadState(this)"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
@@ -63,22 +62,123 @@
                         </div>
                     </div>
                     <div class="form-group" style="width: 100%">
-                      <label for="cliente">Seleccione cliente:</label>
-                      <select class="form-control" id="cliente" onchange="compNum(this)">
-                      <%for(var e=0; e < cli.length; e++){
-                        if(cli[e].idcliente == data['cliente']){%>
-                        <option value="<%=cli[e].idcliente%>" selected="selected"><%=cli[e].sigla%> - <%=cli[e].razon%></option>
-                      <%}else{%>
-                        <option value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></option>
-                      <%}}%>
-                    </select>
+                        <ul class="selector-buscador" role="navigation">
+                            <input type="hidden" id="cliente" onchange="compNum(this)" value="0">
+                            <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Cliente<b class="caret caret-select"></b></a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+                                    <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
+                                    <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Cliente seleccionado</a></li>
+                                        <%for(var e=0; e < cli.length; e++){
+                                        if(cli[e].idcliente == data['cliente']){%>
+                                            <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
+                                        <%}else{%>
+                                            <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
+                                        <%}}%>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p style="width: 100%; padding-left: 20px" id="cliente-caret">Sin Cliente seleccionado</p>
+                        <style>
+                            .selector-buscador{
+                                margin-left: 0;
+                                margin-bottom: 20px;
+                                list-style: none;
+                                width: 100%;
+                            }
+
+                            .selector-buscador ul, ol {
+                                padding: 0;
+                                margin: 0 0 10px 25px;
+                            }
+
+                            .selector-buscador .dropup, .dropdown {
+                                position: relative;
+                            }
+                            .selector-buscador .dropup, .dropdown #drop2{
+                                color: white;
+                            }
+
+                            .selector-buscador .open>.dropdown-menu {
+                                display: block;
+                                max-height: 450px;
+                                width: 400px;
+                                overflow-y: scroll;
+                            }
+
+                            .selector-buscador>li>a {
+                                display: block;
+                            }
+
+                            .selector-buscador .dropdown-menu {
+                                position: absolute;
+                                top: 100%;
+                                left: 0;
+                                z-index: 1000;
+                                display: none;
+                                float: left;
+                                min-width: 160px;
+                                padding: 5px 0;
+                                margin: 2px 0 0;
+                                list-style: none;
+                                background-color: #ffffff;
+                                border: 1px solid #ccc;
+                                border: 1px solid rgba(0, 0, 0, 0.2);
+                                -webkit-border-radius: 6px;
+                                -moz-border-radius: 6px;
+                                border-radius: 6px;
+                                -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                                -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                                -webkit-background-clip: padding-box;
+                                -moz-background-clip: padding;
+                                background-clip: padding-box;
+                            }
+
+                            .selector-buscador .dropdown-menu .divider {
+                                height: 1px;
+                                margin: 9px 1px;
+                                overflow: hidden;
+                                background-color: #e5e5e5;
+                                border-bottom: 1px solid #ffffff;
+                            }
+
+                            .selector-buscador .dropdown-menu>li>a {
+                                display: block;
+                                padding: 3px 20px;
+                                clear: both;
+                                font-weight: normal;
+                                line-height: 20px;
+                                color: #333333;
+                                white-space: nowrap;
+                            }
+                        </style>
+                        <script>
+                            var c = 0;
+                            $(".selector-buscador input").on('keyup', function(e){
+                                e.preventDefault();
+                                var valor = $(this).val();
+                                var res;
+                                $(".option-dropdown").addClass('hidden');
+                                $(".selector-buscador li a").each(function(){
+                                    res = $(this).html().toUpperCase().includes(valor.toUpperCase());
+                                    if(res){
+                                        $(this).parent().removeClass('hidden');
+                                    }
+                                });
+                            });
+                            $(".option-dropdown a").on('click', function(e){
+                                e.preventDefault();
+                                $("#cliente").val($(this).data('value'));
+                                $("#cliente-caret").html($(this).html());
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
         </div>
         <form id="send_of">
             <div style="overflow-y: scroll; max-height: 300px;">
-            <table class="table table-striped sectionSave" style="margin: 0">
+            <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped sectionSave" style="margin: 0">
                 <thead>
                 <tr>
                     <th>Descripción</th>
@@ -102,17 +202,22 @@
                     if(data['idm[]']){
                         var fabricacion = '';
                         var color = '';
-                        console.log(data);
                         for(var e=0; e < data['idm[]'].length; e++){
-                            if(data['prov[]'][e] == '-1'){
+                            //PRODUCIDO
+                            if(data['prov[]'][e] === 'producido'){
                                 fabricacion = 'Interna';
                                 color = 'success';
                             }
-                            else{
+                            //PRODUCTO
+                            else if(data['prov[]'][e] === 'producto'){
                                 fabricacion = 'Externa';
                                 color = 'warning';
                             }
-                        %>                
+                            //OTRO
+                            else{
+                                fabricacion = 'Bodega B.I.';
+                                color = 'info';
+                            }%>
                         <tr class="<%= color%>">
                             <td><%=data['dets[]'][e]%><input type="hidden" name="idm" value="<%=data['idm[]'][e]%>"><input type="hidden" name="idp" value="<%=data['idp[]'][e]%>"><input type='hidden' name='disp' value="<%= data['stock[]'][e]%>"></td>
                             <td><strong><%=fabricacion%></strong></td>
@@ -149,6 +254,7 @@
     $(document).ready(function(){
         compNum("#cliente");
     });
+
     function compNum(yo){
         if($("#num").val() != ''){
                 $.ajax({
@@ -167,12 +273,13 @@
                         }
                     }
                 });
-            }
-            else{
-                $(".contenedor").css('height', '0px');
-                $("#of_submit").prop('disabled', false);
-            }
+        }
+        else{
+            $(".contenedor").css('height', '0px');
+            $("#of_submit").prop('disabled', false);
+        }
     }
+
     $("#num").on('keyup', function(e){
             e.preventDefault();
             if($(this).val() != ''){
@@ -198,6 +305,7 @@
                 $("#of_submit").prop('disabled', false);
             }
     });
+
     $("#setdates").on('change',function(){
         var valor = $(this).val();
         $("input[type=date]").each(function(e){
@@ -209,7 +317,6 @@
     $("#send_of").submit(function(e){
         e.preventDefault();
         lista = $(this).serializeArray();
-        console.log(lista);
         var data = {
             idm: [],
             idp: [],
@@ -218,6 +325,7 @@
             cliente: $("#cliente").val(),
             moneda: $("#moneda").val(),
             factor_item: $("input[name='factor_item']:checked").val(),
+            //prov INDICA EL TIPO DE FABRICACION
             prov: [],
             precio: [],
             lock: [],
@@ -243,34 +351,48 @@
            else{
              data.lock.push('0');  
            }
-           //console.log($(this).val());
         });
-        if(confirm("¿Esta seguro que desea crear la OC?.\n Se creará una OF con los productos que se necesitan fabricar.")){
-            $.ajax({
-                type: 'POST',
-                data: data,
-                url: '/plan/crear_odc',
-                success: function(data){
-                    if(data == 'error'){
-                        alert("La OC que intenta crear es inválida");
-                    } 
-                    else{
-                        var input = [$("#cliente").val(), $("#num").val()];
-                        io.emit('abastNotificacion', input);
-                        if(data != 'none'){
-                            data = [data, $("#cliente").val()];
-                            emitToast(data);
+
+        //COMPRUEBA SI SE HA SELECCIONADO UN CLIENTE, SI NO ES ASI NO PERMITE CREAR OC
+        if($("#cliente").val() === '0') {
+            Alerta("¡Ingrese Cliente!");
+        }
+        else{
+            if(confirm("¿Esta seguro que desea crear la OC?.\n Se creará una OF con los productos que se necesitan fabricar.")){
+                $.ajax({
+                    type: 'POST',
+                    data: data,
+                    url: '/plan/crear_odc',
+                    success: function(data){
+                        if(data === 'error'){
+                            Alerta("La OC que intenta crear es inválida");
                         }
-                        $.ajax({
-                            type: 'GET',
-                            url: '/plan/lanzar_of/pedido',
-                            success: function(html){    
-                                    $("#page-wrapper").html(html);
+                        else{
+                            var input = [$("#cliente").val(), $("#num").val()];
+                            io.emit('abastNotificacion', input);
+                            if(data !== 'none'){
+                                data = [data, $("#cliente").val()];
+                                emitToast(data);
                             }
-                        });
+                            $.ajax({
+                                type: 'GET',
+                                url: '/plan/lanzar_of/pedido',
+                                success: function(html){
+                                        $("#page-wrapper").html(html);
+                                }
+                            });
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     });
+
+    function comprobarCliente(id){
+        alert($("#"+id).val());
+        alert(typeof $("#"+id).val());
+        if($("#"+id).val() === '0'){
+            Alerta("¡Ingrese Cliente!");
+        }
+    }
 </script>

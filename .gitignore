@@ -65,3 +65,4 @@ typings/
 routes/boms
 routes/pdfs
 /public/pdf
+/sql

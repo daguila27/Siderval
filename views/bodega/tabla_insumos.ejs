@@ -4,7 +4,7 @@
         <td class="col-aux hidden" id="nof<%=insum[e].idmaterial%>"> - </td>
         <td class="col-aux hidden"> - </td>
         <td><%= insum[e].detalle%></td>
-        <td style="text-align: center;" class="parsear_nro">Indefinido</td>
+        <td style="text-align: center;" class="parsear_nro"><%= insum[e].u_medida%></td>
         <td style="text-align: center;" class="parsear_nro mat_stock"><%= insum[e].stock %></td>
         <td class="hidden data_gdd" id="in<%= insum[e].idmaterial%>" style="padding: 2px"><input type="number" min="1" max="<%= insum[e].stock%>" data-idpedido="0" data-idmat="<%= insum[e].idmaterial%>" class="form-control" data-idpaletitem="0" data-idpalet="0" value="1" style="width: 80px;margin: 0"></td>
         <td class="mat_butt" id="add<%= insum[e].idmaterial%>">
