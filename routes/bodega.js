@@ -1236,11 +1236,11 @@ router.get('/confirm_notificacion/:idnotificacion/:cantidad', function(req,res,n
 					connection.query('UPDATE notificacion SET active = false WHERE idnotificacion = ?', [idnotificacion],function(err, notif){
 						if(err){console.log("Error Selecting : %s", err);}
 						console.log(notif);
-						if(req.session.userData.nombre == 'faena'){
+						if(req.session.userData.nombre === 'faena'){
 							res.redirect('/faena/render_notificaciones/'+req.session.myValue);
 						}
-						else if(req.session.userData.nombre == 'bodega'){
-					    	res.redirect('/bodega/render_notificaciones');
+						else if(req.session.userData.nombre === 'bodega' || req.session.userData.nombre === 'gestionpl'){
+					    	res.redirect('/'+req.session.userData.nombre+'/render_notificaciones');
 						}
 					});
 				});
