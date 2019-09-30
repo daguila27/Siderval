@@ -429,7 +429,7 @@ router.post('/table_planta', function(req, res, next){
             if(err) throw err;
 
             var consulta = "select " +
-                "odc.numoc, cliente.sigla, cliente.razon,  pedido.numitem,pedido.despachados, coalesce(fabricaciones.idorden_f, 'No OF') as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
+                "COALESCE(querySubA.subaleacion, 'Sin Aleación') AS subaleacion, odc.numoc, cliente.sigla, cliente.razon,  pedido.numitem,pedido.despachados, coalesce(fabricaciones.idorden_f, 'No OF') as idordenfabricacion, material.detalle, pedido.cantidad as solicitados, " +
                 "coalesce(pedido.cantidad - pedido.despachados,0) as xdespachar, pedido.f_entrega, " +
                 "concat(dayname(pedido.f_entrega), ' ', day(pedido.f_entrega),' de ',monthname(pedido.f_entrega),' de ',year(pedido.f_entrega)) as esp_fecha_entrega," +
                 "coalesce(fundidos.fundidos,0) as fundidos,pedido.externo, coalesce(queryPlanta.enproduccion, 0) as enproduccion, coalesce(queryPlanta.finalizados,0) as finalizados, " +
@@ -441,6 +441,7 @@ router.post('/table_planta', function(req, res, next){
                 "as fundidos on fundidos.idpedido= pedido.idpedido " +
                 "left join cliente on odc.idcliente = cliente.idcliente " +
                 "left join fabricaciones on (fabricaciones.idpedido = pedido.idpedido) " +
+                " LEFT JOIN (select idmaterial, subaleacion.subnom as subaleacion from material left join subaleacion on subaleacion.idsubaleacion = SUBSTRING(material.codigo, 6, 2)) AS querySubA ON querySubA.idmaterial = pedido.idmaterial "+
                 "left join material on material.idmaterial = pedido.idmaterial " +
                 "left join " +
                 "(select produccion.idfabricaciones, sum(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1` - produccion.`2`) as enproduccion, produccion.`8` as finalizados from produccion group by produccion.idfabricaciones)" +

@@ -333,12 +333,14 @@ router.post('/table_pedidos', function(req, res, next){
         var limit = result[1];
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query("SELECT * FROM (SELECT pedido.idpedido,COALESCE(GROUP_CONCAT(ordenfabricacion.idordenfabricacion),'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,COALESCE(cliente.sigla, 'Sin Cliente') AS sigla, material.* FROM pedido"
+            connection.query("SELECT * FROM (" +
+                "SELECT COALESCE(querySubA.subaleacion, 'Sin Aleación') AS subaleacion, pedido.idpedido,COALESCE(GROUP_CONCAT(ordenfabricacion.idordenfabricacion),'-') AS oefes, pedido.numitem, pedido.despachados, pedido.f_entrega, pedido.cantidad, pedido.idproveedor, pedido.externo,SUM(fabricaciones.restantes) AS x_fabricar,COALESCE(prods.sol_op,0) AS sol_op,COALESCE(prods.rech_op,0) AS rech_op,COALESCE(prods.bpt_op,0) AS bpt_op, coalesce(odc.idodc, 'Orden de compra indefinida') as idodc, odc.numoc, odc.moneda, odc.creacion,COALESCE(cliente.sigla, 'Sin Cliente') AS sigla, material.* FROM pedido"
                 + " LEFT JOIN odc ON odc.idodc=pedido.idodc"
                 + " LEFT JOIN fabricaciones ON fabricaciones.idpedido= pedido.idpedido"
                 + " LEFT JOIN (SELECT idfabricaciones,SUM(cantidad) AS sol_op,SUM(standby) AS rech_op,SUM(`8`) AS bpt_op "
                 + "FROM produccion GROUP BY idfabricaciones) AS prods ON prods.idfabricaciones = fabricaciones.idfabricaciones"
                 + " LEFT JOIN ordenfabricacion ON pedido.idodc = ordenfabricacion.idodc"
+                + " LEFT JOIN (select idmaterial, subaleacion.subnom as subaleacion from material left join subaleacion on subaleacion.idsubaleacion = SUBSTRING(material.codigo, 6, 2)) AS querySubA ON querySubA.idmaterial = pedido.idmaterial "
                 + " LEFT JOIN cliente ON cliente.idcliente = odc.idcliente"
                 + " LEFT JOIN material ON material.idmaterial=pedido.idmaterial"
                 + " LEFT JOIN (SELECT pedido.idpedido, EstadoPedido(DATEDIFF(pedido.f_entrega, now()), pedido.cantidad <= pedido.despachados) AS estado FROM pedido) AS estado ON estado.idpedido=pedido.idpedido"
@@ -481,7 +483,7 @@ router.post('/table_fabricaciones', function(req, res, next){
       req.getConnection(function(err, connection){
             if(err) throw err;
 
-            var consulta = "select fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados," +
+            var consulta = "select COALESCE(querySubA.subaleacion, 'Sin Aleación') AS subaleacion, fabricaciones.*, coalesce(finalizados.finalizados, 0) as finalizados," +
                 "COALESCE(cliente.sigla,'SIDERVAL S.A') AS cliente,COALESCE(cliente.razon,'SIDERVAL S.A') AS razon,ordenfabricacion.*,pedido.despachados," +
                 "coalesce(pedido.externo,false) as externo, coalesce(material.peso, 0) as peso, material.detalle," +
                 " coalesce(odc.numoc, 'Sin OC') as numoc,COALESCE(pedido.despachados) AS despachados,COALESCE(pedido.cantidad) AS solicitados," +
@@ -490,6 +492,7 @@ router.post('/table_fabricaciones', function(req, res, next){
                 +"left join ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f "
                 +"left join odc on odc.idodc=ordenfabricacion.idodc "
                 +"left join pedido on pedido.idpedido=fabricaciones.idpedido "
+                + " LEFT JOIN (select idmaterial, subaleacion.subnom as subaleacion from material left join subaleacion on subaleacion.idsubaleacion = SUBSTRING(material.codigo, 6, 2)) AS querySubA ON querySubA.idmaterial = pedido.idmaterial "
                 +"left join cliente on cliente.idcliente = odc.idcliente "
                 +"left join (select fabricaciones.idfabricaciones, sum(coalesce(produccion_history.enviados,0)) as finalizados from produccion_history left join produccion on produccion.idproduccion = produccion_history.idproduccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones where produccion_history.to = 8 group by fabricaciones.idfabricaciones) as finalizados on finalizados.idfabricaciones = fabricaciones.idfabricaciones "
                 +"left join (select fabricaciones.idfabricaciones,SUM(produccion.cantidad) as enprod,SUM(produccion.standby) as enrech from produccion left join fabricaciones on produccion.idfabricaciones = fabricaciones.idfabricaciones group by fabricaciones.idfabricaciones) as enprod on enprod.idfabricaciones = fabricaciones.idfabricaciones "

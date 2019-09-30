@@ -19,6 +19,7 @@
 			<th data-name="numoc" id="cab-numoc" class="order-column cab-numoc" data-order="ordenfabricacion.idordenfabricacion-ASC">OC</th>
 			<th data-name="cliente" id="cab-cliente" class="order-column cab-cliente" data-order="cliente.razon-ASC">Cliente</th>
 			<th data-name="descrip" id="cab-descrip" class="order-column cab-descrip" data-order="material.detalle-ASC">Descripción</th>
+			<th data-name="subal" id="cab-subal" class="order-column cab-subal" data-order="material.detalle-ASC">Aleación</th>
 			<th data-name="solicitados" id="cab-solicitados" class="order-column cab-solicitados" data-order="fabricaciones.cantidad-ASC">Solicitados</th>
 			<th data-name="sin_produccion" id="cab-sin_produccion" class="order-column cab-sin_produccion" data-order="fabricaciones.restantes-ASC">Por Moldear</th>
 			<th data-name="en_produccion" id="cab-en_produccion" class="order-column cab-en_produccion" >En Producción</th>
@@ -51,6 +52,7 @@
 					<td data-toggle="tooltip" title="OC" class="numoc o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].numoc%></td>
 					<td data-toggle="tooltip" title="Cliente" class="cliente o_data_cell o_readonly_modifier o_required_modifier" data-toggle="tooltip" title="<%= data[i].razon%>"><%=data[i].cliente%></td>
 					<td data-toggle="tooltip" title="Descripción" class="descrip o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
+				    <td data-toggle="tooltip" title="Aleación" class="subal o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].subaleacion%></td>
 					<%cantidad_total += data[i].cantidad %>
 					<td data-toggle="tooltip" title="Solicitados" data-cs="0" data-name="solicitados" data-valor="<%= data[i].cantidad %>" class="checkFunction solicitados o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad %></td>
 					<%restantes_total += data[i].restantes %>
@@ -100,6 +102,7 @@
 			<td id="numoc"></td>
 			<td id="cliente"></td>
 			<td id="descrip"></td>
+			<td id="subal"></td>
 			<td id="solicitados" data-cs="0" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro"><%= cantidad_total%></td>
 			<td id="sin_produccion" data-cs="0" data-toggle="tooltip" title="Totales por Moldear" style="text-align: center;" class="parsear_nro"><%= restantes_total%></td>
 			<td id="en_produccion" data-cs="0" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro"><%= enproduccion_total%></td>
