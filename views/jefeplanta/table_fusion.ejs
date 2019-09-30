@@ -94,6 +94,8 @@ function fechaEspañol(date){
         <% if(user === 'dt'){%>
             <th></th>
             <th></th>
+        <%}else if(user === 'jefeprod'){%>
+            <th>Anular</th>
         <%}%>
     </tr>
     </thead>
@@ -116,6 +118,12 @@ function fechaEspañol(date){
             <% if(user === 'dt'){%>
                 <td class="nfecha"><input type="date"></td>
                 <td><button data-id="<%= data[i].idproduccion_history%>" onclick="act_fecha(this)">Act</button></td>
+            <%}else if(user === 'jefeprod'){%>
+                <td>
+                <%if(data[i].to != '8'){%>
+                    <button class="btn btn-danger btn-xs anulProdHist" data-idprod="<%= data[i].idproduccion%>" data-idprodh="<%= data[i].idproduccion_history%>" data-from="<%= data[i].from%>">Anular</button>
+                <%}%>
+                </td>
             <%}%>
         </tr>
     <%}%>
@@ -132,6 +140,8 @@ function fechaEspañol(date){
             <td></td>
             <% if(user === 'dt'){%>
                 <td></td>
+                <td></td>
+            <%}else if(user === 'jefeprod'){%>
                 <td></td>
             <%}%>
         </tr>
@@ -267,5 +277,17 @@ function fechaEspañol(date){
         return num;
     }
 
+
+    $(".anulProdHist").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: "/jefeprod/anular_produccion_history_modal/"+$(this).data('idprod')+"/"+$(this).data('idprodh')+"/"+$(this).data('from'),
+            success: function(data){
+                $("#anuProdHistForm").html(data);
+                $("#anularProdHistModal").modal('show');
+            }
+        });
+    });
 
 </script>

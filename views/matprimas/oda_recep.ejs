@@ -1,8 +1,8 @@
-<h2 class="panel-title">Orden de Compra N°<%= data[0].numoda%></h2>
-<table class="table table-striped table-hover table-bordered" style="margin-top: 10px">
+<h2 class="panel-title" style="margin-bottom: 10px; padding: 10px 0px 0px 10px !important;">Orden de Compra N°<%= data[0].numoda%></h2>
+<table  class="o_list_view table table-condensed table-striped o_list_view_ungrouped" cellspacing="0" width="100%" style="margin: 0 !important; padding: 0 !important;">
     <thead>
     <tr>
-        <th>Nombre</th>
+        <th>Descripción</th>
         <th>Pendientes</th>
         <th>Recibidos</th>
         <th>Unidades</th>
@@ -20,7 +20,7 @@
                 <td style="text-align: center;"><%= pendientes%></td>
                 <td style="padding:2px;">
                     <div class="form-group">
-                        <input type="number" step="any" class="form-control" name="rec" data-idmat="<%= data[j].idmaterial%>" data-idabast="<%= data[j].idabast%>" value="0" min="0" max="<%= pendientes%>" required>
+                        <input type="number" step="any" class="form-control" name="rec" data-bmi="<%= data[j].bmi%>" data-idmat="<%= data[j].idmaterial%>" data-idabast="<%= data[j].idabast%>" value="0" min="0" max="<%= pendientes%>" required>
                     </div>
                 </td>
                 <td style="text-align: center;"><%= data[j].umed%></td>
@@ -38,7 +38,7 @@
 </div>
 </div>
 <div class="modal-footer">
-    <button type="button" data-target="#confirmar_gdd" data-toggle="modal" class="btn btn-primary">Registrar</button>
+    <button type="button" data-target="#confirmar_gdd" data-toggle="modal" onclick="checkBMI()" class="btn btn-primary">Registrar</button>
 </div>
 <div id="confirmar_gdd" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -50,6 +50,9 @@
                     <h4 class="modal-title">Confirmar Recepción</h4>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-warning" id="alerta-reservacion">
+                        <strong>¡Atención!</strong> Está a punto de recepcionar productos necesarios para una Reservación.
+                    </div>
                     <p>¿ Confirma que todos los datos están correctos y que no hay inconvenientes ?</p>
                 </div>
                 <div class="modal-footer">

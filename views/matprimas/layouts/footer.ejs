@@ -52,6 +52,12 @@
     }
 </style>
 
+<!-- Modal Preparar Reservación -->
+<div id="prepReservModal" class="modal fade" role="dialog">
+
+</div>
+
+
 <!-- Modal -->
 <div id="facturaModal" class="modal fade bs-example-modal-lg" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -152,17 +158,64 @@
         display: flex;
     }
 </style>
+
+<input type="hidden" id="pageView" value="1">
+<form action="/matprimas/indx" method="post" class="hidden render-form">
+    <input type="hidden" name="route" id="route" value="view_mprimas">
+</form>
+
 <script>
 
-    $.ajax({
+    function ajax(yo){
+
+        $(".active").removeClass('active');
+        $(yo).addClass('active');
+        var l = $(yo).data('link').split('/').join('%');
+        $(".render-form input#route").val(l);
+        $(".render-form input#tipo").val($(yo).data('tipo'));
+        $(".render-form").submit();
+
+        /*$(".active").removeClass('active');
+        $(yo).addClass('active');
+        $.ajax({
+            type: 'GET',
+            url: $(yo).data('link'),
+            beforeSend: function(){
+                destroyDataTable();
+                showLoad();
+                close_menu();
+            },
+            success: function(data){
+                setTimeout(function(){
+                    $("#page-wrapper").html(data);
+                    $("#page-wrapper").fadeIn();
+                    hideLoad();
+                }, 500);
+            }
+        });*/
+    }
+
+    /*$.ajax({
         type: 'GET',
         url: '/matprimas/view_mprimas',
         beforeSend: function(){
-            $("#page-wrapper").css('display', 'none');
+            showLoad();
+            //$("#page-wrapper").css('display', 'none');
         },
         success: function(data){
-            $("#page-wrapper").html(data);
-            $("#page-wrapper").fadeIn();
+            setTimeout(function(){
+                $("#page-wrapper").html(data);
+                $("#page-wrapper").fadeIn();
+                hideLoad();
+            }, 500);
+        }
+    });*/
+
+    $.ajax({
+        type: 'GET',
+        url: '/matprimas/notif_bmi',
+        success: function(data){
+            $(".notificaciones").html(data);
         }
     });
     function show_menu(){
@@ -406,23 +459,20 @@
 
 
 
-    function ajax(yo){
-        $(".active").removeClass('active');
-        $(yo).addClass('active');
-        $.ajax({
-            type: 'GET',
-            url: $(yo).data('link'),
-            beforeSend: function(){
-                destroyDataTable();
-                $("#page-wrapper").css('display', 'none');
-                close_menu();
-            },
-            success: function(data){
-                $("#page-wrapper").html(data);
-                $("#page-wrapper").fadeIn();
 
-            }
-        });
-    }
+
+
+
+    var io = io();
+
+
+
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR  -- INICIO */
+    $(".oe_secondary_submenu li").removeClass('active');
+    $(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").addClass('active');
+    $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
+    $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
+    /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR -- FIN */
 </script>
+
 </html>

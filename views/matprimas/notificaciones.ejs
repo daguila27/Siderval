@@ -1,0 +1,80 @@
+<%if(notif.length > 0){
+for(var u=0; u < notif.length; u++){
+    var desc = notif[u].descripcion.split('@');
+    var hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];
+if(desc[0] === 'bmiOca'){%>
+    <li style="cursor: pointer; display: flex;">
+        <a class="notificacion-bmiOca" data-id="<%= notif[u].idnotificacion%>" data-idreserv="<%= notif[u].idreservacion%>" data-idreservd="<%= notif[u].idreservacion_d%>" style="width: 100%">
+            <div>
+                <small style="margin: 0; margin-bottom: 10px; font-size: 125%; color: rgb(119, 119, 119)">Stock para Reserva: </small>
+                <span class="pull-right text-muted" style="top: 0px">
+                    <em><%= hora%></em>
+                </span>
+            </div>
+            <div style="margin-left: 10px">Ya es posible preparar reserva para <b>OC <%= notif[u].numoc%> - Item <%= notif[u].numitem%> : <%= notif[u].detalle%></b></div>
+        </a>
+        <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+    </li>
+    <li class="divider"></li>
+<%}}%>
+<%}else{%>
+    <li>
+        <a href="#">
+            <div>
+                <strong>No hay notificaciones</strong>
+                <span class="pull-right text-muted">
+                        <em>Ahora mismo</em>
+                        </span>
+            </div>
+            <div>No tiene notificaciones.</div>
+        </a>
+    </li>
+<%}%>
+
+
+
+
+
+
+
+<script type="text/javascript">
+    var cantNotif = parseInt("<%= notif.length%>");
+    $(".open-notif").data('cant',cantNotif);
+    $(".badge-notificaciones").html($(".open-notif").data('cant'));
+
+    if(cantNotif == 0)
+        $(".badge-notificaciones").css('display', 'none');
+    else
+        $(".badge-notificaciones").css('display', 'block');
+
+
+    function removeNotif(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/matprimas/drop_notif/'+$(yo).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    }
+    $(".notificacion-bmiOca").on('click', function(e){
+        //SE OBTIENE LA DATA SOBRE LA RESERVACIÓN QUE SE DEBE PREPARAR
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/matprimas/get_reserv_info/'+$(this).data('idreserv')+'/'+$(this).data('idreservd')+'/'+$(this).data('id'),
+            success: function(data){
+                $('#prepReservModal').html(data);
+                $('#prepReservModal').modal('show');
+            }
+        });
+    });
+
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
+        e.stopPropagation();
+    });
+</script>

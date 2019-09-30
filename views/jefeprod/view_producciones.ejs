@@ -38,10 +38,6 @@
     .etiqueta-filtro-div{
         display: flex;
     }
-</style>
-
-
-<style>
     .busc-din-menu{
         margin: 0;
         padding: 0;
@@ -59,6 +55,12 @@
         z-index: 9;
     }
 </style>
+
+<div class="modal fade" id="anularProduccionModal" tabindex="-1" role="dialog">
+    <form class="form-inline" id="anuProdForm"></form>
+</div><!-- /.modal -->
+
+
 <%
 var clase;
 if(username == 'gestionpl'){clase='busc-din-menu';}
@@ -207,6 +209,30 @@ else{clase='busc-menu';}%>
 
     });
 
+
+    $("#anuProdForm").submit(function(e){
+       e.preventDefault();
+       var data = $(this).serializeArray();
+       var datos = {};
+       for(var i=0 ; i < data.length; i++){
+           datos[data[i].name] = data[i].value;
+       }
+       console.log(datos);
+       $.ajax({
+           type: 'POST',
+           data: datos,
+           url: '/jefeprod/anular_produccion',
+           success: function(data){
+               if(data === 'ok'){
+                   alert("¡Retorno relizado con exito!");
+               }else{
+                   alert("Ha ocurrido un error");
+               }
+               $("#anularProduccionModal").modal('hide');
+               busc.buscar_action();
+           }
+       });
+    });
 </script>
 
 <script src="/buscador_funciones.js"></script>

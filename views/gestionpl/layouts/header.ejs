@@ -118,6 +118,11 @@
             </li>
             <!-- /.dropdown -->
         </ul>
+        <ul class="nav navbar-right ">
+            <li>
+                <div style=" font-size: 15px; color: red; margin-right: 20px">INFORMACIÓN DE TESTEO | NO REPRESENTA LA REALIDAD</div>
+            </li>
+        </ul>
 
 
 
@@ -149,7 +154,7 @@
                     Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li class="active" onclick="ajax(this)" data-link="/gestionpl/create_production_history">
+                    <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/gestionpl/create_production_history">
                         <a class="oe_menu_leaf">
                              <span class="oe_menu_text">
                                  Registrar Movimientos Diarios
@@ -163,21 +168,34 @@
                     Despachos
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/bodega/crear_gdd" id="view_movimientos">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_gdd" id="view_movimientos">
                         <a class="oe_menu_leaf active">
                                             <span class="oe_menu_text">
                                                 Crear Guía de Despacho
                                             </span>
                         </a>
                     </li>
-                    <li  onclick="ajax(this)" data-link="/bodega/view_despachos">
+                    <li  onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_despachos">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Ver Guías
                                             </span>
                         </a>
                     </li>
-
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_recepcion">
+                        <a class="oe_menu_leaf">
+                                            <span class="oe_menu_text">
+                                                Recepcionar Externalizados
+                                            </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_externo">
+                        <a class="oe_menu_leaf">
+                                            <span class="oe_menu_text">
+                                                Ver Externalizados
+                                            </span>
+                        </a>
+                    </li>
                 </ul>
 
 
@@ -187,14 +205,14 @@
                 </div>
 
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/bodega/view_bodega">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_bodega">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Productos
                                             </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/bodega/view_pendientes">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_pendientes">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Packing List
@@ -208,14 +226,14 @@
                     Orden de Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/jefeprod/crear_op">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/crear_op">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                              Crear OP
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/jefeprod/view_producciones">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/view_producciones">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Ver Todas
@@ -223,11 +241,58 @@
                         </a>
                     </li>
                 </ul>
+
+
+
+
+
             </div>
 
         </div>
     </div>
+    <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA PANTALLA DE CARGA-->
+    <div class="load-screen" style="width: 100%; height: 100%; position: fixed; z-index: -10; color: white; background-color: white; transition: 0.5s">
+        <div style="height: 45%; width: 100%"></div>
+        <div style="width: 100%; text-align: center"><i class="fa fa-spinner fa-pulse"></i> Cargando</div>
+        <div style="height: 45%; width: 100%"></div>
+    </div>
+    <script>
+        function showLoad(){
+            $(".load-screen").css("background-color", "rgba(0,0,0,0.4)");
+            $(".load-screen").css('z-index', '100');
+        }
+        function hideLoad(){
+            $(".load-screen").css("background-color", "white");
+            $(".load-screen").css('z-index', '-10');
+        }
+    </script>
+    <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA PANTALLA DE CARGA [FIN] -->
 
     <script src="/buscador.js"></script>
+    <style>
+        .notif-alert-ul{
+            position: fixed;
+            right: 10px;
+            bottom: 5px;
+            z-index: 100;
+            width: 30%;
+            background-color: rgb(220,220,220);
+            padding: 0;
+            -webkit-box-shadow: -8px 10px 13px 1px rgba(0,0,0,0.75);
+            -moz-box-shadow: -8px 10px 13px 1px rgba(0,0,0,0.75);
+            box-shadow: -8px 10px 13px 1px rgba(0,0,0,0.75);
+        }
+        .notif-alert-ul li{
+            cursor: pointer;
+            margin: 5px;
+            padding: 5px 2.5px;
+            padding-left: 10px;
+            background-color: white;
+            list-style: none;
+            border-radius: 2%;
+        }
+    </style>
+    <ul class="notif-alert-ul">
 
-    <div id="page-wrapper"  data-view="/gestionpl/create_production_history" style="width: 90%;margin-left:10%; transition: 0.5s;">
+    </ul>
+    <div id="page-wrapper"  data-view="/gestionpl/create_production_history" style="width: 90%;margin-left:10%; transition: 0.5s;" data-tipo="1">

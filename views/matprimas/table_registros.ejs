@@ -7,8 +7,6 @@ function fechaLatino(string){
         return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
     }
 }
-
-
 function fechaEspañol(date){
     date = new Date(date);
     var meses = [
@@ -36,7 +34,6 @@ function fechaEspañol(date){
     ];
     return dias[date.getDay()] +" "+date.getDate()+" de "+meses[date.getMonth()]+" de "+date.getFullYear();
 }
-
 var etapas = [
     "Jefe de Producción",
     "Moldeo",
@@ -71,13 +68,14 @@ var etapas = [
         <tr class="o_data_row">
             <td style="text-align: center"><%= data[i].idregistro%></td>
             <td><%= data[i].detalle%></td>
-            <% if(parseInt(data[i].tipo) === 1){%>
+
+            <% if(data[i].tipo === 1){%>
                 <td style="text-align: center">Devolución</td>
-            <%}else if(parseInt(data[i].tipo) === 2){%>
+            <%}else if(data[i].tipo === 2){%>
                 <td style="text-align: center">Recepción OCA</td>
             <%}else{%>
                 <td style="text-align: center">Retiro</td>
-            <%} if(parseInt(data[i].tipo) === 1 || parseInt(data[i].tipo) === 2){%>
+            <%} if(data[i].tipo === 1 || data[i].tipo === 2){%>
                 <td style="color: blue; text-align: center"><%= data[i].cantidad%></td>
                 <td style="color: red; text-align: center">-</td>
             <%}else{%>

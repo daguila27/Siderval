@@ -11,16 +11,16 @@
         for(var u=0; u < notif.length; u++){
             var desc = notif[u].descripcion.split('@');
             var hora = desc[3].split(' ')[1].split(':')[0] +":"+desc[3].split(' ')[1].split(':')[1];
-            %>
+            if(notif[u].externo){%>
             <li>
-                <a class="notificacion" data-toggle="modal" data-target="#rechazoModal" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
+                <a class="notificacion" data-toggle="modal" data-target="#rechazoModalExt" data-ext="true"  data-well="<%=translate(desc[6])%>" data-idph="<%= desc[8]%>" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
                     <div>
                             <strong><%= desc[2]%> <%= notif[u].detalle%> Rechazado(s)</strong>
                             <span class="pull-right text-muted">
                             <em><%= hora%></em>
                             </span>
                     </div>
-                    <div>Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
+                    <div>(EXTERNO)Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
                         <div class="well">
                         <% if(desc[6] != ''){ %>
                             <%= translate(desc[6])%>
@@ -33,7 +33,30 @@
                 <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
             </li>
             <li class="divider"></li>
-        <%}%>
+        <%}else{%>
+            <li>
+                <a class="notificacion" data-toggle="modal" data-target="#rechazoModal" data-well="<%=translate(desc[6])%>" data-ext="false" data-idph="<%= desc[8]%>" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
+                    <div>
+                        <strong><%= desc[2]%> <%= notif[u].detalle%> Rechazado(s)</strong>
+                        <span class="pull-right text-muted">
+                            <em><%= hora%></em>
+                            </span>
+                    </div>
+                    <div>Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
+                        <div class="well">
+                            <% if(desc[6] != ''){ %>
+                                <%= translate(desc[6])%>
+                            <%} else {%>
+                                - Sin Mensaje -
+                            <%}%>
+                        </div>
+                    </div>
+                </a>
+                <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+            </li>
+            <li class="divider"></li>
+        <%}
+        }%>
     <%}
     else{%>
         <li>
@@ -71,17 +94,35 @@
         $(".porReponer").val($(this).data('cant'));
         $(".idnotif").val($(this).data('id'));
         var reponer = $(this).data('cant');
-        $.ajax({
-            type: 'POST',
-            data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp')},
-            url: 'jefeprod/predict_newop',
-            success: function(data){
-                console.log(data);
+        if( $(this).data('ext') ){
+            //MOSTRAR MODAL DE NOTIFICACIÓN
+            $("#botonContinuarModal").data('cont', '0');
+            $("#botonContinuarModal").data('id', $(this).data('id'));
+            $("#botonContinuarModal").data('idop', $(this).data('idop'));
+            $("#botonContinuarModal").data('idp', $(this).data('idp'));
+            $("#botonContinuarModal").data('idph', $(this).data('idph'));
+            $("#botonContinuarModal").data('cant', $(this).data('cant'));
+            $.ajax({
+                type: 'POST',
+                data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph'), com: $(this).data('well')},
+                url: 'jefeprod/predict_newop_ext',
+                success: function(data){
+                    $("#rechazoModalExt .modal-body").html(data);
+                }
+            });
+        }else{
+            $.ajax({
+                type: 'POST',
+                data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph')},
+                url: 'jefeprod/predict_newop',
+                success: function(data){
+                    console.log(data);
 
-                $("#rechazoModal .new_op").text("");
-                $("#rechazoModal .new_op").append("<td>"+data.newop[0].idordenproduccion+"</td><td>"+data.newop[0].numordenfabricacion+"</td><td>"+data.newop[0].detalle+"</td><td>"+reponer+"</td>");
-            }
-        });
+                    $("#rechazoModal .new_op").text("");
+                    $("#rechazoModal .new_op").append("<td>"+data.newop[0].idordenproduccion+"</td><td>"+data.newop[0].numordenfabricacion+"</td><td>"+data.newop[0].detalle+"</td><td>"+reponer+"</td>");
+                }
+            });
+        }
     });
 
 
@@ -94,7 +135,12 @@
             }
         });
     }
+
     $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
         e.stopPropagation();
     });
 </script>

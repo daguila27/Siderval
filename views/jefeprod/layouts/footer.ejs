@@ -69,6 +69,67 @@
 
 
 
+<div class="modal fade" id="rechazoModalExt" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"> ¡Se ha Rechazado un Producto Externalizado! </h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer panel-footer">
+                <button type="button" class="btn btn-primary" id="botonContinuarModal"
+                        data-cont="0"
+                        data-idop=""
+                        data-idp=""
+                        data-idph=""
+                        data-id=""
+                        data-cant="">Enviar</button>
+                <button type="button" class="btn btn-default cerrarRechazoModal" data-dismiss="modal">Cerrar</button>
+            </div><!-- /.modal -->
+            <script>
+                $("#botonContinuarModal").on('click', function (e) {
+                    e.preventDefault();
+                    if($(this).data('cont') === '1'){
+                        //PROCEDIMIENTO NORMAL PARA CUALQUIER RECHAZO
+                        $(".idProd").val($(this).data('idp'));
+                        $(".porReponer").val($(this).data('cant'));
+                        $(".idnotif").val($(this).data('id'));
+                        var reponer = $(this).data('cant');
+                        $.ajax({
+                            type: 'POST',
+                            data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph')},
+                            url: 'jefeprod/predict_newop',
+                            success: function(data){
+                                $("#rechazoModalExt").modal('hide');
+                                $("#rechazoModal").modal('show');
+                                $("#rechazoModal .new_op").text("");
+                                $("#rechazoModal .new_op").append("<td>"+data.newop[0].idordenproduccion+"</td><td>"+data.newop[0].numordenfabricacion+"</td><td>"+data.newop[0].detalle+"</td><td>"+reponer+"</td>");
+                            }
+                        });
+                    }else{
+                        //SE CREA LA NOTIFICACION INFORMANDO A ABASTECIMIENTO
+                        if(confirm("¿Está Seguro?")){
+                            $.ajax({
+                                type: 'POST',
+                                data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph'), coment: $("#comentRech").val()},
+                                url: 'jefeprod/save_notificacion_abastecimiento',
+                                success: function(data){
+                                    $("#rechazoModalExt").modal('hide');
+                                }
+                            });
+                        }
+                    }
+                });
+            </script>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
 <div class="modal fade" id="reportNotif" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -409,12 +470,13 @@
                 $(".notificaciones").html(data);
             }
         });
-
     });
     $("form.form-newp").on('submit', function(e){
         e.preventDefault();
-
         var array = $(this).serializeArray();
+        var etp_act = array.etapa_act;
+
+        alert("array__");
         console.log(array);
         $.ajax({
             type: 'POST',

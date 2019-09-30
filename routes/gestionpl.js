@@ -8,17 +8,10 @@ router.use(
     connection(mysql,dbCredentials,'pool')
 );
 
-var conn = mysql.createConnection({
-    host: 'localhost',
-    user: 'admin',
-    password : 'tempo123',
-    port : 3306,
-    database:'siderval',
-    insecureAuth : true
-});
+var conn = mysql.createConnection(dbCredentials);
 
 function verificar(usr){
-    if(usr.nombre == 'gestionpl'){
+    if(usr.nombre === 'gestionpl'){
         return true;
     }else{
         return false;
@@ -94,9 +87,37 @@ function parsear_crl(nro){
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     if(verificar(req.session.userData)){
-        res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre});}
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err){console.log("Error Selecting : %s", err);}
+                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp, route: '/gestionpl/create_production_history'});
+            });
+        });
+    }
     else{res.redirect('bad_login');}
 });
+
+router.post('/indx', function(req, res, next) {
+    var r = req.body.route.split('%').join('/');
+    console.log("rutaaaa");
+    console.log(r);
+
+
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("SELECT * FROM etapafaena", function(err, etp){
+                if(err){ console.log("Error Selecting : %s", err);}
+                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp, route: r});
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
 router.post('/save_production_history_state', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
@@ -114,6 +135,67 @@ router.post('/save_production_history_state', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
+
+/*
+*  Resumen:
+*
+*  Variables Influyentes:
+*       req.params = {}
+*       req.body = {}
+*  Usages:
+*
+* */
+router.get('/render_notificaciones', function(req, res, next){
+    req.getConnection(function(err,connection){
+        connection.query("SELECT " +
+            "notificacion.*," +
+            "material.detalle," +
+            "etapafaena.nombre_etapa, material2.detalle AS detalle2, odc.numoc, odc.idodc " +
+            "from notificacion " +
+            "LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial " +
+            "LEFT JOIN pedido ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=pedido.idpedido " +
+            "LEFT JOIN odc ON odc.idodc=pedido.idodc " +
+            "LEFT JOIN (SELECT * FROM material) AS material2 ON material2.idmaterial=pedido.idmaterial " +
+            "LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value " +
+            "WHERE (SUBSTRING(notificacion.descripcion,1,3) = 'jfp' OR SUBSTRING(notificacion.descripcion,1,3) = 'idm' OR SUBSTRING(notificacion.descripcion,1,5) = 'crgdd') AND notificacion.active = true", function(err, notif){
+            if(err){console.log("Error Selecting : %s", err);}
+            var idprods = [];
+            for(var e=0; e < notif.length; e++){
+                if(notif[e].descripcion.split('@')[0] !== 'crgdd'){
+                    for(var w=0; w < notif[e].descripcion.split('@')[4].split('-').length; w++){
+                        idprods.push(notif[e].descripcion.split('@')[4].split('-')[w]);
+                    }
+                }
+            }
+            var q;
+            if(idprods.length === 0){
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ('0')";
+            }else{
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ("+idprods.join(',')+")";
+            }
+            connection.query(q, function(err, ext){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                for(var e=0; e < notif.length; e++){
+                    if(notif[e].descripcion.split('@')[0] !== 'crgdd') {
+                        for (var w = 0; w < notif[e].descripcion.split('@')[4].split('-').length; w++) {
+                            for (var q = 0; q < ext.length; q++) {
+                                if (ext[q].idproduccion.toString() === notif[e].descripcion.split('@')[4].split('-')[w]) {
+                                    //SE CREA
+                                    if (notif[e].externo === undefined || !notif[e].externo) {
+                                        notif[e].externo = ext[q].externo;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                res.render('gestionpl/notificaciones', {notif: notif});
+            });
+        });
+    });
+});
+
 
 router.get('/load_production_history_state', function(req, res, next){
     if(verificar(req.session.userData)){
@@ -194,11 +276,11 @@ router.post('/save_production_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         if(typeof input['idmat[]'] === 'string'){
-            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ", req);
+            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ", input["fecha[]"], req);
         }
         else{
             for(var e=0; e < input['idmat[]'].length; e++){
-                recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", req);
+                recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", input["fecha[]"][e], req);
             }
         }
         res.send("¡Movimiento Diario registrado con exito!");
@@ -206,16 +288,19 @@ router.post('/save_production_history', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-function recursive_save_ph(idmat,env,from,to,obs, req){
+function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
     if(conn){
-        conn.query("select " +
+        var q = "select " +
             "material.detalle,material.idmaterial,group_concat(produccion.idproduccion SEPARATOR '-') as idprod, group_concat(produccion."+from+" SEPARATOR '-') as cantprod " +
             "from produccion " +
             "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
             "left join material on material.idmaterial=fabricaciones.idmaterial " +
-            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = ? group by material.idmaterial", [idmat], function(err, rows){
+            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = "+idmat+" group by material.idmaterial order by produccion.idproduccion ASC";
+        console.log(q);
+        conn.query(q, function(err, rows){
             if(err) throw err;
 
+            console.log(rows);
             /*
             * { idprod: '22725-22716-22717',
                   cantprod: '400-391-300',
@@ -250,27 +335,11 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                     key: 'fa8'
                 };
                 enviarNotificacionBodega(req, notif);
-            }else if(to === 'e'){
-                notif = {
-                    idproduccion: rows[0].idprod,
-                    cantidad: env,
-                    key: 'fae'
-                };
-                enviarNotificacionExternalizacion(req, notif);
             }
             /*
             * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
             *
             * */
-            /*
-            * UPDATE `table` SET `uid` = CASE
-                    WHEN id = 1 THEN 2952
-                    WHEN id = 2 THEN 4925
-                    WHEN id = 3 THEN 1592
-                    ELSE `uid`
-                    END
-                WHERE id  in (1,2,3)
-            **/
             input.idprod = input.idprod.split('-');
             input.cantprod = input.cantprod.split('-');
             var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
@@ -283,21 +352,29 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
             var ids = "";
             var cant_aux = parseInt(input.sendnum);
             var history = [];
-
+            var prod_affected = [];
+            var env_affected = [];
             for(var w=0; w < input.idprod.length; w++){
                 cant_aux -= parseInt(input.cantprod[w]);
                 if(cant_aux > 0){
                     // SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION
                     query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
-                    query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
-                    //history.push({idproduccion: input.idprod[w],enviados: input.cantprod[w],from: input.etapa_act,to:input.newetapa});
-                    if(input.cantprod[w] > 0){
+                    if(input.newetapa === 's'){
+                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+input.cantprod[w];
+                    }else{
+                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
+                    }
+
+                    if(parseInt(input.cantprod[w]) > 0){
                         history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
+                        prod_affected.push(input.idprod[w]);
+                        //LA CANTIDAD TRASPASADA
+                        env_affected.push(input.cantprod[w]);
                     }
                     ids += input.idprod[w]+",";
                 }
                 else{
-                    /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA */
+                    /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA --> cant_aux negativo*/
                     query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
                     if(input.newetapa === 's'){
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+(cant_aux+parseInt(input.cantprod[w]));
@@ -305,7 +382,10 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
                     }
                     //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
-                    history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa]);
+                    history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa, fecha]);
+                    prod_affected.push(input.idprod[w]);
+                    //LA CANTIDAD TRASPASADA
+                    env_affected.push(cant_aux+parseInt(input.cantprod[w]));
                     ids += input.idprod[w]+",";
                     break;
                 }
@@ -322,9 +402,18 @@ function recursive_save_ph(idmat,env,from,to,obs, req){
                 conn.query(query2 ,function(err,upProd2){
                     if(err) throw err;
 
-                    conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`) VALUES ?",[history],function(err,insert_h){
+                    conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`, `fecha`) VALUES ?",[history],function(err,insert_h){
                         if(err) throw err;
 
+
+                        if(to === 'e'){
+                            notif = {
+                                idproduccion: prod_affected.join('-'),
+                                cantidad: env_affected.join('-'),
+                                key: 'fae'
+                            };
+                            enviarNotificacionExternalizacion(req, notif);
+                        }
                     });
                 });
             });
@@ -407,7 +496,22 @@ function enviarNotificacionExternalizacion(req, input){
     if(conn){
         console.log("INGRESANDO NOTIFICACIÓN DE EXTERNALIZACION");
         console.log(input);
-        //
+        //{ idproduccion: '22744-22853', cantidad: '1', key: 'fae' }
+        //odaext@idproduccion@2019-07-08 16:51:53@idmaterial@cantidad
+        conn.query("SELECT fabricaciones.idmaterial FROM produccion " +
+            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+            "WHERE idproduccion IN ('"+input.idproduccion.split('-').join(',')+"') GROUP BY fabricaciones.idmaterial", function(err, idmat) {
+            if(err){console.log("Error Selecting : %s", err);}
+            idmat = idmat[0].idmaterial;
+            var d = new Date();
+            var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+            var token = "odaext@"+input.idproduccion+"@"+date+"@"+idmat+"@"+input.cantidad;
+            console.log(token);
+            conn.query("INSERT INTO notificacion (descripcion) VALUES ('"+token+"')", function(err, inNotif) {
+                if(err){console.log("Error Selecting : %s", err);}
+
+            });
+        });
     }
 }
 
@@ -420,6 +524,81 @@ router.get('/ver_ruta_modal/:idmaterial', function(req, res, next){
     }
     else{res.redirect('bad_login');}
 });
+
+
+
+router.get('/render_alert_notificacion/:idnotif', function(req, res, next) {
+    req.getConnection(function(err, connection) {
+        if(err) console.log("Error Selecting : %s", err);
+
+        connection.query("SELECT " +
+            "notificacion.*," +
+            "material.detalle," +
+            "etapafaena.nombre_etapa, material2.detalle AS detalle2, odc.numoc, odc.idodc " +
+            "from notificacion " +
+            "LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial " +
+            "LEFT JOIN pedido ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=pedido.idpedido " +
+            "LEFT JOIN odc ON odc.idodc=pedido.idodc " +
+            "LEFT JOIN (SELECT * FROM material) AS material2 ON material2.idmaterial=pedido.idmaterial " +
+            "LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value " +
+            "WHERE (SUBSTRING(notificacion.descripcion,1,3) = 'jfp' OR SUBSTRING(notificacion.descripcion,1,3) = 'idm' OR SUBSTRING(notificacion.descripcion,1,5) = 'crgdd') AND notificacion.active = true", function(err, notif){
+            if(err){console.log("Error Selecting : %s", err);}
+            var idprods = [];
+            for(var e=0; e < notif.length; e++){
+                if(notif[e].descripcion.split('@')[0] !== 'crgdd'){
+                    for(var w=0; w < notif[e].descripcion.split('@')[4].split('-').length; w++){
+                        idprods.push(notif[e].descripcion.split('@')[4].split('-')[w]);
+                    }
+                }
+            }
+            var q;
+            if(idprods.length === 0){
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ('0')";
+            }else{
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ("+idprods.join(',')+")";
+            }
+            connection.query(q, function(err, ext){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                for(var e=0; e < notif.length; e++){
+                    if(notif[e].descripcion.split('@')[0] !== 'crgdd') {
+                        for (var w = 0; w < notif[e].descripcion.split('@')[4].split('-').length; w++) {
+                            for (var q = 0; q < ext.length; q++) {
+                                if (ext[q].idproduccion.toString() === notif[e].descripcion.split('@')[4].split('-')[w]) {
+                                    //SE CREA
+                                    if (notif[e].externo === undefined || !notif[e].externo) {
+                                        notif[e].externo = ext[q].externo;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                console.log("GESTIONPL notificacion");
+                console.log(notif);
+                res.render('gestionpl/alert_notif_gestionpl', {notif: notif});
+
+            });
+        });
+    });
+});
+router.get('/drop_notif/:idnotif', function(req, res, next){
+    req.getConnection(function(err,connection){
+        if(err){
+            console.log("Error Connection : %s", err);
+        }
+        connection.query("UPDATE notificacion SET active = false WHERE idnotificacion = ?",[req.params.idnotif],
+            function(err, notif){
+                if(err){
+                    console.log("Error Selecting : %s", err);
+                }
+                res.redirect('/gestionpl/render_notificaciones');
+            });
+    });
+});
+
 
 
 module.exports = router;

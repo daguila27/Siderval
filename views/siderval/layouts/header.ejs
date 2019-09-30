@@ -79,12 +79,12 @@
             <li onclick="show_menu()" style="cursor:pointer;">
                 <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="fa fa-bars"></i> Menu</span></a>
             </li>
-            <li>
-                <a class="oe_menu_leaf"><span class="oe_menu_text"></span></a>
-            </li>
-
 
         </ul>
+
+
+
+
 
 
         <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
@@ -107,12 +107,15 @@
                     <i class="fa fa-caret-down"></i>
                     <span class="badge badge-notificaciones"></span>
                 </a>
-                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
-
-                </ul>
             </li>
         </ul>
 
+
+        <ul class="nav navbar-right ">
+            <li>
+                <div style=" font-size: 15px; color: red; margin-right: 20px">INFORMACIÓN DE TESTEO | NO REPRESENTA LA REALIDAD</div>
+            </li>
+        </ul>
 
 
     </div>
@@ -140,21 +143,21 @@
 
                 <div class="oe_secondary_menu_section">Planificación</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li id="pedd" class="active" onclick="ajax(this)" data-link="/plan/view_pedidos">
+                    <li class="active" onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Pedidos (OC)" data-link="/plan/view_pedidos">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Pedidos
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/plan/view_fabricaciones">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Fabricaciones (OF)" data-link="/plan/view_fabricaciones">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Fabricaciones
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/bodega/view_bodega">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Stock de Productos" data-link="/bodega/view_bodega">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Stock de Productos
@@ -165,7 +168,7 @@
 
                 <div class="oe_secondary_menu_section">Abastecimiento</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/view_abastecimiento">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Orden de Compra" data-link="/abastecimiento/view_abastecimiento">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Orden de Compra
@@ -176,38 +179,31 @@
 
                 <div class="oe_secondary_menu_section">Materias Primas</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <!--<li onclick="ajax(this)" data-link="/abastecimiento/stock_matp">
-                        <a class="oe_menu_leaf">
-                                <span class="oe_menu_text">
-                                    Ver Materias Primas
-                                </span>
-                        </a>
-                    </li>-->
-                    <li onclick="ajax(this)" data-link="/matprimas/view_mprimas">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Materias Primas" data-link="/matprimas/view_mprimas">
                         <a class="oe_menu_leaf active">
                                         <span class="oe_menu_text">
                                             Materias Primas
                                         </span>
                         </a>
                     </li>
-                    <li  onclick="ajax(this)" data-link="/matprimas/view_movimientos" id="view_movimientos">
+                    <li  onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Movimientos" data-link="/matprimas/view_movimientos" id="view_movimientos">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Movimientos
                                 </span>
                         </a>
                     </li>
-                    <li  onclick="ajax(this)" data-link="/matprimas/view_recep" id="view_movimientos">
+                    <li  onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Recepciones" data-link="/matprimas/view_recep" id="view_movimientos">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Recepciones
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/bom_mat_uni">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Siderval - Ver BOM de Productos" data-link="/abastecimiento/bom_mat_uni">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
-                                    Ver BOM productos
+                                    Ver BOM de Productos
                                 </span>
                         </a>
                     </li>
@@ -215,21 +211,21 @@
 
                 <div class="oe_secondary_menu_section">Jefe Producción</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/jefeprod/view_producciones">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Producciones" data-link="/jefeprod/view_producciones">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Producciones
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/faena/procesos">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Siderval - Ver Procesos" data-link="/faena/procesos">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Procesos
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/jefeprod/phistory_view">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Historial de Producción" data-link="/jefeprod/phistory_view">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Historial de producción
@@ -241,7 +237,7 @@
                 <div class="oe_secondary_menu_section">Jefe de Planta</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
 
-                    <li onclick="ajax(this)" data-link="/jefeplanta/view_fusion">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Registros Diarios" data-link="/jefeplanta/view_fusion">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Registros Diarios
@@ -249,7 +245,8 @@
                         </a>
                     </li>
 
-                    <li onclick="ajax(this)" data-link="/jefeplanta/view_planta">
+
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Listado Maestro" data-link="/jefeplanta/view_planta">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Listado Maestro
@@ -260,7 +257,7 @@
 
                 <div class="oe_secondary_menu_section">Bodega</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link='bodega/view_despachos'>
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Ver Guías de Despacho" data-link='/bodega/view_despachos'>
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Guías de Despacho
@@ -271,21 +268,21 @@
 
                 <div class="oe_secondary_menu_section">Informes</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/1">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Informe de Stock (Productos Producidos)" data-link="/abastecimiento/fabrs_ids/1">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Producción
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/2">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Informe de Stock (Materias Primas e Insumos)" data-link="/abastecimiento/fabrs_ids/2">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Materias Primas e Insumos
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-link="/abastecimiento/fabrs_ids/0">
+                    <li onclick="ajax(this)"  data-tipo="1" data-msg="Siderval - Informe de Stock (Todos)" data-link="/abastecimiento/fabrs_ids/0">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Todos
@@ -296,7 +293,7 @@
                 </ul>
                 <div class="oe_secondary_menu_section">Clientes y Proveedores</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-link="/plan/all_clientes">
+                    <li onclick="ajax(this)"  data-tipo="0" data-msg="Siderval - Clientes y Proveedores" data-link="/plan/all_clientes">
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Todos
@@ -311,6 +308,26 @@
 
         </div>
     </div>
+
+
+    <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA PANTALLA DE CARGA-->
+    <div class="load-screen" style="width: 100%; height: 100%; position: fixed; z-index: -10; color: white; background-color: white; transition: 0.5s">
+        <div style="height: 45%; width: 100%"></div>
+        <div style="width: 100%; text-align: center"><i class="fa fa-spinner fa-pulse"></i> Cargando</div>
+        <div style="height: 45%; width: 100%"></div>
+    </div>
+    <script>
+        function showLoad(){
+            $(".load-screen").css("background-color", "rgba(0,0,0,0.4)");
+            $(".load-screen").css('z-index', '100');
+        }
+        function hideLoad(){
+            $(".load-screen").css("background-color", "white");
+            $(".load-screen").css('z-index', '-10');
+        }
+    </script>
+    <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA PANTALLA DE CARGA [FIN] -->
+
     <script src="/buscador.js"></script>
 
-    <div id="page-wrapper" style="width: 100%;">
+    <div id="page-wrapper" style="width: 100%;" data-tipo="1" data-view="/plan/view_pedidos">

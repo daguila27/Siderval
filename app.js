@@ -34,7 +34,7 @@ var gestionpl = require('./routes/gestionpl');
 
 
 // view engine setup
-app.set('port', process.env.PORT || 4300);
+app.set('port', process.env.PORT || 6300);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
@@ -46,7 +46,7 @@ app.use(cookieParser("usuarios"));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieSession({
     name: 'session',
-    keys: ['usuarios']
+    keys: ['usuario_espejo']
 }));
 
 
@@ -89,16 +89,16 @@ app.use(function(err, req, res, next) {
 
 
 // Create a new service object
-
-/*var svc = new Service({
-  name:'Siderval SGP',
+/*
+var svc = new Service({
+  name:'Siderval espejo alfa',
   description: 'Servicio creado por nodejs para nuevo repositorio git.',
-  script: '/app.js'
-});*/
+  script: 'C:/Siderapp/alpha-testeo/app.js'
+});
 
 // Listen for the "install" event, which indicates the
 // process is available as a service.
-/*svc.on('install',function(){
+svc.on('install',function(){
   svc.start();
 });
 
@@ -116,14 +116,10 @@ const io = require('socket.io')(server);
 
 
 var mysql = require('mysql');
-var connection = mysql.createConnection({
-      host: '127.0.0.1',
-      user: 'admin',
-      password: 'tempo123',
-      port: 3306,
-      database: 'siderval',
-      insecureAuth : true
-});
+var dbcredentials = require('./dbCredentials');
+dbcredentials.insecureAuth = true;
+
+var connection = mysql.createConnection(dbcredentials);
 
 
 connection.connect();
@@ -144,15 +140,18 @@ io.on('connection', function (socket) {
              dataInsert.descripcion = "jfp@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop+"@"+input.razon+"@"+input.etapa;
              connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                  if(err){console.log("Error Selecting : %s", err);}
-                 io.sockets.emit("notif");
+                 io.sockets.emit("refreshBodegaNotif", [rows.insertId]);
+                 io.sockets.emit("refreshGestionplNotif", [rows.insertId]);
              });
          });
      });
       socket.on('addNotificacion', function(input){
+          console.log("addNotificacion");
           console.log(input);
           var userf = input.key.substring(2,input.key.length);
           connection.query("SELECT fabricaciones.idmaterial, produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion){
               if(err){console.log("Error Selecting : %s", err);}
+
                 var idmaterial = produccion[0].idmaterial;
                 var idop = produccion[0].idop;
                 var dataInsert = {};
@@ -168,20 +167,46 @@ io.on('connection', function (socket) {
                 if(userf === '8'){
                   dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                   connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                      if(err){console.log("Error Selecting : %s", err);}                    
-                        io.sockets.emit("notif");
+                      if(err){console.log("Error Selecting : %s", err);}
+                        io.sockets.emit("refreshBodegaNotif", [rows.insertId]);
+                        io.sockets.emit("refreshGestionplNotif", [rows.insertId]);
                   });
 
-
                 }
-                else if(userf === "9"){
+                else if(userf === "e"){
                     dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
                     console.log(dataInsert);
                     connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
                         if(err){console.log("Error Selecting : %s", err);}
-                        io.sockets.emit("refreshfaena"+userf);
 
-                        //connection.end();
+                        var idprod = [];
+                        var cantprod = [];
+                        var cant_aux = parseInt(input.cantidad);
+
+                        for(var w=0; w < input.idproduccion.split('-').length; w++){
+                            cant_aux -= parseInt(input.cantprod.split('-')[w]);
+                            if(cant_aux > 0){
+                                idprod.push(input.idproduccion.split('-')[w]);
+                                cantprod.push(parseInt(input.cantprod.split('-')[w]));
+                            }
+                            else{
+                                idprod.push(input.idproduccion.split('-')[w]);
+                                cantprod.push(cant_aux+parseInt(input.cantprod.split('-')[w]));
+                                break;
+                            }
+                        }
+                        //odaext@22955-22958@2019-7-10 01:04:06@110813@300-684
+                        var token = "odaext@"+idprod.join('-')+"@"+date+"@"+idmaterial+"@"+cantprod.join('-');
+                        dataInsert = {descripcion: token};
+                        connection.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                            if(err){console.log("Error Selecting : %s", err);}
+
+
+                            io.sockets.emit("refreshfaena"+userf);
+
+                            //connection.end();
+                        });
+
                     });
                 }
                 else{
@@ -194,7 +219,7 @@ io.on('connection', function (socket) {
                       //connection.end();
                   });
                 }
-                
+
 
         });
       });
@@ -234,7 +259,7 @@ io.on('connection', function (socket) {
             
       });
       socket.on('abastNotificacion', function(input){ 
-          connection.query("select * from pedido left join odc on odc.idodc = pedido.idodc where odc.numoc = ? and odc.idcliente = ? and pedido.externo = true", [input[1],input[0]],function(err, oc){
+          connection.query("select * from pedido left join odc on odc.idodc = pedido.idodc where odc.numoc = ? and odc.idcliente = ? and (pedido.externo = true || pedido.bmi = true)", [input[1],input[0]],function(err, oc){
             if(err)
               console.log("Error Selecting : %s", err);
             if(oc.length > 0){
@@ -256,7 +281,25 @@ io.on('connection', function (socket) {
           console.log(id);
           io.sockets.emit("refreshProduccion", {info : id});
       });
+       //SOCKET ACTUALIZA NOTIFICACIONES EN USUARIO BODEGA
+      socket.on('actNotifBodega', function(idnotifs){
+          console.log('Actualizando notificaciones [Bodega]...');
+          io.sockets.emit("refreshBodegaNotif", idnotifs);
+      });
+
+    //SOCKET ACTUALIZA NOTIFICACIONES EN USUARIO BODEGA
+    socket.on('actNotifGestionPl', function(idnotifs){
+        console.log('Actualizando notificaciones [Gestion Planta]...');
+        io.sockets.emit("refreshGestionplNotif", idnotifs);
+    });
+    //SOCKET ACTUALIZA NOTIFICACIONES EN USUARIO Planificación
+    socket.on('actNotifPlan', function(idnotifs){
+        console.log('Actualizando notificaciones [Planificación]...');
+        console.log(idnotifs);
+        io.sockets.emit("refreshPlanNotif", idnotifs);
+    });
       app.locals.socket = socket;
 });
 app.locals.io = io;
+app.locals.puerto = app.get('port');
 

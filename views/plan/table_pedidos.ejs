@@ -1,12 +1,12 @@
 <%
 	function fechaLatino(string){
-		return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-') 
+		return [string.split('-')[2] , string.split('-')[1] , string.split('-')[0]].join('-');
 	}
 	function diff_indays(date1){
 		dt1 = new Date();
 		dt2 = new Date(date1);
 		return Math.floor((Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate()) ) /(1000 * 60 * 60 * 24));
-		}
+	}
 %>
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
@@ -36,7 +36,8 @@
 			</tr>
 		</thead>
 	<tbody class="ui-sortable">
-		<%var clase;
+		<%
+		var clase;
 		var estado;
 		var t_sol = 0;
         var t_xfabs = 0;
@@ -44,13 +45,13 @@
         var t_sindesp = 0;
         var t_desp = 0;
 		for(var i=0; i < data.length; i++){
-			if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 10 && diff_indays(data[i].f_entrega)>=0 ){
+			if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 10 && diff_indays(data[i].f_entrega) >= 0 ){
 				clase = 'warning';
 				estado = 'Pronta Entrega';
 			}else if(parseInt(data[i].despachados) < parseInt(data[i].cantidad)  && diff_indays(data[i].f_entrega) < 0 ){
 				clase = 'danger';
 				estado = 'Atrasado';
-			}else if(parseInt(data[i].despachados) == parseInt(data[i].cantidad)){
+			}else if(parseInt(data[i].despachados) === parseInt(data[i].cantidad)){
 				clase = 'success';
 				estado = 'Finalizado';
 			}else{
@@ -60,7 +61,7 @@
 		<tr class="o_data_row <%=clase%>">
 			<td data-toggle="tooltip" title="OF" class="col-numof o_data_cell o_readonly_modifier o_required_modifier" style="text-align: center" data-idof="<%=data[i].oefes%>" onclick="submit_of(this)">
 				<button class="btn btn-primary btn-xs">
-					<%if(data[i].oefes.split(',').length > 2){%>
+					<% if(data[i].oefes.split(',').length > 2){%>
 						<%=data[i].oefes.substring(0,8)%>...
 					<%}else{%>
 						<%=data[i].oefes%>
@@ -100,7 +101,6 @@
             bottom:0px;
             height:30px;
             width:100%;
-            /*background:#999;*/
         }
     </style>
     <tfoot>
@@ -138,12 +138,12 @@
             },
 			url: '/plan/page_oc/'+$(yo).data('idodc'),
 			success: function(data){
-				$(".main-page").html(data);	
+                ocultar_buscador();
+				$(".main-page").html(data);
 			}
 		});
 	}
     function submit_of(yo){
-        //$("#form"+$(yo).data('idodc')).submit();
         $.ajax({
             type: 'GET',
 			beforeSend: function(){
@@ -151,6 +151,7 @@
 			},
             url: '/plan/page_of/'+$(yo).data('idof'),
             success: function(data){
+                ocultar_buscador();
                 $(".main-page").html(data);
             }
         });

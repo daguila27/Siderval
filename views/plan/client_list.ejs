@@ -1,16 +1,83 @@
+<style>
+	.o_searchview_autocomplete {
+		position: absolute;
+		top: 100%;
+		left: auto;
+		bottom: auto;
+		right: auto;
+		width: 100%;
+	}
+	.o_searchview {
+		background-color: white;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		padding: 1px 25px 3px 5px;
+	}
+	.etiqueta-filtro{
+		padding: 5px;
+		margin: 3px;
+		display: flex;
+	}
+
+	.etiqueta-filtro div{
+		padding: 0px;
+		margin: 0px 0px 0px 7px;
+		color: white;
+	}
+	.etiqueta-filtro strong{
+		padding: 0px;
+		margin: 0px 0px 0px 7px;
+		color: white;
+	}
+	.etiqueta-input{
+		padding: 2px 6px;
+	}
+	.etiqueta-filtro-div{
+		display: flex;
+	}
+</style>
+
+<%if(username == 'abastecimiento'){%>
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 90%;transition:0.5s; z-index: 9;">
+	<%}else{%>
+	<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; z-index: 9;">
+		<%}%>
+		<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+			<ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+				<li class="active">Listado de Clientes</li>
+				<!-- Mostrar cantidad de datos -->
+				<div id="indicador_paginas" data-total="0" style="margin-top: 8px"></div>
+			</ol>
+
+			<div style="width: 50%;">
+				<!--<div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+                </div>-->
+				<div class="row">
+					<form id="form-cliente">
+						<div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top: 10px;display: flex;">
+							<input style="width: 80%" id="cl-detail" type="text" class="form-control" placeholder="Buscar cliente" tabindex="1">
+							<button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
+							<button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_clientes()"><i class="glyphicon glyphicon-refresh"></i></button>
+						</div>
+					</form>
+				</div>
+				<div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+					<button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+					<ul class="dropdown-menu">
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
 <div class="row" style=" margin: 0 ; padding-bottom: 2%; margin-right: 2%;margin-left: 2%;background-color: white; height: 100%">
 <h1 class="page-header" style="margin: 0; padding-top: 3%">Malla de clientes:</h1>
 
 	
 
-<div class="row">
-		<form id="form-cliente">
-			<div class="col-md-offset-3 col-md-6 input-group" style="margin-bottom: 10px;margin-top: 10px;display: flex;">
-		    	<input style="width: 80%" id="cl-detail" type="text" class="form-control" placeholder="Buscar cliente" tabindex="1">
-		    	<button style="width: 10%" type="submit" class="input-group-addon btn" tabindex="2"><i class="glyphicon glyphicon-search"></i></button>
-		    	<button style="width: 10%" type="button" class="btn input-group-addon" tabindex="3" onclick="render_all_clientes()"><i class="glyphicon glyphicon-refresh"></i></button>
-		  	</div>
-	  	</form>
+<div class="row" style="margin-top: 50px">
+
 	  	<!-- Paginacion -->
 	  	<div style="margin-left: 33.8%">
 	  		<nav aria-label="Page navigation">
@@ -41,7 +108,9 @@
 </style>
 
 <script type="text/javascript">
-
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+    });
 	$("#form-cliente").on('submit',function(e){
 		e.preventDefault();
 		var info = $("#cl-detail").val();

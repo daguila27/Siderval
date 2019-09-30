@@ -1,0 +1,214 @@
+<style>
+    .select-a-sim:hover{
+        text-decoration-line: underline;
+    }
+</style>
+
+<%
+function translate(word){
+    if(word == 'Otro'){
+        return "con detalle no especificado";
+    }
+    else{
+        return word;
+    }
+}
+if(notif.length > 0){
+for(var u=0; u < notif.length; u++){
+    var desc = notif[u].descripcion.split('@');
+    var hora;
+if(desc[0] === 'idm'){
+    hora = desc[3].split(' ')[1].split(':')[0] +":"+desc[3].split(' ')[1].split(':')[1];%>
+<li style="cursor: pointer;">
+    <a data-id="<%= notif[u].idnotificacion%>" style="width: 100%">
+        <div style="width: 100% !important;">
+            <small style="margin: 0; margin-bottom: 10px; font-size: 125%; color: rgb(119, 119, 119)">Material entrante: </small>
+            <span class="pull-right text-muted" style="top: 0px">
+                                    <em><%= hora%></em>
+                                </span>
+        </div>
+        <div style="color: black !important; width: 100% !important;">
+            Ha recibido <%= desc[2]%> unidades de <%=notif[u].detalle%>
+        </div>
+        <div style="width: 100% !important; display: flex; margin-top: 5px !important;">
+            <div class="select-a-sim" style="text-align: center; width: 50% !important; color: green !important;" onclick="confirm_notif(this)" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>"><i class="fa fa-check"></i> He Recibido</div>
+            <div class="select-a-sim" style="text-align: center;width: 50% !important; color: red !important;"><i class="fa fa-warning"></i> Error</div>
+        </div>
+    </a>
+    <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+</li>
+<li class="divider" style="width: 100%;"></li>
+<%}else if(desc[0] === 'jfp'){
+    hora = desc[3].split(' ')[1].split(':')[0] +":"+desc[3].split(' ')[1].split(':')[1];
+if(notif[u].externo){%>
+<li>
+    <a class="notificacion-jfp" data-toggle="modal" data-target="#rechazoModalExt" data-ext="true"  data-well="<%=translate(desc[6])%>" data-idph="<%= desc[8]%>" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
+        <div>
+            <strong><%= desc[2]%> <%= notif[u].detalle%> Rechazado(s)</strong>
+            <span class="pull-right text-muted">
+                            <em><%= hora%></em>
+                            </span>
+        </div>
+        <div>(EXTERNO)Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
+            <div class="well">
+                <% if(desc[6] != ''){ %>
+                    <%= translate(desc[6])%>
+                <%} else {%>
+                    - Sin Mensaje -
+                <%}%>
+            </div>
+        </div>
+    </a>
+    <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+</li>
+<li class="divider"></li>
+<%}else{%>
+<li>
+    <a class="notificacion-jfp" data-toggle="modal" data-target="#rechazoModal" data-well="<%=translate(desc[6])%>" data-ext="false" data-idph="<%= desc[8]%>" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
+        <div>
+            <strong><%= desc[2]%> <%= notif[u].detalle%> Rechazado(s)</strong>
+            <span class="pull-right text-muted">
+                            <em><%= hora%></em>
+                            </span>
+        </div>
+        <div>Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
+            <div class="well">
+                <% if(desc[6] != ''){ %>
+                    <%= translate(desc[6])%>
+                <%} else {%>
+                    - Sin Mensaje -
+                <%}%>
+            </div>
+        </div>
+    </a>
+    <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+</li>
+<li class="divider"></li>
+<%}
+}else if(desc[0] === 'crgdd'){
+    hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];%>
+    <li style="cursor: pointer;">
+        <a data-id="<%= notif[u].idnotificacion%>" style="width: 100%">
+            <div style="width: 100% !important;">
+                <small style="margin: 0; margin-bottom: 10px; font-size: 125%; color: rgb(119, 119, 119)">Stock para Reserva: </small>
+                <span class="pull-right text-muted" style="top: 0px">
+                                                <em><%= hora%></em>
+                                            </span>
+            </div>
+            <div style="color: black !important; width: 100% !important;">
+                Ya es posible realizar GDD para <b>OC <%= notif[u].numoc%> - Item 10 : <%= notif[u].detalle2%></b>
+            </div>
+            <div style="width: 100% !important; display: flex; margin-top: 5px !important;">
+                <div class="select-a-sim" style="visibility: hidden; text-align: center;width: 50% !important; color: red !important;"><i class="fa fa-warning"></i> Lo haré después</div>
+                <div class="select-a-sim notificacion-crearGdd" data-alert="false" style="text-align: center; width: 50% !important; color: green !important;" data-id="<%= notif[u].idnotificacion%>" data-idodc="<%= notif[u].idodc%>" data-idped="<%= notif[u].descripcion.split('@')[1]%>">Crear GDD <i class="fa fa-arrow-right"></i></div>
+            </div>
+        </a>
+        <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+    </li>
+<li class="divider"></li>
+<%}}} else {%>
+    <li>
+        <a href="#">
+            <div>
+                <strong>No hay notificaciones</strong>
+                <span class="pull-right text-muted">
+                    <em>Ahora mismo</em>
+                    </span>
+            </div>
+        </a>
+    </li>
+<%}%>
+
+<script type="text/javascript">
+    var cantNotif = parseInt("<%= notif.length%>");
+    $(".open-notif").data('cant',cantNotif);
+    $(".badge-notificaciones").html($(".open-notif").data('cant'));
+
+    if(cantNotif == 0)
+        $(".badge-notificaciones").css('display', 'none');
+    else
+        $(".badge-notificaciones").css('display', 'block');
+    //Funcion Confirmar notificación
+    function confirm_notif(esto){
+        var data = $(esto).data();
+        $.ajax({
+            type: 'GET',
+            url: 'bodega/confirm_notificacion/'+data.id+'/'+data.cant,
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    }
+
+    $(".notificacion-jfp").on('click', function(e){
+        e.preventDefault();
+        $(".idProd").val($(this).data('idp'));
+        $(".porReponer").val($(this).data('cant'));
+        $(".idnotif").val($(this).data('id'));
+        var reponer = $(this).data('cant');
+        if( $(this).data('ext') ){
+            //MOSTRAR MODAL DE NOTIFICACIÓN
+            $("#botonContinuarModal").data('cont', '0');
+            $("#botonContinuarModal").data('id', $(this).data('id'));
+            $("#botonContinuarModal").data('idop', $(this).data('idop'));
+            $("#botonContinuarModal").data('idp', $(this).data('idp'));
+            $("#botonContinuarModal").data('idph', $(this).data('idph'));
+            $("#botonContinuarModal").data('cant', $(this).data('cant'));
+            $.ajax({
+                type: 'POST',
+                data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph'), com: $(this).data('well')},
+                url: 'jefeprod/predict_newop_ext',
+                success: function(data){
+                    $("#rechazoModalExt .modal-body").html(data);
+                }
+            });
+        }else{
+            $.ajax({
+                type: 'POST',
+                data: {idop: $(this).data('idop'), rep: $(this).data('cant'), idp: $(this).data('idp'), idph: $(this).data('idph')},
+                url: 'jefeprod/predict_newop',
+                success: function(data){
+                    console.log(data);
+
+                    $("#rechazoModal .new_op").text("");
+                    $("#rechazoModal .new_op").append("<td>"+data.newop[0].idordenproduccion+"</td><td>"+data.newop[0].numordenfabricacion+"</td><td>"+data.newop[0].detalle+"</td><td>"+reponer+"</td>");
+                }
+            });
+        }
+    });
+
+
+    function removeNotif(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/gestionpl/drop_notif/'+$(yo).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    }
+
+
+
+
+    $(".notificacion-crearGdd").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/bodega/get_pedido_gdd/'+ $(this).data('idodc') +'/'+$(this).data('idped')+"/"+ $(this).data('id'),
+            success: function(data){
+                $('#crearGddModal').html(data);
+                $('#crearGddModal').modal('show');
+            }
+        });
+    });
+
+
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
+        e.stopPropagation();
+    });
+</script>

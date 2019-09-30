@@ -89,30 +89,58 @@
             background-color: rgb(124,123,173) !important;
             color: white !important;
         }
+        .nav-tabs li a{
+            border: 1px solid rgb(200,200,200) !important;
+        }
     </style>
-    <ul class="nav nav-tabs col-md-10 col-md-offset-1" style="padding-left: 1%">
-        <li class="active"><a data-toggle="tab" data-etp="mol" href="#mol">Moldeo <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="fus" href="#fus">Fusión <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="qui" href="#qui">Quiebre <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="tra" href="#tra">Tratamiento Térmico <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="ter" href="#ter">Terminación <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="mae" href="#mae">Maestranza <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="con" href="#con">Control de Calidad <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="rec" href="#rec">Rechazo <small></small></a></li>
-        <li><a data-toggle="tab" data-etp="ext" href="#ext">Externalizado <small></small></a></li>
+    <ul class="nav nav-tabs col-md-10 col-md-offset-1 tabs-etapas" style="padding-left: 1%">
+        <li class="active"><a data-toggle="tab" data-etp="mol" data-etpval="1" href="#mol">Moldeo<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="fus" href="#fus" data-etpval="2">Fusión<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="qui" href="#qui" data-etpval="3">Quiebre<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="tra" href="#tra" data-etpval="4">Tratamiento<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ter" href="#ter" data-etpval="5">Terminación<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="mae" href="#mae" data-etpval="6">Maestranza<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="con" href="#con" data-etpval="7">Cc<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="rec" href="#rec" data-etpval="s">Rechazo<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="ext" href="#ext" data-etpval="e">Externalizado<small></small></a></li>
     </ul>
     <div class="etapas-content tab-content">
         <div id="mol" class="tab-pane fade in active">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -122,7 +150,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Siguiente Etapa" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Siguiente Etapa" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -140,14 +169,38 @@
         <div id="fus" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -157,7 +210,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -175,14 +229,38 @@
         <div id="qui" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -192,7 +270,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -210,14 +289,38 @@
         <div id="tra" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -227,7 +330,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -245,14 +349,38 @@
         <div id="ter" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -262,7 +390,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -280,14 +409,38 @@
         <div id="mae" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -297,7 +450,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -315,14 +469,38 @@
         <div id="con" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -332,7 +510,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Siguiente Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -350,14 +529,38 @@
         <div id="rec" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -368,6 +571,7 @@
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Rechazado Desde</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -385,14 +589,38 @@
         <div id="ext" class="tab-pane fade">
             <div class="panel panel-primary col-md-12" style="padding: 0">
                 <div class="panel-heading">
-                    <div class="dropdown opcion-sl" style="margin-left: 99%; width: 1%;">
-                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><span class="caret"></span></button>
-                        <ul class="dropdown-menu" style="right: 0; left: auto;">
-                            <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
-                            <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
-                            <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
-                            <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
-                        </ul>
+                    <div style="margin-left: 90%; width: 10%; display: flex">
+                        <div class="dropdown">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
+                                <li class="input-date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                </li>
+                                <li class="divider"></li>
+                                <li class="input-option" style="padding: 0px 10px; width: 100%;">
+                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
+                                    </div>
+                                    <div class="radio">
+                                        <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                <li class="pull-right" style="padding: 0px 10px">
+                                    <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="panel-body" style="padding: 0%">
@@ -402,7 +630,8 @@
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
-                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Rechazado Desde</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Moldeo" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento" style="text-align: center">Fecha</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
                                 <th></th>
                             </tr>
@@ -418,6 +647,7 @@
             </div>
         </div>
     </div>
+
 
     <button class="btn btn-primary" onclick="submit_action()" style="margin-left: 80%; margin-right: 10%; margin-bottom: 10px; width: 10%;">Enviar</button>
 
@@ -500,6 +730,8 @@
 
 
 <script>
+
+
     var etapas = [
         "Moldeo",
         "Fusión",
@@ -539,6 +771,24 @@
     $("#prodTable_wrapper").css('margin-top', '-39px');
     $("#prodTable_wrapper label").css('color', 'white');
 
+
+    function setDatesMov(yo){
+        var etp = $(".tabs-etapas li.active a").data('etp');
+        var fecha = $(yo).parent().parent().children('.input-date').children('input').val();
+        var option = $(yo).parent().parent().children('.input-option').children('.radio').children('label').children('input').val();
+        $(yo).parent().parent().children('.input-option').children('.radio').children('label').children('input').each(function(){
+            if($(this).is(':checked')){
+                option = $(this).val();
+            }
+        });
+        if(option === 'esta'){
+            $(".dateInputMov-"+etp).val(fecha);
+            $(".dateInputMov-"+etp).parent().data('valor', fecha);
+        }else if(option === 'todas'){
+            $(".dateInputMov").val(fecha);
+            $(".dateInputMov").parent().data('valor', fecha);
+        }
+    }
     function verRuta(yo){
         $("#verRutaModal").modal('show');
         var html = "";
@@ -559,29 +809,11 @@
             }
         }
         $("#verRutaModal .modal-body").html(html);
-        /*
-        * <div style="display: flex;">
-                    <div class="circulo">Mol<br>100</div>
-                    <div class="linea"></div>
-                    <div class="circulo">Fus<br>100</div>
-                    <div class="linea"></div>
-                    <div class="circulo">Qui<br>100</div>
-                    <div class="linea"></div>
-                    <div class="circulo">Ter<br>100</div>
-                    <div class="linea"></div>
-                    <div class="circulo">Tto<br>100</div>
-                    <div class="linea"></div>
-                    <div class="circulo">Mae<br>100</div>
-                    <div class="linea"></div>
-                    <div class="circulo">CC<br>100</div>
-                    <div class="linea"></div>
-                    <div class="circulo">BPT<br>100</div>
-                </div>
-                */
     }
 
     function col_movh(yo){
         var next;
+        var previus;
         var r = $(yo).parent().data('ruta').split(',');
         //SE OBTIENE LA SIGUIENTE ETAPA SEGÚN RUTA
         //SI LA ETAPA ACTUAL NO SE ENCUENTRA EN LA RUTA DE PRODUCCION
@@ -599,22 +831,35 @@
                     next = 9;
                 }else{next = r[r.indexOf($(yo).data('etapa').toString()) + 1];}
             }
-
+            previus = r[r.indexOf($(yo).data('etapa').toString()) - 1];
             $('#prod_info').children('strong').html($(yo).parent().data('nombre'));
             $('#prod_info').children('strong').data('idmat', $(yo).parent().data('idmat'));
             $("#etapa-previus").val($(yo).data('etapa'));
 
-            $('#prod_info').children('small').html("<label>Enviar a:     " +
-                "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
-                "<option value='"+next+"' selected>"+etapas[parseInt(next)-1]+"</option>" +
-                "<option value='s'>Rechazo</option>" +
-                "</select></label>");
+            if($(yo).data('etapa') === 1 || $(yo).data('etapa') === 8 || $(yo).data('etapa') === 'e') {
+                $('#prod_info').children('small').html("<label>Enviar a:     " +
+                    "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
+                    "<option value='"+next+"' selected>Siguiente : "+etapas[parseInt(next)-1]+"</option>" +
+                    "<option value='s'>Rechazo</option>" +
+                    "</select></label>");
+            }else{
+                $('#prod_info').children('small').html("<label>Enviar a:     " +
+                    "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
+                    "<option value='"+next+"' selected>Siguiente : "+etapas[parseInt(next)-1]+"</option>" +
+                    "<option value='"+previus+"'>Previa : "+etapas[parseInt(previus)-1]+"</option>" +
+                    "<option value='s'>Rechazo</option>" +
+                    "</select></label>");
+            }
+
             $("#nom-etapa").val($(yo).data('netapa'));
             $(".procesados-input").attr('max', parseInt($(yo).html()) )
             $("#crearProdHist").modal('show');
 
 
         }
+    }
+    function changeDateValue(yo){
+        $(yo).parent().data('valor', $(yo).val());
     }
 
     $("#prodhistForm").submit(function(e){
@@ -630,6 +875,7 @@
                 "<td style='text-align: center' data-name='to' data-valor='s'>" +
                  etapas[parseInt($("#etapa-previus").val())] +
                 "</td>" +
+                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)'></td>" +
                 "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
                 "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
@@ -648,6 +894,7 @@
                 "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
                 $('#prod_info > small > label > select > option:selected').html()
                 +"</td>" +
+                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)'></td>" +
                 "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
                 "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
@@ -676,7 +923,8 @@
             env: [],
             to: [],
             from: [],
-            coment: []
+            coment: [],
+            fecha: []
         };
         $(".tab-content td").each(function(){
             data[$(this).data('name')].push($(this).data('valor'));

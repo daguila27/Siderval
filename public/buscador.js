@@ -65,9 +65,11 @@ class Buscador{
 
     //add_cond es un string con la concatenación en sql de cualquier filtro adicional que se desea incluir
     //Ejemplo: "material.detalle>0@gd.tipo='Blanco'";
-    buscar_action(forpageoc){
+    buscar_action(forpageoc, callback){
         var t = this.idtabla;
         var ispage = this.ispage;
+        console.log("datos buscardor");
+        console.log(this);
         $.ajax({
             type: 'POST',
             data: {clave: this.filtros_seleccionados.join(','),cond: this.add_cond, ispage: ispage, rango: this.rango.join('@'), page: this.page, isRango: this.datefill, columnaRango: this.columnaRango, extraInfo: this.extraInfo.join('%')  },
@@ -80,11 +82,14 @@ class Buscador{
 
             },
             success: function(data){
-
                 $(".main-page").html(data);
                 $("#"+t).css('font-family', '12px');
                 $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height());
+
+                if(callback){
+                    callback();
+                }
 
             }
         });
@@ -115,13 +120,13 @@ class Buscador{
                 $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
             }
             else if(this.page === 1){
-                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
             }
             else if(this.lastpage){
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
             }
             else{
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
             }
         }
         else{

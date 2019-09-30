@@ -1,5 +1,5 @@
-<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%;">
-    <div class="col-md-12" id="panel_odaform" style="margin-top: 20px">
+<div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%; margin-top: 20px; background-color: white; height: 100%;">
+    <div class="col-md-12" id="panel_odaform" style="margin-top: 20px;">
         <div class="panel panel-primary panel-defecto">
             <div class="panel-heading">
                 <h3>Registrar Recepción de materiales</h3>
@@ -20,9 +20,19 @@
                         </div>
                     </div>
                 </form>
+
+                <%
+                var key = new Date().toLocaleString();
+                key = key.split(' ');
+                key[0] = key[0].split('-').join('');
+                key[1] = key[1].split(':').join('');
+                key = key.join('');
+                %>
                 <form id="gdd_form<%= key%>">
-                    <div id="oda_gdd" class="well" style="margin-top: 20px">
-                        No se ha seleccionado ninguna OC
+                    <div id="oda_gdd" class="well" style="margin-top: 20px; padding: 0px !important;">
+                        <p style="padding: 20px">
+                            No se ha seleccionado ninguna OC
+                        </p>
                     </div>
                 </form>
 
@@ -30,29 +40,47 @@
        </div>
     </div>
     <div class="col-md-12">
-        <div class="panel panel-default">
-            <div class="panel-body" style="padding: 0;">
-                <table id="odaTable" class="table table-striped" style="margin: 0; width: 100%">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 style="display: flex">
+                    <label style="width: 75%">Añadir Productos : </label>
+                    <label style="display: flex; width: 25%; vertical-align: middle">Buscar : <input type="search" class="form-control input-sm" id="buscadorodaTable" style="width: 75%; margin-left: 10px;" ></label>
+                </h3>
+            </div>
+            <div class="panel-body" style="padding: 0 !important; margin: 0px !important;">
+                <table id="odaTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" cellspacing="0" width="100%" style="margin: 0 !important; padding: 0 !important;">
                     <thead>
-                    <tr>
-                        <td>ID OCA</td>
-                        <td>Detalle Mat.</td>
-                        <td>Stock Mat.</td>
-                        <td>Pedidos</td>
-                        <td>Recibidos</td>
-                        <td></td>
-                    </tr>
+                        <tr>
+                            <th>OCA</th>
+                            <th>Descripción</th>
+                            <th>Stock Mat.</th>
+                            <th>Pedidos</th>
+                            <th>Recibidos</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
                     </thead>
 
                     <tbody>
                     <%for (var i = 0; i < abast.length; i++){ %>
                     <tr>
-                        <td><%=abast[i]['idoda']%></td>
+                        <td style="text-align: center"><%=abast[i]['idoda']%></td>
                         <td><%=abast[i]['detalle']%></td>
-                        <td><%=abast[i]['stock']%></td>
-                        <td><%=abast[i]['cantidad']%></td>
-                        <td><%=abast[i]['recibidos']%></td>
-                        <td><a class="btn btn-success btn-xs" onclick="send_search(<%=abast[i].idoda%>)"><i class="fa fa-plus"></i></a></td>
+                        <td style="text-align: center"><%=abast[i]['stock']%></td>
+                        <td style="text-align: center"><%=abast[i]['cantidad']%></td>
+                        <td style="text-align: center"><%=abast[i]['recibidos']%></td>
+                        <td style="text-align: center">
+
+                            <%
+                            if(abast[i]['bmi'] === 1){%>
+                                Reservación
+                            <%}else if(abast[i]['externo'] === 1){%>
+                                Producción
+                            <%}else{%>
+                                -
+                            <%}%>
+                        </td>
+                        <td><a class="btn btn-success btn-xs" onclick="send_search( <%= abast[i].idoda%> )"><i class="fa fa-plus"></i></a></td>
                     </tr>
                     <%}%>
                     </tbody>
@@ -63,21 +91,41 @@
 </div>
 
 <script type="text/javascript">
-    
-    //Ejecutar la DataTable
-    $('#odaTable').DataTable({
-        "lengthChange": false,
-        "searching": true,
-        "bInfo": false,
-        "paging": false
-    });
 
-    /*function goToByScroll(id) {
-        // Scroll
-        $('html,#page-wrapper').animate({
-            scrollTop: $("#" + id).offset().top
-        }, 'slow');
-    }*/
+    //Ejecutar la DataTable
+    var odaTable = $('#odaTable').DataTable( {
+        "scrollCollapse": true,
+        "paging":         false,
+        "language": {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    } );
+
+    $("#odaTable_filter").parent().parent().addClass('hidden');
+    $("#odaTable_wrapper").css('margin-top', '0px !important');
+    $("#odaTable_wrapper").css('padding', '0px');
+
+    $('#buscadorodaTable').keyup(function(){
+        odaTable.search($(this).val()).draw() ;
+    });
 
     function send_search(numero){
         $("#oda_input").val(numero);
@@ -104,12 +152,17 @@
     $("#gdd_form<%= key%>").submit(function(e){
         e.preventDefault();
         var detalle = [];
+        var bmi = false;
         $("#confirmar_gdd").modal("toggle");
         //revisar todos los inputs de la tabla
         $("input[name = 'rec']").each(function(e){
             //Agregar a la lista sólo los inputs que sean distintos de cero.
             if($(this).val() != 0){
-                detalle.push([$(this).data('idabast'),$(this).val(),$(this).data('idmat')]);
+                detalle.push([$(this).data('idabast'),$(this).val(),$(this).data('idmat'), $(this).data('bmi')]);
+                alert(typeof $(this).data('bmi'));
+                if($(this).data('bmi')){
+                    bmi = true;
+                }
             }
         });
 
@@ -124,9 +177,29 @@
             success: function(data){
                 if(!data.err){
                     alert("Guía guardada correctamente");
-                    $("#page-wrapper").html(data);
+                    io.emit('actNotifPlan', JSON.parse(data));
+                    $.ajax({
+                        type: 'GET',
+                        url: '/matprimas/busq_oda',
+                        success: function(data){
+                            $("#page-wrapper").html(data);
+                        }
+                    });
                 } else alert(data.err_msg);
             }
         });
     });
+    //RECORRE EL FORMULARIO EN BUSCA DE ALGUN PEDIDO TIPO BMI, PARA SABER SI MOSTRAR LA ALERTA O NO.
+    function checkBMI(){
+        var bmi = false;
+        $("input[name = 'rec']").each(function(e){
+            if($(this).val() != 0){
+                if($(this).data('bmi') === 1){
+                    bmi = true;
+                }
+            }
+        });
+        if(bmi){$("#alerta-reservacion").removeClass('hidden');}
+        else{$("#alerta-reservacion").addClass('hidden');}
+    }
 </script>
