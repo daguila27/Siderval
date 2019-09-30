@@ -110,4 +110,13 @@
             }
         });
     });
+
+
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
+        e.stopPropagation();
+    });
 </script>

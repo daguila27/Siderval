@@ -68,6 +68,8 @@ class Buscador{
     buscar_action(forpageoc, callback){
         var t = this.idtabla;
         var ispage = this.ispage;
+        console.log("datos buscardor");
+        console.log(this);
         $.ajax({
             type: 'POST',
             data: {clave: this.filtros_seleccionados.join(','),cond: this.add_cond, ispage: ispage, rango: this.rango.join('@'), page: this.page, isRango: this.datefill, columnaRango: this.columnaRango, extraInfo: this.extraInfo.join('%')  },
@@ -80,11 +82,11 @@ class Buscador{
 
             },
             success: function(data){
-
                 $(".main-page").html(data);
                 $("#"+t).css('font-family', '12px');
                 $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height());
+
                 if(callback){
                     callback();
                 }

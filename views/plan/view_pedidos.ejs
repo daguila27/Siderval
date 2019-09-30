@@ -161,11 +161,11 @@
 		e.preventDefault();
 		$('.view-option').removeClass('active');
 		$(this).addClass('active');
-		if($(this).data('view')=='item_odcs') {
+		if($(this).data('view') === 'item_odcs') {
 			busc.url = '/plan/item_odcs';
 			busc.buscar_action();
 		}
-		else if($(this).data('view') == 'table_pedidos/pedido.f_entrega-ASC/1') {
+		else if($(this).data('view') === 'table_pedidos/pedido.f_entrega-ASC/1') {
 			// Muestra el nav de paginacion
             busc.url = '/plan/table_pedidos';
 			busc.buscar_action();
@@ -176,7 +176,7 @@
 	// Paginacion
 	$(function(){
         window.pagObj = $('.pagination').twbsPagination({
-            totalPages: <%=Math.ceil(largo/50)%>,
+            totalPages: parseInt('<%=Math.ceil(largo/50)%>'),
             visiblePages: 4,
             first:"Primero",
             prev: '<span aria-hidden="true">&laquo;</span>',

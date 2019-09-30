@@ -30,29 +30,33 @@
         <th id="solicitados" class="cabecera o_column_sortable" style="text-align: center;" data-order="recepcion_detalle.cantidad*1-ASC">Cantidad</th>
         <th id="sin_produccion" class="cabecera o_column_sortable" style="text-align: center;" data-order="material.u_medida-ASC">Unidad</th>
         <th id="f_entrega" class="cabecera o_column_sortable" style="text-align: center;" data-order="recepcion.fecha-DESC">Fecha de Registro</th>
+        <th id="anular" style="text-align: center;"></th>
     </tr>
     </thead>
     <tbody class="ui-sortable">
     <%for(var i=0; i < data.length; i++){%>
         <tr class="o_data_row">
-            <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numgd%>
-                <% if(data[i].anulado){%>
-                    <a style="color: red">Anulado</a>
-                <%}else{%>
-                    <a class="anulRecep" data-idrecepcion="<%= data[i].idrecepcion%>">Anular</a>
-                <%}%>
-            </td>
+            <td class="o_data_cell o_readonly_modifier o_required_modifier"><%=data[i].numgd%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier" ><%=data[i].detalle%></td>
             <td class="o_data_cell o_readonly_modifier o_required_modifier parsear_nro" style="text-align: center;" ><%= data[i].cantidad%></td>
             <td class="o_data_cell" style="text-align: center;"><%=data[i].u_medida%></td>
             <td class="o_data_cell o_list_number o_monetary_cell o_readonly_modifier" style="text-align: center;" data-order="<%= new Date(data[i].fecha).getTime()%>">
                 <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" name="amount_total"><%= fechaLatino(new Date(data[i].fecha).toLocaleDateString())%></span>
             </td>
+            <td style="text-align: center ;">
+                <% if(data[i].anulado){%>
+                    <a style="color: red">Anulado</a>
+                <%}else{%>
+                    <button class="btn btn-danger btn-xs anulRecep" data-idrecepcion="<%= data[i].idrecepcion%>"><i class="fa fa-ban" aria-hidden="true"></i></button>
+
+                <%}%>
+            </td>
         </tr>
     <%}%>
     </tbody>
     <tfoot>
     <tr>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>

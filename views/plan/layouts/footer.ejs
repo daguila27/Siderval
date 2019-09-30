@@ -495,6 +495,39 @@
     $("head title").html($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('msg'));
     $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
     /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR -- FIN */
+
+
 </script>
+
+
+<!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA FUNCION ALERTA-->
+<div class="alert-screen" style="width: 100%; height: 100%; position: fixed; z-index: -20; color: white; background-color: white; transition: 0.5s">
+    <div style="height: 30%; width: 100%"></div>
+    <div class="mensaje" style="width: 100%; text-align: center;border-radius: 5%; ">
+    </div>
+    <div style="height: 45%; width: 100%"></div>
+</div>
+<script>
+    function Alerta(msg){
+        $(".alert-screen .mensaje").html(
+            "<div class='div-msg' style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; padding: 50px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>"+msg+"</div>"+
+            "<div style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; text-align: center;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>\n" +
+            "<button class='btn btn-primary' style='position: relative; bottom: 15px;' onclick='cerrarAlerta()'>Aceptar</button>" +
+            "</div>");
+        $(".alert-screen").css('display', 'block');
+        $(".alert-screen").css("background-color", "rgba(0,0,0,0.4)");
+        $(".alert-screen").css('z-index', '100');
+        $(".alert-screen .mensaje div").css('background-color', 'rgb(124,126,126)');
+
+        $(".alert-screen .mensaje div button").focus();
+    }
+    function cerrarAlerta() {
+        $(".alert-screen").css('display', 'none');
+        $(".alert-screen").css('z-index', '-20');
+        $(".alert-screen").css("background-color", "white");
+        //$(".alert-screen .mensaje").css('background-color', 'white');
+    }
+</script>
+<!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA FUNCION ALERTA [FIN] -->
 </body>
 </html>

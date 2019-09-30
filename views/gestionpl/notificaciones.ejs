@@ -187,9 +187,7 @@ if(notif[u].externo){%>
             }
         });
     }
-    $(document).on('click', '.notificaciones li', function (e) {
-        e.stopPropagation();
-    });
+
 
 
 
@@ -197,11 +195,20 @@ if(notif[u].externo){%>
         e.preventDefault();
         $.ajax({
             type: 'GET',
-            url: '/bodega/get_pedido_gdd/'+ $(this).data('idodc') +'/'+$(this).data('idped'),
+            url: '/bodega/get_pedido_gdd/'+ $(this).data('idodc') +'/'+$(this).data('idped')+"/"+ $(this).data('id'),
             success: function(data){
                 $('#crearGddModal').html(data);
                 $('#crearGddModal').modal('show');
             }
         });
+    });
+
+
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
+        e.stopPropagation();
     });
 </script>

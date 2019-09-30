@@ -4,7 +4,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Cargar Plantilla de OC</h4>
+            <h4 class="modal-title">Proceder a Crear GDD</h4>
         </div>
         <div class="modal-body">
             <div class="row">
@@ -12,12 +12,18 @@
                     Se ha recepcionado el stock necesario para OC <%= numoc%>:
                 </p>
                 <div style="overflow: hidden; padding: 0px 5%" class="list-group" id="contReservModal-list">
-                    <% for(var e=0; e < data.length; e++ ){%>
+                    <% if(data.length > 0){
+                        for(var e=0; e < data.length; e++ ){%>
                         <a class='list-group-item itemhover row' data-idped="<%= data[e].idpedido%>">
                             <div class="col-md-5"><%= data[e].detalle%></div>
                             <div class="col-md-4">Solicitados: <%= data[e].cantidad%></div>
                             <div class="col-md-3">Reservados: <%= data[e].reservados%></div>
                         </a>
+                    <%}
+                    }else{%>
+                            <div style="text-align: center; display: flex">
+                                <h5>No hay Preparaciones pendientes. <a class="drop-notif-link" onclick="removeNotifModal(this)" data-id="<%= idnotif%>">Eliminar notificación.</a></h5>
+                            </div>
                     <%}%>
                 </div>
                 <style>
@@ -96,6 +102,18 @@
             success: function(data){
                 $("#page-wrapper").html(data);
                 hideLoad();
+            }
+        });
+    }
+
+
+    function removeNotifModal(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/gestionpl/drop_notif/'+$(yo).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+                $('#crearGddModal').modal('hide');
             }
         });
     }

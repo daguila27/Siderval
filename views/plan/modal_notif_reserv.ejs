@@ -1,10 +1,10 @@
 <div class="modal-dialog">
 
     <!-- Modal content-->
-    <div class="modal-content">
-        <div class="modal-header">
+    <div class="modal-content panel-primary">
+        <div class="modal-header panel-heading">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Cargar Plantilla de OC</h4>
+            <h4 class="modal-title">Proceder a Crear Reservación : </h4>
         </div>
         <div class="modal-body">
             <div class="row">
@@ -12,12 +12,18 @@
                     Se ha recepcionado el stock necesario para OC <%= numoc%>:
                 </p>
                 <div style="overflow: hidden; padding: 0px 5%" class="list-group" id="contReservModal-list">
-                    <% for(var e=0; e < data.length; e++ ){%>
+                    <%
+                    if(data.length > 0){
+                    for(var e=0; e < data.length; e++ ){%>
                         <a class='list-group-item itemhover row' data-idped="<%= data[e].idpedido%>">
                             <div class="col-md-5"><%= data[e].detalle%></div>
                             <div class="col-md-4">Solicitados: <%= data[e].cantidad%></div>
                             <div class="col-md-3">Stock: <%= data[e].stock%></div>
                         </a>
+                    <%}}else{%>
+                            <div style="text-align: center; display: flex">
+                                <h5>No hay Preparaciones pendientes. <a class="drop-notif-link" onclick="removeNotifModal(this)" data-id="<%= idnotif%>">Eliminar notificación.</a></h5>
+                            </div>
                     <%}%>
                 </div>
                 <style>
@@ -38,7 +44,6 @@
                     }
                 </style>
                 <script>
-
                     /*FUNCIONES NECESARIAS PARA DESTACAR COLUMNAS CON EL MOUSE*/
                     $(".itemhover").attr('unselectable','on')
                         .css({'-moz-user-select':'-moz-none',
@@ -92,6 +97,18 @@
             url: '/plan/crear_reservacion_post',
             success: function(data){
                 $("#page-wrapper").html(data);
+                $('#contReservModal').modal('hide');
+            }
+        });
+    }
+
+
+    function removeNotifModal(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/plan/drop_notif/'+$(yo).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
                 $('#contReservModal').modal('hide');
             }
         });

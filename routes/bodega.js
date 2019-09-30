@@ -2655,7 +2655,7 @@ router.post("/anular_recepcion_externo",function(req,res,next){
 });
 
 
-router.get('/get_pedido_gdd/:idodc/:idped', function(req, res, next) {
+router.get('/get_pedido_gdd/:idodc/:idped/:idnotif', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);
         connection.query("SELECT * FROM pedido " +
@@ -2673,7 +2673,7 @@ router.get('/get_pedido_gdd/:idodc/:idped', function(req, res, next) {
                 numoc = rows[0].numoc;
             }
 
-            res.render('bodega/modal_notif_gdd', {data: rows, numoc: numoc});
+            res.render('bodega/modal_notif_gdd', {data: rows, numoc: numoc, idnotif: req.params.idnotif});
         });
     });
 });

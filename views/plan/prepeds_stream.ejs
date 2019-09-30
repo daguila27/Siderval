@@ -23,7 +23,7 @@ function letraMayus(string) {
         <td style="text-align: center"><%= data[i].stock%></td>
         <td style="text-align: center"><%= data[i].xdespachar%></td>
         <td style="text-align: center"><%= data[i].enproduccion%></td>
-        <% if( data[i].stock+data[i].enproduccion-data[i].xdespachar > 0 ){%>
+        <% if( data[i].stock + data[i].enproduccion - data[i].xdespachar > 0 ){%>
             <td style="text-align: center;"><%= data[i].stock+data[i].enproduccion-data[i].xdespachar%></td>
         <%}else{%>
             <td style="text-align: center;">0</td>

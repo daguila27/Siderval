@@ -55,7 +55,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
 
 
 
-    if(condiciones_where.length==0){
+    if(condiciones_where.length === 0){
         where = "";
     }
     else{
@@ -657,8 +657,8 @@ router.post("/table_recepcion",function(req,res,next){
             "recepcion.fecha-off": []
         };
 
-        var condiciones_where = ["recepcion.visible"];
-        if(input.cond != ''){
+        var condiciones_where = [];
+        if(input.cond !== ''){
             for(var e=0; e < input.cond.split('@').length; e++){
                 condiciones_where.push(input.cond.split('@')[e]);
             }
@@ -926,6 +926,8 @@ router.get("/view_reservaciones",function(req,res,next){
 router.post("/table_reservaciones",function(req,res,next){
     if(req.session.userData){
         var input = JSON.parse(JSON.stringify(req.body));
+        console.log("INPUT");
+        console.log(input);
         var array_fill = [
             "reservacion.idreservacion",
             "material.detalle"

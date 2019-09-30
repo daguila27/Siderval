@@ -226,8 +226,23 @@
         <div role="tabpanel" class="tab-pane fade" id="segunOF">
           <div class="panel panel-info">
             <div class="panel-heading">
-              <div style="display: flex;">
+              <div style="display: flex; padding-left: 30px">
+                  <input type="checkbox" id="of-fin" value="off"> Mostrar OF finalizada<br>
               </div>
+                <script>
+                    $("#of-fin").on('change', function(e){
+                        e.preventDefault();
+                        if( $(this).is(':checked') ) {
+                            alert('Seleccionado');
+                            $(".encurso").removeClass('hidden');
+                        }else{
+                            alert('no');
+                            $(".encurso").addClass('hidden');
+
+                        }
+                    });
+
+                </script>
             </div>
           </div>
           <div class="panel-body renderizar_ofs">

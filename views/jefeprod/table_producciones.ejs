@@ -29,8 +29,8 @@ function fechaLatino(string){
             <th data-toggle="tooltip" data-placement="bottom" title="Bodega Productos Terminados" style="text-align: center">BPT</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Externalizados" style="text-align: center">EXT</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Rechazo" style="text-align: center">RCH</th>
-            <% if(user === 'jefeprod'){%>
-            <th data-toggle="tooltip" data-placement="bottom" title="Anular Producción" style="text-align: center">Anular</th>
+            <% if(user === 'jefeprod' || user === 'gestionpl'){%>
+                <th data-toggle="tooltip" data-placement="bottom" title="Anular Producción" style="text-align: center">Anular</th>
             <%}%>
         </tr>
     </thead>
@@ -75,7 +75,7 @@ function fechaLatino(string){
         <td data-cs="0" class='col-rec parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Bodega Productos Terminados" style="text-align: center"><%=  datalen[i]['8'] %></td>
         <td data-cs="0" class='col-rec parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Externalizados" style="text-align: center"><%=  datalen[i]['e'] %></td>
         <td data-cs="0" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
-        <% if(user === 'jefeprod' ){
+        <% if(user === 'jefeprod' || user === 'gestionpl'){
             if(datalen[i].anulable){%>
             <td data-order='1' data-toggle="tooltip" data-placement="bottom" title="Anular Producción" style="text-align: center" >
                 <button class="btn btn-danger btn-xs anulButton" data-idproduccion="<%= datalen[i].idproduccion%>">
@@ -107,7 +107,7 @@ function fechaLatino(string){
         <td></td>
         <td></td>
         <td></td>
-        <% if(user === 'jefeprod'){%>
+        <% if(user === 'jefeprod' || user === 'gestionpl'){%>
             <td></td>
         <%}%>
     </tr>
@@ -130,7 +130,7 @@ function fechaLatino(string){
             <td></td>
             <td></td>
             <td class="parsear_nro" data-cs="0" style="text-align: center;"><%=to_rec%></td>
-            <% if(user === 'jefeprod'){%>
+            <% if(user === 'jefeprod' || user === 'gestionpl'){%>
                 <td></td>
             <%}%>
         </tr>

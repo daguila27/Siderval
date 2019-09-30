@@ -30,17 +30,18 @@
               <div></div>
             </div>-->
             <ul class="selector-buscador" role="navigation">
-              <input type="hidden" id="cliente" onchange="compNum(this)">
+              <input type="hidden" id="cliente" value="0" onchange="compNum(this)">
               <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Cliente<b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
                   <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
+                  <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Cliente seleccionado</a></li>
                   <%for(var e=0; e < cli.length; e++){%>
                   <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
                   <%}%>
                 </ul>
               </li>
             </ul>
-            <p style="width: 100%; padding-left: 20px" id="cliente-caret">No seleccionado</p>
+            <p style="width: 100%; padding-left: 20px" id="cliente-caret">Sin Cliente seleccionado</p>
             <style>
               .selector-buscador{
                 margin-left: 0;
@@ -334,24 +335,29 @@ $("#send_of").submit(function(e){
     //console.log($(this).val());
   });
   console.log(data);
-  if(confirm("¿Esta segúro que desea crear la OC?")){
-    $.ajax({
-      type: 'POST',
-      data: data,
-      url: '/abastecimiento/crear_oda',
-      success: function(data){
-        if(data == 'error'){
-          alert("La OC que esta intentando crear es inválida.");
-        } else {
-          alert("La OC fue creada exitosamente.");
-          $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-          $(".form-pdf form").submit();
-          setTimeout(function(){
-              location.reload();
-          }, 500);
+  //COMPRUEBA SI SE HA SELECCIONADO UN CLIENTE, SI NO ES ASI NO PERMITE CREAR OCA
+  if($("#cliente").val() === '0'){
+      Alerta("¡Seleccione Proveedor!");
+  }else{
+    if(confirm("¿Esta segúro que desea crear la OC?")){
+      $.ajax({
+        type: 'POST',
+        data: data,
+        url: '/abastecimiento/crear_oda',
+        success: function(data){
+          if(data == 'error'){
+            alert("La OC que esta intentando crear es inválida.");
+          } else {
+            alert("La OC fue creada exitosamente.");
+            $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+            $(".form-pdf form").submit();
+            setTimeout(function(){
+                location.reload();
+            }, 500);
+          }
         }
-      }
-    });
+      });
+    }
   }
 });
 

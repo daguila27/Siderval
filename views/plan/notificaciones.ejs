@@ -61,11 +61,21 @@ if(desc[0] === 'bmiReserv'){%>
         e.preventDefault();
         $.ajax({
             type: 'GET',
-            url: '/plan/get_reserv_info/'+$(this).data('idodc')+"/"+$(this).data('idped'),
+            url: '/plan/get_reserv_info/'+$(this).data('idodc')+"/"+$(this).data('idped')+"/"+$(this).data('id'),
             success: function(data){
                 $('#contReservModal').html(data);
                 $('#contReservModal').modal('show');
             }
         });
+    });
+
+
+
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
+        e.stopPropagation();
     });
 </script>

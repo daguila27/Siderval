@@ -92,7 +92,7 @@
     ];
     var busc = new Buscador("buscar_recepcion", ".o_searchview", array_fill, "/matprimas/table_recepcion", "receps_table", true, true, '.filters', 'recepcion.fecha');
 
-    busc.add_cond = "";
+    busc.add_cond = "recepcion.visible";
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
         busc.buscar_action();

@@ -47,9 +47,7 @@ if(desc[0] === 'bmiOca'){%>
     else
         $(".badge-notificaciones").css('display', 'block');
 
-    $(document).on('click', '.notificaciones li', function (e) {
-        e.stopPropagation();
-    });
+
     function removeNotif(yo){
         $.ajax({
             type: 'GET',
@@ -70,5 +68,13 @@ if(desc[0] === 'bmiOca'){%>
                 $('#prepReservModal').modal('show');
             }
         });
+    });
+
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
+        e.stopPropagation();
     });
 </script>

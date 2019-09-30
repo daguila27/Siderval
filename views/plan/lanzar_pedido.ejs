@@ -364,8 +364,8 @@
                 data: data,
                 url: '/plan/crear_odc',
                 success: function(data){
-                    if(data == 'error'){
-                        alert("La OC que intenta crear es inválida");
+                    if(data === 'error'){
+                        Alerta("La OC que intenta crear es inválida");
                     }
                     else{
                         var input = [$("#cliente").val(), $("#num").val()];

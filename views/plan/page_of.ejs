@@ -80,6 +80,7 @@
                             $("form#formEditOF").submit(function(e){
                                 e.preventDefault();
                                 var a = $(this).serializeArray();
+                                var invalidForm = false;
                                 if( confirm("¿Está seguro?") ){
                                     var array = {};
                                     $(".oc-edit-col").each(function(){
@@ -88,27 +89,45 @@
                                         }else{
                                             array[$(this).children('input').data('name')].push($(this).children('input').val());
                                         }
-                                    });
-                                    console.log(array);
-                                    $.ajax({
-                                        type: 'POST',
-                                        data: array,
-                                        url: '/plan/editar_of_save',
-                                        success: function(data){
-                                            alert("¡OF editada con Exito!");
-                                            $(".main-page").html(data);
+
+                                        //SI EL NUMERO NO CUMPLE CON MAX Y MIN
+                                        if(  parseInt($(this).children('input').val()) < parseInt($(this).children('input').data('min')) ){
+                                            invalidForm = true;
+                                            $(this).children('input').css('color', 'red');
+                                        }
+                                        else{
+                                            $(this).children('input').css('color', 'green');
+
                                         }
                                     });
+
+                                    if(invalidForm){
+                                        Alerta("¡Los Datos Ingresados son Incorrectos!");
                                     }
+                                    else{
+                                        console.log(array);
+                                        $.ajax({
+                                            type: 'POST',
+                                            data: array,
+                                            url: '/plan/editar_of_save',
+                                            success: function(data){
+                                                Alerta("¡OF editada con Exito!");
+                                                $(".main-page").html(data);
+                                            }
+                                        });
+                                    }
+                                }
                             });
                             function editarOCfinalizar(){
                                 $("form#formEditOF").submit();
                             }
                         </script>
                         <% if(odv){%>
-                            <button type="button" onclick="editarOC()" class="button-edit btn btn-xs btn-info" style="align-content: center; height: 50%; ">
-                                <i class="glyphicon glyphicon-pencil"></i> Editar
-                            </button>
+                            <div class="btn-group" style="display: flex;">
+                                <button type="button" onclick="editarOC()" class="button-edit btn btn-xs btn-info" style="align-content: center;">
+                                    <i class="glyphicon glyphicon-pencil"></i> Editar
+                                </button>
+                            </div>
                             <div class="btn-group" style="display: flex;">
                                 <button type="button" onclick="editarOCfinalizar()" class="button-edit hidden btn btn-xs btn-primary" style="align-content: center;height: 50%;">
                                     <i class="fa fa-check"></i> Finalizar
@@ -264,10 +283,10 @@
                                                         <td style="text-align: center;"><%=fabs[e].numitem%></td>
                                                         <td class="o_data_cell o_required_modifier" style="text-align: center;"><%=fabs[e].detalle%></td>
                                                         <td class="o_data_cell o_list_number o_required_modifier oc-edit-col" style="text-align: center;">
-                                                            <input class="form-control input-xs hidden" name="cantidad<%= e%>" type="number" value="<%=fabs[e].cantidad%>" data-name="cantidad" min="0" data-input="number" data-valor="<%=fabs[e].cantidad%>"> <div><%= fabs[e].cantidad%></div>
+                                                            <input class="form-control input-xs hidden" name="cantidad<%= e%>" type="number" value="<%=fabs[e].cantidad%>" data-name="cantidad" min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-input="number" data-valor="<%=fabs[e].cantidad%>"> <div><%= fabs[e].cantidad%></div>
                                                         </td>
                                                         <td class="o_data_cell o_list_number o_required_modifier oc-edit-col hidden" style="text-align: center;">
-                                                            <input type="hidden" name="cantidad_a<%= e%>" data-name="cantidad_a" min="0" data-input="number" data-valor="<%=fabs[e].cantidad%>" value="<%=fabs[e].cantidad%>"> <div> <%= fabs[e].cantidad%> </div>
+                                                            <input type="hidden" name="cantidad_a<%= e%>" data-name="cantidad_a" min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-min="<%=fabs[e].cantidad-fabs[e].restantes%>" data-input="number" data-valor="<%=fabs[e].cantidad%>" value="<%=fabs[e].cantidad%>"> <div> <%= fabs[e].cantidad%> </div>
                                                         </td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].restantes%></td>
                                                         <td class="o_data_cell o_list_number o_readonly_modifier" style="text-align: center;"><%=fabs[e].u_medida%></td>
@@ -283,7 +302,6 @@
                                                     <td></td>
                                                     <td></td>
                                                     <td class="hidden"></td>
-                                                    <td></td>
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>

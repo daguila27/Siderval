@@ -642,7 +642,6 @@ router.get('/page_oc/:idodc', function(req, res, next){
     if(verificar(req.session.userData)){
         if(req.session.isUserLogged){
             var idodc = req.params.idodc;
-            console.log("idodc: "+idodc);
             req.getConnection(function(err,connection){
                 if(err) console.log("Connection Error: %s",err);
                 connection.query("SELECT coalesce(queryRev.idmodificaciones_concat, 'false') AS idmodificaciones_concat, odc.* FROM odc LEFT JOIN cliente ON cliente.idcliente=odc.idcliente " +
@@ -650,7 +649,6 @@ router.get('/page_oc/:idodc', function(req, res, next){
                     " WHERE odc.idodc = ?",[idodc], function(err, odc){
                     if(err) console.log("Select Error: %s",err);
 
-                    console.log(odc);
                     var modificaciones;
                     connection.query("SELECT fabricaciones.restantes as restantes_fabricaciones, pedido.*,pedido.precio as precioOC, material.*, (to_days(pedido.f_entrega)-to_days(now())) as dias FROM pedido "
                         +"LEFT JOIN material ON material.idmaterial=pedido.idmaterial LEFT JOIN fabricaciones ON fabricaciones.idpedido = pedido.idpedido WHERE pedido.idodc = ? ORDER BY (pedido.numitem*1)",[idodc], function(err ,ped){
@@ -663,7 +661,6 @@ router.get('/page_oc/:idodc', function(req, res, next){
                             connection.query("SELECT * FROM modificacion_oc WHERE idmodificacion IN ("+modificaciones+")", function(err, mod){
                                 if(err) console.log("Select Error: %s",err);
 
-                                console.log(mod);
                                 var obj = {};
                                 for( var w=0; w < mod.length; w++ ){
                                     if( Object.keys(obj).indexOf(mod[w].idpedido.toString()+"-"+mod[w].idmodificacion.toString()) === -1  ){
@@ -1473,7 +1470,13 @@ router.post('/addsession_prepeds', function(req,res,next){
     var fabricacion;
     if(verificar(req.session.userData)){
         req.getConnection(function(err, connection){
-            connection.query("SELECT material.detalle, coalesce(enp_query.enproduccion, 0) as enproduccion, coalesce(disp.disponible, 0) as stock,caracteristica.cnom FROM material LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial,material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp"/* where ped_xdesp.disponible > 0*/+") as disp on disp.idmaterial = material.idmaterial " +
+            connection.query("SELECT " +
+                "material.detalle, coalesce(enp_query.enproduccion, 0) as enproduccion, coalesce(disp.disponible, 0) as stock, coalesce(disp.stock_m, 0) as stock_m, coalesce(disp.cantidad, 0) as cantidad, coalesce(disp.despachados, 0) as despachados, material.stock as stock_bodega," +
+                "caracteristica.cnom " +
+                "FROM material " +
+                "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " +
+                "LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial, material.stock as stock_m, sum(coalesce(pedido.cantidad,0)) as cantidad, sum(coalesce(pedido.despachados, 0)) as despachados, material.stock - sum(coalesce(pedido.cantidad,0) - coalesce(pedido.despachados,0) ) as disponible,  material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) " +
+                "as ped_xdesp) as disp on disp.idmaterial = material.idmaterial " +
                 " LEFT JOIN (select " +
                 "  fabricaciones.idmaterial," +
                 "  sum(produccion.1 + produccion.2 + produccion.3 + " +
@@ -1488,7 +1491,10 @@ router.post('/addsession_prepeds', function(req,res,next){
                     if(req.body.tipo === 'producido'){fabricacion='Interna'}
                     else if(req.body.tipo === 'otro'){fabricacion='Bodega M.I.'}
                     else{fabricacion='Externa'}
-                    var stock_d = details[0].stock + details[0].enproduccion;
+                    console.log(details);
+                    var enp = details[0].enproduccion;
+                    //var stock_d = details[0].stock + details[0].enproduccion;
+                    var stock_d = details[0].stock_bodega + (details[0].cantidad-details[0].despachados);
                     if(stock_d < 0){stock_d = 0;}
                     fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'><input type='hidden' name='disp' value='" + stock_d +"'></td><td><strong>" + fabricacion + "</strong></td>";
                     var inputprov = false;
@@ -1524,7 +1530,7 @@ router.post('/addsession_prepeds', function(req,res,next){
                         else{ fila = fila + "<td><input type='text' value='"+req.body.tipo+"' name='prov' style='display:none;'>" + auxs[0].aux2 +"</td>";}
                         fila = fila + "<td style='padding: 3px'><input type='date' name='fechas' class='form-control' min='"+ new Date().toLocaleDateString() +"' required></td>" 
                         +"<td style='padding: 3px'><input class='form-control' type='number' name='cants' min='1' required></td>"
-                        +"<td style='text-align: center'>"+ parsear_crl(stock_d) +"</td>"
+                        +"<td style='text-align: center'>"+ parsear_crl(stock_d)+"</td>"
                         +"<td style='padding: 3px'><input type='number' class='form-control' placeholder='Precio' name='precio'></td>"
                         +"<td style='text-align: center; padding: 5px'><input class='form-control' style='margin-left: 30%; width: 20px; height: 20px;' type='checkbox' name='lock'></td>"
                         +"<td><a onclick='drop(this)' class='btn btn-danger btn-xs'><i class='fa fa-remove'></i></a></td></tr>";
@@ -3392,7 +3398,8 @@ router.get('/crear_reservacion', function(req, res){
                 "LEFT JOIN material ON material.idmaterial = pedido.idmaterial " +
                 "LEFT JOIN odc ON odc.idodc = pedido.idodc " +
                 "LEFT JOIN cliente ON cliente.idcliente = odc.idcliente " +
-                "LEFT JOIN (select fabricaciones.idmaterial, coalesce(coalesce(reservacion_detalle.sin_prep,0) + coalesce(reservacion_detalle.prep,0), 0) AS nodisponible from reservacion_detalle left join fabricaciones on fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones) AS queryDisp ON queryDisp.idmaterial = fabricaciones.idmaterial " +
+                "LEFT JOIN (SELECT fabricaciones.idfabricaciones, fabricaciones.idmaterial, coalesce(coalesce(sum(reservacion_detalle.sin_prep),0) + coalesce(sum(reservacion_detalle.prep),0), 0) AS nodisponible from reservacion_detalle left join fabricaciones on fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones group by fabricaciones.idfabricaciones" +
+                ") AS queryDisp ON queryDisp.idfabricaciones = fabricaciones.idfabricaciones " +
                 "LEFT JOIN (" +
                 "SELECT abastecimiento.idfabricacion, sum(abastecimiento.cantidad) AS abastecidos FROM " +
                 "abastecimiento " +
@@ -3400,7 +3407,7 @@ router.get('/crear_reservacion', function(req, res){
                 ") AS queryAbastecidos ON queryAbastecidos.idfabricacion = fabricaciones.idfabricaciones " +
                 "LEFT JOIN (SELECT " +
                 "reservacion_detalle.idfabricaciones, " +
-                "SUM(COALESCE(reservacion_detalle.cantidad,0) ) AS reservados FROM reservacion_detalle " +
+                "SUM(COALESCE(reservacion_detalle.cantidad,0)) AS reservados FROM reservacion_detalle " +
                 "GROUP BY reservacion_detalle.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
                 "WHERE pedido.bmi = true AND COALESCE(queryReservados.reservados,0) < pedido.cantidad", //PARA SABER QUE CANTIDAD YA SE HA RESERVADO SE DEBE COMPARAR CON LOS REGISTRO DE reservados EN BD
                 function (err, ped) {
@@ -3445,7 +3452,6 @@ router.post('/save_reservacion', function(req, res){
                             data[t].push(data[t][1]);
                         }
                     }
-                    console.log(data);
                     connection.query("INSERT INTO reservacion_detalle (idfabricaciones, cantidad, idreservacion, sin_prep) VALUES ?", [data], function(err, inReserv){
                         if(err){console.log("Error Inserting : %s", err);}
                         var notif_tokens_bmi = [];
@@ -3456,9 +3462,7 @@ router.post('/save_reservacion', function(req, res){
                         connection.query("INSERT INTO notificacion (descripcion) VALUES ?", [notif_tokens_bmi], function(err, inNotif){
                             if(err){console.log("Error Inserting : %s", err);}
 
-                            console.log("NOTIFICACIONES A BMI");
-                            console.log(inNotif);
-                            console.log(notif_tokens_bmi);
+
                             res.redirect('/plan/crear_reservacion');
 
                         });
@@ -3488,9 +3492,6 @@ router.get('/notif_plan', function(req, res, next){
                     console.log("Error Selecting : %s", err);
                 }
 
-                console.log("NOTIFICACION");
-                console.log(notif);
-
                 res.render('plan/notificaciones', {notif: notif});
 
         });
@@ -3498,7 +3499,7 @@ router.get('/notif_plan', function(req, res, next){
 });
 
 
-router.get('/get_reserv_info/:idodc/:idped', function(req, res, next) {
+router.get('/get_reserv_info/:idodc/:idped/:idnotif', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);
         connection.query("select " +
@@ -3521,7 +3522,7 @@ router.get('/get_reserv_info/:idodc/:idped', function(req, res, next) {
             }else{
                 numoc = "Desconocido";
             }
-            res.render('plan/modal_notif_reserv', {data: reserv, numoc: numoc});
+            res.render('plan/modal_notif_reserv', {data: reserv, numoc: numoc, idnotif: req.params.idnotif});
         });
     });
 });

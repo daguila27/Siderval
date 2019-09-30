@@ -56,17 +56,18 @@ function letraMayus(string) {
 
                     <label style="width: 30%">
                         <ul class="selector-buscador" role="navigation">
-                            <input type="hidden" id="cliente" onchange="compNum(this)">
+                            <input type="hidden" id="cliente" onchange="compNum(this)" value="0">
                             <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Cliente<b class="caret"></b></a>
                                 <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
                                     <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
+                                    <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Cliente seleccionado</a></li>
                                     <%for(var e=0; e < cli.length; e++){%>
                                         <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
                                     <%}%>
                                 </ul>
                             </li>
                         </ul>
-                        <p style="width: 100%; padding-left: 20px" id="cliente-caret">No seleccionado</p>
+                        <p style="width: 100%; padding-left: 20px" id="cliente-caret">Sin Cliente Seleccionado</p>
                         <style>
                             .selector-buscador{
                                 margin-left: 0;
@@ -748,51 +749,53 @@ function letraMayus(string) {
             pl = $(".num_pl_input input").val();
         }
 
-        if(comprobarCliente()){
-            if(aux.length == 0){
-                conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
-                est = "Blanco";
-            } else {
-                conf = confirm("¿Esta seguro que desea crear esta GDD?");
+        //COMPRUEBA SI SE HA SELECCIONADO CLIENTE, SI NO ES ASI NO PERMITE CREAR LA GDD
+        if($("#cliente").val() === '0'){
+            Alerta("¡Ingrese Cliente!")
+        }else{
+            if(comprobarCliente()){
+                if(aux.length == 0){
+                    conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
+                    est = "Blanco";
+                } else {
+                    conf = confirm("¿Esta seguro que desea crear esta GDD?");
+                }
             }
-        }
-        /*else if(!comprobarCliente()){
-            alert("Seleccione Cliente.");
-        }*/
-        else{
-            alert("No es posible crear la GDD. \n ¡Uno de los pedidos a despachar supera el stock disponible en Bodega!");
-        }
+            else{
+                alert("No es posible crear la GDD. \n ¡Uno de los pedidos a despachar supera el stock disponible en Bodega!");
+            }
 
-        if(conf){
-            $.ajax({
-                type: 'POST',
-                data: {
-                    list: aux,
-                    estado: est,
-                    pl: pl,
-                    obs:$("#gddobs .form-control").val(),
-                    idcliente: $("#cliente").val(),
-                    idgd: $("#idguia").val()
-                },
-                url: 'bodega/save_gdd',
-                success: function(data){
-                    if(est !== 'Blanco'){
-                        $.ajax({
-                            type: 'GET',
-                            url: 'bodega/gen_pdfgdd/'+idgdd,
-                            success: function(data2){
-                                window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
+            if(conf){
+                    $.ajax({
+                        type: 'POST',
+                        data: {
+                            list: aux,
+                            estado: est,
+                            pl: pl,
+                            obs:$("#gddobs .form-control").val(),
+                            idcliente: $("#cliente").val(),
+                            idgd: $("#idguia").val()
+                        },
+                        url: 'bodega/save_gdd',
+                        success: function(data){
+                            if(est !== 'Blanco'){
+                                $.ajax({
+                                    type: 'GET',
+                                    url: 'bodega/gen_pdfgdd/'+idgdd,
+                                    success: function(data2){
+                                        window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
+                                        alert("Guía Creada!");
+                                        $("#page-wrapper").html(data);
+                                    }
+                                });
+                            }
+                            else{
                                 alert("Guía Creada!");
                                 $("#page-wrapper").html(data);
                             }
-                        });
-                    }
-                    else{
-                        alert("Guía Creada!");
-                        $("#page-wrapper").html(data);
-                    }
-                }
-            });
+                        }
+                    });
+            }
         }
     });
 
