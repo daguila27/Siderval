@@ -344,16 +344,31 @@ $("#send_of").submit(function(e){
         type: 'POST',
         data: data,
         url: '/abastecimiento/crear_oda',
+        beforeSend: function(){
+            showLoad();
+        },
         success: function(data){
-          if(data == 'error'){
+          if(data === 'error'){
             alert("La OC que esta intentando crear es inválida.");
           } else {
             alert("La OC fue creada exitosamente.");
-            $(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-            $(".form-pdf form").submit();
-            setTimeout(function(){
-                location.reload();
-            }, 500);
+
+              $.ajax({
+                  type: 'GET',
+                  url: '/abastecimiento/new_pdf_oca/'+data,
+                  beforeSend: function(){
+                  },
+                  success: function(data){
+                    jQuery('<form action="'+data+'" target="_blank"></form>').appendTo('body').submit().remove();
+                    setTimeout(function(){
+                        location.reload();
+                    }, 500);
+                }
+            });
+            hideLoad()
+            /*$(".form-pdf").html("<form method='POST' action='/plan/view_ordenpdf_first' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+            $(".form-pdf form").submit();*/
+
           }
         }
       });

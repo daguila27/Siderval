@@ -875,7 +875,7 @@
                 "<td style='text-align: center' data-name='to' data-valor='s'>" +
                  etapas[parseInt($("#etapa-previus").val())] +
                 "</td>" +
-                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)'></td>" +
+                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)' required></td>" +
                 "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
                 "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
@@ -894,7 +894,7 @@
                 "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
                 $('#prod_info > small > label > select > option:selected').html()
                 +"</td>" +
-                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)'></td>" +
+                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)' required></td>" +
                 "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
                 "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +

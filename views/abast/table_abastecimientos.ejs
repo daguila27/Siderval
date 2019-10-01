@@ -243,25 +243,7 @@
 		$(this).parent().css('width', $(this).css('width'));
 	});
     $(document).ready(function(){
-        /*$('[data-toggle="tooltip"]').tooltip({
-            container: 'body'
-        });*/
-        /*$(".order-column").removeClass('o-sort-up');
-        $(".order-column").removeClass('o-sort-down');
-        $(".order-column").each(function(){
-            if($(this).data('order').split('-')[0] == "<= key.split('-')[0]>" ){
-                if("<= key.split('-')[1]>" == "ASC"){
-                    $(this).addClass('o-sort-up');
-                    //$(this).append("<a><i class='fa fa-filter table-filtro'></i></a>");
-                    $(this).data('order', '<= key.split("-")[0]>-DESC');
-                }
-                else{
-                    $(this).addClass('o-sort-down');
-                    //$(this).append("<a><i class='fa fa-filter table-filtro'></i></a>");
-                    $(this).data('order', '<= key.split("-")[0]>-ASC');
-                }
-            }
-        });*/
+
     });
     $(document).on('click', '.filtro-tabla .dropdown-menu', function (e) {
         e.stopPropagation();
