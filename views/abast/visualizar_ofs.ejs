@@ -29,12 +29,8 @@
         </tr>
         </thead>
         <tbody>
-        <%for(var e=0; e < of.length; e++){
-            if(of[e].encurso){%>
-                <tr class="encurso success hidden">
-            <%}else{%>
-                <tr class="warning">
-            <%}%>
+        <%for(var e=0; e < of.length; e++){%>
+            <tr>
                 <td style="text-align: center"><%= of[e].idordenfabricacion%></td>
                 <td><%= of[e].detalle%></td>
                 <td style="text-align: center"><%= of[e].cantidad%></td>
@@ -89,7 +85,7 @@
     $(document).ready(function() {
         $('#viewOF').DataTable({
             "lengthChange": false,
-            "paging": false,
+            "paging": true,
             order: [[ 0, "desc" ]],
             "language": {
                 "sProcessing":     "Procesando...",

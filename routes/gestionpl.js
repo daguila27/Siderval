@@ -280,7 +280,7 @@ router.post('/save_production_history', function(req, res, next){
         }
         else{
             for(var e=0; e < input['idmat[]'].length; e++){
-                recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", input["fecha[]"][e], req);
+               recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", input["fecha[]"][e], req);
             }
         }
         res.send("¡Movimiento Diario registrado con exito!");
@@ -382,6 +382,9 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
                     }
                     //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
+                    if(fecha === '' || fecha === ' ' || !fecha || fecha === null || fecha === undefined ){
+                        fecha = new Date();
+                    }
                     history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa, fecha]);
                     prod_affected.push(input.idprod[w]);
                     //LA CANTIDAD TRASPASADA

@@ -161,6 +161,7 @@
       <ul class="nav nav-tabs">
           <li class="active"><a href="#buscador" aria-controls="home" role="tab" data-toggle="tab">Buscador</a></li>
           <li><a href="#segunOF" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación</a></li>
+          <li><a href="#segunOF_fin" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación Finalizadas</a></li>
       </ul>
     <div>
       <div class="tab-content">
@@ -226,28 +227,19 @@
         <div role="tabpanel" class="tab-pane fade" id="segunOF">
           <div class="panel panel-info">
             <div class="panel-heading">
-              <div style="display: flex; padding-left: 30px">
-                  <input type="checkbox" id="of-fin" value="off"> Mostrar OF finalizada<br>
-              </div>
-                <script>
-                    $("#of-fin").on('change', function(e){
-                        e.preventDefault();
-                        if( $(this).is(':checked') ) {
-                            alert('Seleccionado');
-                            $(".encurso").removeClass('hidden');
-                        }else{
-                            alert('no');
-                            $(".encurso").addClass('hidden');
-
-                        }
-                    });
-
-                </script>
             </div>
           </div>
           <div class="panel-body renderizar_ofs">
           </div>
-        </div>   
+        </div>
+          <div role="tabpanel" class="tab-pane fade" id="segunOF_fin">
+              <div class="panel panel-info">
+                  <div class="panel-heading">
+                  </div>
+              </div>
+              <div class="panel-body renderizar_of_fin">
+              </div>
+          </div>
       </div>
     </div>
   </div>
@@ -619,6 +611,13 @@
          url: '/abastecimiento/visualizar_ofs',
          success: function(data){
              $(".renderizar_ofs").html(data)
+             $.ajax({
+                 type: 'GET',
+                 url: '/abastecimiento/visualizar_of_fin',
+                 success: function(data){
+                     $(".renderizar_of_fin").html(data)
+                 }
+             });
          }
      });
    });
