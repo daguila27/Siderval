@@ -36,7 +36,7 @@
                   <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
                   <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Cliente seleccionado</a></li>
                   <%for(var e=0; e < cli.length; e++){%>
-                  <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
+                  <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>" data-pago="<%=cli[e].pago%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
                   <%}%>
                 </ul>
               </li>
@@ -138,6 +138,8 @@
                 });
                 $(".option-dropdown a").on('click', function(e){
                     e.preventDefault();
+                    //SE SETEA LA FORMA DE PAGO EN EL CAMPO CORRESPONDIENTE
+                    $("#pag").val($(this).data('pago'));
                     $("#cliente").val($(this).data('value'));
                     $("#cliente-caret").html($(this).html());
                 });
