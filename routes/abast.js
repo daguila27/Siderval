@@ -4158,7 +4158,14 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
 
                     oda[0].creacion = new Date(oda[0].creacion);
                     oda[0].creacion = oda[0].creacion.getDate()+"/"+(parseInt(oda[0].creacion.getMonth()) + 1)+"/"+oda[0].creacion.getFullYear();
-
+                    console.log(oda);
+                    var dets = [{
+                    	pago: oda[0].tokenoda.split('@')[3],
+						plazo: oda[0].tokenoda.split('@')[2],
+						obs: oda[0].tokenoda.split('@')[0],
+						entrega: oda[0].tokenoda.split('@')[4]
+					}];
+					console.log(dets);
                     (async function(){
                         try{
                             const browser = await puppeteer.launch()
@@ -4167,6 +4174,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                             const content = await compile('oca',
                                 {
                                     "oda":oda[0],
+									"dets": dets[0],
                                     "mats":mats,
                                     "vacio": array_vacio,
 									"logo": base64img.base64Sync('./public/assets/img/logo.png'),
