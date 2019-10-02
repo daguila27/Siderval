@@ -134,32 +134,29 @@ However, delay the fade out process for 2.5 seconds */
 <div class="col-md-12 col-md-offset-0">
     <div class="panel panel-default">
         <div class="panel-heading">
-        <h4 style="width: 60%">Productos por Lanzar
-                
-            </h4>
-    <div style="display: flex;">
-        <div style="width: 45%; margin-right: 5%;">
-
-            <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
-            <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
-        </div>
-        <div style="width: 50%;" class="form-group">
-              <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
-              <div style="display: flex;">
-              <select style="width: 40%" class="form-control" id="filtro" onchange="refreshProdList()">
-                <option value="ordenfabricacion.idordenfabricacion">N° OF</option>
-                <option value="material.detalle">Descripción</option>
-                <option value="subaleacion.subnom">Aleación</option>
-                <option value="fabricaciones.restantes">Necesidad</option>
-                <option value="fabricaciones.f_entrega" selected="selected">Fecha de Entrega</option>
-              </select>
-              <select style="width: 40%" class="form-control" id="orden" onchange="refreshProdList()">
-                <option value="ASC" selected="selected">Ascendente</option>
-                <option value="DESC">Descendente</option>
-              </select>
-              </div>
+        <h4 style="width: 60%">Productos por Lanzar</h4>
+        <div style="display: flex;">
+            <div style="width: 45%; margin-right: 5%;">
+                <small for="detProducto" style="width: 100%;margin-top: 5px">Buscador:</small>
+                <input placeholder="Ej: Inserto 23023 R2" class="form-control" style="width: 100%" id="detProducto">
             </div>
-    </div>
+            <div style="width: 50%;" class="form-group">
+                  <small for="filtro" style="width: 100%;margin-top: 5px">Ordenar por:</small>
+                  <div style="display: flex;">
+                      <select style="width: 40%" class="form-control" id="filtro" onchange="refreshProdList()">
+                        <option value="ordenfabricacion.idordenfabricacion">N° OF</option>
+                        <option value="material.detalle">Descripción</option>
+                        <option value="subaleacion.subnom">Aleación</option>
+                        <option value="fabricaciones.restantes">Necesidad</option>
+                        <option value="fabricaciones.f_entrega" selected="selected">Fecha de Entrega</option>
+                      </select>
+                      <select style="width: 40%" class="form-control" id="orden" onchange="refreshProdList()">
+                        <option value="ASC" selected="selected">Ascendente</option>
+                        <option value="DESC">Descendente</option>
+                      </select>
+                  </div>
+            </div>
+        </div>
         </div>
     <table id="tabla_producciones" class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
         <thead>
@@ -262,27 +259,7 @@ However, delay the fade out process for 2.5 seconds */
         $(yo).data('count', 0);
         refreshProdList();
     }
-/*    $(".sendtoQueue").on('click', function(e){
-        e.preventDefault();
-        var idfabricaciones = $(this).data('id');
-        $.ajax({
-                type: 'POST',
-                data: JSON.stringify({
-                    idfabricaciones: idfabricaciones,
-                    restantes: $(this).data('restantes'),
-                    detalle:$(this).data('detalle'),
-                    ruta:$(this).data('aleacion')
-                }),
-                contentType: 'application/json',
-                url: 'jefeprod/add_produccion',
-                success: function(data){
-                    $("#session_prod").html(data);
-                    $("#" + idfabricaciones).css('transform', 'scaleY(0)');
-                    $("#" + idfabricaciones).html("");
-                }
-        });
-        
-    });*/
+
     function sendtoQueue(yo){
             var idfabricaciones = $(yo).data('id');
             var cant_array = [];
@@ -335,9 +312,9 @@ However, delay the fade out process for 2.5 seconds */
         $.ajax({
             type: 'POST',
             data: {fill: $("#filtro").val(),  orden: $("#orden").val() , detalle: $("#detProducto").val()},
-            url: 'jefeprod/lanzar_op_fill',
-            success: function(data){  
-                $("#tabla_producciones").html(data);                    
+            url: '/jefeprod/lanzar_op_fill',
+            success: function(data){
+                $("#tabla_producciones").html(data);
             }
         });
     }
@@ -586,29 +563,6 @@ However, delay the fade out process for 2.5 seconds */
             }
         });
     }
-/*    $("#delProd").on('click', function(e){
-            e.preventDefault();
-            var idf = $(this).data('idf');
-            $.ajax({
-                type: 'POST',
-                data: {idf: idf},
-                url: '/jefeprod/del_produccion',
-                success: function(data){
-                    $("#session_prod").html(data);
-                    alert("¿CORRECTO?");*/
-                    /*$.ajax({
-                        type: 'POST',
-                        data: {idf: idf},
-                        url: '/jefeprod/restore_fab',
-                        success: function(data){
-                            $("#" + idfabricaciones).html("");
-                        }
-                    });*/
-                    
-                /*}
-            });      
-    });*/
-
 
     
 
