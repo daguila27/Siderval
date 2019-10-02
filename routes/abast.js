@@ -4211,9 +4211,6 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                                 });
                             }
 
-                            console.log('done');
-							console.log(res.req.headers.host);
-//                            res.send( "localhost:"+res.req.headers.host.split(':')[1]+'/pdf/odc'+req.params.idoca+'.pdf');
                             res.send( res.req.headers.host+'/pdf/odc'+req.params.idoca+'.pdf');
 
                         }
