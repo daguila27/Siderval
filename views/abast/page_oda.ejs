@@ -49,9 +49,9 @@ function fechaLatino(string){
                                 <a class="pull-right" style="z-index: 10; margin-left: 10px;" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" onclick="verPdf(this)">
                                     <i data-toggle="tooltip" title="Ver PDF" class="fa fa-file-pdf-o"></i>
                                 </a>
-                                <!--<a class="pull-right" style="z-index: 10; margin-left: 10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="OCA<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
+                                <a class="pull-right" style="z-index: 10; margin-left: 10px" href="/pdf/odc<%= oda.idoda%>.pdf" download="oca<%= oda.idoda%>.pdf" data-numoda="<%= oda.idoda%>" data-idoda="<%= oda.idoda%>" download>
                                     <i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
-                                </a>-->
+                                </a>
                                 <%if(user.nombre != 'siderval'){%>
                                     <a class="pull-right" style="margin-left: 10px" data-idoda="<%= oda.idoda%>" data-numoda="<%= oda.idoda%>" data-view="pagina" onclick="setFactuNum(this)">
                                         <i data-toggle="tooltip" title="Facturar" class="fa fa-money"></i>

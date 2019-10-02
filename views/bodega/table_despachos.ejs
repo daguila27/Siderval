@@ -81,7 +81,7 @@
     function getxlsx(file){
 		$.ajax({
 			type: 'GET',
-			url: 'bodega/gen_pdfgdd/'+$(file).attr("data-id"),
+			url: '/bodega/gen_pdfgdd/'+$(file).attr("data-id"),
 			beforeSend: function(){
                 $(file).html("<i class='fa fa-spinner fa-pulse'></i>");
 			},
@@ -105,7 +105,7 @@
             $.ajax({
                 type: 'POST',
                 data: {idgd: $(file).data('id')},
-                url: 'bodega/anular_gdd',
+                url: '/bodega/anular_gdd',
                 success: function(){
 					$("#btns"+$(file).data('id')).html('');
 					$("#est"+$(file).data('id')).html('Anulado');
@@ -137,10 +137,18 @@
         $.ajax({
             type: 'POST',
             data: {id: $(yo).data('id')},
-            url: 'bodega/activar_gdd',
+            url: '/bodega/activar_gdd',
+            beforeSend: function(){
+               	$("#gdTable").DataTable().destroy();
+                showLoad();
+
+            },
             success: function(data){
-                destroyDataTable();
-                $("#page-wrapper").html(data);
+                setTimeout(function(){
+                    $("#page-wrapper").data('view', '/bodega/activar_gdd');
+                    $("#page-wrapper").html(data);
+                    hideLoad();
+                }, 500);
             }
         });
 	}

@@ -925,6 +925,7 @@ router.get('/page_gdd/:idgd', function(req, res, next){
 
 //Controlador que guarda la activacion de una GDD en Blanco
 router.post('/act_gdd', function(req, res, next){
+    console.log("activando BLANCO");
     var input = JSON.parse(JSON.stringify(req.body));
     var query ="UPDATE pedido SET despachados = CASE ";
     var query2 ="UPDATE material SET stock = CASE ";
@@ -943,18 +944,17 @@ router.post('/act_gdd', function(req, res, next){
             ope = '-';
             ope2 = '+';
     }
-    //console.log(typeof req.body['list[]']);
-
-    var input = JSON.parse(JSON.stringify(req.body));
+    //var input = JSON.parse(JSON.stringify(req.body));
     console.log(input);
     req.getConnection(function (err,connection) {
         //Insertamos los valores de una GD
         let values = [[input.estado, new Date(), new Date() , input.obs,input.idcliente]];
-        connection.query("INSERT INTO gd (estado, fecha, last_mod, obs,idcliente) VALUES ?", [values], function (err, results) {
+        connection.query("UPDATE gd SET `last_mod` = CURRENT_TIMESTAMP,`estado`=?,`obs`=?,`idcliente` = ?  WHERE idgd = ?",
+            [input.estado, input.obs,input.idcliente, input.idgdd], function (err, results) {
             if(err) {throw err;}
             if (input.estado !== "Blanco") {
                 //ID ultima GD y lista vacia que contendra pedidos
-                let idgd = results.insertId;
+                let idgd = input.idgd;
                 let despachos = [];
                 var case_p = [];
                 var case_pl = [];
@@ -962,7 +962,7 @@ router.post('/act_gdd', function(req, res, next){
                 //matriz que contiene los id de palet
                 var ids_palets = [];
                 var ids_palet_item = [];
-                for (let i = 0; i < Object.keys(input).length - 4 ; i++) {
+                for (let i = 0; i < Object.keys(input).length - 5 ; i++) {
                     if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
                         if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) == -1){
                             ids_palets.push( input['list[' + i + '][]'][3].split('-')[0]);
@@ -993,6 +993,7 @@ router.post('/act_gdd', function(req, res, next){
                     case_gdd = "UPDATE gd SET gd.idpackinglist = '"+input.pl+"' where gd.idgd in ("+idgd+")" ;
                 }
 
+                console.log(despachos);
                 //Insertamos cada Despacho asociado a la GD
                 connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?", [despachos], function (err, rows) {
                     if (err) {throw err;}
@@ -1084,7 +1085,7 @@ router.post('/act_gdd', function(req, res, next){
             }
         });
     });
-    req.getConnection(function(err, connection){
+    /*req.getConnection(function(err, connection){
         if(err)
             console.log("Error Selecting : %s", err);
         var d_list = [];
@@ -1140,7 +1141,7 @@ router.post('/act_gdd', function(req, res, next){
                 }
             }
         });
-    });
+    });*/
 });
 
 router.post('/anular_gdd', function(req, res, next){
@@ -1413,11 +1414,15 @@ router.post('/activar_gdd', function(req,res,next){
                 num = desp[0].idgd;
                 connection.query("SELECT * FROM cliente", function(err, cli) {
                     if (err) {console.log("Error Selecting : %s", err);}
-                    connection.query("select fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                    connection.query("SELECT COALESCE(queryReservados.reservados, 0) AS reservados , fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem,pedido.bmi, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                         +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
                         +" left join (select pedido.idpedido, sum(palet_item.cantidad) as cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where !palet.desp group by palet_item.idpedido) as pl on pl.idpedido = pedido.idpedido"
-                        +" left join odc on odc.idodc=pedido.idodc left join cliente on cliente.idcliente=odc.idcliente left join producido on producido.idmaterial=material.idmaterial left join fabricaciones on fabricaciones.idpedido = pedido.idpedido left join"
-                        +" ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
+                        +" left join odc on odc.idodc=pedido.idodc" +
+                        " left join cliente on cliente.idcliente=odc.idcliente" +
+                        " left join producido on producido.idmaterial=material.idmaterial" +
+                        " left join fabricaciones on fabricaciones.idpedido = pedido.idpedido LEFT JOIN (SELECT fabricaciones.idfabricaciones, SUM(reservacion_detalle.ret) AS reservados FROM reservacion_detalle " +
+                        " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones WHERE reservacion_detalle.ret > 0 GROUP BY fabricaciones.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
+                        " left join ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
                         +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
                         function(err, rows){
                             if(err)
@@ -1441,7 +1446,8 @@ router.post('/activar_gdd', function(req,res,next){
                                 if(err)
                                     console.log("Error Selecting :%s", err);
 
-                                res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 1, cli: cli});
+
+                                res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 1, cli: cli, sel: [], redirect: false});
                             });
                         });
                 });

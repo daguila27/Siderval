@@ -35,7 +35,7 @@ function letraMayus(string) {
         }else{
             idtag = 'send_gdd';
         }%>
-        <form id="send_gdd" type="post">
+        <form id="<%= idtag%>" type="post">
             <div class="panel panel-primary panel-defecto">
                 <div class="panel-heading" style="display: flex;">
                 <div style="width: 50%">
@@ -51,7 +51,6 @@ function letraMayus(string) {
                         <button class="btn btn-primary loadStateButton"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
                     </div>-->
                 </div>
-
                     <label style="width: 30%">
                         <ul class="selector-buscador" role="navigation">
                             <input type="hidden" id="cliente" onchange="compNum(this)" value="0">
@@ -162,7 +161,7 @@ function letraMayus(string) {
                         </script>
                     </label>
             </div>
-                <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
+            <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
                 <thead>
                     <tr>
                         <th>N° OC</th>
@@ -199,18 +198,18 @@ function letraMayus(string) {
                     </div>
                     <div class="divSelect col-md-offset-1 col-md-1"  style="padding-left: 0; padding-right: 8px;">
                         <label for="estado">Tipo de GD:
-                        <select name="estado" id="estadoselect" class="form-control">
-                            <option value="Venta" class="notT">Venta</option>
-                            <option value="Traslado">Traslado</option>
-                            <option value="Devolucion" class="notT">Devolución</option>
-                            <option value="Otro" class="notT">Otro</option>
-                            <option value="Blanco" class="notT">Blanco</option>
-                        </select>
+                            <select name="estado" id="estadoselect" class="form-control">
+                                <option value="Venta" class="notT">Venta</option>
+                                <option value="Traslado">Traslado</option>
+                                <option value="Devolucion" class="notT">Devolución</option>
+                                <option value="Otro" class="notT">Otro</option>
+                                <option value="Blanco" class="notT">Blanco</option>
+                            </select>
                         </label>
                     </div>
                     <div class="num_pl_input col-md-1 hidden"  style="padding-left: 0; padding-right: 8px">
                         <label for="input_idpackinglist">N° Packing List:
-                        <input id="input_idpackinglist" class="form-control" type="text" placeholder="N° Packing List" disabled></input>
+                            <input id="input_idpackinglist" class="form-control" type="text" placeholder="N° Packing List" disabled></input>
                         </label>
                     </div>
                     <div class="col-md-1" style="padding: 0; padding-right: 8px">
@@ -219,12 +218,10 @@ function letraMayus(string) {
                     <div class="col-md-1" style="padding: 0">
                         <button class="btn btn-success" type="submit" style="width: 80px">Crear</button>
                     </div>
-
                 </div>
             </div>
         </div>
     </form>
-
 </div>
 
 <style type="text/css">
@@ -287,6 +284,7 @@ function letraMayus(string) {
                         <%
                         var stateButton;
                         for(var i=0; i< data.length; i++){
+                            console.log(i);
                             stateButton = 'true';
                             if(data[i].stock <= 0){
                                 stateButton = 'false';
@@ -336,6 +334,7 @@ function letraMayus(string) {
                 </div>
             </div>
         </div>
+        <%= console.log("saliendo")%>
         <div class="tab-pane fade" id="insum">
             <div class="panel panel-default">
                 <div class="panel-heading" style="display: flex;">
@@ -351,21 +350,23 @@ function letraMayus(string) {
                     </h3>
                 </div>
                 <div class="panel-body">
-                <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
-                    <thead>
-                    <tr>
-                        <th>Detalle</th>
-                        <th>Unidad</th>
-                        <th>Stock</th>
-                        <th>Añadir</th>
-                    </tr>
-                    </thead>
-                    <tbody class="tabla_insumos" id="tbody">
-                    </tbody>
-                </table>
-            </div>
+                    <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
+                        <thead>
+                            <tr>
+                                <th>Detalle</th>
+                                <th>Unidad</th>
+                                <th>Stock</th>
+                                <th>Añadir</th>
+                            </tr>
+                        </thead>
+                        <tbody class="tabla_insumos" id="tbody">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+        <%= console.log("saliendo")%>
+
         <div class="tab-pane fade" id="palets" style="display: block; margin: 0 ; padding: 0">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -374,26 +375,28 @@ function letraMayus(string) {
                 <div class="panel-body" style="padding: 0px">
                     <table id="DataTablePalets" class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped" style="padding: 0; margin: 0 !important; width: 100% !important;">
                         <thead>
-                        <tr>
-                            <th>#Packing List</th>
-                            <th>#Palet</th>
-                            <th>OC</th>
-                            <th>Cliente</th>
-                            <th>Item</th>
-                            <th>Detalle</th>
-                            <th class="hidden"></th>
-                            <th class="hidden"></th>
-                            <th>Cantidad</th>
-                            <th class="hidden"></th>
-                            <th>Peso Unitario</th>
-                            <th>Peso Total</th>
-                            <th>Peso Palet</th>
-                            <th></th>
-                            <th class="hidden"></th>
-                        </tr>
+                            <tr>
+                                <th>#Packing List</th>
+                                <th>#Palet</th>
+                                <th>OC</th>
+                                <th>Cliente</th>
+                                <th>Item</th>
+                                <th>Detalle</th>
+                                <th class="hidden"></th>
+                                <th class="hidden"></th>
+                                <th>Cantidad</th>
+                                <th class="hidden"></th>
+                                <th>Peso Unitario</th>
+                                <th>Peso Total</th>
+                                <th>Peso Palet</th>
+                                <th></th>
+                                <th class="hidden"></th>
+                            </tr>
                         </thead>
                         <tbody>
-                            <%for(var i=0; i< palet.length; i++){%>
+                            <%for(var i=0; i< palet.length; i++){
+                                console.log(i);
+                            %>
                                 <tr class="mat_desp palet_desp palet<%= palet[i].idpalet%>" data-idpalet="<%= palet[i].idpalet%>" data-idpackinglist="<%= palet[i].idpackinglist%>">
                                     <td class="idpackinglist" style="text-align: center"><%= palet[i].idpackinglist%></td>
                                     <td class="idp" style="text-align: center"><%= palet[i].idpalet%></td>
@@ -423,13 +426,15 @@ function letraMayus(string) {
         </div>
     </div>
 </div>
+    <%console.log("salir");
+    console.log(num);%>
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
     var inTabPL = false;
     var idgdd = '<%= num%>';
-
+    console.log('<%= num%>');
     var idioma_español = {
         "sProcessing":     "Procesando...",
         "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -518,6 +523,7 @@ function letraMayus(string) {
     // Oculta la seccion de insumos
     $(document).ready(function(){
         $("#insum").css("display","none");
+        console.log("ready");
         if('<%= redirect%>' === 'true'){
             <% for(var e = 0; e < sel.length; e++){%>
                 $(".mat_desp[data-idped="+parseInt('<%= sel[e]%>')+"]").children('td.mat_butt').children('a.btn-success').click();
@@ -731,17 +737,6 @@ function letraMayus(string) {
 
 
 
-    function comprobarStock(){
-        /*$().each(function(){
-            alert($(this).children('input').attr('min') +" - "+typeof $(this).children('input').attr('min')  );
-            alert($(this).children('input').val() +" - "+typeof $(this).children('input').val()  );
-            if($(this).children('input').attr('min') <  $(this).children('input').val() ){
-                alert();
-           }
-        });*/
-    }
-
-
     $("form#send_gdd").on('submit',function(e){
         e.preventDefault();
         $(this).serializeArray();
@@ -787,21 +782,26 @@ function letraMayus(string) {
                             idcliente: $("#cliente").val(),
                             idgd: $("#idguia").val()
                         },
-                        url: 'bodega/save_gdd',
+                        url: '/bodega/save_gdd',
+                        beforeSend: function(){
+                            showLoad();
+                        },
                         success: function(data){
                             if(est !== 'Blanco'){
                                 $.ajax({
                                     type: 'GET',
-                                    url: 'bodega/gen_pdfgdd/'+idgdd,
+                                    url: '/bodega/gen_pdfgdd/'+idgdd,
                                     success: function(data2){
                                         window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
-                                        alert("Guía Creada!");
+                                        hideLoad();
+                                        Alerta("Guía Creada!");
                                         $("#page-wrapper").html(data);
                                     }
                                 });
                             }
                             else{
-                                alert("Guía Creada!");
+                                hideLoad();
+                                Alerta("Guía Creada!");
                                 $("#page-wrapper").html(data);
                             }
                         }
@@ -819,13 +819,72 @@ function letraMayus(string) {
         });
         var conf = true;
         var est = $("#estadoselect").val();
-        conf = confirm("¿Esta seguro?");
-        $.ajax({
+        var pl;
+        if($(".num_pl_input").hasClass('hidden')){
+            pl = null;
+        }
+        else{
+            pl = $(".num_pl_input input").val();
+        }
+        var conf;
+        if($("#cliente").val() === '0'){
+            Alerta("¡Ingrese Cliente!")
+        }else{
+            if(comprobarCliente()){
+                if(aux.length === 0){
+                    conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
+                    est = "Blanco";
+                } else {
+                    conf = confirm("¿Esta seguro que desea crear esta GDD?");
+                }
+            }
+            else{
+                alert("No es posible crear la GDD. \n ¡Uno de los pedidos a despachar supera el stock disponible en Bodega!");
+            }
+
+            if(conf){
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        list: aux,
+                        estado: est,
+                        pl: pl,
+                        obs:$("#gddobs .form-control").val(),
+                        idcliente: $("#cliente").val(),
+                        idgd: $("#idguia").val()
+                    },
+                    url: '/bodega/act_gdd',
+                    beforeSend: function(){
+                        showLoad();
+                    },
+                    success: function(data){
+                        if(est !== 'Blanco'){
+                            $.ajax({
+                                type: 'GET',
+                                url: '/bodega/gen_pdfgdd/'+idgdd,
+                                success: function(data2){
+                                    window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
+                                    hideLoad();
+                                    Alerta("Guía Creada!");
+                                    $("#page-wrapper").html(data);
+                                }
+                            });
+                        }
+                        else{
+                            hideLoad();
+                            Alerta("Guía Creada!");
+                            $("#page-wrapper").html(data);
+                        }
+                    }
+                });
+            }
+        }
+        /*$.ajax({
             type: 'POST',
             data: {
                 list: aux,
                 estado: est,
-                idgdd: <%= num%>,
+                idgdd: ,
                 obs:$("#gddobs .form-control").val(),
                 idcliente: $("#cliente").val()
             },
@@ -834,7 +893,7 @@ function letraMayus(string) {
                 alert("Guía Creada!")
                 $("#page-wrapper").html(data);
             }
-        });
+        });*/
     });
 
 

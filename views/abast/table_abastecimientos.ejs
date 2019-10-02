@@ -193,7 +193,12 @@
 				<td class="o_data_cell">
 					<div style="display: flex;">
 						<button class="btn btn-xs btn-primary" data-idoda="<%= data[i].idoda%>" data-numoda="<%= data[i].idoda%>" data-view="lista" onclick="setFactuNum(this)"><i class="fa fa-money"></i></button>
-						<button class="btn btn-xs btn-success" data-numoda="<%= data[i].idoda%>" data-idoda="<%= data[i].idoda%>" onclick="verPdf(this)"><i class="fa fa-file-pdf-o"></i></button>
+						<button class="btn btn-xs btn-success" data-numoda="<%= data[i].idoda%>" data-idoda="<%= data[i].idoda%>" onclick="verPdf(this)">
+							<i class="fa fa-file-pdf-o"></i>
+						</button>
+						<a class="hidden" href="/pdf/odc<%= data[i].idoda%>.pdf" download="oca<%= data[i].idoda%>.pdf" data-numoda="<%= data[i].idoda%>" data-idoda="<%= data[i].idoda%>" download>
+							<i data-toggle="tooltip" title="Descargar PDF" class="fa fa-download"></i>
+						</a>
 					</div>
 				</td>
 			</tr>
