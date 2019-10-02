@@ -4161,7 +4161,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                     console.log(oda);
                     var dets = [{
                     	pago: oda[0].tokenoda.split('@')[3],
-						plazo: oda[0].tokenoda.split('@')[2],
+						plazo: [oda[0].tokenoda.split('@')[2].split('-')[2],oda[0].tokenoda.split('@')[2].split('-')[1],oda[0].tokenoda.split('@')[2].split('-')[0]].join('/'),
 						obs: oda[0].tokenoda.split('@')[0],
 						entrega: oda[0].tokenoda.split('@')[4]
 					}];
