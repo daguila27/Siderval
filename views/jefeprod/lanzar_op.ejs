@@ -276,7 +276,7 @@ However, delay the fade out process for 2.5 seconds */
                         cantidades: cant_array
                     }),
                     contentType: 'application/json',
-                    url: 'jefeprod/add_produccion',
+                    url: '/jefeprod/add_produccion',
                     success: function(data){
                         $("#session_prod").html(data);
                         $("#btn_materiales").attr("disabled",false);
@@ -301,7 +301,7 @@ However, delay the fade out process for 2.5 seconds */
             type: 'POST',
             data: JSON.stringify({list: cantidades}),
             contentType: 'application/json',
-            url: 'jefeprod/lista_materiales',
+            url: '/jefeprod/lista_materiales',
             success: function(data){
                 $("#lista_mat").html(data);
             }
@@ -359,7 +359,7 @@ However, delay the fade out process for 2.5 seconds */
                         type: 'POST',
                         data: JSON.stringify({list: aux, dates: aux2}),
                         contentType: 'application/json',
-                        url: 'jefeprod/save_op',
+                        url: '/jefeprod/save_op',
                         success: function (data) {
                             if (data == 'Error') {
                                 alert("Ha ocurrido un error");
@@ -371,7 +371,7 @@ However, delay the fade out process for 2.5 seconds */
                                 $(".aux_formulario form").submit();
                                 $.ajax({
                                     type: 'GET',
-                                    url: 'jefeprod/crear_op',
+                                    url: '/jefeprod/crear_op',
                                     success: function (data) {
                                         $("#page-wrapper").html(data);
                                     }
@@ -389,7 +389,7 @@ However, delay the fade out process for 2.5 seconds */
                         type: 'POST',
                         data: JSON.stringify({list: aux, dates: aux2}),
                         contentType: 'application/json',
-                        url: 'jefeprod/save_op',
+                        url: '/jefeprod/save_op',
                         success: function (data) {
                             if (data == 'Error') {
                                 alert("Ha ocurrido un error");
@@ -401,7 +401,7 @@ However, delay the fade out process for 2.5 seconds */
                                 $(".aux_formulario form").submit();
                                 $.ajax({
                                     type: 'GET',
-                                    url: 'jefeprod/crear_op',
+                                    url: '/jefeprod/crear_op',
                                     success: function (data) {
                                         $("#page-wrapper").html(data);
                                     }
@@ -474,7 +474,7 @@ However, delay the fade out process for 2.5 seconds */
                 var c = 0;
                 $("#send_op :input.form-control").each(function(e){
                     if(c > 0){
-                        if(c%2!=0){     
+                        if(c%2 !== 0){
                             aux.push(this.value);
                             alert($(this).attr('id'));
                             idf.push($(this).attr('id').substring(4, $(this).attr('id').length));
@@ -540,7 +540,8 @@ However, delay the fade out process for 2.5 seconds */
             type: 'POST',
             data: {
                 idf: idf,
-                cantidades: cant_array},
+                cantidades: cant_array
+            },
             url: '/jefeprod/del_produccion',
             success: function(data){
                 $("#session_prod").html(data);
