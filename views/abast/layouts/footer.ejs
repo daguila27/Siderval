@@ -289,6 +289,8 @@
 <form action="/abastecimiento/indx" method="post" class="hidden render-form">
     <input type="hidden" name="route" id="route" value="abast_myself">
 </form>
+
+
 </body>
 <script>
     function show_menu(){
@@ -758,6 +760,7 @@
 
 
     function verPdf(yo){
+        var idoda = $(yo).data('idoda');
         $.ajax({
            type: 'GET',
            url: '/abastecimiento/new_pdf_oca/'+$(yo).data('idoda'),
@@ -767,17 +770,17 @@
                 $(yo).children('i').addClass('fa-spin');
            },
            success: function(data){
+                window.open("http://"+data, '_blank');
 
-               jQuery('<form action="'+data+'" target="_blank"></form>').appendTo('body').submit().remove();
-
-               $(yo).children('i').removeClass('fa-spinner');
-               $(yo).children('i').removeClass('fa-spin');
-               $(yo).children('i').addClass('fa-file-pdf-o');
-               //window.open(data, '_blank');
+                $(yo).children('i').removeClass('fa-spinner');
+                $(yo).children('i').removeClass('fa-spin');
+                $(yo).children('i').addClass('fa-file-pdf-o');
+                //window.open(data, '_blank');
 
            }
         });
     }
+
 
 
 
