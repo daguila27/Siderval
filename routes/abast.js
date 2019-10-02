@@ -4114,10 +4114,11 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
         if(err)
             console.log("Error Connection : %s", err);
 
-        connection.query('select material.detalle, coalesce(abastecimiento.costo,0) as precio, coalesce(abastecimiento.cantidad,0) as cantidad, coalesce(abastecimiento.costo,0)*coalesce(abastecimiento.cantidad,0) as preciototal ' +
+        connection.query('select sub_ccontable.idccontable as subcuenta, material.detalle, coalesce(abastecimiento.costo,0) as precio, coalesce(abastecimiento.cantidad,0) as cantidad, coalesce(abastecimiento.costo,0)*coalesce(abastecimiento.cantidad,0) as preciototal ' +
 			'from abastecimiento ' +
 			'left join oda on abastecimiento.idoda=oda.idoda ' +
-			'left join material on material.idmaterial=abastecimiento.idmaterial where oda.idoda=?', [req.params.idoca],
+			'left join material on material.idmaterial=abastecimiento.idmaterial ' +
+			'left join sub_ccontable on abastecimiento.cc = sub_ccontable.idsub where oda.idoda=?', [req.params.idoca],
             function(err, mats){
                 if(err)
                     console.log("Error Selecting : %s", err);
@@ -4203,8 +4204,10 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                             }
 
                             console.log('done');
-
+							console.log(res.req.headers.host);
+//                            res.send( "localhost:"+res.req.headers.host.split(':')[1]+'/pdf/odc'+req.params.idoca+'.pdf');
                             res.send( res.req.headers.host+'/pdf/odc'+req.params.idoca+'.pdf');
+
                         }
                         catch(e){
                             console.log("Error al generar PDF : %s", e);
