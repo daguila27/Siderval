@@ -272,21 +272,6 @@ router.get('/create_production_history', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-router.post('/save_production_history', function(req, res, next){
-    if(verificar(req.session.userData)){
-        var input = JSON.parse(JSON.stringify(req.body));
-        if(typeof input['idmat[]'] === 'string'){
-            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ", input["fecha[]"], req);
-        }
-        else{
-            for(var e=0; e < input['idmat[]'].length; e++){
-               recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", input["fecha[]"][e], req);
-            }
-        }
-        res.send("¡Movimiento Diario registrado con exito!");
-    }
-    else{res.redirect('bad_login');}
-});
 
 function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
     if(conn){
@@ -295,12 +280,10 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
             "from produccion " +
             "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
             "left join material on material.idmaterial=fabricaciones.idmaterial " +
-            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = "+idmat+" group by material.idmaterial order by produccion.idproduccion ASC";
-        console.log(q);
+            "where produccion.cantidad >= produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = "+idmat+" group by material.idmaterial order by produccion.idproduccion ASC";
         conn.query(q, function(err, rows){
             if(err) throw err;
 
-            console.log(rows);
             /*
             * { idprod: '22725-22716-22717',
                   cantprod: '400-391-300',
@@ -319,7 +302,7 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
             };
             //jfp@109603@120@2019-6-25 16:19:58@22901-22864-22866@283@COMENTARIO@4
             //ENVIAR NOTIFICACIÓN
-           var notif;
+            var notif;
             if(to === 's'){
                 notif = {
                     idproduccion: rows[0].idprod,
@@ -366,7 +349,10 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                     }
 
                     if(parseInt(input.cantprod[w]) > 0){
-                        history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
+                        if(fecha === '' || fecha === ' ' || !fecha || fecha === null || fecha === undefined ){
+                            fecha = new Date();
+                        }
+                        history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa, fecha]);
                         prod_affected.push(input.idprod[w]);
                         //LA CANTIDAD TRASPASADA
                         env_affected.push(input.cantprod[w]);
@@ -424,6 +410,23 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
         });
     }
 }
+
+router.post('/save_production_history', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        if(typeof input['idmat[]'] === 'string'){
+            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ", input["fecha[]"], req);
+        }
+        else{
+            for(var e=0; e < input['idmat[]'].length; e++){
+               recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", input["fecha[]"][e], req);
+            }
+        }
+        res.send("¡Movimiento Diario registrado con exito!");
+    }
+    else{res.redirect('bad_login');}
+});
+
 
 
 function enviarNotificacionBodega(req, input){
