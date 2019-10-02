@@ -987,8 +987,11 @@ router.post('/del_produccion', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     var idf = input.idf;
     var cants = input["cantidades[]"];
+    if(typeof cants === 'string'){
+        cants = [cants];
+    }
     for(var t=0; t < req.session.arrayProduccion.length; t++){
-       if(req.session.arrayProduccion[t][0] == idf){
+       if(req.session.arrayProduccion[t][0] === parseInt(idf) ){
         req.session.arrayProduccion.splice(t,1);
         cants.splice(t,1);
        } 
