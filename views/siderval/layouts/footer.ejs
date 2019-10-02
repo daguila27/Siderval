@@ -249,10 +249,29 @@
             $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height);
         }
     });*/
-    function verPdf(yo){
-        window.open('/plan/show_pdf/'+$(yo).data('numoda'), '_blank');
-    }
 
+
+    function verPdf(yo){
+        var idoda = $(yo).data('idoda');
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/new_pdf_oca/'+$(yo).data('idoda'),
+            beforeSend: function(){
+                $(yo).children('i').removeClass('fa-file-pdf-o');
+                $(yo).children('i').addClass('fa-spinner');
+                $(yo).children('i').addClass('fa-spin');
+            },
+            success: function(data){
+                window.open("http://"+data, '_blank');
+
+                $(yo).children('i').removeClass('fa-spinner');
+                $(yo).children('i').removeClass('fa-spin');
+                $(yo).children('i').addClass('fa-file-pdf-o');
+                //window.open(data, '_blank');
+
+            }
+        });
+    }
     function gen_pdf(id){
         $("#vpdf_btn").attr('disabled',true);
         //$('body').loading('toggle');
