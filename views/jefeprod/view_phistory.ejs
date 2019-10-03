@@ -30,6 +30,15 @@
                 <th data-toggle="tooltip" data-placement="bottom" style="text-align: center">Fecha</th>
             </tr>
             </thead>
+            <% for(var e=0; e < data.length; e++){%>
+                <tr>
+                    <td><%= data[e].detalle%></td>
+                    <td><%= data[e].enviados%></td>
+                    <td><%= data[e].desde%></td>
+                    <td><%= data[e].hacia%></td>
+                    <td data-order="<%= new Date(data[e].fechap).getTime()%>"><%= data[e].fecha%></td>
+                </tr>
+            <%}%>
             <tbody>
             </tbody>
         </table>
@@ -75,17 +84,6 @@
                 "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
                 "sSortDescending": ": Activar para ordenar la columna de manera descendente"
             }
-        },
-        ajax: {
-            url: '/jefeprod/phistory_data',
-            dataSrc: ''
-        },
-        columns: [
-            {data: "detalle"},
-            {data: "enviados"},
-            {data: "desde"},
-            {data: "hacia"},
-            {data: "fecha"}
-        ]
+        }
     } );
 </script>

@@ -1810,7 +1810,22 @@ router.post('/modif_op', function(req, res, next){
 * */
 router.get("/phistory_view",function(req,res){
    if(verificar(req.session.userData)){
-       res.render("jefeprod/view_phistory");
+       req.getConnection(function(err,connection){
+           if(err) console.log(err);
+           connection.query("SELECT produccion_history.enviados,DATE_FORMAT(produccion_history.fecha,'%Y-%m-%d %r') AS fecha," +
+               " produccion_history.fecha as fechap, etapafaena.nombre_etapa AS desde, ef2.nombre_etapa AS hacia, material.detalle FROM siderval.produccion_history " +
+               " LEFT JOIN etapafaena ON etapafaena.value = produccion_history.from" +
+               " LEFT JOIN etapafaena AS ef2 ON ef2.value = produccion_history.to" +
+               " LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion" +
+               " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
+               " LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial",function(err,rows){
+               if(err) console.log(err);
+
+
+               console.log(rows);
+               res.render("jefeprod/view_phistory", {data: rows});
+           });
+       });
    } else res.redirect("/bad_login");
 });
 //Conseguir filas historial de produccion.
