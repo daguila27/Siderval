@@ -139,9 +139,14 @@
                     margin-top: 5px;
                 }
 
-            </style>
-            <div class="oe_secondary_menu">
+                #menu-lateral-izquierdo ul li a:hover{
+                    cursor: pointer;
+                    background-color: rgb(190, 189, 215);
+                    color: white;
+                }
 
+            </style>
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">Planificación</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li id="pedd" onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Ver Pedidos" data-link="/plan/view_pedidos">
@@ -176,24 +181,23 @@
                         </a>
                     </li>
                 </ul>
-
                 <div class="oe_secondary_menu_section">Despachos</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Productos Fundidos (Despachos)" data-link='jefeplanta/view_despachositem/funds'>
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Productos Fundidos (Despachos)" data-link='/jefeplanta/view_despachositem/funds'>
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Productos Fundidos
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Otros (Despachos)" data-link='jefeplanta/view_despachositem/otros'>
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Otros (Despachos)" data-link='/jefeplanta/view_despachositem/otros'>
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Otros
                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Ver Guías de Despacho" data-link='bodega/view_despachos'>
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Ver Guías de Despacho" data-link='/bodega/view_despachos'>
                         <a class="oe_menu_leaf">
                                 <span class="oe_menu_text">
                                     Ver Guías de Despacho
@@ -201,8 +205,6 @@
                         </a>
                     </li>
                 </ul>
-
-
             </div>
         </div>
     </div>

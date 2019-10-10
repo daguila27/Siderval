@@ -145,18 +145,15 @@
                     margin-top: 5px;
                 }
 
+                #menu-lateral-izquierdo ul li a:hover{
+                    cursor: pointer;
+                    background-color: rgb(190, 189, 215);
+                    color: white;
+                }
             </style>
-
-
-            <div class="oe_secondary_menu">
-
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">
-
-
-
                 </div>
-
-
                 <div class="oe_secondary_menu_section">
                     Orden de Compra
                 </div>
@@ -222,13 +219,9 @@
                         </a>
                     </li>
                 </ul>
-
-
-
                 <div class="oe_secondary_menu_section">
                     Proveedores
                 </div>
-
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li onclick="ajax(this)" data-tipo="0" data-msg="Abastecimiento - Todos los Proveedores" data-link="/abastecimiento/all_proveedores">
                         <a class="oe_menu_leaf">
