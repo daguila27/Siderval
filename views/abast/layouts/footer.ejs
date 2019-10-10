@@ -988,18 +988,33 @@
                         if(data == 'error'){
                             alert("La OCA que esta intentando crear es inválida.");
                         } else {
+                            var idoda_new = data.split('@')[1];
+                            var idnotif = data.split('@')[0];
+
                             alert("La OCA fue creada exitosamente.");
-                            $(".footer-hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data.split('@')[1]+"'></form>");
-                            $(".footer-hidden form").submit();
                             $.ajax({
                                 type: 'GET',
-                                url: '/abastecimiento/comprobar_notificaciones/'+data.split('@')[0],
+                                url: '/abastecimiento/new_pdf_oca/'+idoda_new,
+                                beforeSend: function(){
+                                },
                                 success: function(data){
-
-                                    $(".notificaciones").html(data);
-                                    $(".cerrarNewOC").click();
+                                    window.open("http://"+data, '_blank');
+                                    //jQuery('<form action="'+data+'" target="_blank"></form>').appendTo('body').submit().remove();
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: '/abastecimiento/comprobar_notificaciones/'+idnotif,
+                                        success: function(data){
+                                            $(".notificaciones").html(data);
+                                            $(".cerrarNewOC").click();
+                                            setTimeout(function(){
+                                                //hideLoad();
+                                                location.reload();
+                                            }, 500);
+                                        }
+                                    });
                                 }
                             });
+
                         }
                     }
                 });
@@ -1091,16 +1106,32 @@
                             alert("La OCA que esta intentando crear es inválida.");
                         } else {
                             alert("La OCA fue creada exitosamente.");
-                            $(".footer-hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
-                            $(".footer-hidden form").submit();
+                            //$(".footer-hidden").html("<form method='POST' action='/plan/view_ordenpdf' target='_blank'><input type='hidden' name='idoda' value='"+data+"'></form>");
+                            //$(".footer-hidden form").submit();
                             $.ajax({
                                 type: 'GET',
-                                url: '/abastecimiento/notif_abast',
+                                url: '/abastecimiento/new_pdf_oca/'+data,
+                                beforeSend: function(){
+                                },
                                 success: function(data){
-                                    $(".notificaciones").html(data);
-                                    $(".cerrarNewOC").click();
+                                    window.open("http://"+data, '_blank');
+                                    //jQuery('<form action="'+data+'" target="_blank"></form>').appendTo('body').submit().remove();
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: '/abastecimiento/notif_abast',
+                                        success: function(data){
+                                            $(".notificaciones").html(data);
+                                            $(".cerrarNewOC").click();
+                                            setTimeout(function(){
+                                                //hideLoad();
+                                                location.reload();
+                                            }, 500);
+                                        }
+                                    });
                                 }
                             });
+
+
                         }
                     }
                 });

@@ -311,8 +311,7 @@
                                 <div class="form-group" style="display: flex;">
                                     <div style="width: 100%">
                                         <label for="obs">Observaciones:</label>
-                                        <textarea class="form-control" id="obs" name="obs" style="width: 100%" cols="10" rows="2" charswidth="23" >
-                        </textarea>
+                                        <textarea class="form-control" id="obs" name="obs" style="width: 100%" cols="10" rows="2" charswidth="23"></textarea>
                                     </div>
                                 </div>
                                 <div class="form-inline">
@@ -338,9 +337,9 @@
       $(document).ready(function(){
         $('[data-toggle="popover"]').popover({ trigger: "hover" }); 
       });
-        function setPago(yo){
-          $("#odcForm #pag").val($(yo).val().split('@')[1]);
-        }
+      function setPago(yo){
+        $("#odcForm #pag").val($(yo).val().split('@')[1]);
+      }
     $(".atr-canv").on('click', function(e){
         e.preventDefault();
         $(".sig-canv").attr('disabled', false);
@@ -400,9 +399,7 @@
         var count = 0;
         $(".costo-total").each(function(){
             if($(this).parent().children('.ped-hab').children('.check-ped').is(":checked")){
-              console.log("PEDIDO HABILITADO");
-
-              auxc = $(this).parent().children('.td-cant').children('.cant_compra').val();  
+              auxc = $(this).parent().children('.td-cant').children('.cant_compra').val();
               //console.log($(this).parent().children('.td-money').children('.key_money').val().indexOf(','));
               if($(this).parent().children('.td-money').children('.key_money').val().indexOf(',') == -1){
                   //auxm = $(this).parent().children('.td-money').children('.key_money').val(); 
