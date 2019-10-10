@@ -1510,7 +1510,7 @@ router.post('/ficha_abastecimiento', function(req,res){
                                 var phantom = require('phantom');   
                                 phantom.create().then(function(ph) {
                                     ph.createPage().then(function(page) {
-                                        page.open("http://localhost:4300/jefeprod/lista_abastecimiento_get/"+idop).then(function(status) {
+                                        page.open("http://"+res.req.headers.host+"/jefeprod/lista_abastecimiento_get/"+idop).then(function(status) {
                                             page.render('routes/boms/bom'+idop+'.pdf').then(function() {
                                                 console.log('Page Rendered');
                                                 ph.exit();
@@ -1533,6 +1533,8 @@ router.post('/ficha_abastecimiento', function(req,res){
                         });
     });
 });
+
+
 /*
 *  Resumen:
 *
@@ -1545,13 +1547,13 @@ router.post('/ficha_abastecimiento', function(req,res){
 router.get('/lista_abastecimiento_get/:idop', function(req,res){
     var idop = req.params.idop;
     req.getConnection(function(err, connection){
-        connection.query("select  material.detalle, material.codigo,produccion.cantidad, group_concat(billof.codigo separator '@') as code_token,group_concat(billof.detalle separator '@') as componentes, group_concat(billof.cantidad) as cant_bom, group_concat(billof.u_medida) as u_bom from produccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join ("+                
+        connection.query("SELECT material.detalle, material.codigo,produccion.cantidad, group_concat(billof.codigo separator '@') as code_token,group_concat(billof.detalle separator '@') as componentes, group_concat(billof.cantidad) as cant_bom, group_concat(billof.u_medida) as u_bom from produccion left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones left join ("+
             "select bom.idmaterial_master, material.detalle,material.codigo,bom.cantidad,material.u_medida from bom left join material on material.idmaterial=bom.idmaterial_slave where material.notbom=true order by bom.idmaterial_master)"+
             "as billof on billof.idmaterial_master=fabricaciones.idmaterial left join material on material.idmaterial=fabricaciones.idmaterial where produccion.idordenproduccion=? group by produccion.idproduccion", [idop], 
             function(err, mats){
                 if(err)
                     console.log("Error Selecting : %s", err);
-                connection.query("select * from ordenproduccion where idordenproduccion=?", [idop], function(err, op){
+                connection.query("SELECT * FROM ordenproduccion WHERE idordenproduccion=?", [idop], function(err, op){
                     if(err)
                         console.log("Error Selecting : %s", err);
                     

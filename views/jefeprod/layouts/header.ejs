@@ -138,25 +138,23 @@
                 .oe_secondary_menu_section{
                     margin-top: 5px;
                 }
-
+                #menu-lateral-izquierdo ul li a:hover{
+                    cursor: pointer;
+                    background-color: rgb(190, 189, 215);
+                    color: white;
+                }
             </style>
 
-            <div class="oe_secondary_menu">
-
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">
 
 
 
                 </div>
-
-
                 <div class="oe_secondary_menu_section">
                     Orden de Producción
                 </div>
-
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-
-
                     <li class="active"  onclick="ajax(this)" data-link="/jefeprod/crear_op">
 
 
@@ -183,7 +181,6 @@
                 <div class="oe_secondary_menu_section">
                     Planta
                 </div>
-
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li onclick="ajax(this)" data-link="/faena/procesos">
                         <a class="oe_menu_leaf">
@@ -200,7 +197,6 @@
                         </a>
                     </li>
                 </ul>
-
                 <div class="oe_secondary_menu_section">Producción</div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
 
@@ -212,8 +208,6 @@
                         </a>
                     </li>
                 </ul>
-
-
             </div>
 
 

@@ -144,10 +144,14 @@
                     margin-top: 5px;
                 }
 
+                 #menu-lateral-izquierdo ul li a:hover{
+                     cursor: pointer;
+                     background-color: rgb(190, 189, 215);
+                     color: white;
+                 }
             </style>
 
-
-            <div class="oe_secondary_menu">
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">
                 </div>
                 <div class="oe_secondary_menu_section">
@@ -162,8 +166,6 @@
                         </a>
                     </li>
                 </ul>
-
-
                 <div class="oe_secondary_menu_section">
                     Despachos
                 </div>
@@ -197,13 +199,9 @@
                         </a>
                     </li>
                 </ul>
-
-
-
                 <div class="oe_secondary_menu_section">
                     Stock
                 </div>
-
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_bodega">
                         <a class="oe_menu_leaf">
@@ -221,7 +219,6 @@
                     </li>
 
                 </ul>
-
                 <div class="oe_secondary_menu_section">
                     Orden de Producción
                 </div>
@@ -241,11 +238,6 @@
                         </a>
                     </li>
                 </ul>
-
-
-
-
-
             </div>
 
         </div>

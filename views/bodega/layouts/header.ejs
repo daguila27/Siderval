@@ -139,8 +139,13 @@
                     margin-top: 5px;
                 }
 
+                #menu-lateral-izquierdo ul li a:hover{
+                    cursor: pointer;
+                    background-color: rgb(190, 189, 215);
+                    color: white;
+                }
             </style>
-            <div class="oe_secondary_menu">
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">
                     Despachos
                 </div>
@@ -162,45 +167,44 @@
 
                 </ul>
 
+
+                <div class="oe_secondary_menu_section">
+                    Stock
+                </div>
+
+                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
+                    <li onclick="ajax(this)" data-link="/bodega/view_bodega">
+                        <a class="oe_menu_leaf">
+                            <span class="oe_menu_text">
+                                Productos
+                            </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-link="/bodega/view_pendientes">
+                        <a class="oe_menu_leaf">
+                            <span class="oe_menu_text">
+                                Packing List
+                            </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-link="/bodega/crear_recepcion">
+                        <a class="oe_menu_leaf">
+                                                <span class="oe_menu_text">
+                                                    Recepcionar Externalizados
+                                                </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-link="/bodega/view_externo">
+                        <a class="oe_menu_leaf">
+                                                <span class="oe_menu_text">
+                                                    Ver Externalizados
+                                                </span>
+                        </a>
+                    </li>
+
+                </ul>
+
             </div>
-
-            <div class="oe_secondary_menu_section">
-                Stock
-            </div>
-
-            <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                <li onclick="ajax(this)" data-link="/bodega/view_bodega">
-                    <a class="oe_menu_leaf">
-                        <span class="oe_menu_text">
-                            Productos
-                        </span>
-                    </a>
-                </li>
-                <li onclick="ajax(this)" data-link="/bodega/view_pendientes">
-                    <a class="oe_menu_leaf">
-                        <span class="oe_menu_text">
-                            Packing List
-                        </span>
-                    </a>
-                </li>
-                <li onclick="ajax(this)" data-link="/bodega/crear_recepcion">
-                    <a class="oe_menu_leaf">
-                                            <span class="oe_menu_text">
-                                                Recepcionar Externalizados
-                                            </span>
-                    </a>
-                </li>
-                <li onclick="ajax(this)" data-link="/bodega/view_externo">
-                    <a class="oe_menu_leaf">
-                                            <span class="oe_menu_text">
-                                                Ver Externalizados
-                                            </span>
-                    </a>
-                </li>
-
-            </ul>
-
-
         </div>
     </div>
 

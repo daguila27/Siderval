@@ -142,10 +142,14 @@
                 .oe_secondary_menu_section{
                     margin-top: 5px;
                 }
-
+                #menu-lateral-izquierdo ul li a:hover{
+                    cursor: pointer;
+                    background-color: rgb(190, 189, 215);
+                    color: white;
+                }
             </style>
 
-            <div class="oe_secondary_menu">
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
 
 
                 <div class="oe_secondary_menu_section">
@@ -156,17 +160,11 @@
 
 
                     <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Crear OC" data-link="/plan/lanzar_of/pedido">
-
-
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                              Crear OC
                                         </span>
                         </a>
-
-
-
-
                     </li>
 
                     <li onclick="ajax(this)"  data-tipo="1" data-msg="Planificación - Ver Todas (OC)" data-link="/plan/view_pedidos">
@@ -187,7 +185,6 @@
                 <div class="oe_secondary_menu_section">
                     Orden de Fabricación
                 </div>
-
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
 
                     <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Crear OF" data-link="/plan/lanzar_of/of">
@@ -236,13 +233,9 @@
 
 
                 </ul>
-
-
-
                 <div class="oe_secondary_menu_section">
                     Productos
                 </div>
-
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li onclick="ajax(this)"  data-tipo="0" data-msg="Planificación - Ver por OC" data-link="/plan/show_prod/1">
 
@@ -272,8 +265,6 @@
                         </a>
                     </li>
                 </ul>
-
-
                 <div class="oe_secondary_menu_section">
                     Clientes y Proveedores
                 </div>
