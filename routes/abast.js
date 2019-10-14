@@ -4153,6 +4153,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                         }
 
                     }
+                    var msg = '';
                     console.log(oda[0].tokenoda.split('@'));
                     console.log(typeof oda[0].tokenoda.split('@')[7]);
                     if(oda[0].tokenoda.split('@')[7] === 'off'){
@@ -4161,6 +4162,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                     }else{
                         oda[0].iva = 0;
                         oda[0].total = oda[0].neto;
+                        msg = 'EXENTO IVA';
                     }
                     
 
@@ -4190,7 +4192,8 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                                     "mats":mats,
                                     "vacio": array_vacio,
 									"logo": base64img.base64Sync('./public/assets/img/logo.png'),
-                                    "firma": base64img.base64Sync('./public/assets/img/firma.png')
+                                    "firma": base64img.base64Sync('./public/assets/img/firma.png'),
+                                    "msg": msg
                                 }
                             );
 
