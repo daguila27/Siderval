@@ -317,8 +317,7 @@ $("#send_of").submit(function(e){
     set_fd: [],
     centroc: []
   }
-   
-  console.log(lista);
+
   for(var i =0;i<$(this).serializeArray().length;i++){
      if(lista[i].name != 'nroordenfabricacion' && lista[i].name != 'entr' && lista[i].name != 'pag' && lista[i].name != 'plae' && lista[i].name != 'dest' && lista[i].name != 'obs' && lista[i].name != 'cuent' && lista[i].name != 'money' && lista[i].name != 'desc' && lista[i].name != 'exento' ){
         data[lista[i].name].push(lista[i].value);
@@ -327,15 +326,16 @@ $("#send_of").submit(function(e){
      }
   }
   data.ex_iva = [];
+  data.exento = 'off';
   $("#send_of .ex_iva").each(function(){
     if($(this).is(':checked')){
-      data.ex_iva.push('on');
+        data.ex_iva.push('on');
+        data.exento = 'on';
     } else{
-      data.ex_iva.push('off');  
+        data.ex_iva.push('off');
     }
     //console.log($(this).val());
   });
-  console.log(data);
   //COMPRUEBA SI SE HA SELECCIONADO UN CLIENTE, SI NO ES ASI NO PERMITE CREAR OCA
   if($("#cliente").val() === '0'){
       Alerta("¡Seleccione Proveedor!");
