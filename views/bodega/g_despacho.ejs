@@ -395,7 +395,6 @@ function letraMayus(string) {
                         </thead>
                         <tbody>
                             <%for(var i=0; i< palet.length; i++){
-                                console.log(i);
                             %>
                                 <tr class="mat_desp palet_desp palet<%= palet[i].idpalet%>" data-idpalet="<%= palet[i].idpalet%>" data-idpackinglist="<%= palet[i].idpackinglist%>">
                                     <td class="idpackinglist" style="text-align: center"><%= palet[i].idpackinglist%></td>
@@ -426,8 +425,6 @@ function letraMayus(string) {
         </div>
     </div>
 </div>
-    <%console.log("salir");
-    console.log(num);%>
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 

@@ -987,7 +987,7 @@ router.post('/crear_oda', function(req, res, next){
         if(input.desc == '' || input.desc == undefined){
         	input.desc = 0;
         }
-        if(input.exento == undefined){
+        if(input.exento === undefined){
         	input.exento = 'off';
         }
         var token = input.obs+"@"+input.dest+"@"+input.plae+"@"+input.pag+"@"+input.entr+"@"+input.cuent+"@"+input.money+"@"+input.exento+"@"+input.desc;
