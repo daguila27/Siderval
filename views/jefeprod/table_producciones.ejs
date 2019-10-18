@@ -63,7 +63,7 @@ function fechaLatino(string){
         <td data-toggle="tooltip" data-placement="bottom" title="Nombre"><%=datalen[i].detalle%></td>
         <td style="text-align: center"><%= datalen[i].idordenproduccion %></td>
         <td style="text-align: center"><%= datalen[i].numordenfabricacion %></td>
-        <td data-cs="0" class="col-can parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] %></td>
+        <td data-cs="0" class="col-can parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Cantidad en Producción" style="text-align: center"><%= datalen[i].cantidad - datalen[i]['8'] - datalen[i].standby %></td>
         <td data-cs="0" class="col-mol parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Moldeo" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['1'] %></td>
         <td data-cs="0" class="col-fus parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Fusion" id="prod<%=datalen[i].idproduccion%>-2" id="prod<%=datalen[i].idproduccion%>-1" style="text-align: center"><%= datalen[i]['2'] %></td>
         <td data-cs="0" class="col-qui parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Quiebre" id="prod<%=datalen[i].idproduccion%>-3" style="text-align: center"><%= datalen[i]['3'] %></td>
@@ -72,7 +72,7 @@ function fechaLatino(string){
         <td data-cs="0" class="col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6" style="text-align: center"><%= datalen[i]['6'] %></td>
         <td data-cs="0" class="col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i]['7'] %></td>
         <td data-cs="0" class='danger parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Tratados" style="text-align: center"><%= datalen[i].trats %></td>
-        <td data-cs="0" class='col-rec parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Bodega Productos Terminados" style="text-align: center"><%=  datalen[i]['8'] %></td>
+        <td data-cs="0" class='col-rec parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Stock en Bodega Productos Terminados" style="text-align: center"><%=  datalen[i].stock_bodega %></td>
         <td data-cs="0" class='col-rec parsear_nro' data-toggle="tooltip" data-placement="bottom" title="Externalizados" style="text-align: center"><%=  datalen[i]['e'] %></td>
         <td data-cs="0" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-7" style="text-align: center"><%= datalen[i].standby %></td>
         <% if(user === 'jefeprod' || user === 'gestionpl'){
