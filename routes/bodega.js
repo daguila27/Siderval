@@ -949,8 +949,10 @@ router.post('/act_gdd', function(req, res, next){
     req.getConnection(function (err,connection) {
         //Insertamos los valores de una GD
         let values = [[input.estado, new Date(), new Date() , input.obs,input.idcliente]];
+        console.log("values");
+        console.log(values);
         connection.query("UPDATE gd SET `last_mod` = CURRENT_TIMESTAMP,`estado`=?,`obs`=?,`idcliente` = ?  WHERE idgd = ?",
-            [input.estado, input.obs,input.idcliente, input.idgdd], function (err, results) {
+            [input.estado, input.obs,input.idcliente, input.idgd], function (err, results) {
             if(err) {throw err;}
             if (input.estado !== "Blanco") {
                 //ID ultima GD y lista vacia que contendra pedidos
@@ -1085,63 +1087,6 @@ router.post('/act_gdd', function(req, res, next){
             }
         });
     });
-    /*req.getConnection(function(err, connection){
-        if(err)
-            console.log("Error Selecting : %s", err);
-        var d_list = [];
-        console.log(Object.keys(input).length - 4);
-        console.log(input);
-        for(let i = 0; i < Object.keys(input).length - 4; i++){
-            console.log("idfab: " + input['list[' + i + '][]'][0]);
-            query2 += "WHEN material.idmaterial = "+ input['list[' + i + '][]'][1]
-                + " THEN material.stock " + ope+ " " + input['list[' + i + '][]'][2]+ " ";
-
-            if(input.estado == 'Venta'){
-                query += "WHEN idpedido = " + input['list[' + i + '][]'][0]
-                    + " THEN despachados " + ope2+ " " + input['list[' + i + '][]'][2]+ " ";
-                d_list.push([input.idgdd, input['list[' + i + '][]'][0], input['list[' + i + '][]'][1], input['list[' + i + '][]'][2]]);
-            } else {
-                d_list.push([input.idgdd,null, input['list[' + i + '][]'][1], input['list[' + i + '][]'][2]]);
-            }
-        }
-        query += 'ELSE despachados END where idpedido > 0';
-        query2 += 'ELSE stock END where idmaterial > 0';
-        connection.query("UPDATE gd SET `last_mod` = CURRENT_TIMESTAMP,`estado`=?,`obs`=?,`idcliente` = ?  WHERE idgd = ?",
-            [input.estado, input.obs,input.idcliente, input.idgdd], function(err, producciones){
-            if(err){
-                console.log("Error Selecting : %s", err);
-                res.send("Error");
-            } else {
-                if(input.estado != "Blanco" && Object.keys(input).length - 4){
-                    console.log("No es blanco!");
-                    connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?",[d_list],function(err,rows){
-                        if(err){
-                            console.log("Error Selecting : %s", err);
-                        }
-                        connection.query(query2, function(err, rows){
-                            if(err){
-                                console.log("Error Selecting : %s", err);
-                            }
-                            if(input.estado == 'Venta'){
-                                connection.query(query, function(err, rows){
-                                    if(err){
-                                        console.log("Error Selecting : %s", err);
-                                    }
-                                    res.redirect('/bodega/crear_gdd');
-                                });
-                            } else {
-                                res.redirect('/bodega/crear_gdd');
-
-                            }
-                        });
-                    });
-                } else{
-                    console.log("es blanco!");
-                    res.redirect('/bodega/crear_gdd');
-                }
-            }
-        });
-    });*/
 });
 
 router.post('/anular_gdd', function(req, res, next){

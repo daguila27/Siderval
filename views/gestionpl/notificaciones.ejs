@@ -49,7 +49,7 @@ if(notif[u].externo){%>
                             <em><%= hora%></em>
                             </span>
         </div>
-        <div>(EXTERNO)Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
+        <div>Se notificó un Rechazo en  <%= notif[u].nombre_etapa%> desde una Producción Externalizada correspondiente a <%= desc[2]%> unidades de <%=notif[u].detalle%> con el siguiente adjunto:
             <div class="well">
                 <% if(desc[6] != ''){ %>
                     <%= translate(desc[6])%>
