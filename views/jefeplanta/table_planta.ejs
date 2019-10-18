@@ -83,24 +83,29 @@ function fechaEspañol(date){
 
 <table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-top: 0px !important;">
     <thead>
-    <tr>
-        <th id="cab-numof">OF</th>
-        <th id="cab-numitem">Item</th>
-        <th id="cab-cliente">Cliente</th>
-        <th id="cab-descrip">Descripción</th>
-        <th id="cab-subal">Aleación</th>
-        <th id="cab-pesoxproducir" style="text-align: center;">Peso unitario</th>
-        <th id="cab-solicitados">Solicitados</th>
-        <th id="cab-sin_produccion">Por Despachar</th>
-        <th id="cab-fundidos">Fundidos</th>
-        <th id="cab-xfusion">Por Fundir</th>
-        <th id="cab-pesoxfusion">Peso x Fundir</th>
-        <th id="cab-en_produccion">En Producción</th>
-        <th id="cab-peso" style="text-align: center;">Peso x Despachar</th>
-        <th id="cab-pesototal" style="text-align: center;">Peso Despachado</th>
-        <th id="cab-stock" style="text-align: center;">Stock</th>
-        <th id="cab-f_entrega" style="text-align: center;">Fecha de Entrega</th>
-    </tr>
+        <tr>
+            <th rowspan="2" id="cab-numof">OF</th>
+            <th rowspan="2" id="cab-numitem">Item</th>
+            <th rowspan="2" id="cab-cliente">Cliente</th>
+            <th rowspan="2" id="cab-descrip">Descripción</th>
+            <th rowspan="2" id="cab-subal">Aleación</th>
+            <th colspan="4" style="text-align: center">Cantidad</th>
+            <th colspan="5" style="text-align: center">Peso</th>
+            <th rowspan="2" id="cab-stock" style="text-align: center;">Stock</th>
+            <th rowspan="2" id="cab-f_entrega" style="text-align: center;">Fecha de Entrega</th>
+        </tr>
+        <tr>
+            <th id="cab-solicitados">Solicitada</th>
+            <th id="cab-sin_produccion">Sin Despachar</th>
+            <th id="cab-fundidos">Fundida</th>
+            <th id="cab-xfusion">Por Fundir</th>
+
+            <th id="cab-pesoxproducir" style="text-align: center;">Unitario</th>
+            <th id="cab-pesoxfusion">Por Fundir</th>
+            <th id="cab-en_produccion">En Producción</th>
+            <th id="cab-peso" style="text-align: center;">Por Despachar</th>
+            <th id="cab-pesototal" style="text-align: center;">Despachado</th>
+        </tr>
     </thead>
     <tbody>
     <%
@@ -117,11 +122,11 @@ function fechaEspañol(date){
         <td data-toggle="tooltip" title="OF" class="numof" data-order="<%=data[i].idordenfabricacion%>">
             <%if(!data[i].externo){%>
                 <a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
-                    <%=data[i].idordenfabricacion%>
+                    <%= data[i].idordenfabricacion%>
                 </a>
             <%}else{%>
                     <a onclick="submit_form(this)" data-idodc="<%= data[i].idordenfabricacion%>" class="btn btn-xs btn-primary">
-                        <%=data[i].idordenfabricacion%>
+                        <%= data[i].idordenfabricacion%>
                     </a>
             <%}%>
         </td>
@@ -143,8 +148,8 @@ function fechaEspañol(date){
         <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
         <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion" class="checkFunction sin_produccion parsear_nro" data-cs="0" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
         <td data-toggle="tooltip" title="Fundidos Totales" data-name = "fundidos" class="checkFunction fundidos parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].fundidos%>"><%= data[i].fundidos%></td>
-        <td data-toggle="tooltip" title="Por Fundir" data-name = "xfusion" class="checkFunction xfusion parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%=data[i].solicitados - data[i].fundidos%>"><%=data[i].solicitados - data[i].fundidos%></td>
-        <td data-toggle="tooltip" title="Peso Por Fundir" data-name = "pesoxfusion" class="checkFunction pesoxfusion parsear_nro" data-cs="2" style="text-align: center;" data-valor="<%= (data[i].solicitados - data[i].fundidos)*data[i].peso%>"><%= (data[i].solicitados - data[i].fundidos)*data[i].peso%></td>
+        <td data-toggle="tooltip" title="Por Fundir" data-name = "xfusion" class="checkFunction xfusion parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%=Math.max(data[i].solicitados - data[i].fundidos, 0)%>"><%= Math.max(data[i].solicitados - data[i].fundidos, 0)%></td>
+        <td data-toggle="tooltip" title="Peso Por Fundir" data-name = "pesoxfusion" class="checkFunction pesoxfusion parsear_nro" data-cs="2" style="text-align: center;" data-valor="<%= (Math.max(data[i].solicitados - data[i].fundidos, 0))*data[i].peso%>"><%= (Math.max(data[i].solicitados - data[i].fundidos, 0))*data[i].peso%></td>
         <td data-toggle="tooltip" title="En Producción" data-name = "en_produccion" class="checkFunction en_produccion parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
         <td data-toggle="tooltip" title="Peso x Despachar" data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;"  data-cs="1" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
         <td data-toggle="tooltip" title="Peso Despachado" data-name= "pesototal" class="checkFunction pesototal parsear_nro"  data-cs="2" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
@@ -177,7 +182,7 @@ function fechaEspañol(date){
     </tfoot>
 </table>
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js"></script>
+<script src="/parsear_nro.js"></script>
 
 <script type="text/javascript">
     function parsear_nro(x, cs){

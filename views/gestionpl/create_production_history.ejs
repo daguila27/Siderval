@@ -12,7 +12,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-default" id="prod_info" style="background-color: rgb(124,123,173); display: flex">
-                        <strong style="color: white; width: 70%; font-size: 15px; margin-top: 15px" id="prod_nombre" data-idmat="">Inserto 23023</strong><small class="pull-right" id="sig_etapa" style="color: white; width:30%"> Siguiente Etapa: Quiebre</small>
+                        <strong style="color: white; width: 70%; font-size: 15px; margin-top: 15px" id="prod_nombre" data-idmat="">Inserto 23023</strong>
+                        <small class="pull-right" id="sig_etapa" style="color: white; width:50%"> Siguiente Etapa: Quiebre</small>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-2" for="email">Procesados:</label>
@@ -694,7 +695,7 @@
                             <td data-valor="" data-netapa="tra" data-etapa="5" data-cs="0" onclick="col_movh(this)" class="col-proceso col-tra parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Tratamiento térmico" id="prod<%=datalen[i].idproduccion%>-5"><%= datalen[i]['5'] %></td>
                             <td data-valor="" data-netapa="mae" data-etapa="6" data-cs="0" onclick="col_movh(this)" class="col-proceso col-mae parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Maestranza" id="prod<%=datalen[i].idproduccion%>-6"><%= datalen[i]['6'] %></td>
                             <td data-valor="" data-netapa="con" data-etapa="7" data-cs="0" onclick="col_movh(this)" class="col-proceso col-con parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Control de Calidad" id="prod<%=datalen[i].idproduccion%>-7"><%= datalen[i]['7'] %></td>
-                            <td data-valor="" data-netapa="ext" data-etapa="e" data-cs="0" onclick="col_movh(this)" style="text-align: center;" class="col-proceso col-ext parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Externalizados" id="prod<%=datalen[i].idproduccion%>-e"><%= datalen[i]['e'] %></td>
+                            <td data-valor="" data-netapa="ext" data-etapa="e" data-cs="0" style="text-align: center;" class="col-ext parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Externalizados" id="prod<%=datalen[i].idproduccion%>-e"><%= datalen[i]['e'] %></td>
                             <td data-valor="" data-netapa="rec" data-etapa="s" data-cs="0" style="text-align: center;" class="col-rec parsear_nro" data-toggle="tooltip" data-placement="bottom" title="Rechazados" id="prod<%=datalen[i].idproduccion%>-s"><%= datalen[i].standby %></td>
                             <td data-cs="0" style="text-align: center;" class="col-proceso col-rut" data-cant="<%= %>" data-ruta="<%= datalen[i].ruta%>" data-toggle="tooltip" data-placement="bottom" title="Ruta de Producción" onclick="verRuta(this)"><button class="btn btn-xs btn-primary">Ver Ruta</button></td>
                         </tr>
@@ -878,7 +879,7 @@
                 "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)' required></td>" +
                 "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
-                "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove(); act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
                 "</td></tr>";
 
 
