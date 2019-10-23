@@ -321,23 +321,6 @@
         $(".render-form input#tipo").val($(yo).data('tipo'));
         $(".render-form").submit();
 
-
-        /*$(".active").removeClass('active');
-        $(yo).addClass('active');
-        $.ajax({
-            type: 'GET',
-            url: $(yo).data('link'),
-            beforeSend: function(){
-                destroyDataTable();
-                $("#page-wrapper").css('display', 'none');
-                $("#page-wrapper").data('view', $(yo).data('link'));
-            },
-            success: function(data){
-                $("#page-wrapper").html(data);
-                $("#page-wrapper").fadeIn();
-
-            }
-        });*/
     }
     var io = io();
 
@@ -349,7 +332,7 @@
 
     $.ajax({
         type: 'GET',
-        url: 'gestionpl/render_notificaciones',
+        url: '/gestionpl/render_notificaciones',
         success: function(data){
             $(".notificaciones").html(data);
         }

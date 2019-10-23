@@ -228,23 +228,6 @@
         $(".render-form input#route").val(l);
         $(".render-form input#tipo").val($(yo).data('tipo'));
         $(".render-form").submit();
-
-        /*$(".active").removeClass('active');
-        $(yo).addClass('active');
-        $.ajax({
-            type: 'GET',
-            url: $(yo).data('link'),
-            beforeSend: function(){
-                destroyDataTable();
-                $("#page-wrapper").css('display', 'none');
-                close_menu();
-            },
-            success: function(data){
-                $("#page-wrapper").html(data);
-                $("#page-wrapper").fadeIn();
-
-            }
-        });*/
     }
     /*$(document).ready(function(){
         $.ajax({
