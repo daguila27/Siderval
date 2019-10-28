@@ -1,0 +1,355 @@
+<%
+function trunc (x, posiciones = 0) {
+    var s = x.toString()
+    var l = s.length
+    if(s.indexOf('.') == -1){
+        return x;
+    }
+    else{
+        var decimalLength = s.indexOf('.') + 1;
+        var numStr = s.substr(0, decimalLength + posiciones);
+        return Number(numStr);
+    }
+
+}
+function numberFormat(numero){
+    var resultado = "";
+    if(numero[0]=="-")
+    {
+        nuevoNumero=numero.replace(/\./g,'').substring(1);
+    }else{
+        nuevoNumero=numero.replace(/\./g,'');
+    }
+    if(numero.indexOf(",")>=0)
+        nuevoNumero=nuevoNumero.substring(0,nuevoNumero.indexOf(","));
+
+    for (var j, i = nuevoNumero.length - 1, j = 0; i >= 0; i--, j++)
+        resultado = nuevoNumero.charAt(i) + ((j > 0) && (j % 3 == 0)? ".": "") + resultado;
+    if(numero.indexOf(",")>=0)
+        resultado+=numero.substring(numero.indexOf(","));
+    if(numero[0]=="-")
+    {
+        return "-"+resultado;
+    }else{
+        return resultado;
+    }
+}
+%>
+
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js" type="text/javascript"></script>
+<div class="ventana" style="margin: 0; padding: 0; overflow: hidden;">
+    <%
+    if(semi.length>0){
+        var clase;
+        var tip_i = [];
+        var tip_s = [];
+        var tip_m = [];
+        if(semi[0].idm_token){
+            semi[0].cod_token = semi[0].cod_token.split('@');
+            semi[0].d_token = semi[0].d_token.split('@');
+            semi[0].c_token = semi[0].c_token.split('@');
+            semi[0].s_token = semi[0].s_token.split('@');
+            semi[0].sc_token = semi[0].sc_token.split('@');
+            semi[0].si_token = semi[0].si_token.split('@');
+            semi[0].p_token = semi[0].p_token.split('@');
+            semi[0].u_token = semi[0].u_token.split('@');
+            semi[0].idm_token = semi[0].idm_token.split('@');
+            for(var n=0; n < semi[0].d_token.length; n++){
+                if(semi[0].cod_token[n].substring(0,1) === 'I'){
+                    tip_i.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
+                }
+                else if(semi[0].cod_token[n].substring(0,1) === 'S'){
+                    tip_s.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
+                }
+                else if(semi[0].cod_token[n].substring(0,1) === 'M'){
+                    tip_m.push([semi[0].cod_token[n],semi[0].d_token[n],semi[0].u_token[n],semi[0].c_token[n],semi[0].p_token[n],semi[0].s_token[n],semi[0].idm_token[n]]);
+                }
+            }
+        }%>
+    <h3 style="margin-bottom: 35px; margin-left: 5%;">
+        <%= semi[0].detalle.substring(0,1).toUpperCase() + semi[0].detalle.substring(1,semi[0].detalle.length).toLowerCase()%>
+        <small><%= cmsj%></small>
+    </h3>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#insfin">Insumos</a></li>
+        <li><a data-toggle="tab" href="#semfin">Semi Elaborados</a></li>
+        <li><a data-toggle="tab" href="#matfin">Materias Primas</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="insfin" class="tab-pane fade in active">
+            <table id="insumosTableFin" style="margin: 10px 0px" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descripcion</th>
+                    <th>Unidad</th>
+                    <th>Cantidad</th>
+                    <% if(add){%>
+                        <th>Total</th>
+                    <%}%>
+                    <th>Costo</th>
+                    <th>Stock</th>
+                    <% if(add){%>
+                        <th></th>
+                    <%}%>
+                </tr>
+                </thead>
+                <tbody>
+                <%for(var e=0; e < tip_i.length; e++){%>
+                    <tr>
+                        <td><%= tip_i[e][0]%></td>
+                        <td><%= tip_i[e][1]%></td>
+                        <td><%= tip_i[e][2]%></td>
+                        <td class="parsear_nro" data-cs="2"><%= tip_i[e][3]%></td>
+                        <%if(add){
+                            console.log(tip_i[e][3]*csol);%>
+                        <td class="parsear_nro" data-cs="2"><%= tip_i[e][3]*csol%></td>
+                        <%}%>
+                        <td class="parsear_nro" data-cs="0"><%= tip_i[e][4]%></td>
+                        <td class="parsear_nro" data-cs="2"><%= tip_i[e][5]%></td>
+                        <%if(add){%>
+                            <td style="text-align: center"><button class="btn btn-xs btn-success" data-cant="<%= tip_i[e][3]*csol%>" data-idm="<%= tip_i[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+                        <%}%>
+                    </tr>
+                <%}%>
+
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <%if(add){%>
+                        <td></td>
+                    <%}%>
+                    <td></td>
+                    <td></td>
+                    <%if(add){%>
+                        <td></td>
+                    <%}%>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div id="semfin" class="tab-pane fade">
+            <table id="semiTableFin" style="margin: 10px 0px" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descripcion</th>
+                    <th>Unidad</th>
+                    <th>Cantidad</th>
+                    <% if(add){%>
+                        <th>Total</th>
+                    <%}%>
+                    <th>Costo</th>
+                    <th>Stock</th>
+                    <%if(add){%>
+                        <th></th>
+                    <%}%>
+                </tr>
+                </thead>
+                <tbody>
+                <%for(var e=0; e < tip_s.length; e++){%>
+                    <tr>
+                        <td><%= tip_s[e][0]%></td>
+                        <td><%= tip_s[e][1]%></td>
+                        <td><%= tip_s[e][2]%></td>
+                        <td class="parsear_nro" data-cs="2"><%= tip_s[e][3]%></td>
+                        <%if(add){%>
+                            <td class="parsear_nro" data-cs="2"><%= tip_s[e][3]*csol%></td>
+                        <%}%>
+                        <td class="parsear_nro" data-cs="0"><%= tip_s[e][4]%></td>
+                        <td class="parsear_nro" data-cs="2"><%= tip_s[e][5]%></td>
+                        <%if(add){%>
+                            <td style="text-align: center"><button class="btn btn-xs btn-success" data-cant="<%= tip_s[e][3]*csol%>" data-idm="<%= tip_s[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+                        <%}%>
+                    </tr>
+                <%}%>
+
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <%if(add){%>
+                        <td></td>
+                    <%}%>
+                    <td></td>
+                    <td></td>
+                    <%if(add){%>
+                        <td></td>
+                    <%}%>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div id="matfin" class="tab-pane fade">
+            <table id="mateTableFin" style="margin: 10px 0px" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Descripcion</th>
+                    <th>Unidad</th>
+                    <th>Cantidad</th>
+                    <% if(add){%>
+                        <th>Total</th>
+                    <%}%>
+                    <th>Costo</th>
+                    <th>Stock</th>
+                    <%if(add){%>
+                        <th></th>
+                    <%}%>
+                </tr>
+                </thead>
+                <tbody>
+                <%for(var e=0; e < tip_m.length; e++){%>
+                    <tr>
+                        <td><%= tip_m[e][0]%></td>
+                        <td><%= tip_m[e][1]%></td>
+                        <td><%= tip_m[e][2]%></td>
+                        <td class="parsear_nro" data-cs="2"><%= tip_m[e][3]%></td>
+                        <%if(add){%>
+                            <td class="parsear_nro" data-cs="2"><%= tip_m[e][3]*csol%></td>
+                        <%}%>
+                        <td class="parsear_nro" data-cs="0"><%= tip_m[e][4]%></td>
+                        <td class="parsear_nro" data-cs="2"><%= tip_m[e][5]%></td>
+                        <%if(add){%>
+                            <td style="text-align: center"><button class="btn btn-xs btn-success" data-cant="<%= tip_m[e][3]*csol%>" data-idm="<%= tip_m[e][6]%>" onclick="add_prefabr(this)"><i class="fa fa-plus"></i></button></td>
+                        <%}%>
+                    </tr>
+                <%}%>
+
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <%if(add){%>
+                        <td></td>
+                    <%}%>
+                    <td></td>
+                    <td></td>
+                    <%if(add){%>
+                        <td></td>
+                    <%}%>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <%}
+    else{%>
+        <h2 style="text-align: center;">No existe B.O.M.</h2>
+    <%}%>
+</div>
+
+<script type="text/javascript">
+
+    $("#insumosTableFin").DataTable({
+        paging: false,
+        fixedColumns: true,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+
+    $("#semiTableFin").DataTable({
+        paging: false,
+        fixedColumns: true,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+
+
+    $("#mateTableFin").DataTable({
+        paging: false,
+        fixedColumns: true,
+        lengthChange: false,
+        bFilter: false,
+        bInfo: false,
+        order: [],
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+
+    $(document).ready(function(){
+        if(parseInt($(".ventana").css('height').substring(0,$(".ventana").css('height').length-2 ) )> screen.height*(0.61) ){
+            $(".ventana").css('height', screen.height*(0.61));
+            $(".ventana").css('overflow-y','scroll');
+
+        }
+    });
+</script>

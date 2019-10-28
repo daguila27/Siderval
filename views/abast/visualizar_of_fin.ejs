@@ -42,7 +42,7 @@ function setZeros(str){
         <%}else{%>
             <td style="text-align: center">Interna</td>
         <%}%>
-        <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" data-cant="<%= of[e].restantes%>" onclick="renderBOM(this)"><i class="fa fa-eye"></i></button></td>
+        <td style="text-align: center"><button class="btn btn-xs btn-primary" data-idmat="<%= of[e].idmaterial%>" data-cant="<%= of[e].cantidad%>" onclick="renderBOMFin(this)"><i class="fa fa-eye"></i></button></td>
         <td style="text-align: center" class="btn-group">
             <button class="btn btn-xs btn-success" onclick="obtener_pdf(<%= of[e].idordenfabricacion%>, this)"><i class="fa fa-file-pdf-o"></i></button>
             <!--<button class="btn btn-xs btn-danger" data-idmat="<%= of[e].idmaterial%>"><i class="fa fa-remove"></i></button>-->
@@ -61,7 +61,7 @@ function setZeros(str){
     </tr>-->
     </tfoot>
 </table>
-<div id="visorInsumos" class="modal fade" role="dialog">
+<div id="visorInsumosFin" class="modal fade" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
@@ -70,7 +70,7 @@ function setZeros(str){
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Bill Of Materials</h4>
             </div>
-            <div class="modal-body" id="modalbody-bom">
+            <div class="modal-body" id="modalbody-bomfin">
 
             </div>
             <div class="modal-footer">
@@ -127,14 +127,14 @@ function setZeros(str){
             }
         })
     }
-    function renderBOM(yo){
+    function renderBOMFin(yo){
         $.ajax({
             type: 'POST',
-            data: {idmaterial: $(yo).data('idmat'), addOCA: true, cant: $(yo).data('cant')},
+            data: {idmaterial: $(yo).data('idmat'), addOCA: true, cant: $(yo).data('cant'), view: true},
             url: '/abastecimiento/data_bom',
             success: function(data){
-                $("#modalbody-bom").html(data);
-                $("#visorInsumos").modal("show");
+                $("#modalbody-bomfin").html(data);
+                $("#visorInsumosFin").modal("show");
             }
         });
     }

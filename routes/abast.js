@@ -380,11 +380,13 @@ router.get('/bom_mat_uni', function(req, res, next) {
     }
 	else{res.redirect('bad_login');}	
 });
-
 router.post('/data_bom', function(req, res, next) {
 	if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         console.log(input);
+        if(!input.view){
+        	input.view = false;
+		}
         var adjuntar;
         if(input.addOCA){
         	adjuntar = input.addOCA;
@@ -412,7 +414,7 @@ router.post('/data_bom', function(req, res, next) {
 								if(err)
 									console.log("Error Selecting : %s", err);
 
-								if(semi.length == 0){
+								if(semi.length === 0){
 									console.log("SIN BOM");
 								}
 	        	                console.log("if");
@@ -433,7 +435,12 @@ router.post('/data_bom', function(req, res, next) {
 									console.log("SIN BOM");
 								}
 								console.log("else");
-	        	                res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar, cmsj:cmsj, csol: parseInt(input.cant)});
+								if(input.view){
+                                    res.render('abast/bom_mat_uni_fin', {data: [], semi: semi, add: adjuntar, cmsj:cmsj, csol: parseInt(input.cant)});
+								}
+								else{
+                                    res.render('abast/bom_mat_uni', {data: [], semi: semi, add: adjuntar, cmsj:cmsj, csol: parseInt(input.cant)});
+                                }
 				});
 			}
 
