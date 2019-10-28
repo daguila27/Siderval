@@ -507,7 +507,6 @@
       });
       }
   });*/
-
   function renderInsumos(idof){
    //alert("AJAX");
    $.ajax({
@@ -524,13 +523,10 @@
      }
    });
   }
-
    function selectCC(yo){
       //alert($(yo).parent('td').children('input').val());
       $("#auxCC").val($(yo).parent('td').children('input').attr('id'));
    }
-
-
    function saveState(plantilla){
        var lista = $("#send_of").serializeArray();
        var data = {
@@ -576,7 +572,6 @@
        });
 
    }
-
    function loadState(plantilla){
         /*
         * EL CONTROLADOR ACEPTA plantilla (booleano que indica si se esta cargando un plantilla o no)
