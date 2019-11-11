@@ -158,7 +158,7 @@
                     Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/gestionpl/create_production_history">
+                    <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Registro Diario de Movimientos" data-link="/gestionpl/create_production_history">
                         <a class="oe_menu_leaf">
                              <span class="oe_menu_text">
                                  Registrar Movimientos Diarios
@@ -170,28 +170,28 @@
                     Despachos
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_gdd" id="view_movimientos">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Crear GDD" data-link="/bodega/crear_gdd" id="view_movimientos">
                         <a class="oe_menu_leaf active">
                                             <span class="oe_menu_text">
                                                 Crear Guía de Despacho
                                             </span>
                         </a>
                     </li>
-                    <li  onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_despachos">
+                    <li  onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Ver Despachos" data-link="/bodega/view_despachos">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Ver Guías
                                             </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_recepcion">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Crear Recepción" data-link="/bodega/crear_recepcion">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Recepcionar Externalizados
                                             </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_externo">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Ver Externalizados" data-link="/bodega/view_externo">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Ver Externalizados
@@ -203,14 +203,14 @@
                     Stock
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_bodega">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Ver Stock de Productos" data-link="/bodega/view_bodega">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Productos
                                             </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_pendientes">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Packing List" data-link="/bodega/view_pendientes">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Packing List
@@ -223,18 +223,26 @@
                     Orden de Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/crear_op">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Crear OP" data-link="/jefeprod/crear_op">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                              Crear OP
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/view_producciones">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Ver Producciones" data-link="/jefeprod/view_producciones">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Ver Todas
                                         </span>
+                        </a>
+                    </li>
+
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Jefe de Planta - Registros Diarios" data-link="/jefeplanta/view_fusion">
+                        <a class="oe_menu_leaf">
+                                <span class="oe_menu_text">
+                                    Registros Diarios
+                                </span>
                         </a>
                     </li>
                 </ul>

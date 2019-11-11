@@ -1,12 +1,5 @@
 <%
-function fechaLatino(string){
-    if(string.split('-').length == 3){
-        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
-    }
-    else{
-        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
-    }
-}
+
 var etp = [
     "Moldes",
     "Fundidos",
@@ -26,6 +19,36 @@ var etp_f = [
     "Maestranza",
     "CC"
 ];
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+
+//SE USA rech QUE ENTREGA EL CONTROLADOR
+function postRechazados(idprod, etp, ruta, rechazados){
+    ruta = ruta.split(',');
+    idprod = idprod.toString();
+    var sum = 0;
+    var msg = '';
+    //OBTIENE EL OBJETO CON LA LLAVE idprod Y LO RECORRE
+    if(rechazados[idprod]){
+        for(var t=0; t < Object.keys(rechazados[idprod]).length; t++ ){
+            if( ruta.indexOf(etp.toString()) < ruta.indexOf(Object.keys(rechazados[idprod])[t].toString()) ){
+                sum += rechazados[idprod][Object.keys(rechazados[idprod])[t]];
+                msg += rechazados[idprod][Object.keys(rechazados[idprod])[t]]+" rechazados en "+ etp_f[Object.keys(rechazados[idprod])[t]] +"\n";
+            }
+        }
+    }
+
+    if(msg === ''){msg = "No hay Rechazos posteriores";}
+
+    return [sum, msg];
+}
+
 
 
 function fechaEspañol(date){
@@ -90,6 +113,7 @@ function fechaEspañol(date){
         <th><%= etp[parseInt(etapa)-1]%></th>
         <th>Peso Pieza (kg)</th>
         <th>Peso (kg)</th>
+        <th>Rechazados <br> Posteriormente</th>
         <th>Fecha <%= etp_f[parseInt(etapa)-1]%></th>
         <% if(user === 'dt'){%>
             <th></th>
@@ -103,8 +127,9 @@ function fechaEspañol(date){
     <%
     var kilos_totales = 0;
     var piezas_totales = 0;
+    var aux = [];
     for(var i=0; i < data.length; i++){%>
-        <tr class="o_data_row select-desp" data-state="nosele">
+        <tr class="o_data_row select-desp" id="trProd<%= data[i].idproduccion_history%>" data-state="nosele">
             <td><%= data[i].idorden_f%></td>
             <td><%= data[i].numoc%></td>
             <td><%= data[i].sigla%></td>
@@ -112,8 +137,11 @@ function fechaEspañol(date){
             <td class="parsear_nro body_p" data-cs="0" data-val="<%= data[i].enviados%>" style="text-align: center;"><%= data[i].enviados%></td>
             <td class="parsear_nro" data-cs="1" style="text-align: center;"><%= data[i].peso%></td>
             <% kilos_totales += (data[i].peso*data[i].enviados);
-               piezas_totales += data[i].enviados;%>
+               piezas_totales += data[i].enviados;
+                aux = postRechazados(data[i].idproduccion, etapa, data[i].ruta, rech);
+            %>
             <td class="parsear_nro body_k" data-cs="0" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
+            <td class="parsear_nro rech_td" data-cs="0" data-val="" style="text-align: center;" data-toggle="tooltip" title="<%=aux[1]%>"><%= aux[0]%></td>
             <td style="text-align: left" data-order="<%= new Date(data[i].mov_fecha).getTime()%>"><%= fechaEspañol(data[i].mov_fecha)%></td>
             <% if(user === 'dt'){%>
                 <td class="nfecha"><input type="date"></td>
@@ -137,6 +165,7 @@ function fechaEspañol(date){
             <td id="footer_pt" class="parsear_nro" data-cs="0" style="text-align: center"><%= piezas_totales%></td>
             <td></td>
             <td id="footer_kt" class="parsear_nro" data-cs="0" style="text-align: center"><%= kilos_totales%></td>
+            <td></td>
             <td></td>
             <% if(user === 'dt'){%>
                 <td></td>

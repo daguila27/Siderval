@@ -67,7 +67,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
     return [where, limit];
 }
 function verificar(usr){
-    if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'dt' || usr.nombre === 'plan'){
+    if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'dt' || usr.nombre === 'plan' || usr.nombre === 'gestionpl'){
         return true;
     }else{
         return false;
@@ -290,7 +290,7 @@ router.get('/view_despachositem/:tab', function(req, res, next){
 * */
 router.get('/view_fusion', function(req, res, next){
     if(verificar(req.session.userData)){
-        res.render('jefeplanta/view_fusion');
+        res.render('jefeplanta/view_fusion', {username: req.session.userData.nombre});
     }
     else{res.redirect('bad_login');}
 });
@@ -341,20 +341,48 @@ router.post('/table_fusion/:idetapa', function(req, res, next){
                     "material.detalle, material.peso, " +
                     "produccion_history.*, produccion_history.fecha as mov_fecha,coalesce(odc.numoc, 'Producción para Stock') as numoc, " +
                     "fabricaciones.idorden_f, " +
-                    "coalesce(cliente.sigla, 'SIDERVAL') as sigla, cliente.razon " +
+                    "coalesce(cliente.sigla, 'SIDERVAL') as sigla, cliente.razon, producido.ruta " +
                     "from produccion_history " +
                     "left join produccion on produccion.idproduccion = produccion_history.idproduccion " +
                     "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
                     "left join material on material.idmaterial = fabricaciones.idmaterial " +
+                    "left join producido on material.idmaterial = producido.idmaterial " +
                     "left join pedido on pedido.idpedido = fabricaciones.idpedido " +
                     "left join odc on odc.idodc = pedido.idodc " +
                     "left join cliente on cliente.idcliente = odc.idcliente "+where + limit;
                 connection.query(consulta,
                     function(err, fund){
                         if(err) throw err;
+                        connection.query("SELECT " +
+                            "produccion_history.idproduccion," +
+                            "produccion_history.from AS desde, " +
+                            "etapafaena.nombre_etapa AS etapa, " +
+                            "SUM(COALESCE(produccion_history.enviados, 0)) AS rechazados " +
+                            "FROM produccion_history " +
+                            "LEFT JOIN etapafaena ON etapafaena.value = produccion_history.from " +
+                            "WHERE produccion_history.to = 's' " +
+                            "GROUP BY concat(produccion_history.idproduccion,'.',produccion_history.from)", function(err, rech){
+                            if(err) throw err;
 
-                        res.render('jefeplanta/table_fusion', {data: fund, etapa: idetapa, user: req.session.userData.nombre});
+                            //OBJETO CON LLAVE idproduccion {idproduccion: { ... }, ... }
+                            //Y CONTIENE OTRO OBJECTO {etapa: rechazados, ..., msg: 'Detalle de Cantidades Rechazadas' }
+                            var rechObj = {};
+                            for(var e=0; e < rech.length; e++){
+                                //COMPRUEBA SI EXISTE LA LLAVE rech[e].idproduccion
+                                if(Object.keys(rechObj).indexOf(rech[e].idproduccion) === -1){
+                                    rechObj[rech[e].idproduccion] = {msg: ''};
+                                }
 
+                                //COMPRUEBA SI EXISTE LA LLAVE rech[e].desde (etapa.value)
+                                if(Object.keys(rechObj[rech[e].idproduccion]).indexOf(rech[e].desde) === -1){
+                                    rechObj[rech[e].idproduccion][rech[e].desde.toString()] = 0;
+                                }
+
+                                rechObj[rech[e].idproduccion][rech[e].desde.toString()] += rech[e].rechazados;
+                                rechObj[rech[e].idproduccion]['msg'] += rech[e].rechazados + ' Rechazados en ' + rech[e].etapa;
+                            }
+                            res.render('jefeplanta/table_fusion', {data: fund, etapa: idetapa, rech: rechObj, user: req.session.userData.nombre});
+                        });
                 });
         });
     }

@@ -260,12 +260,26 @@ router.get('/create_production_history', function(req, res, next){
             +"  LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial LEFT JOIN producido ON producido.idmaterial = material.idmaterial WHERE produccion.`8` + produccion.standby != produccion.cantidad GROUP BY material.idmaterial) AS table_prod"
             +" GROUP BY table_prod.idmaterial";
 
+
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connection: %s", err);}
             connection.query(query, function(err, prods){
                 if(err){console.log("Error Selecting: %s", err);}
 
-                res.render('gestionpl/create_production_history', {datalen: prods});
+                //OBTIENE TODOS LOS despachos CON GDD ESTADO Servicios QUE AUN NO SE HAYAN ENLAZADO
+                connection.query("SELECT " +
+                    "material.idmaterial," +
+                    "material.detalle," +
+                    "despachos.* " +
+                    "FROM despachos " +
+                    "LEFT JOIN gd ON gd.idgd = despachos.idgd " +
+                    "LEFT JOIN material ON material.idmaterial = despachos.idmaterial " +
+                    "LEFT JOIN (SELECT idgd, COALESCE(sum(enviados),0) AS despachados FROM produccion_history GROUP BY idgd) AS prod_gd ON prod_gd.idgd = gd.idgd " +
+                    "WHERE gd.estado = 'Servicio' AND COALESCE(prod_gd.despachados,0) < despachos.cantidad", function(err, gdds){
+                    if(err){console.log("Error Selecting: %s", err);}
+
+                    res.render('gestionpl/create_production_history', {datalen: prods, gdds: gdds});
+                });
             });
         });
     }
@@ -372,7 +386,16 @@ function enviarNotificacionBodega(req, input){
     });
 }
 
-function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
+function recursive_save_ph(data, index, req){
+    console.log(data);
+    var idmat = data['idmat[]'][index];
+    var env = data['env[]'][index];
+    var from = data['from[]'][index];
+    var to = data['to[]'][index];
+    var obs= data['coment[]'][index];
+    var fecha = data['fecha[]'][index];
+    var iddesp = data['iddesp[]'][index];
+    console.log('function');
     if(conn){
         console.log("recursive_save_ph");
         var q = "select " +
@@ -392,6 +415,7 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                   sendnum: '91',
                   etapa_act: '1' };
             * */
+            if(iddesp.toString() === '0'){iddesp = null;}
             //EXT === 9
             if(to === '9'){to = 'e';}
             var input = {
@@ -399,7 +423,8 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                 cantprod: rows[0].cantprod,
                 newetapa: to,
                 sendnum: env,
-                etapa_act: from
+                etapa_act: from,
+                iddesp: iddesp
             };
             //jfp@109603@120@2019-6-25 16:19:58@22901-22864-22866@283@COMENTARIO@4
             //ENVIAR NOTIFICACIÓN
@@ -411,14 +436,16 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                     razon: obs,
                     etapa: from
                 };
-                enviarNotificacionRechazo(req, notif);
+                setTimeout(function(){ enviarNotificacionRechazo(req, notif); }, 666);
+
             }else if(to === '8'){
                 notif = {
                     idproduccion: rows[0].idprod,
                     cantidad: env,
                     key: 'fa8'
                 };
-                enviarNotificacionBodega(req, notif);
+                setTimeout(function(){ enviarNotificacionBodega(req, notif); }, 666);
+
             }
             /*
             * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
@@ -445,7 +472,8 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                     query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
                     if(input.newetapa === 's'){
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+input.cantprod[w];
-                    }else{
+                    }
+                    else{
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
                     }
 
@@ -453,7 +481,11 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                         if(fecha === '' || fecha === ' ' || !fecha || fecha === null || fecha === undefined ){
                             fecha = new Date();
                         }
-                        history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa, fecha]);
+                        else{
+                            fecha = new Date(fecha);
+                            fecha.setTime( fecha.getTime() + new Date().getTimezoneOffset()*60*1000 );
+                        }
+                        history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa, fecha, input.iddesp]);
                         prod_affected.push(input.idprod[w]);
                         //LA CANTIDAD TRASPASADA
                         env_affected.push(input.cantprod[w]);
@@ -465,14 +497,19 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                     query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
                     if(input.newetapa === 's'){
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+(cant_aux+parseInt(input.cantprod[w]));
-                    }else{
+                    }
+                    else{
                         query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
                     }
                     //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
                     if(fecha === '' || fecha === ' ' || !fecha || fecha === null || fecha === undefined ){
                         fecha = new Date();
                     }
-                    history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa, fecha]);
+                    else{
+                        fecha = new Date(fecha);
+                        fecha.setTime( fecha.getTime() + new Date().getTimezoneOffset()*60*1000 );
+                    }
+                    history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa, fecha, input.iddesp]);
                     prod_affected.push(input.idprod[w]);
                     //LA CANTIDAD TRASPASADA
                     env_affected.push(cant_aux+parseInt(input.cantprod[w]));
@@ -484,7 +521,8 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
             query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
             if(input.newetapa === 's'){
                 query2 += " ELSE produccion.`standby` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
-            }else{
+            }
+            else{
                 query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
             }
             conn.query(query ,function(err,upProd1){
@@ -493,7 +531,7 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                 conn.query(query2 ,function(err,upProd2){
                     if(err) {throw err;}
 
-                    conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`, `fecha`) VALUES ?",[history],function(err,insert_h){
+                    conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`, `fecha`,`idgd` ) VALUES ?",[history],function(err,insert_h){
                         if(err) {throw err;}
 
 
@@ -503,30 +541,57 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                                 cantidad: env_affected.join('-'),
                                 key: 'fae'
                             };
-                            enviarNotificacionExternalizacion(req, notif);
+                            setTimeout(function(){ enviarNotificacionExternalizacion(req, notif); }, 666);
+
                         }
+
+
+                        if(data['idmat[]'][++index]){
+                            recursive_save_ph(data, index, req);
+                        }else{
+                            return true;
+                        }
+
+
+
                     });
                 });
             });
-            setTimeout(function(){return true;}, 500);
         });
     }
 }
+
+
+
 function allMovFunction(input, req){
-    console.log(input);
     if(typeof input['idmat[]'] === 'string'){
-        recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]'], input['coment[]'], input["fecha[]"], req);
+        input = {
+            'idmat[]': [ input['idmat[]']  ],
+            'env[]': [  input['env[]'] ],
+            'to[]': [  input['to[]'] ],
+            'from[]': [  input['from[]']],
+            'coment[]': [  input['coment[]']],
+            'fecha[]': [  input['fecha[]'] ],
+            'iddesp[]': [  input['iddesp[]'] ]
+        };
     }
-    else{
-        for(var e=0; e < input['idmat[]'].length; e++){
-            recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e], input['coment[]'], input["fecha[]"][e], req);
-        }
-    }
+    recursive_save_ph(input, 0, req);
 }
 
 router.post('/save_production_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
+
+        /*
+        * {
+          'idmat[]': [ '110932', '110932', '110931' ],
+          'env[]': [ '4', '5', '1' ],
+          'to[]': [ '4', '7', '5' ],
+          'from[]': [ '3', '5', '7' ],
+          'coment[]': [ '', '', '' ],
+          'fecha[]': [ '2019-11-11', '2019-11-11', '2019-11-11' ],
+          'iddesp[]': [ '0', '0', '0' ] }
+        */
         allMovFunction(input, req);
         res.send("¡Movimiento Diario registrado con exito!");
     }

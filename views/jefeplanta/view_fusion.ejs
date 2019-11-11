@@ -41,6 +41,24 @@
     .filters{
         display: flex;
     }
+
+
+    .busc-din-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 90%;
+        transition:0.5s;
+        z-index: 9;
+    }
+    .busc-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 100%;
+        transition:0.5s;
+        z-index: 9;
+    }
 </style>
 
 <%
@@ -64,7 +82,12 @@ function getSunday(d) {
     <form class="form-inline" id="anuProdHistForm"></form>
 </div><!-- /.modal -->
 <div class="hidden tipovista listafusion"></div>
-<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%; z-index: 10;">
+
+<%
+var clase;
+if(username === 'gestionpl'){clase='busc-din-menu';}
+else{clase='busc-menu';}%>
+<div id="up-fills" class="row up-fills <%=clase%>">
     <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
         <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
             <li class="active" style="display: flex; vertical-align: middle">
