@@ -13,21 +13,38 @@
                 <div class="modal-body">
                     <div class="alert alert-default" id="prod_info" style="background-color: rgb(124,123,173); display: flex">
                         <strong style="color: white; width: 70%; font-size: 15px; margin-top: 15px" id="prod_nombre" data-idmat="">Inserto 23023</strong>
-                        <small class="pull-right" id="sig_etapa" style="color: white; width:50%"> Siguiente Etapa: Quiebre</small>
+                        <small class="pull-right" id="sig_etapa" style="color: white; width:50%">
+                            <label>
+                                Enviar a:
+                                <select class='form-control selectFormMov' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'></select>
+                            </label>
+                        </small>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group sendMov">
                         <label class="control-label col-sm-2" for="email">Procesados:</label>
                         <div>
                             <input type="number" class="form-control procesados-input" id="procesados" name="procesados" placeholder="Procesados">
-                            <label id="comentario-rechazo" for="" style="width: 100%;">
-                                Comentario:
-                                <textarea class="form-control" name="" id="comentarioMov" cols="20" rows="3"></textarea>
-                            </label>
                         </div>
                         <input type="hidden" id="idmaterial" name="idmaterial">
                         <input type="hidden" id="nom-etapa" name="nom-etapa">
                         <input type="hidden" id="nom-etapa-previus" name="nom-etapa-previus">
                         <input type="hidden" id="etapa-previus" name="etapa-previus">
+                    </div>
+                    <div class="form-group sendMovGDD">
+                        <label class="control-label" for="email" style="width: 100%">Guías de Despacho:</label>
+                        <div>
+                            <select class="form-control selectGDDForm">
+                                <%for(var e=0; e < gdds.length; e++){%>
+                                    <option value="<%= gdds[e].iddespacho%>" data-gd="<%= gdds[e].idgd%>" data-idmat="<%= gdds[e].idmaterial%>" data-cant="<%= gdds[e].cantidad%>">GDD <%= gdds[e].idgd%>: <%=gdds[e].detalle%> - <%= gdds[e].cantidad%> despachado(s).</option>
+                                <%}%>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="comentario-rechazo" for="" style="width: 100%;">
+                            Comentario:
+                            <textarea class="form-control" name="" id="comentarioMov" cols="20" rows="3"></textarea>
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -74,7 +91,6 @@
                }
            </style>
            <div class="modal-body" style="width: 100%;">
-
            </div>
            <div class="modal-footer">
                <button type="button" class="btn btn-default" onclick="$('#verRutaModal').modal('hide')" data-dismiss="modal">Cancelar</button>
@@ -101,7 +117,7 @@
         <li><a data-toggle="tab" data-etp="tra" href="#tra" data-etpval="4">Tratamiento<small></small></a></li>
         <li><a data-toggle="tab" data-etp="ter" href="#ter" data-etpval="5">Terminación<small></small></a></li>
         <li><a data-toggle="tab" data-etp="mae" href="#mae" data-etpval="6">Maestranza<small></small></a></li>
-        <li><a data-toggle="tab" data-etp="con" href="#con" data-etpval="7">Cc<small></small></a></li>
+        <li><a data-toggle="tab" data-etp="con" href="#con" data-etpval="7">Calidad<small></small></a></li>
         <li><a data-toggle="tab" data-etp="rec" href="#rec" data-etpval="s">Rechazo<small></small></a></li>
         <li><a data-toggle="tab" data-etp="ext" href="#ext" data-etpval="e">Externalizado<small></small></a></li>
     </ul>
@@ -733,6 +749,7 @@
 <script>
 
 
+    var selectGD = false;
     var etapas = [
         "Moldeo",
         "Fusión",
@@ -811,7 +828,6 @@
         }
         $("#verRutaModal .modal-body").html(html);
     }
-
     function col_movh(yo){
         var next;
         var previus;
@@ -837,20 +853,25 @@
             $('#prod_info').children('strong').data('idmat', $(yo).parent().data('idmat'));
             $("#etapa-previus").val($(yo).data('etapa'));
 
+
             if($(yo).data('etapa') === 1 || $(yo).data('etapa') === 8 || $(yo).data('etapa') === 'e') {
-                $('#prod_info').children('small').html("<label>Enviar a:     " +
-                    "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
+                $('#prod_info').children('small').children('label').children('select').html(
                     "<option value='"+next+"' selected>Siguiente : "+etapas[parseInt(next)-1]+"</option>" +
-                    "<option value='s'>Rechazo</option>" +
-                    "</select></label>");
-            }else{
-                $('#prod_info').children('small').html("<label>Enviar a:     " +
-                    "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
+                    "<option value='s'>Rechazo</option>"
+                );
+            }
+            else{
+                $('#prod_info').children('small').children('label').children('select').html(
                     "<option value='"+next+"' selected>Siguiente : "+etapas[parseInt(next)-1]+"</option>" +
                     "<option value='"+previus+"'>Previa : "+etapas[parseInt(previus)-1]+"</option>" +
-                    "<option value='s'>Rechazo</option>" +
-                    "</select></label>");
+                    "<option value='s'>Rechazo</option>"
+                );
             }
+
+
+            //SE MUESTRA EL FORMULARIO normal O DE gdd
+            if(next === 9){changeModalMovh(true,$(yo).parent().data('idmat'));}
+            else{changeModalMovh(false,null);}
 
             $("#nom-etapa").val($(yo).data('netapa'));
             $(".procesados-input").attr('max', parseInt($(yo).html()) )
@@ -859,41 +880,29 @@
 
         }
     }
+
+
+    $(".selectFormMov").change(function(){
+        if($(this).val() === '9'){changeModalMovh(true);}
+        else{changeModalMovh(false);}
+    });
     function changeDateValue(yo){
         $(yo).parent().data('valor', $(yo).val());
     }
-
     $("#prodhistForm").submit(function(e){
         e.preventDefault();
+
         var array = $(this).serializeArray();
         var html;
         var c = 0;
-        //SI LA ETAPA SELECCIONADA ES RECHAZO
-        if($('#prod_info > small > label > select').val() === 's'){
+        //SI SE HA SELECCIONADO UNA GDD
+        if(selectGD){
             html = "<tr>" +
+                "<td class='hidden' data-name='iddesp' data-valor='"+$(".selectGDDForm").val()+"'></td>" +
                 "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
-                "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
-                "<td style='text-align: center' data-name='to' data-valor='s'>" +
-                 etapas[parseInt($("#etapa-previus").val())] +
-                "</td>" +
-                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)' required></td>" +
-                "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
-                "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
-                "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove(); act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
-                "</td></tr>";
-
-
-            $(".tab-content div#rec table tbody").append(html);
-            $(".tab-content div#rec table tbody tr").each(function(){c++;});
-            $(".nav-tabs li a[data-etp='rec'] small").html("("+c+")");
-        }
-        //SI NO ES RECHAZO
-        else{
-            html = "<tr>" +
-                "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
-                "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+            "<td style='text-align: center' data-name='env' data-valor='"+$(".selectGDDForm").children("option:selected").data('cant')+"'>"+$(".selectGDDForm").children("option:selected").data('cant')+"</td>" +
                 "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
-                $('#prod_info > small > label > select > option:selected').html()
+                $('#prod_info > small > label > select > option:selected').html()+" GDD: "+$(".selectGDDForm").children("option:selected").data('gd')
                 +"</td>" +
                 "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)' required></td>" +
                 "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
@@ -906,10 +915,52 @@
             $(".tab-content div#"+$("#nom-etapa").val()+" table tbody tr").each(function(){c++;});
             $(".nav-tabs li a[data-etp='"+$("#nom-etapa").val()+"'] small").html("("+c+")");
         }
+        //SI NO SE HA SELECCIONADO UNA GDD
+        else{
+            //SI LA ETAPA SELECCIONADA ES RECHAZO
+            if($('#prod_info > small > label > select').val() === 's'){
+                html = "<tr>" +
+                    "<td class='hidden' data-name='iddesp' data-valor='0'></td>" +
+                    "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
+                    "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+                    "<td style='text-align: center' data-name='to' data-valor='s'>" +
+                    etapas[parseInt($("#etapa-previus").val())] +
+                    "</td>" +
+                    "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)' required></td>" +
+                    "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                    "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
+                    "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove(); act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                    "</td></tr>";
+
+
+                $(".tab-content div#rec table tbody").append(html);
+                $(".tab-content div#rec table tbody tr").each(function(){c++;});
+                $(".nav-tabs li a[data-etp='rec'] small").html("("+c+")");
+            }
+            //SI NO ES RECHAZO
+            else{
+                html = "<tr>" +
+                    "<td class='hidden' data-name='iddesp' data-valor='0'></td>" +
+                    "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
+                    "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+                    "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
+                    $('#prod_info > small > label > select > option:selected').html()
+                    +"</td>" +
+                    "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)' required></td>" +
+                    "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                    "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
+                    "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                    "</td></tr>";
+
+
+                $(".tab-content div#"+$("#nom-etapa").val()+" table tbody").append(html);
+                $(".tab-content div#"+$("#nom-etapa").val()+" table tbody tr").each(function(){c++;});
+                $(".nav-tabs li a[data-etp='"+$("#nom-etapa").val()+"'] small").html("("+c+")");
+            }
+        }
         $("#crearProdHist").modal('hide');
 
     });
-
     function act_numcol(yo){
         var c = 0;
         $(".tab-content div#"+$(yo).data('preetp')+" table tbody tr").each(function(){c++;});
@@ -917,7 +968,6 @@
         else{$(".nav-tabs li a[data-etp='"+$(yo).data('preetp')+"'] small").html("("+c+")");}
         //$(".tab-pane#"+id)
     }
-
     function submit_action(){
         data = {
             idmat: [],
@@ -925,7 +975,8 @@
             to: [],
             from: [],
             coment: [],
-            fecha: []
+            fecha: [],
+            iddesp: []
         };
         $(".tab-content td").each(function(){
             data[$(this).data('name')].push($(this).data('valor'));
@@ -940,9 +991,6 @@
             }
         });
     }
-
-
-
 
     function saveStateProdHist(){
         var token = [];
@@ -980,4 +1028,38 @@
             }
         });
     }
+
+    function changeModalMovh(type, idmat){
+        //SE EJECUTA CUANDO APARECE MODAL
+        //type = true ==> SE MUESTRA FORMULARIO gdd
+        //type = false ==> NO SE MUESTRA FORMULARIO gdd
+        //idmat = MATERIAL QUE SE MOSTRARÁ EN select, LOS DEMAS SE OCULTAN
+        if(type){
+            //APARECE EN FORMULARIO gdd Y DESAPARECE EL normal
+            $(".sendMov").addClass('hidden');
+            $(".sendMovGDD").removeClass('hidden');
+            selectGD = true;
+        }else{
+            //APARECE EN FORMULARIO normal Y DESAPARECE EL DE gdd
+            $(".sendMov").removeClass('hidden');
+            $(".sendMovGDD").addClass('hidden');
+            selectGD = false;
+        }
+        var sel = false;
+
+        //SE INCLUYE LA VARIABLE idmat CUANDO SE MUESTRAN LAS gdds
+        if(idmat){
+            $(".selectGDDForm").children('option').each(function(){
+                if($(this).data('idmat') === idmat){
+                    if(!sel){
+                        $(this).prop('selected', true);
+                        sel = true;
+                    }
+                    $(this).removeClass('hidden');
+                }
+                else{$(this).addClass('hidden');}
+            });
+        }
+    }
+
 </script>
