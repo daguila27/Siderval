@@ -144,16 +144,18 @@ function fechaEspañol(date){
         <td data-toggle="tooltip" title="Cliente" class="cliente" data-toggle="tooltip" data-placement="top" title="<%=data[i].razon%>"><%=data[i].sigla%></td>
         <td data-toggle="tooltip" title="Descripción" class="descrip" ><%=data[i].detalle%></td>
         <td data-toggle="tooltip" title="Aleación" class="subal" ><%=data[i].subaleacion%></td>
+
+        <td data-toggle="tooltip" title="Cantidad Solicitada" data-name = "solicitados" class="checkFunction solicitados parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
+        <td data-toggle="tooltip" title="Cantidad por Despachar" data-name = "sin_produccion" class="checkFunction sin_produccion parsear_nro" data-cs="0" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
+        <td data-toggle="tooltip" title="Cantidad Total Fundida" data-name = "fundidos" class="checkFunction fundidos parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].fundidos%>"><%= data[i].fundidos%></td>
+        <td data-toggle="tooltip" title="Cantidad por Fundir" data-name = "xfusion" class="checkFunction xfusion parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%=Math.max(data[i].solicitados - data[i].fundidos, 0)%>"><%= Math.max(data[i].solicitados - data[i].fundidos, 0)%></td>
+
         <td data-toggle="tooltip" title="Peso Unitario" class="pesoxproducir parsear_nro" data-cs="0" style="text-align: center;"><%= data[i].peso%></td>
-        <td data-toggle="tooltip" title="Solicitados" data-name = "solicitados" class="checkFunction solicitados parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%= data[i].solicitados%>"><%= data[i].solicitados%></td>
-        <td data-toggle="tooltip" title="Por Despachar" data-name = "sin_produccion" class="checkFunction sin_produccion parsear_nro" data-cs="0" style="text-align: center;"  data-valor="<%= data[i].xdespachar%>"><%= data[i].xdespachar %></td>
-        <td data-toggle="tooltip" title="Fundidos Totales" data-name = "fundidos" class="checkFunction fundidos parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].fundidos%>"><%= data[i].fundidos%></td>
-        <td data-toggle="tooltip" title="Por Fundir" data-name = "xfusion" class="checkFunction xfusion parsear_nro" data-cs="0" style="text-align: center;" data-valor="<%=Math.max(data[i].solicitados - data[i].fundidos, 0)%>"><%= Math.max(data[i].solicitados - data[i].fundidos, 0)%></td>
-        <td data-toggle="tooltip" title="Peso Por Fundir" data-name = "pesoxfusion" class="checkFunction pesoxfusion parsear_nro" data-cs="2" style="text-align: center;" data-valor="<%= (Math.max(data[i].solicitados - data[i].fundidos, 0))*data[i].peso%>"><%= (Math.max(data[i].solicitados - data[i].fundidos, 0))*data[i].peso%></td>
-        <td data-toggle="tooltip" title="En Producción" data-name = "en_produccion" class="checkFunction en_produccion parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
-        <td data-toggle="tooltip" title="Peso x Despachar" data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;"  data-cs="1" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
+        <td data-toggle="tooltip" title="Peso por Fundir" data-name = "pesoxfusion" class="checkFunction pesoxfusion parsear_nro" data-cs="2" style="text-align: center;" data-valor="<%= (Math.max(data[i].solicitados - data[i].fundidos, 0))*data[i].peso%>"><%= (Math.max(data[i].solicitados - data[i].fundidos, 0))*data[i].peso%></td>
+        <td data-toggle="tooltip" title="Peso en Producción" data-name = "en_produccion" class="checkFunction en_produccion parsear_nro"  data-cs="0" style="text-align: center;" data-valor="<%= data[i].enproduccion%>"><%= data[i].enproduccion%></td>
+        <td data-toggle="tooltip" title="Peso por Despachar" data-name= "peso" class="checkFunction peso parsear_nro" style="text-align: center;"  data-cs="1" data-valor="<%= data[i].peso * data[i].xdespachar%>"><%= data[i].peso * data[i].xdespachar%></td>
         <td data-toggle="tooltip" title="Peso Despachado" data-name= "pesototal" class="checkFunction pesototal parsear_nro"  data-cs="2" style="text-align: center;" data-valor="<%= data[i].peso * data[i].despachados%>"><%= data[i].peso * data[i].despachados%></td>
-        <td data-toggle="tooltip" title="Stock" data-cs="0" class="stock parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
+        <td data-toggle="tooltip" title="Stock en BPT/BMI" data-cs="0" class="stock parsear_nro" style="text-align: center;" ><%= data[i].stock%></td>
         <td data-toggle="tooltip" title="Fecha de Entrega" class="f_entrega" style="text-align: center;" >
             <span class="cfield_monetary o_field_number o_field_widget o_readonly_modifier" data-order="<%= new Date(data[i].f_entrega).getTime()%>" name="amount_total"> <%= fechaEspañol(data[i].f_entrega) %> </span>
         </td>
@@ -167,11 +169,11 @@ function fechaEspañol(date){
         <td id="cliente"></td>
         <td id="descrip"></td>
         <td id="subal"></td>
-        <td id="pesoxproducir"></td>
         <td id="solicitados" data-toggle="tooltip" title="Totales Solicitados" style="text-align: center;" class="parsear_nro" data-cs="0"><%=solic_total%></td>
         <td id="sin_produccion" data-toggle="tooltip" title="Totales por Despachar" style="text-align: center;" class="parsear_nro" data-cs="0"><%=xdesp_total%></td>
-        <td></td>
+        <td id="pesoxproducir"></td>
         <td id="xfusion" data-toggle="tooltip" title="Totales por Fundir" style="text-align: center;" class="parsear_nro" data-cs="0"><%=xfusion_total%></td>
+        <td></td>
         <td id="pesoxfusion" data-toggle="tooltip" title="Peso por Fundir" style="text-align: center;" class="parsear_nro" data-cs="2"><%=pesoxfusion_total%></td>
         <td id="en_produccion" data-toggle="tooltip" title="Total en Producción" style="text-align: center;" class="parsear_nro" data-cs="0"><%=enpro_total%> </td>
         <td id="peso" data-toggle="tooltip" title="Peso Total por despachar" style="text-align: center;" class="parsear_nro" data-cs="1"><%=pesot_total%> Kg</td>
