@@ -80,22 +80,23 @@ function fechaEspañol(date){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"><%= data.length %></div>
 
-<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-top: 0px !important; margin-bottom: 0px !important;">
+<table id="DataTableFabs" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-top: 0px !important; margin-bottom: 0px !important; overflow: auto">
     <thead>
     <tr>
-        <th>OF</th>
-        <th>OC/ODV</th>
-        <th>Cliente</th>
-        <th>Detalle</th>
-        <th><%= etp[parseInt(etapa)-1]%></th>
-        <th>Peso Pieza (kg)</th>
-        <th>Peso (kg)</th>
-        <th>Fecha <%= etp_f[parseInt(etapa)-1]%></th>
+        <th style="text-align: center;white-space: nowrap">OF</th>
+        <th style="text-align: center;white-space: nowrap">OC/ODV</th>
+        <th style="text-align: center;white-space: nowrap">Cliente</th>
+        <th style="text-align: center;white-space: nowrap">Detalle</th>
+        <th style="text-align: center;white-space: nowrap"><%= etp[parseInt(etapa)-1]%></th>
+        <th style="text-align: center;white-space: nowrap">Peso Pieza (kg)</th>
+        <th style="text-align: center;white-space: nowrap">Peso (kg)</th>
+        <!--<th>Rechazados <br> Posteriormente</th>-->
+        <th style="text-align: center;white-space: nowrap">Fecha <%= etp_f[parseInt(etapa)-1]%></th>
         <% if(user === 'dt'){%>
-            <th></th>
-            <th></th>
+            <th style="text-align: center;white-space: nowrap"></th>
+            <th style="text-align: center;white-space: nowrap"></th>
         <%}else if(user === 'jefeprod'){%>
-            <th>Anular</th>
+            <th style="text-align: center;white-space: nowrap">Anular</th>
         <%}%>
     </tr>
     </thead>
@@ -104,22 +105,25 @@ function fechaEspañol(date){
     var kilos_totales = 0;
     var piezas_totales = 0;
     for(var i=0; i < data.length; i++){%>
-        <tr class="o_data_row select-desp" data-state="nosele">
-            <td><%= data[i].idorden_f%></td>
-            <td><%= data[i].numoc%></td>
-            <td><%= data[i].sigla%></td>
-            <td><%= data[i].detalle%></td>
-            <td class="parsear_nro body_p" data-cs="0" data-val="<%= data[i].enviados%>" style="text-align: center;"><%= data[i].enviados%></td>
-            <td class="parsear_nro" data-cs="1" style="text-align: center;"><%= data[i].peso%></td>
+        <tr class="o_data_row select-desp" id="trProd<%= data[i].idproduccion_history%>" data-state="nosele">
+            <td style="text-align: center;white-space: nowrap"><%= data[i].idorden_f%></td>
+            <td style="text-align: center;white-space: nowrap"><%= data[i].numoc%></td>
+            <td style="text-align: center;white-space: nowrap"><%= data[i].sigla%></td>
+            <td style="text-align: left;white-space: nowrap"><%= data[i].detalle%></td>
+            <td class="parsear_nro body_p" data-cs="0" data-val="<%= data[i].enviados%>" style="text-align: center;white-space: nowrap"><%= data[i].enviados%></td>
+            <td class="parsear_nro" data-cs="1" style="text-align: center;white-space: nowrap"><%= data[i].peso%></td>
             <% kilos_totales += (data[i].peso*data[i].enviados);
-               piezas_totales += data[i].enviados;%>
-            <td class="parsear_nro body_k" data-cs="0" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;"><%= data[i].peso*data[i].enviados%></td>
-            <td style="text-align: left" data-order="<%= new Date(data[i].mov_fecha).getTime()%>"><%= fechaEspañol(data[i].mov_fecha)%></td>
+               piezas_totales += data[i].enviados;
+                aux = postRechazados(data[i].idproduccion, etapa, data[i].ruta, rech);
+            %>
+            <td class="parsear_nro body_k" data-cs="0" data-val="<%= data[i].peso*data[i].enviados%>" style="text-align: center;white-space: nowrap"><%= data[i].peso*data[i].enviados%></td>
+            <!--<td class="parsear_nro rech_td" data-cs="0" data-val="" style="text-align: center;white-space: nowrap" data-toggle="tooltip" title="<%=aux[1]%>"><%= aux[0]%></td>-->
+            <td style="text-align: left;white-space: nowrap" data-order="<%= new Date(data[i].mov_fecha).getTime()%>"><%= fechaEspañol(data[i].mov_fecha)%></td>
             <% if(user === 'dt'){%>
-                <td class="nfecha"><input type="date"></td>
-                <td><button data-id="<%= data[i].idproduccion_history%>" onclick="act_fecha(this)">Act</button></td>
+                <td style="text-align: center;white-space: nowrap" class="nfecha"><input type="date"></td>
+                <td style="text-align: center;white-space: nowrap"><button data-id="<%= data[i].idproduccion_history%>" onclick="act_fecha(this)">Act</button></td>
             <%}else if(user === 'jefeprod'){%>
-                <td>
+                <td style="text-align: center;white-space: nowrap">
                 <%if(data[i].to != '8'){%>
                     <button class="btn btn-danger btn-xs anulProdHist" data-idprod="<%= data[i].idproduccion%>" data-idprodh="<%= data[i].idproduccion_history%>" data-from="<%= data[i].from%>">Anular</button>
                 <%}%>
@@ -148,7 +152,7 @@ function fechaEspañol(date){
     </tfoot>
 </table>
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js"></script>
+<script src="/parsear_nro.js"></script>
 
 <script type="text/javascript">
     function act_fecha(yo){
@@ -166,6 +170,19 @@ function fechaEspañol(date){
     var total_piezas = parseFloat('<%=piezas_totales%>');
     var total_peso = parseFloat('<%=kilos_totales%>');
     setDataTableFixed("#DataTableFabs");
+
+    $("#DataTableFabs_wrapper").css('overflow-x', 'auto');
+    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA*/
+    $("#DataTableFabs_wrapper").scroll(function(e){
+        //$('.fixedHeader-floating').scrollLeft($(this).scrollLeft());
+        $(".fixedHeader-floating tfoot").offset({ left: $("#DataTableFabs thead").offset().left })
+        $('.fixedHeader-floating thead').offset({ left: $("#DataTableFabs thead").offset().left });
+        //$('.fixedHeader-floating tfoot').offset({ left: $("#rechTable tfoot").offset().left });
+        //alert($('.fixedHeader-floating tfoot').left());
+        //$('.fixedHeader-floating').css('left', $(this).css('left'));
+    });
+    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA --- FIN*/
+
     busc.setIndicadorPaginas(parseInt('<%= data.length%>'), ".indicador_paginas");
 
 
@@ -291,3 +308,24 @@ function fechaEspañol(date){
     });
 
 </script>
+
+<style>
+    table.fixedHeader-floating thead {
+        top: 0px;
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+    table.fixedHeader-floating tfoot {
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+
+    table#DataTableFabs thead tr{
+        width: 100%;
+    }
+    table#DataTableFabs tfoot{
+        width: 100% !important;
+    }
+</style>

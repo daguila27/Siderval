@@ -1,4 +1,23 @@
+<%
+function completarDigitos(num, dig){
+    var arr = [];
+    if(num.toString().length >= dig){
+        return num.toString();
+    }
+    else{
+        for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
+        return arr.join('')+num.toString();
+    }
+}
 
+
+var d_min = new Date();
+d_min = d_min.setDate(new Date().getDate()-7);
+d_min = [new Date(d_min).getFullYear(), completarDigitos(new Date(d_min).getMonth()+1, 2), completarDigitos(new Date(d_min).getDate() , 2) ].join('-') ;
+var d_max = new Date();
+d_max = d_max.setDate(new Date().getDate()+7);
+d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMonth()+1, 2) , completarDigitos(new Date(d_max).getDate(),2) ].join('-');
+%>
 <!-- Modal adjuntar Movimiento-->
 <div id="crearProdHist" class="modal-primary modal fade" role="dialog">
     <div class="modal-dialog">
@@ -27,6 +46,22 @@
                         <input type="hidden" id="nom-etapa" name="nom-etapa">
                         <input type="hidden" id="nom-etapa-previus" name="nom-etapa-previus">
                         <input type="hidden" id="etapa-previus" name="etapa-previus">
+                    </div>
+                    <div class="form-group sendMovGDD">
+                        <label class="control-label" for="email" style="width: 100%">Guías de Despacho:</label>
+                        <div>
+                            <select class="form-control selectGDDForm" id="selectGDDForm">
+                                <%for(var e=0; e < gdds.length; e++){%>
+                                    <option value="<%= gdds[e].iddespacho%>" data-gd="<%= gdds[e].idgd%>" data-idmat="<%= gdds[e].idmaterial%>" data-cant="<%= gdds[e].group_cantidad%>" data-canthtml="<%= gdds[e].cantidad%>">GDD <%= gdds[e].idgd%>: <%=gdds[e].detalle%> - <%= gdds[e].cantidad%> despachado(s).</option>
+                                <%}%>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="comentario-rechazo" for="" style="width: 100%;">
+                            Comentario:
+                            <textarea class="form-control" name="" id="comentarioMov" cols="20" rows="3"></textarea>
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -113,11 +148,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" min="<%=d_min%>" max="<%= d_max%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style="color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -174,11 +209,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" min="<%=d_min%>" max="<%= d_max%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style="color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -234,11 +269,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" min="<%=d_min%>" max="<%= d_max%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style="color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -294,11 +329,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" max="<%=d_max%>" min="<%=d_min%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style="color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -354,11 +389,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" max="<%=d_max%>" min="<%=d_min%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style="color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -414,11 +449,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" max="<%=d_max%>" min="<%=d_min%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style="color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -474,11 +509,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" max="<%=d_max%>" min="<%=d_min%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style=" color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -534,11 +569,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" max="<%=d_max%>" min="<%=d_min%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style=" color: black; margin-bottom: 0px; white-space: nowrap  ">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -594,11 +629,11 @@
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
                                 <li class="input-date">
-                                    <input id="fecha-hasta" class="form-control input-xs" type="date">
+                                    <input id="fecha-hasta" class="form-control input-xs" type="date" max="<%=d_max%>" min="<%=d_min%>">
                                 </li>
                                 <li class="divider"></li>
                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                    <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
+                                    <label style="color: black; margin-bottom: 0px; white-space: nowrap">Ingresar Fecha para : </label>
                                     <div class="radio">
                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
                                     </div>
@@ -728,7 +763,11 @@
     </div>
 </div>
 
-
+<style>
+    .hiddenSelectd{
+        display: none;
+    }
+</style>
 <script>
 
 
@@ -862,48 +901,92 @@
         $(yo).parent().data('valor', $(yo).val());
     }
 
+    function completarDigitos(num, dig){
+        var arr = [];
+        if(num.toString().length >= dig){
+            return num.toString();
+        }
+        else{
+            for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
+            return arr.join('')+num.toString();
+        }
+    }
+
     $("#prodhistForm").submit(function(e){
         e.preventDefault();
         var array = $(this).serializeArray();
         var html;
         var c = 0;
-        //SI LA ETAPA SELECCIONADA ES RECHAZO
-        if($('#prod_info > small > label > select').val() === 's'){
-            html = "<tr>" +
-                "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
-                "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
-                "<td style='text-align: center' data-name='to' data-valor='s'>" +
-                 etapas[parseInt($("#etapa-previus").val())] +
-                "</td>" +
-                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)'></td>" +
-                "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
-                "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
-                "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
-                "</td></tr>";
+        var d_min = new Date();
+        d_min = d_min.setDate(new Date().getDate()-7);
+        d_min = [new Date(d_min).getFullYear(), completarDigitos(new Date(d_min).getMonth()+1, 2), completarDigitos(new Date(d_min).getDate() , 2) ].join('-') ;
+        var d_max = new Date();
+        d_max = d_max.setDate(new Date().getDate()+7);
+        d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMonth()+1, 2) , completarDigitos(new Date(d_max).getDate(),2) ].join('-');
 
 
-            $(".tab-content div#rec table tbody").append(html);
-            $(".tab-content div#rec table tbody tr").each(function(){c++;});
-            $(".nav-tabs li a[data-etp='rec'] small").html("("+c+")");
-        }
-        //SI NO ES RECHAZO
-        else{
+        //SI SE HA SELECCIONADO UNA GDD
+        if(selectGD){
             html = "<tr>" +
+                "<td class='hidden' data-name='iddesp' data-valor='"+$("#selectGDDForm").val()+"'></td>" +
                 "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
-                "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+                "<td style='text-align: center' data-name='env' data-valor='"+$("#selectGDDForm").children("option:selected").data('cant')+"'>"+$("#selectGDDForm").children("option:selected").data('canthtml')+"</td>" +
                 "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
-                $('#prod_info > small > label > select > option:selected').html()
+                $('#prod_info > small > label > select > option:selected').html()+" GDD: "+$("#selectGDDForm").children("option:selected").data('gd')
                 +"</td>" +
-                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)'></td>" +
+                "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)' min='"+d_min+"' max='"+ d_max+"' onkeydown=\"return false\" required></td>" +
                 "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
                 "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
-                "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick=' $(\"#selectGDDForm\").children(\""+"option[value="+$("#selectGDDForm").val()+"]"+"\").removeClass(\"hiddenSelectd\"); $(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
                 "</td></tr>";
 
-
+            $("#selectGDDForm").children("option:selected").addClass('hiddenSelectd');
             $(".tab-content div#"+$("#nom-etapa").val()+" table tbody").append(html);
             $(".tab-content div#"+$("#nom-etapa").val()+" table tbody tr").each(function(){c++;});
             $(".nav-tabs li a[data-etp='"+$("#nom-etapa").val()+"'] small").html("("+c+")");
+        }
+        //SI NO SE HA SELECCIONADO UNA GDD
+        else{
+            //SI LA ETAPA SELECCIONADA ES RECHAZO
+            if($('#prod_info > small > label > select').val() === 's'){
+                html = "<tr>" +
+                    "<td class='hidden' data-name='iddesp' data-valor='0'></td>" +
+                    "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
+                    "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+                    "<td style='text-align: center' data-name='to' data-valor='s'>" +
+                    etapas[parseInt($("#etapa-previus").val())] +
+                    "</td>" +
+                    "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-rec' type='date' onchange='changeDateValue(this)'  min='"+d_min+"' max='"+ d_max +"' onkeydown=\"return false\" required></td>" +
+                    "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                    "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
+                    "<button class='btn btn-xs btn-danger' data-preetp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' data-etp='"+$("#nom-etapa-previus").val()+"' onclick='$(this).parent().parent().remove(); act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                    "</td></tr>";
+
+
+                $(".tab-content div#rec table tbody").append(html);
+                $(".tab-content div#rec table tbody tr").each(function(){c++;});
+                $(".nav-tabs li a[data-etp='rec'] small").html("("+c+")");
+            }
+            //SI NO ES RECHAZO
+            else{
+                html = "<tr>" +
+                    "<td class='hidden' data-name='iddesp' data-valor='0'></td>" +
+                    "<td data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
+                    "<td style='text-align: center' data-name='env' data-valor='"+$("#procesados").val()+"'>"+$("#procesados").val()+"</td>" +
+                    "<td style='text-align: center' data-name='to' data-valor='"+$('#prod_info > small > label > select').val()+"'>"+
+                    $('#prod_info > small > label > select > option:selected').html()
+                    +"</td>" +
+                    "<td data-name='fecha' data-valor=' '><input class='form-control input-xs dateInputMov dateInputMov-"+$("#nom-etapa").val()+"' type='date' onchange='changeDateValue(this)' min='"+d_min+"' max='"+ d_max +"' onkeydown=\"return false\" required></td>" +
+                    "<td data-name='coment' data-valor='"+$("#comentarioMov").val()+"'>"+$("#comentarioMov").val()+"</td>" +
+                    "<td style='text-align: center' data-name='from' data-valor='"+$("#etapa-previus").val()+"'>" +
+                    "<button class='btn btn-xs btn-danger' data-preetp='"+$("#nom-etapa-previus").val()+"' data-etp='"+$('#prod_info > small > label > select > option:selected').html().substring(0,3).toLowerCase()+"' onclick='$(this).parent().parent().remove();act_numcol(this)'><i class='fa fa-times' aria-hidden='true'></i></button>" +
+                    "</td></tr>";
+
+
+                $(".tab-content div#"+$("#nom-etapa").val()+" table tbody").append(html);
+                $(".tab-content div#"+$("#nom-etapa").val()+" table tbody tr").each(function(){c++;});
+                $(".nav-tabs li a[data-etp='"+$("#nom-etapa").val()+"'] small").html("("+c+")");
+            }
         }
         $("#crearProdHist").modal('hide');
 
@@ -918,7 +1001,7 @@
     }
 
     function submit_action(){
-        data = {
+        dataDom = {
             idmat: [],
             env: [],
             to: [],
@@ -927,15 +1010,27 @@
             fecha: []
         };
         $(".tab-content td").each(function(){
-            data[$(this).data('name')].push($(this).data('valor'));
+            dataDom[$(this).data('name')].push($(this).data('valor'));
         });
         $.ajax({
             type: 'POST',
-            data: data,
-            url: '/gestionpl/save_production_history',
-            success: function(data){
-                alert(data);
-                $(".oe_secondary_submenu li.active").click();
+            data: dataDom,
+            url: '/gestionpl/save_production_history_check_gdd',
+            success: function(check){
+                if(!check[0]){
+                    $.ajax({
+                        type: 'POST',
+                        data: dataDom,
+                        url: '/gestionpl/save_production_history',
+                        success: function(data){
+                            alert(data);
+                            $(".oe_secondary_submenu li.active").click();
+                        }
+                    });
+                }
+                else{
+                    Alerta("¡Debe completar el registro de la GDD! \n" + check[1]);
+                }
             }
         });
     }
@@ -979,4 +1074,38 @@
             }
         });
     }
+
+    function changeModalMovh(type, idmat){
+        //SE EJECUTA CUANDO APARECE MODAL
+        //type = true ==> SE MUESTRA FORMULARIO gdd
+        //type = false ==> NO SE MUESTRA FORMULARIO gdd
+        //idmat = MATERIAL QUE SE MOSTRARÁ EN select, LOS DEMAS SE OCULTAN
+        if(type){
+            //APARECE EN FORMULARIO gdd Y DESAPARECE EL normal
+            $(".sendMov").addClass('hidden');
+            $(".sendMovGDD").removeClass('hidden');
+            selectGD = true;
+        }else{
+            //APARECE EN FORMULARIO normal Y DESAPARECE EL DE gdd
+            $(".sendMov").removeClass('hidden');
+            $(".sendMovGDD").addClass('hidden');
+            selectGD = false;
+        }
+        var sel = false;
+
+        //SE INCLUYE LA VARIABLE idmat CUANDO SE MUESTRAN LAS gdds
+        if(idmat){
+            $(".selectGDDForm").children('option').each(function(){
+                if($(this).data('idmat') === idmat){
+                    if(!sel && !$(this).hasClass('hiddenSelectd')){
+                        $(this).prop('selected', true);
+                        sel = true;
+                    }
+                    $(this).removeClass('hidden');
+                }
+                else{$(this).addClass('hidden');}
+            });
+        }
+    }
+
 </script>

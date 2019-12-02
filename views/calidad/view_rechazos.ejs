@@ -1,0 +1,132 @@
+<style>
+    .vista-pill:hover{
+        cursor:pointer;
+    }
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+    .busc-din-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 90%;
+        transition:0.5s;
+        z-index: 9;
+    }
+    .busc-menu{
+        margin: 0;
+        padding: 0;
+        position: fixed;
+        width: 100%;
+        transition:0.5s;
+        z-index: 9;
+    }
+</style>
+
+<%
+var clase;
+if(username === 'calidad'){clase='busc-din-menu';}
+else{clase='busc-menu';}%>
+<div id="up-fills" class="row up-fills <%=clase%>">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
+            <li class="active">Informe de Rechazos</li>
+        </ol>
+        <div style="width: 40%;">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+            </div>
+            <div style="margin-top: 5px; display: flex">
+                <div class="date-fill" style="display: flex;">
+
+                </div>
+                <div>
+                    <label style="white-space: nowrap; display: flex; margin-left: 20px">
+                        <div style="margin-top: 8px;">Agrupar según : </div>
+                        <select class="form-control selectGroupOption" onchange="busc.extraInfo = [$(this).val()]; busc.buscar_action();">
+                            <option value="no-group" selected>No Agrupar</option>
+                            <option value="desc">Descripción</option>
+                            <option value="colada">Colada</option>
+                            <option value="causal">Causal</option>
+
+                        </select>
+                    </label>
+                </div>
+            </div>
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="getcsvof" data-tipo="opdetalle"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel Detalle</a></li>
+                    <li><a href="#" class="getcsvof" data-tipo="op"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%; ">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page" style="height: 100%">
+        </div>
+    </div>
+</div>
+
+<style type="text/css">
+    .caption a:hover{
+        cursor:pointer;
+    }
+</style>
+
+<script type="text/javascript">
+    var array_fill = [
+        "Descripción@primary",
+        "Colada@success",
+        "Producto@info",
+        "Cliente@info",
+    ];
+    var busc = new Buscador("buscar_rechazo", ".o_searchview", array_fill, "/calidad/table_rechazos", "rechTable", false, true, '.date-fill', 'produccion_history.fecha');
+
+    busc.add_cond = "";
+    busc.extraInfo = [$(".selectGroupOption").val()];
+    // Carga la tabla de pedidos
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        busc.buscar_action();
+
+    });
+
+</script>
+
+<script src="/buscador_funciones.js"></script>

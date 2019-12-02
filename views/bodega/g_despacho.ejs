@@ -199,16 +199,16 @@ function letraMayus(string) {
                             <textarea name="obs" class="form-control" rows="1" placeholder="Observaciones"></textarea>
                         </div>
                     </div>
-                    <div class="divSelect col-md-offset-1 col-md-1"  style="padding-left: 0; padding-right: 8px;">
-                        <label for="estado">Tipo de GD:
+                    <div class="divSelect col-md-offset-1 col-md-2"  style="padding-left: 0; padding-right: 8px; display: flex">
+                        <label for="estado" style="white-space: nowrap; margin-top:5%; margin-right: 2px">Tipo de GD:</label>
                         <select name="estado" id="estadoselect" class="form-control">
                             <option value="Venta" class="notT">Venta</option>
                             <option value="Traslado">Traslado</option>
                             <option value="Devolucion" class="notT">Devolución</option>
+                            <option value="Servicio">Servicio Externalizado</option>
                             <option value="Otro" class="notT">Otro</option>
                             <option value="Blanco" class="notT">Blanco</option>
                         </select>
-                        </label>
                     </div>
                     <div class="num_pl_input col-md-1 hidden"  style="padding-left: 0; padding-right: 8px">
                         <label for="input_idpackinglist">N° Packing List:
@@ -751,10 +751,10 @@ function letraMayus(string) {
 
         //COMPRUEBA SI SE HA SELECCIONADO CLIENTE, SI NO ES ASI NO PERMITE CREAR LA GDD
         if($("#cliente").val() === '0'){
-            Alerta("¡Ingrese Cliente!")
+            Alerta("¡Ingrese Cliente!");
         }else{
             if(comprobarCliente()){
-                if(aux.length == 0){
+                if(aux.length === 0){
                     conf = confirm("¿Esta seguro que desea crear la GDD en blanco?");
                     est = "Blanco";
                 } else {

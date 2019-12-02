@@ -191,7 +191,7 @@ router.post('/stats_fusion/:fill/:valetapa', function(req, res, next){
             "cliente.sigla-on": []
         };
         var condiciones_where = ['produccion_history.from = '+valetapa];
-        if(input.cond != '') {
+        if(input.cond !== '') {
             for (var e = 0; e < input.cond.split('@').length; e++) {
                 condiciones_where.push(input.cond.split('@')[e]);
             }

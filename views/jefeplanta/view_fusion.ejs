@@ -117,7 +117,7 @@ function getSunday(d) {
                     </div>
                     <h5 style="margin-left: 10px" class="indicator-of-check indicador_busqueda"><small>Mostrando Fusiones de este Mes</small></h5>
                     <div class="form-group pull-right filtro_graph hidden" style="margin-left: 15px; display: flex;">
-                        <label for="filtro_graph">Filtro por:</label>
+                        <label for="filtro_graph" style="white-space: nowrap; margin-top: 6px">Filtro por:</label>
                         <select class="form-control" id="filtro_graph" onchange="busc.buscar_action()">
                             <option value="cliente" selected>Cliente</option>
                             <option value="producto">Producto</option>
@@ -125,8 +125,8 @@ function getSunday(d) {
                         </select>
 
                         <div class="radio option_graph" style="margin-left: 10px;margin-top: 0">
-                            <label><input type="radio" name="optdata" value="pi" checked>Piezas Procesadas</label>
-                            <label><input type="radio" name="optdata" value="kg">Kilos Procesados</label>
+                            <label style="white-space: nowrap"><input type="radio" name="optdata" value="pi" checked>Piezas Procesadas</label>
+                            <label style="white-space: nowrap"><input type="radio" name="optdata" value="kg">Kilogramos Procesados</label>
                         </div>
                     </div>
                 </div>
@@ -136,7 +136,7 @@ function getSunday(d) {
 </div>
 <div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
     <div id="fw-body"  style="padding:0;margin: 0;">
-        <div class="content main-page">
+        <div class="content main-page" style="height: 100%; overflow-x: auto">
         </div>
     </div>
 </div>

@@ -1508,10 +1508,10 @@ router.get('/get_dataodcext/:idprod/:cant/:idnotif', function(req, res, next){
 						"fabricaciones.idfabricaciones, " +
 						"material.idmaterial as idmaterial_master, " +
 						"material.detalle as detalle_master, " +
-						"material_h.idmaterial as idmaterial_ext, " +
-						"material_h.detalle as detalle_ext, " +
-						"material_h.u_medida as medida_ext," +
-						"material_h.u_compra as compra_ext " +
+						"COALESCE(material_h.idmaterial, 0) as idmaterial_ext, " +
+						"COALESCE(material_h.detalle,'No hay Servicio asociado.') as detalle_ext, " +
+						"COALESCE(material_h.u_medida, '-') as medida_ext," +
+						"COALESCE(material_h.u_compra, '-') as compra_ext " +
 						"FROM produccion " +
 						"LEFT JOIN fabricaciones ON produccion.idfabricaciones=fabricaciones.idfabricaciones " +
 						"LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial " +
@@ -1522,7 +1522,7 @@ router.get('/get_dataodcext/:idprod/:cant/:idnotif', function(req, res, next){
 						if(err)
 							console.log("Error Selecting : %s", err);
 
-						console.log(cant);
+						console.log(dets);
 						res.render('abast/modal_odcext_creation', {data: dets, cant: cant, provs: proveedor, last: last[0].num + 1, idnotificacion: req.params.idnotif});
 					});
                 });

@@ -53,20 +53,14 @@
     <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
     <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
     <%function show_user(usename){
-        if(username === 'gestionpl'){
-            return "Gestión Planta";
+        if(username === 'calidad'){
+            return "Control de Calidad";
         }
     }%>
 
 </head>
 
-
-
 <body class="o_web_client" style="overflow-y: scroll;">
-
-
-
-
 
 <nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 90%;margin-left:10%; z-index: 10; transition: 0.5s">
     <div class="navbar-header">
@@ -76,7 +70,6 @@
             </div>
         </button>
     </div>
-
     <div class="navbar-collapse collapse">
 
         <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
@@ -91,11 +84,11 @@
         </ul>
 
 
-        <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px;">
-            <li>
-                <div style="font-family: 'Lobster'; font-size: 15px; color: white; margin: 0px 10px;">Bienvenido <%= show_user(username)%></div>
+        <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
+            <li style="margin-right: 10px; text-align: center;">
+                <div style="font-family: 'Lobster'; font-size: 15px; color: white; ">Bienvenido <%= show_user(username)%></div>
             </li>
-            <li style="margin-top: 3px; margin-right: 3px">
+            <li>
                 <div><a href="../user/log_out">Cerrar sesión</a></div>
             </li>
         </ul>
@@ -120,7 +113,7 @@
         </ul>
         <ul class="nav navbar-right ">
             <li>
-                <div style=" font-size: 15px; color: red; margin-right: 20px">INFORMACIÓN DE TESTEO | NO REPRESENTA LA REALIDAD</div>
+                <div style=" font-size: 15px; color: red; margin-right: 20px"></div>
             </li>
         </ul>
 
@@ -144,110 +137,36 @@
                     margin-top: 5px;
                 }
 
+                #menu-lateral-izquierdo ul li a:hover{
+                    cursor: pointer;
+                    background-color: rgb(190, 189, 215);
+                    color: white;
+                }
             </style>
 
-
-            <div class="oe_secondary_menu">
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">
                 </div>
                 <div class="oe_secondary_menu_section">
                     Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/gestionpl/create_production_history">
+                    <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Control de Calidad - Registrar Rechazos" data-link="/calidad/create_production_rech_prodh">
                         <a class="oe_menu_leaf">
                              <span class="oe_menu_text">
-                                 Registrar Movimientos Diarios
+                                 Registrar Rechazos
+                             </span>
+                        </a>
+                    </li>
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Control de Calidad - Ver Rechazos" data-link="/calidad/view_rechazos">
+                        <a class="oe_menu_leaf">
+                             <span class="oe_menu_text">
+                                 Ver Rechazos
                              </span>
                         </a>
                     </li>
                 </ul>
-
-
-                <div class="oe_secondary_menu_section">
-                    Despachos
-                </div>
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_gdd" id="view_movimientos">
-                        <a class="oe_menu_leaf active">
-                                            <span class="oe_menu_text">
-                                                Crear Guía de Despacho
-                                            </span>
-                        </a>
-                    </li>
-                    <li  onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_despachos">
-                        <a class="oe_menu_leaf">
-                                            <span class="oe_menu_text">
-                                                Ver Guías
-                                            </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_recepcion">
-                        <a class="oe_menu_leaf">
-                                            <span class="oe_menu_text">
-                                                Recepcionar Externalizados
-                                            </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_externo">
-                        <a class="oe_menu_leaf">
-                                            <span class="oe_menu_text">
-                                                Ver Externalizados
-                                            </span>
-                        </a>
-                    </li>
-                </ul>
-
-
-
-                <div class="oe_secondary_menu_section">
-                    Stock
-                </div>
-
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_bodega">
-                        <a class="oe_menu_leaf">
-                                            <span class="oe_menu_text">
-                                                Productos
-                                            </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_pendientes">
-                        <a class="oe_menu_leaf">
-                                            <span class="oe_menu_text">
-                                                Packing List
-                                            </span>
-                        </a>
-                    </li>
-
-                </ul>
-
-                <div class="oe_secondary_menu_section">
-                    Orden de Producción
-                </div>
-                <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/crear_op">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                             Crear OP
-                                        </span>
-                        </a>
-                    </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/view_producciones">
-                        <a class="oe_menu_leaf">
-                                        <span class="oe_menu_text">
-                                            Ver Todas
-                                        </span>
-                        </a>
-                    </li>
-                </ul>
-
-
-
-
-
             </div>
-
         </div>
     </div>
     <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA PANTALLA DE CARGA-->
@@ -295,4 +214,4 @@
     <ul class="notif-alert-ul">
 
     </ul>
-    <div id="page-wrapper"  data-view="/gestionpl/create_production_history" style="width: 90%;margin-left:10%; transition: 0.5s;" data-tipo="1">
+    <div id="page-wrapper"  data-view="/calidad/create_production_rech" style="width: 90%;margin-left:10%; transition: 0.5s;" data-tipo="1">

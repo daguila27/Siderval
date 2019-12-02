@@ -265,7 +265,25 @@ router.get('/create_production_history', function(req, res, next){
             connection.query(query, function(err, prods){
                 if(err){console.log("Error Selecting: %s", err);}
 
-                res.render('gestionpl/create_production_history', {datalen: prods});
+                //OBTIENE TODOS LOS despachos CON GDD ESTADO Servicios QUE AUN NO SE HAYAN ENLAZADO
+                connection.query("SELECT " +
+                    "CONCAT(despachos.idgd, despachos.idmaterial), \n" +
+                    " group_concat(despachos.cantidad) as group_cantidad," +
+                    " sum(despachos.cantidad) as cantidad,\n" +
+                    " despachos.idgd,\n" +
+                    " group_concat(despachos.iddespacho) AS iddespacho,\n" +
+                    " group_concat(despachos.idpedido) AS idpedido,\n" +
+                    " material.idmaterial,\n" +
+                    " material.detalle " +
+                    "FROM despachos " +
+                    "LEFT JOIN gd ON gd.idgd = despachos.idgd " +
+                    "LEFT JOIN material ON material.idmaterial = despachos.idmaterial " +
+                    "LEFT JOIN (SELECT idgd as iddesp, COALESCE(sum(enviados),0) AS despachados FROM produccion_history GROUP BY idgd) AS prod_gd ON prod_gd.iddesp = despachos.iddespacho " +
+                    "WHERE gd.estado = 'Servicio' AND COALESCE(prod_gd.despachados,0) < despachos.cantidad GROUP BY CONCAT(despachos.idgd, despachos.idmaterial)", function(err, gdds){
+                    if(err){console.log("Error Selecting: %s", err);}
+
+                    res.render('gestionpl/create_production_history', {datalen: prods, gdds: gdds});
+                });
             });
         });
     }
@@ -300,105 +318,131 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
         conn.query(q, function(err, rows){
             if(err) throw err;
 
-            console.log(rows);
-            /*
-            * { idprod: '22725-22716-22717',
-                  cantprod: '400-391-300',
-                  newetapa: '2',
-                  sendnum: '91',
-                  etapa_act: '1' };
-            * */
-            //EXT === 9
-            if(to === '9'){to = 'e';}
-            var input = {
-                idprod: rows[0].idprod,
-                cantprod: rows[0].cantprod,
-                newetapa: to,
-                sendnum: env,
-                etapa_act: from
-            };
-            //jfp@109603@120@2019-6-25 16:19:58@22901-22864-22866@283@COMENTARIO@4
-            //ENVIAR NOTIFICACIÓN
-           var notif;
-            if(to === 's'){
-                notif = {
-                    idproduccion: rows[0].idprod,
-                    cantidad: env,
-                    razon: obs,
-                    etapa: from
-                };
-                enviarNotificacionRechazo(req, notif);
-            }else if(to === '8'){
-                notif = {
-                    idproduccion: rows[0].idprod,
-                    cantidad: env,
-                    key: 'fa8'
-                };
-                enviarNotificacionBodega(req, notif);
-            }
-            /*
-            * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
-            *
-            * */
-            input.idprod = input.idprod.split('-');
-            input.cantprod = input.cantprod.split('-');
-            var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
-            var query2;
-            if(to === 's'){
-                query2 = "UPDATE produccion SET produccion.`standby` = CASE ";
-            }else{
-                query2 = "UPDATE produccion SET produccion.`"+input.newetapa+"` = CASE ";
-            }
-            var ids = "";
-            var cant_aux = parseInt(input.sendnum);
-            var history = [];
-            var prod_affected = [];
-            var env_affected = [];
-            for(var w=0; w < input.idprod.length; w++){
-                cant_aux -= parseInt(input.cantprod[w]);
-                if(cant_aux > 0){
-                    // SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION
-                    query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
-                    if(input.newetapa === 's'){
-                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+input.cantprod[w];
-                    }else{
-                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
-                    }
 
-                    if(parseInt(input.cantprod[w]) > 0){
-                        history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa]);
-                        prod_affected.push(input.idprod[w]);
-                        //LA CANTIDAD TRASPASADA
-                        env_affected.push(input.cantprod[w]);
-                    }
-                    ids += input.idprod[w]+",";
+            //NO QUEDA SALDO EN PRODUCCION PARA REALIZAR EL MOVIMIENTO
+            if(rows.length > 0) {
+                /*
+                * { idprod: '22725-22716-22717',
+                      cantprod: '400-391-300',
+                      newetapa: '2',
+                      sendnum: '91',
+                      etapa_act: '1' };
+                * */
+                if(iddesp.toString() === '0'){iddesp = null;}
+                //EXT === 9
+                if(to === '9'){to = 'e';}
+                var input = {
+                    idprod: rows[0].idprod,
+                    cantprod: rows[0].cantprod,
+                    newetapa: to,
+                    sendnum: env,
+                    etapa_act: from,
+                    iddesp: iddesp
+                };
+                //jfp@109603@120@2019-6-25 16:19:58@22901-22864-22866@283@COMENTARIO@4
+                //ENVIAR NOTIFICACIÓN
+                var notif;
+                if(to === 's'){
+                    notif = {
+                        idproduccion: rows[0].idprod,
+                        cantidad: env,
+                        razon: obs,
+                        etapa: from
+                    };
+                    setTimeout(function(){ enviarNotificacionRechazo(req, notif); }, 666);
+
+                }
+                else if(to === '8'){
+                    notif = {
+                        idproduccion: rows[0].idprod,
+                        cantidad: env,
+                        key: 'fa8'
+                    };
+                    setTimeout(function(){ enviarNotificacionBodega(req, notif); }, 666);
+
+                }
+                /*
+                * input.cantprod: token separado por comas que representa el saldo disponible en cada producción (según la etapa)
+                *
+                * */
+                input.idprod = input.idprod.split('-');
+                input.cantprod = input.cantprod.split('-');
+                var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
+                var query2;
+                if(to === 's'){
+                    query2 = "UPDATE produccion SET produccion.`standby` = CASE ";
                 }
                 else{
-                    /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA --> cant_aux negativo*/
-                    query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
-                    if(input.newetapa === 's'){
-                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+(cant_aux+parseInt(input.cantprod[w]));
-                    }else{
-                        query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
-                    }
-                    //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
-                    history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa, fecha]);
-                    prod_affected.push(input.idprod[w]);
-                    //LA CANTIDAD TRASPASADA
-                    env_affected.push(cant_aux+parseInt(input.cantprod[w]));
-                    ids += input.idprod[w]+",";
-                    break;
+                    query2 = "UPDATE produccion SET produccion.`"+input.newetapa+"` = CASE ";
                 }
-            }
-            //var notif =  {cant: input.sendnum, idproduccion: input.idprod};
-            query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
-            if(input.newetapa === 's'){
-                query2 += " ELSE produccion.`standby` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
-            }else{
-                query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
-            }
-            conn.query(query ,function(err,upProd1){
-                if(err) throw err;
+                var ids = "";
+                var cant_aux = parseInt(input.sendnum);
+                var history = [];
+                var prod_affected = [];
+                var env_affected = [];
+                for(var w=0; w < input.idprod.length; w++){
+                    cant_aux -= parseInt(input.cantprod[w]);
+                    if(cant_aux > 0){
+                        /* SI cant_aux ES MAYOR A CERO SIGNIFICA QUE SE UTILIZO TODO EL SALDO DE LA PRODUCCION*/
+                        query += " WHEN idproduccion ="+input.idprod[w]+" THEN 0";
+                        if(input.newetapa === 's'){
+                            query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+input.cantprod[w];
+                        }
+                        else{
+                            query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+input.cantprod[w];
+                        }
+
+                        if(parseInt(input.cantprod[w]) > 0){
+                            if(fecha === '' || fecha === ' ' || !fecha || fecha === null || fecha === undefined ){
+                                fecha = new Date();
+                            }
+                            else{
+                                fecha = new Date(fecha);
+                                fecha.setTime( fecha.getTime() + new Date().getTimezoneOffset()*60*1000 );
+                            }
+                            history.push([input.idprod[w], input.cantprod[w], input.etapa_act, input.newetapa, fecha, input.iddesp]);
+                            prod_affected.push(input.idprod[w]);
+                            //LA CANTIDAD TRASPASADA
+                            env_affected.push(input.cantprod[w]);
+                        }
+                        ids += input.idprod[w]+",";
+                    }
+                    else{
+                        /* EN CASO CONTRARIO QUEDA SALDO EN LA ETAPA --> cant_aux negativo*/
+                        query += " WHEN idproduccion ="+input.idprod[w]+" THEN "+Math.abs(cant_aux);
+                        if(input.newetapa === 's'){
+                            query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`standby` + "+(cant_aux+parseInt(input.cantprod[w]));
+                        }
+                        else{
+                            query2 += " WHEN idproduccion ="+input.idprod[w]+" THEN produccion.`"+input.newetapa+"` + "+(cant_aux+parseInt(input.cantprod[w]));
+                        }
+                        //history.push({idproduccion: input.idprod[w],enviados: cant_aux+parseInt(input.cantprod[w]),from: input.etapa_act,to:input.newetapa});
+                        if(fecha === '' || fecha === ' ' || !fecha || fecha === null || fecha === undefined ){
+                            fecha = new Date();
+                        }
+                        else{
+                            fecha = new Date(fecha);
+                            fecha.setTime( fecha.getTime() + new Date().getTimezoneOffset()*60*1000 );
+                        }
+                        history.push([input.idprod[w], cant_aux+parseInt(input.cantprod[w]), input.etapa_act, input.newetapa, fecha, input.iddesp]);
+                        prod_affected.push(input.idprod[w]);
+                        //LA CANTIDAD TRASPASADA
+                        env_affected.push(cant_aux+parseInt(input.cantprod[w]));
+                        ids += input.idprod[w]+",";
+                        break;
+                    }
+                }
+                //var notif =  {cant: input.sendnum, idproduccion: input.idprod};
+                query += " ELSE produccion.`"+input.etapa_act+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+                if(input.newetapa === 's'){
+                    query2 += " ELSE produccion.`standby` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+                }
+                else{
+                    query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
+                }
+                conn.query(query ,function(err,upProd1){
+                if(err) {throw err;}
+
                 conn.query(query2 ,function(err,upProd2){
                     if(err) throw err;
 
@@ -417,7 +461,14 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                     });
                 });
             });
-            setTimeout(function(){return true;}, 250);
+            }
+            else{
+                if(data['idmat[]'][++index]){
+                    recursive_save_ph(data, index, req);
+                }else{
+                    return true;
+                }
+            }
         });
     }
 }
@@ -432,27 +483,178 @@ function enviarNotificacionBodega(req, input){
         var dataInsert = {};
         var d = new Date();
 
-        var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
-        /*date = [d.getMonth()+1,
-                   d.getDate(),
-                   d.getFullYear()].join('/')+' '+
-                  [d.getHours(),
-                   d.getMinutes(),
-                   d.getSeconds()].join(':');*/
-        if(userf === '8'){
-            dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                if(err){console.log("Error Selecting : %s", err);}
-                req.app.locals.io.emit("notif");
-            });
 
+function allMovFunction(input, req){
+    if(typeof input['idmat[]'] === 'string'){
+        input = {
+            'idmat[]': [ input['idmat[]']  ],
+            'env[]': [  input['env[]'] ],
+            'to[]': [  input['to[]'] ],
+            'from[]': [  input['from[]']],
+            'coment[]': [  input['coment[]']],
+            'fecha[]': [  input['fecha[]'] ],
+            'iddesp[]': [  input['iddesp[]'] ]
+        };
+    }
+    /*
+    * {
+      'idmat[]': [ '110814', '110814' ],
+      'env[]': [ '2', '1' ],
+      'to[]': [ '9', '9' ],
+      'from[]': [ '4', '4' ],
+      'coment[]': [ '', '' ],
+      'fecha[]': [ '2019-11-27', '2019-11-27' ],
+      'iddesp[]': [ '3572', '3567' ] }
+    * */
+    for(var t=0; t < input['idmat[]'].length; t++){
 
+        //HACIA EXTERNALIZADO => ENLAZADO CON despachos
+        if(input['iddesp[]'][t].split(',').length > 1){
+            for(var w=0; w < input['iddesp[]'][t].split(',').length; w++){
+                if(w >= 1){
+                    input['idmat[]'].push(input['idmat[]'][t]);
+                    input['to[]'].push(input['to[]'][t]);
+                    input['from[]'].push(input['from[]'][t]);
+                    input['coment[]'].push(input['coment[]'][t]);
+                    input['fecha[]'].push(input['fecha[]'][t]);
+
+                    input['env[]'].push( input['env[]'][t].split(',')[w] );
+                    input['iddesp[]'].push( input['iddesp[]'][t].split(',')[w] );
+                }
+            }
+            input['env[]'][t] =  input['env[]'][t].split(',')[0];
+            input['iddesp[]'][t] =  input['iddesp[]'][t].split(',')[0];
         }
-        else if(userf === "9"){
-            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+
+        //SI ES RECHAZO SE DEBE SEPARA EL MOVIMIENTO DE 1 EN 1
+        if( input['to[]'][t] === 's' && parseInt(input['env[]'][t]) > 1 ){
+            for(var e=0; e < parseInt(input['env[]'][t]); e++){
+                input['idmat[]'].push(input['idmat[]'][t]);
+                input['to[]'].push(input['to[]'][t]);
+                input['from[]'].push(input['from[]'][t]);
+                input['coment[]'].push(input['coment[]'][t]);
+                input['fecha[]'].push(input['fecha[]'][t]);
+                input['iddesp[]'].push(input['iddesp[]'][t]);
+                input['env[]'].push( '1' );
+            }
+            input['env[]'][t] =  '1';
+        }
+    }
+    recursive_save_ph(input, 0, req);
+}
+
+
+        /*
+        * {
+          'idmat[]': [ '110932', '110932', '110931' ],
+          'env[]': [ '4', '5', '1' ],
+          'to[]': [ '4', '7', '5' ],
+          'from[]': [ '3', '5', '7' ],
+          'coment[]': [ '', '', '' ],
+          'fecha[]': [ '2019-11-11', '2019-11-11', '2019-11-11' ],
+          'iddesp[]': [ '0', '0', '0' ] }
+        */
+        allMovFunction(input, req);
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("UPDATE user SET block_s = true WHERE username = 'calidad'", function(err, upCdc){
+                if(err){console.log("Error Updating : %s", err);}
+
+                connection.query("INSERT INTO notificacion (`descripcion`) VALUES ('cdcBloc@@"+new Date().toLocaleString()+"')", function(err, upCdc){
+                    if(err){console.log("Error Updating : %s", err);}
+
+                    res.send("¡Movimiento Diario registrado con exito!");
+                });
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.post('/save_production_history_check_gdd', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        /*
+        * {
+          'idmat[]': [ '110932', '110932', '110931' ],
+          'env[]': [ '4', '5', '1' ],
+          'to[]': [ '4', '7', '5' ],
+          'from[]': [ '3', '5', '7' ],
+          'coment[]': [ '', '', '' ],
+          'fecha[]': [ '2019-11-11', '2019-11-11', '2019-11-11' ],
+          'iddesp[]': [ '0', '0', '0' ] }
+        */
+        if(typeof input['idmat[]'] === 'string'){
+            input = {
+                'idmat[]': [ input['idmat[]']  ],
+                'env[]': [  input['env[]'] ],
+                'to[]': [  input['to[]'] ],
+                'from[]': [  input['from[]']],
+                'coment[]': [  input['coment[]']],
+                'fecha[]': [  input['fecha[]'] ],
+                'iddesp[]': [  input['iddesp[]'] ]
+            };
+        }
+        var iddesp = [];
+        for(var t=0; t < input['idmat[]'].length; t++){
+            if(input['iddesp[]'][t] !== '0'){iddesp.push(input['iddesp[]'][t]);}
+        }
+        var q = "SELECT " +
+            "despachos.idgd," +
+            "count(despachos.iddespacho) as total, count(despachos.iddespacho) < totalGd.total as noComplete, " +
+            "totalGd.total AS totalGd FROM despachos " +
+            "LEFT JOIN (" +
+            "   SELECT " +
+            "       despachos.idgd," +
+            "       count(despachos.iddespacho) as total " +
+            "   FROM despachos GROUP BY despachos.idgd) AS totalGd ON totalGd.idgd = despachos.idgd " +
+            "WHERE despachos.iddespacho IN ("+iddesp.join(',')+") GROUP BY despachos.idgd";
+        console.log(q);
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+
+            connection.query(q, function(err, check){
                 if(err){console.log("Error Selecting : %s", err);}
-                req.app.locals.io.emit("refreshfaena"+userf);
+                console.log(check);
+                var boolSend = false;
+                var idgds = [];
+                if(check){
+                    for(var w=0; w < check.length; w++){
+                        if(check[w].noComplete === '1' || check[w].noComplete === 1){
+                            idgds.push(check[w].idgd);
+                            boolSend = true;
+                            break;
+                        }
+                    }
+                }
+                console.log("SELECT " +
+                    "CONCAT('<li>GDD ', despachos.idgd, ' : ', material.detalle, ' ', despachos.cantidad, ' despachado(s).</li>' ) AS text " +
+                    "FROM despachos " +
+                    "LEFT JOIN material ON material.idmaterial = despachos.idmaterial " +
+                    "WHERE despachos.idgd IN ("+idgds.join(',')+") AND despachos.iddespacho NOT IN ("+iddesp.join(',')+")");
+                connection.query("SELECT " +
+                    "CONCAT('<li>GDD ', despachos.idgd, ' : ', material.detalle, ' ', despachos.cantidad, ' despachado(s).</li>' ) AS text " +
+                    "FROM despachos " +
+                    "LEFT JOIN material ON material.idmaterial = despachos.idmaterial " +
+                    "WHERE despachos.idgd IN ("+idgds.join(',')+") AND despachos.iddespacho NOT IN ("+iddesp.join(',')+")", function(err, restDesp){
+                    if(err){console.log("Error Selecting : %s", err);}
+
+                    var msg = [];
+
+                    if(restDesp){
+                        restDesp.map(function(x) {
+                            msg.push(x['text']);
+                        });
+                    }
+
+                    res.send([boolSend, "<ul style='white-space: nowrap; margin: 0; padding: 0;'>"+msg.join("\n")+"</ul>"]);
+                });
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
 
                 //connection.end();
             });

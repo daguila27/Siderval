@@ -27,7 +27,7 @@
             </ul>
         </div>
         <div class="modal-body sliderModal" style="overflow: hidden; width: 100%; padding: 0; margin: 0px !important; position:relative;">
-            <div style="margin: 0; width: 100%; display: flex; transition: 0.5s">
+            <div style="margin: 0; width: 100%; display: flex; transition: 0.5s;">
                 <div style="width: 100%;">
                     <div class="tab-content">
                         <div id="peds" class="tab-pane fade in active">
@@ -156,16 +156,6 @@
                         </div>
                         <div id="infog" class="tab-pane fade" style="padding: 10px">
                             <div style="width: 100%">
-                                <!--<div class="form-group" style="width: 100%">
-                                    <label for="prov">Seleccione Proveedor:</label>
-                                    <select class="form-control" name="prov" onchange="setPago(this)">
-                                        <#for(var t=0; t < provs.length; t++){#>
-                                        <option value="<%#provs[t].idcliente%>@<%#provs[t].pago%>"><%#provs[t].sigla%> - <%#provs[t].razon%></option>
-                                        <#}#>
-                                    </select>
-
-                                </div>-->
-
                                 <div class="form-group" style="width: 100%">
                                     <ul class="selector-buscador" role="navigation">
                                         <input type="hidden" id="cliente" value="0" name="prov" onchange="setPago(this)">
