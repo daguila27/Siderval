@@ -264,7 +264,6 @@ router.get('/create_production_history', function(req, res, next){
             if(err){console.log("Error Connection: %s", err);}
             connection.query(query, function(err, prods){
                 if(err){console.log("Error Selecting: %s", err);}
-
                 //OBTIENE TODOS LOS despachos CON GDD ESTADO Servicios QUE AUN NO SE HAYAN ENLAZADO
                 connection.query("SELECT " +
                     "CONCAT(despachos.idgd, despachos.idmaterial), \n" +
@@ -293,15 +292,19 @@ router.get('/create_production_history', function(req, res, next){
 router.post('/save_production_history', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        if(typeof input['idmat[]'] === 'string'){
-            recursive_save_ph(input['idmat[]'],input['env[]'],input['from[]'],input['to[]']," ", input["fecha[]"], req);
-        }
-        else{
-            for(var e=0; e < input['idmat[]'].length; e++){
-                recursive_save_ph(input['idmat[]'][e],input['env[]'][e],input['from[]'][e],input['to[]'][e]," ", input["fecha[]"][e], req);
-            }
-        }
-        res.send("¡Movimiento Diario registrado con exito!");
+        allMovFunction(input, req);
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("UPDATE user SET block_s = true WHERE username = 'calidad'", function(err, upCdc){
+                if(err){console.log("Error Updating : %s", err);}
+
+                connection.query("INSERT INTO notificacion (`descripcion`) VALUES ('cdcBloc@@"+new Date().toLocaleString()+"')", function(err, upCdc){
+                    if(err){console.log("Error Updating : %s", err);}
+
+                    res.send("¡Movimiento Diario registrado con exito!");
+                });
+            });
+        });
     }
     else{res.redirect('bad_login');}
 });
@@ -317,7 +320,6 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
         console.log(q);
         conn.query(q, function(err, rows){
             if(err) throw err;
-
 
             //NO QUEDA SALDO EN PRODUCCION PARA REALIZAR EL MOVIMIENTO
             if(rows.length > 0) {
@@ -438,18 +440,16 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                     query2 += " ELSE produccion.`standby` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
                 }
                 else{
+
                     query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
                 }
                 conn.query(query ,function(err,upProd1){
                 if(err) {throw err;}
-
                 conn.query(query2 ,function(err,upProd2){
-                    if(err) throw err;
+                    if(err){throw err;}
 
                     conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`, `fecha`) VALUES ?",[history],function(err,insert_h){
-                        if(err) throw err;
-
-
+                        if(err) {throw err};
                         if(to === 'e'){
                             notif = {
                                 idproduccion: prod_affected.join('-'),
@@ -482,8 +482,39 @@ function enviarNotificacionBodega(req, input){
         var idop = produccion[0].idop;
         var dataInsert = {};
         var d = new Date();
+        var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+        /*date = [d.getMonth()+1,
+                   d.getDate(),
+                   d.getFullYear()].join('/')+' '+
+                  [d.getHours(),
+                   d.getMinutes(),
+                   d.getSeconds()].join(':');*/
+        if(userf === '8'){
+            dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("notif");
+            });
 
+        }
+        else if(userf === "9"){
+            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("refreshfaena"+userf);
+            });
+        }
+        else{
+            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            console.log(dataInsert);
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("refreshfaena"+userf);
 
+            });
+        }
+    });
+}
 function allMovFunction(input, req){
     if(typeof input['idmat[]'] === 'string'){
         input = {
@@ -544,32 +575,6 @@ function allMovFunction(input, req){
 }
 
 
-        /*
-        * {
-          'idmat[]': [ '110932', '110932', '110931' ],
-          'env[]': [ '4', '5', '1' ],
-          'to[]': [ '4', '7', '5' ],
-          'from[]': [ '3', '5', '7' ],
-          'coment[]': [ '', '', '' ],
-          'fecha[]': [ '2019-11-11', '2019-11-11', '2019-11-11' ],
-          'iddesp[]': [ '0', '0', '0' ] }
-        */
-        allMovFunction(input, req);
-        req.getConnection(function(err, connection){
-            if(err){console.log("Error Connecting : %s", err);}
-            connection.query("UPDATE user SET block_s = true WHERE username = 'calidad'", function(err, upCdc){
-                if(err){console.log("Error Updating : %s", err);}
-
-                connection.query("INSERT INTO notificacion (`descripcion`) VALUES ('cdcBloc@@"+new Date().toLocaleString()+"')", function(err, upCdc){
-                    if(err){console.log("Error Updating : %s", err);}
-
-                    res.send("¡Movimiento Diario registrado con exito!");
-                });
-            });
-        });
-    }
-    else{res.redirect('bad_login');}
-});
 
 
 router.post('/save_production_history_check_gdd', function(req, res, next){
@@ -656,23 +661,6 @@ router.post('/save_production_history_check_gdd', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-                //connection.end();
-            });
-        }
-        else{
-            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-            console.log(dataInsert);
-            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                if(err){console.log("Error Selecting : %s", err);}
-                req.app.locals.io.emit("refreshfaena"+userf);
-
-                //connection.end();
-            });
-        }
-
-
-    });
-}
 
 function enviarNotificacionRechazo(req, input){
     if(conn){
