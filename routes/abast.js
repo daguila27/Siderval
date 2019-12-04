@@ -4161,9 +4161,14 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                     console.log(oda[0].tokenoda.split('@'));
                     console.log(typeof oda[0].tokenoda.split('@')[7]);
                     if(oda[0].tokenoda.split('@')[7] === 'off'){
+
+                        oda[0].dcto = oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100);
+                        oda[0].neto - oda[0].neto - oda[0].dcto;
                         oda[0].iva = oda[0].neto*0.19;
                         oda[0].total = oda[0].neto+oda[0].iva;
                     }else{
+                        oda[0].dcto = oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100);
+                        oda[0].neto - oda[0].neto - oda[0].dcto;
                         oda[0].iva = 0;
                         oda[0].total = oda[0].neto;
                         msg = 'EXENTO IVA';
@@ -4172,8 +4177,8 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
 
                     oda[0].iva = parsear_nro_routes(oda[0].iva);
                     oda[0].total = parsear_nro_routes(oda[0].total);
-                    oda[0].dcto = parsear_nro_routes(oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100) );
-                    oda[0].neto = parsear_nro_routes(oda[0].neto - (oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100)) );
+                    oda[0].dcto = parsear_nro_routes(oda[0].dcto);
+                    oda[0].neto = parsear_nro_routes(oda[0].neto);
 
                     oda[0].creacion = new Date(oda[0].creacion);
                     oda[0].creacion = oda[0].creacion.getDate()+"/"+(parseInt(oda[0].creacion.getMonth()) + 1)+"/"+oda[0].creacion.getFullYear();
