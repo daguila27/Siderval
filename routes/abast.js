@@ -4172,7 +4172,8 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
 
                     oda[0].iva = parsear_nro_routes(oda[0].iva);
                     oda[0].total = parsear_nro_routes(oda[0].total);
-                    oda[0].neto = parsear_nro_routes(oda[0].neto);
+                    oda[0].dcto = parsear_nro_routes(oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100) );
+                    oda[0].neto = parsear_nro_routes(oda[0].neto - (oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100)) );
 
                     oda[0].creacion = new Date(oda[0].creacion);
                     oda[0].creacion = oda[0].creacion.getDate()+"/"+(parseInt(oda[0].creacion.getMonth()) + 1)+"/"+oda[0].creacion.getFullYear();
