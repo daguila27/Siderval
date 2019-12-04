@@ -4163,12 +4163,12 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                     if(oda[0].tokenoda.split('@')[7] === 'off'){
 
                         oda[0].dcto = oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100);
-                        oda[0].neto - oda[0].neto - oda[0].dcto;
+                        oda[0].neto = oda[0].neto - oda[0].dcto;
                         oda[0].iva = oda[0].neto*0.19;
                         oda[0].total = oda[0].neto+oda[0].iva;
                     }else{
                         oda[0].dcto = oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100);
-                        oda[0].neto - oda[0].neto - oda[0].dcto;
+                        oda[0].neto = oda[0].neto - oda[0].dcto;
                         oda[0].iva = 0;
                         oda[0].total = oda[0].neto;
                         msg = 'EXENTO IVA';
