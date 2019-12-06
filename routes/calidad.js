@@ -239,6 +239,9 @@ router.get('/create_production_rech_prodh', function(req, res, next){
                                 function(err, notifMax){
                                     if(err){console.log("Error Selecting : %s", err);}
 
+                                    console.log("notifMax");
+                                    console.log(notifMax);
+
                                     var alertMsg = "";
                                     if(notifMax.length > 0){
                                         alertMsg = "El ultimo registro de Gestión Planta se realizó el "+
@@ -571,9 +574,11 @@ router.post('/save_production_rech_prod', function(req, res, next){
                 'colada[]': [input['colada[]']],
                 'producto[]': [input['producto[]']],
                 'causal[]': [input['causal[]']],
+                'causal_check[]': [input['causal_check[]']],
                 'area[]': [input['area[]']],
                 'from[]': [input['from[]']],
-                'idprodh[]': [input['idprodh[]']]
+                'idprodh[]': [input['idprodh[]']],
+                'image[]': [input['image[]']]
             };
         }
         console.log(input);
@@ -582,20 +587,22 @@ router.post('/save_production_rech_prod', function(req, res, next){
 
             for(var w=0; w < input['idmat[]'].length; w++){
                 rech.push([input['colada[]'][w], input['producto[]'][w], input['causal[]'][w], input['idprodh[]'][w] ]);
-
                 //DATA QUE SE INSERTA A produccionh_causal
                 //[[idcausal_etapacausal (toke), idproduccion_h],[idcausal_etapacausal (token), idproduccion_h], ...]
                 for(var q=0; q < input['causal[]'][w].split('-').length; q++){
-                    rech_causal.push([input['causal[]'][w].split('-')[q], input['idprodh[]'][w]]);
+                    if( input['causal_check[]'][w].split('-')[q] === 'true' ){
+                        rech_causal.push([input['causal[]'][w].split('-')[q], input['idprodh[]'][w], true]);
+                    }
+                    else{
+                        rech_causal.push([input['causal[]'][w].split('-')[q], input['idprodh[]'][w], false]);
+                    }
                 }
             }
             connection.query("INSERT INTO rechazos_cdc (`colada`, `producto`, `causal`, `idproduccion_h`) VALUES ?", [rech], function(err, inRechCdc){
                 if(err){console.log("Error Inserting : %s", err);}
-                connection.query("INSERT INTO produccionh_causal (`idcausal_etapacausal`, `idproduccion_h`) VALUES ?", [rech_causal], function(err, inProdHistCau) {
+                connection.query("INSERT INTO produccionh_causal (`idcausal_etapacausal`, `idproduccion_h`, `princ`) VALUES ?", [rech_causal], function(err, inProdHistCau) {
                     if (err) {console.log("Error Inserting : %s", err);}
 
-                    console.log("inProdHistCau");
-                    console.log(inProdHistCau);
                     res.send("¡Rechazo registrado con exito!");
                 });
             });

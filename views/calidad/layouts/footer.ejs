@@ -236,11 +236,22 @@
     <div style="height: 45%; width: 100%"></div>
 </div>
 <script>
+    var flag = true;
+    var fooCallBack = function(){location.reload();};
+    function foo(){
+        if (!flag){
+            fooCallBack();
+        }else{
+            setTimeout(foo, 100);
+        }
+    }
+
+
     function Alerta(msg){
         $(".alert-screen .mensaje").html(
             "<div class='div-msg' style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; padding: 50px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>"+msg+"</div>"+
             "<div style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; text-align: center;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>\n" +
-            "<button class='btn btn-primary' style='position: relative; bottom: 15px;' onclick='cerrarAlerta()'>Aceptar</button>" +
+            "<button class='btn btn-primary' style='position: relative; bottom: 15px;' onclick='cerrarAlerta();'>Aceptar</button>" +
             "</div>");
         $(".alert-screen").css('display', 'block');
         $(".alert-screen").css("background-color", "rgba(0,0,0,0.4)");
@@ -254,6 +265,7 @@
         $(".alert-screen").css('z-index', '-20');
         $(".alert-screen").css("background-color", "white");
         //$(".alert-screen .mensaje").css('background-color', 'white');
+        flag = false;
     }
 </script>
 <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA FUNCION ALERTA [FIN] -->

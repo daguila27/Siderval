@@ -166,6 +166,33 @@
                         </a>
                     </li>
                 </ul>
+                <button onclick="verificarPantalla()">AAA</button>
+                <script>
+                    var screens = [320,375,425,768,1024,1440];
+                    function verificarPantalla(){
+                        switch ($("html").width()) {
+                            case 320:
+                                alert('320')
+                                break;
+                            case 375:
+                                alert('375')
+                                break;
+                            case 425:
+                                alert('425')
+                                break;
+                            case 768:
+                                alert('768')
+                                break;
+                            case 1024:
+                                alert('1024')
+                                break;
+                            default:
+                                alert('default')
+                                break;
+                        }
+                        alert($("html").width());
+                    }
+                </script>
             </div>
         </div>
     </div>

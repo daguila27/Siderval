@@ -86,11 +86,23 @@ else{clase='busc-menu';}%>
                     </label>
                 </div>
             </div>
+            <style>
+                .input-xs {
+                    height: 22px;
+                    padding: 2px 5px;
+                    font-size: 12px;
+                    line-height: 1.5; /* If Placeholder of the input is moved up, rem/modify this. */
+                    border-radius: 3px;
+                }
+            </style>
             <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
                     <li><a href="#" class="getcsvof" data-tipo="opdetalle"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel Detalle</a></li>
                     <li><a href="#" class="getcsvof" data-tipo="op"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                    <li class="divider"></li>
+                    <li style="display: flex"><a href="#" class="getcsvof" data-tipo="op" style="display: flex">
+                            <label for="">Tamaño de Fuente: <div class="input-group"><input type="number" class="form-control input-xs"><span class="input-group-addon btn btn-default input-xs" onclick="alert('ok');">Cambiar</span></div></label></a></li>
                 </ul>
             </div>
         </div>
