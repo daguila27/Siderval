@@ -239,11 +239,8 @@ router.get('/create_production_rech_prodh', function(req, res, next){
                                 function(err, notifMax){
                                     if(err){console.log("Error Selecting : %s", err);}
 
-                                    console.log("notifMax");
-                                    console.log(notifMax);
-
                                     var alertMsg = "";
-                                    if(notifMax.length > 0){
+                                    if(notifMax.length > 0 || notifMax[0].idnotif_max !== null ){
                                         alertMsg = "El ultimo registro de Gestión Planta se realizó el "+
                                             [notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[2], notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[1], notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[0]].join('/')+
                                             " a las "+
