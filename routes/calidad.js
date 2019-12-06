@@ -239,6 +239,10 @@ router.get('/create_production_rech_prodh', function(req, res, next){
                                 function(err, notifMax){
                                     if(err){console.log("Error Selecting : %s", err);}
 
+
+                                    console.log("notifMax");
+                                    console.log(notifMax);
+                                    console.log(notifMax.length > 0 || notifMax[0].idnotif_max !== null);
                                     var alertMsg = "";
                                     if(notifMax.length > 0 || notifMax[0].idnotif_max !== null ){
                                         alertMsg = "El ultimo registro de Gestión Planta se realizó el "+
