@@ -85,7 +85,7 @@
         margin: 0;
         padding: 0;
         position: fixed;
-        width: 90%;
+        width: 100%;
         transition:0.5s;
         z-index: 9;
     }
@@ -103,44 +103,46 @@ var clase;
 if(username == 'gestionpl'){clase='busc-din-menu';}
 else{clase='busc-menu';}%>
 <div id="up-fills" class="row up-fills <%=clase%>">
-    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
-        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
-            <li class="active change-inv-title">Bodega Productos Terminados</li>
-            <li class="hidden hidden-inv-buttons"><button class="btn btn-success btn-xs" onclick="save_inventario()">Guardar</button></li>
-            <li class="hidden hidden-inv-buttons"><button class="btn btn-primary btn-xs" onclick="fin_inventario()">Finalizar</button></li>
-            <!-- Mostrar cantidad de datos -->
-            <div id="pedidos" data-total="0" style="margin-top: 8px"></div>
+    <div class="col-md-12 col-sm-12 col-xs-12 o_control_panel row" style="display: flex; margin: 0; padding: 10px; position: relative">
+        <ol class="col-md-6 col-sm-12 col-12 breadcrumb" style="padding: 10px 2px 0px 20px;">
+            <li class="active change-inv-title">
+                Bodega Productos Terminados
+            </li>
+            <div id="pedidos" data-total="0"></div>
+
+            <!--<li class="hidden-inv-buttons"><button class="btn btn-success btn-xs" onclick="save_inventario()">Guardar</button></li>
+            <li class="hidden-inv-buttons"><button class="btn btn-primary btn-xs" onclick="fin_inventario()">Finalizar</button></li>
+             Mostrar cantidad de datos -->
 
 
         </ol>
-        <div style="width: 50%;">
-            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
-
-            </div>
-            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
-                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
-                <ul class="dropdown-menu">
-                    <li><a href="#" class="getcsvof" data-tipo="stock"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
-                    <!--<li class="option_inventario"><a><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Realizar Inventario</a></li>-->
-                </ul>
-            </div>
-            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
+        <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0;padding: 0;">
+        </div>
+        <div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6"></div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" style="margin-top: 5px; display: flex">
+            <div class="btn-group btn-group-sm o_cp_switch_buttons">
                 <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='Lista' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
                 <div style="display: flex">
                     <label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
                     <input type="checkbox" id="show_zeros" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px">
                     <h5 style="margin-left: 10px" class="indicator-oc-check"><small>Mostrando solo productos(s) en existencia</small></h5>
-
                 </div>
             </div>
-
         </div>
+        <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+            <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+            <ul class="dropdown-menu">
+                <li><a href="#" class="getcsvof" data-tipo="stock"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                <!--<li class="option_inventario"><a><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Realizar Inventario</a></li>-->
+            </ul>
+        </div>
+        <div style="width: 100%"><button class="btn btn-xs btn-primary pull-right" onclick="hiddenUpMenu('DataTableBodega')"><i class="fa fa-angle-up"></i></button></div>
     </div>
 </div>
 
 <div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
     <div id="fw-body"  style="padding:0;margin: 0;">
-        <div class="content main-page">
+        <div class="content main-page" style="height: 100%; overflow-x: scroll">
         </div>
     </div>
 </div>
@@ -359,6 +361,20 @@ else{clase='busc-menu';}%>
 
     });
 
+
+
+
+
 </script>
 
 <script src="/buscador_funciones.js"></script>
+
+<button class="btn btn-primary search-button-display" id="search-button-display" onclick="showUpMenu('DataTableBodega')" style="
+position: fixed;
+bottom: -100px;
+transition: 1s;
+right: 10px;
+z-index:100;
+-webkit-box-shadow: 6px 6px 5px -2px rgba(0,0,0,0.75);
+-moz-box-shadow: 6px 6px 5px -2px rgba(0,0,0,0.75);
+box-shadow: 6px 6px 5px -2px rgba(0,0,0,0.75);"><i class="fa fa-search fa-3x"></i></button>

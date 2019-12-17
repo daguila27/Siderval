@@ -302,6 +302,12 @@ io.on('connection', function (socket) {
     });
       app.locals.socket = socket;
 });
+
+
+
+
+
+
 app.locals.io = io;
 app.locals.puerto = app.get('port');
 

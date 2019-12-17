@@ -5,7 +5,7 @@
 	}
 %>
 
-<table id="gdTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTabla" style="width: 100%; margin-top:0px !important;">
+<table id="gdTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTabla" style="min-width: 100%; width: auto; margin-top: 0 !important;">
 		<thead>
 			<tr>
 				<th class="o_column_sortable">GDD</th>
@@ -76,7 +76,7 @@
 <script type="text/javascript">
     setDataTableFixed("#gdTable");
     busc.setIndicadorPaginas(parseInt('<%= largoData%>'), ".indicador_paginas");
-
+	$(".indicador_paginas").css('position', 'absolute');
 
     function getxlsx(file){
 		$.ajax({
@@ -144,5 +144,50 @@
             }
         });
 	}
+
+
+
+    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA*/
+    $('.main-page').scroll(function(e){
+
+        //$('.fixedHeader-floating').scrollLeft($(this).scrollLeft());
+        $(".fixedHeader-floating tfoot").offset({ left: $("#gdTable thead").offset().left })
+        $('.fixedHeader-floating thead').offset({ left: $("#gdTable thead").offset().left });
+        //$('.fixedHeader-floating tfoot').offset({ left: $("#rechTable tfoot").offset().left });
+        //alert($('.fixedHeader-floating tfoot').left());
+        //$('.fixedHeader-floating').css('left', $(this).css('left'));
+    });
+    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA --- FIN*/
 </script>
 
+
+
+
+<style>
+	table.fixedHeader-floating thead {
+		top: 0px;
+		width: 100% !important;
+		display: block;
+		overflow-x: unset;
+	}
+	table.fixedHeader-floating tfoot {
+		width: 100% !important;
+		display: block;
+		overflow-x: unset;
+	}
+
+	table#gdTable thead tr{
+		width: 100%;
+	}
+	table#gdTable tfoot{
+		width: 100% !important;
+
+	}
+
+	table#gdTable thead tr th{
+		white-space: nowrap;
+	}
+	table#gdTable tbody tr td{
+		white-space: nowrap;
+	}
+</style>

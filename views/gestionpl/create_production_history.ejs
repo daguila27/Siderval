@@ -33,19 +33,15 @@ d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMont
                     <div class="alert alert-default" id="prod_info" style="background-color: rgb(124,123,173); display: flex">
                         <strong style="color: white; width: 70%; font-size: 15px; margin-top: 15px" id="prod_nombre" data-idmat="">Inserto 23023</strong><small class="pull-right" id="sig_etapa" style="color: white; width:30%"> Siguiente Etapa: Quiebre</small>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group sendMov">
                         <label class="control-label col-sm-2" for="email">Procesados:</label>
                         <div>
                             <input type="number" class="form-control procesados-input" id="procesados" name="procesados" placeholder="Procesados">
-                            <label id="comentario-rechazo" for="" style="width: 100%;">
-                                Comentario:
-                                <textarea class="form-control" name="" id="comentarioMov" cols="20" rows="3"></textarea>
-                            </label>
                         </div>
                         <input type="hidden" id="idmaterial" name="idmaterial">
-                        <input type="hidden" id="nom-etapa" name="nom-etapa">
                         <input type="hidden" id="nom-etapa-previus" name="nom-etapa-previus">
                         <input type="hidden" id="etapa-previus" name="etapa-previus">
+                        <input type="hidden" id="nom-etapa" name="nom-etapa">
                     </div>
                     <div class="form-group sendMovGDD">
                         <label class="control-label" for="email" style="width: 100%">Guías de Despacho:</label>
@@ -118,7 +114,6 @@ d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMont
 </div>
 
 <div style="margin-top: 50px; padding: 0 30px">
-
     <style>
         .nav-tabs li.active a{
             background-color: rgb(124,123,173) !important;
@@ -881,7 +876,9 @@ d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMont
                     "<option value='"+next+"' selected>Siguiente : "+etapas[parseInt(next)-1]+"</option>" +
                     "<option value='s'>Rechazo</option>" +
                     "</select></label>");
-            }else{
+            }
+
+            else{
                 $('#prod_info').children('small').html("<label>Enviar a:     " +
                     "<select class='form-control' style='background-color: rgb(249,249,249); border-radius: 0; margin-right:10px'>" +
                     "<option value='"+next+"' selected>Siguiente : "+etapas[parseInt(next)-1]+"</option>" +
@@ -890,11 +887,13 @@ d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMont
                     "</select></label>");
             }
 
+            //SE MUESTRA EL FORMULARIO normal O DE gdd
+            if(next === 9 || next === '9'){changeModalMovh(true,$(yo).parent().data('idmat'));}
+            else{changeModalMovh(false,null);}
+
             $("#nom-etapa").val($(yo).data('netapa'));
-            $(".procesados-input").attr('max', parseInt($(yo).html()) )
+            $(".procesados-input").attr('max', parseInt($(yo).html()));
             $("#crearProdHist").modal('show');
-
-
         }
     }
     function changeDateValue(yo){
@@ -923,7 +922,6 @@ d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMont
         var d_max = new Date();
         d_max = d_max.setDate(new Date().getDate()+7);
         d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMonth()+1, 2) , completarDigitos(new Date(d_max).getDate(),2) ].join('-');
-
 
         //SI SE HA SELECCIONADO UNA GDD
         if(selectGD){
@@ -1007,7 +1005,8 @@ d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMont
             to: [],
             from: [],
             coment: [],
-            fecha: []
+            fecha: [],
+            iddesp: []
         };
         $(".tab-content td").each(function(){
             dataDom[$(this).data('name')].push($(this).data('valor'));

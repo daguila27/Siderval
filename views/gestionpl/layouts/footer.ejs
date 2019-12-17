@@ -232,7 +232,7 @@
 </body>
 </html>
 <script>
-    function show_menu(){
+    /*function show_menu(){
         $('.o_sub_menu').css('left', '0%');
         $("#oe_main_menu_navbar").css('width', '90%');
         $("#oe_main_menu_navbar").css('margin-left', '10%');
@@ -285,8 +285,16 @@
         $(".menu-icon").removeClass('fa-times');
         $(".menu-icon").addClass('fa-bars');
         $(".menu-icon").parent().parent().parent().attr('onclick', 'show_menu()');
-    }
+    }*/
 
+
+
+    function show_menu(){
+        $('.o_sub_menu').css('left', '0%');
+    }
+    function close_menu() {
+        $('.o_sub_menu').css('left', $('.o_sub_menu').width()*-1 );
+    }
     function destroyDataTable(callback){
         if ( $.fn.DataTable.isDataTable('table') ) {
             $('table').DataTable().destroy();
@@ -447,4 +455,33 @@
     $("#pageView").val($(".oe_secondary_submenu li[data-link='"+"<%= route%>"+"']").data('tipo'));
     /*COMANDOS NECESARIOS PARA DESTACAR OPCIÓN SELECCIONADA Y CAMBIAR EL NOMBRE EN PESTAÑA DE NAVEGADOR -- FIN */
 
+</script>
+
+<script>
+    function hiddenUpMenu(str){
+
+        $(".up-fills").css('top', (parseInt($(".up-fills").css('height'))*-1) + 2 );
+        $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height() + 2 ) ;
+        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+
+        $(".fixedHeader-floating thead").parent('.fixedHeader-floating').offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $(".fixedHeader-floating thead").offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $('.fixedHeader-floating tfoot').offset({ top: $("#"+str+" tfoot").offset().top });
+        //dataTable.fixedHeader.headerOffset( 0 );
+
+        $(".search-button-display").css('bottom', '10px');
+    }
+
+    function showUpMenu(str){
+        $(".up-fills").css('top', '0' );
+        $("#fw-container").css('margin-top', $(".up-fills").height() + $("#oe_main_menu_navbar").height() ) ;
+        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+
+        $(".fixedHeader-floating thead").parent('.fixedHeader-floating').offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $(".fixedHeader-floating thead").offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $('.fixedHeader-floating tfoot').offset({ top: $("#"+str+" tfoot").offset().top });
+        //dataTable.fixedHeader.headerOffset( 0 );
+
+        $(".search-button-display").css('bottom', '-100px');
+    }
 </script>

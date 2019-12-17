@@ -11,7 +11,7 @@ function fechaLatino(string){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"></div>
 
-<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="min-width: 100%; width: auto; margin-top: -2px !important;">
     <thead>
         <tr>
             <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
@@ -153,5 +153,46 @@ function fechaLatino(string){
                 }
             })
         });
+        /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA*/
+        $('.main-page').scroll(function(e){
+
+            //$('.fixedHeader-floating').scrollLeft($(this).scrollLeft());
+            $(".fixedHeader-floating tfoot").offset({ left: $("#prodTable thead").offset().left })
+            $('.fixedHeader-floating thead').offset({ left: $("#prodTable thead").offset().left });
+            //$('.fixedHeader-floating tfoot').offset({ left: $("#rechTable tfoot").offset().left });
+            //alert($('.fixedHeader-floating tfoot').left());
+            //$('.fixedHeader-floating').css('left', $(this).css('left'));
+        });
+        /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA --- FIN*/
 
 </script>
+
+
+<style>
+    table.fixedHeader-floating thead {
+        top: 0px;
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+    table.fixedHeader-floating tfoot {
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+
+    table#prodTable thead tr{
+        width: 100%;
+    }
+    table#prodTable tfoot{
+        width: 100% !important;
+
+    }
+
+    table#prodTable thead tr th{
+        white-space: nowrap;
+    }
+    table#prodTable tbody tr td{
+        white-space: nowrap;
+    }
+</style>

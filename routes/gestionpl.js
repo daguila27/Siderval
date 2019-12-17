@@ -289,37 +289,99 @@ router.get('/create_production_history', function(req, res, next){
     else{res.redirect('bad_login');}
 });
 
-router.post('/save_production_history', function(req, res, next){
-    if(verificar(req.session.userData)){
-        var input = JSON.parse(JSON.stringify(req.body));
-        allMovFunction(input, req);
-        req.getConnection(function(err, connection){
-            if(err){console.log("Error Connecting : %s", err);}
-            connection.query("UPDATE user SET block_s = true WHERE username = 'calidad'", function(err, upCdc){
-                if(err){console.log("Error Updating : %s", err);}
+function enviarNotificacionBodega(req, input){
+    var userf = input.key.substring(2,3);
+    conn.query("SELECT fabricaciones.idmaterial, produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion){
+        if(err){console.log("Error Selecting : %s", err);}
+        var idmaterial = produccion[0].idmaterial;
+        var idop = produccion[0].idop;
+        var dataInsert = {};
+        var d = new Date();
+        var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+        /*date = [d.getMonth()+1,
+                   d.getDate(),
+                   d.getFullYear()].join('/')+' '+
+                  [d.getHours(),
+                   d.getMinutes(),
+                   d.getSeconds()].join(':');*/
+        if(userf === '8'){
+            dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("notif");
+            });
 
-                connection.query("INSERT INTO notificacion (`descripcion`) VALUES ('cdcBloc@@"+new Date().toLocaleString()+"')", function(err, upCdc){
-                    if(err){console.log("Error Updating : %s", err);}
+        }
+        else if(userf === "9"){
+            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("refreshfaena"+userf);
+            });
+        }
+        else{
+            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
+            console.log(dataInsert);
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.emit("refreshfaena"+userf);
 
-                    res.send("¡Movimiento Diario registrado con exito!");
-                });
+            });
+        }
+    });
+}
+function enviarNotificacionRechazo(req, input){
+    if(conn){
+        conn.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion in ("+input.idproduccion.split('-').join(',')+")", function(err, produccion) {
+            if(err){console.log("Error Selecting : %s", err);}
+            var idmaterial = produccion[0].idmaterial;
+            var idop = produccion[0].idop;
+            var dataInsert = {};
+            var d = new Date();
+            var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+            dataInsert.descripcion = "jfp@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop+"@"+input.razon+"@"+input.etapa;
+            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
+                if(err){console.log("Error Selecting : %s", err);}
+                req.app.locals.io.sockets.emit("notif");
             });
         });
     }
-    else{res.redirect('bad_login');}
-});
+}
+function enviarNotificacionExternalizacion(req, input){
+    if(conn){
+        console.log("INGRESANDO NOTIFICACIÓN DE EXTERNALIZACION");
+        console.log(input);
+        //{ idproduccion: '22744-22853', cantidad: '1', key: 'fae' }
+        //odaext@idproduccion@2019-07-08 16:51:53@idmaterial@cantidad
+        conn.query("SELECT fabricaciones.idmaterial FROM produccion " +
+            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+            "WHERE idproduccion IN ('"+input.idproduccion.split('-').join(',')+"') GROUP BY fabricaciones.idmaterial", function(err, idmat) {
+            if(err){console.log("Error Selecting : %s", err);}
+            idmat = idmat[0].idmaterial;
+            var d = new Date();
+            var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
+            var token = "odaext@"+input.idproduccion+"@"+date+"@"+idmat+"@"+input.cantidad;
+            console.log(token);
+            conn.query("INSERT INTO notificacion (descripcion) VALUES ('"+token+"')", function(err, inNotif) {
+                if(err){console.log("Error Selecting : %s", err);}
 
-function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
+            });
+        });
+    }
+}
+
+//function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
+function recursive_save_ph(data, index, req){
     if(conn){
         var q = "select " +
-            "material.detalle,material.idmaterial,group_concat(produccion.idproduccion SEPARATOR '-') as idprod, group_concat(produccion."+from+" SEPARATOR '-') as cantprod " +
+            "material.detalle,material.idmaterial,group_concat(produccion.idproduccion SEPARATOR '-') as idprod, group_concat(produccion."+data['from[]'][index]+" SEPARATOR '-') as cantprod " +
             "from produccion " +
             "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
             "left join material on material.idmaterial=fabricaciones.idmaterial " +
-            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+from+">0 and material.idmaterial = "+idmat+" group by material.idmaterial order by produccion.idproduccion ASC";
+            "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+data['from[]'][index]+">0 and material.idmaterial = "+data['idmat[]'][index]+" group by material.idmaterial order by produccion.idproduccion ASC";
         console.log(q);
         conn.query(q, function(err, rows){
-            if(err) throw err;
+            if(err){ throw err; }
 
             //NO QUEDA SALDO EN PRODUCCION PARA REALIZAR EL MOVIMIENTO
             if(rows.length > 0) {
@@ -330,34 +392,35 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                       sendnum: '91',
                       etapa_act: '1' };
                 * */
-                if(iddesp.toString() === '0'){iddesp = null;}
+                if(data['iddesp[]'][index].toString() === '0'){data['iddesp[]'][index] = null;}
                 //EXT === 9
-                if(to === '9'){to = 'e';}
+                if(data['to[]'][index] === '9'){data['to[]'][index] = 'e';}
                 var input = {
                     idprod: rows[0].idprod,
                     cantprod: rows[0].cantprod,
-                    newetapa: to,
-                    sendnum: env,
-                    etapa_act: from,
-                    iddesp: iddesp
+                    newetapa: data['to[]'][index],
+                    sendnum: data['env[]'][index],
+                    etapa_act: data['from[]'][index],
+                    iddesp: data['iddesp[]'][index]
                 };
                 //jfp@109603@120@2019-6-25 16:19:58@22901-22864-22866@283@COMENTARIO@4
                 //ENVIAR NOTIFICACIÓN
                 var notif;
-                if(to === 's'){
+                var fecha = data['fecha[]'][index];
+                if(data['to[]'][index] === 's'){
                     notif = {
                         idproduccion: rows[0].idprod,
-                        cantidad: env,
-                        razon: obs,
-                        etapa: from
+                        cantidad: data['env[]'][index],
+                        razon: data['comment[]'][index],
+                        etapa: data['from[]'][index]
                     };
                     setTimeout(function(){ enviarNotificacionRechazo(req, notif); }, 666);
 
                 }
-                else if(to === '8'){
+                else if(data['to[]'][index] === '8'){
                     notif = {
                         idproduccion: rows[0].idprod,
-                        cantidad: env,
+                        cantidad: data['env[]'][index],
                         key: 'fa8'
                     };
                     setTimeout(function(){ enviarNotificacionBodega(req, notif); }, 666);
@@ -371,7 +434,7 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                 input.cantprod = input.cantprod.split('-');
                 var query = "UPDATE produccion SET produccion.`"+input.etapa_act+"` = CASE ";
                 var query2;
-                if(to === 's'){
+                if(data['to[]'][index] === 's'){
                     query2 = "UPDATE produccion SET produccion.`standby` = CASE ";
                 }
                 else{
@@ -444,23 +507,26 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
                     query2 += " ELSE produccion.`"+input.newetapa+"` END WHERE idproduccion IN (" +ids.substring(0, ids.length-1) +")";
                 }
                 conn.query(query ,function(err,upProd1){
-                if(err) {throw err;}
-                conn.query(query2 ,function(err,upProd2){
-                    if(err){throw err;}
+                    if(err) {throw err;}
+                    console.log(1);
+                    conn.query(query2 ,function(err,upProd2){
+                        if(err){throw err;}
+                        console.log(history);
 
-                    conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`, `fecha`) VALUES ?",[history],function(err,insert_h){
-                        if(err) {throw err};
-                        if(to === 'e'){
-                            notif = {
-                                idproduccion: prod_affected.join('-'),
-                                cantidad: env_affected.join('-'),
-                                key: 'fae'
-                            };
-                            enviarNotificacionExternalizacion(req, notif);
-                        }
+                        conn.query("INSERT INTO produccion_history (`idproduccion`, `enviados`, `from`, `to`, `fecha`, `idgd`) VALUES ?",[history],function(err,insert_h){
+                            if(err) {throw err;}
+
+                            if(data['to[]'][index] === 'e'){
+                                notif = {
+                                    idproduccion: prod_affected.join('-'),
+                                    cantidad: env_affected.join('-'),
+                                    key: 'fae'
+                                };
+                                enviarNotificacionExternalizacion(req, notif);
+                            }
+                        });
                     });
                 });
-            });
             }
             else{
                 if(data['idmat[]'][++index]){
@@ -473,48 +539,6 @@ function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
     }
 }
 
-
-function enviarNotificacionBodega(req, input){
-    var userf = input.key.substring(2,3);
-    conn.query("SELECT fabricaciones.idmaterial, produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion = ?", [input.idproduccion], function(err, produccion){
-        if(err){console.log("Error Selecting : %s", err);}
-        var idmaterial = produccion[0].idmaterial;
-        var idop = produccion[0].idop;
-        var dataInsert = {};
-        var d = new Date();
-        var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
-        /*date = [d.getMonth()+1,
-                   d.getDate(),
-                   d.getFullYear()].join('/')+' '+
-                  [d.getHours(),
-                   d.getMinutes(),
-                   d.getSeconds()].join(':');*/
-        if(userf === '8'){
-            dataInsert.descripcion = "idm@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                if(err){console.log("Error Selecting : %s", err);}
-                req.app.locals.io.emit("notif");
-            });
-
-        }
-        else if(userf === "9"){
-            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                if(err){console.log("Error Selecting : %s", err);}
-                req.app.locals.io.emit("refreshfaena"+userf);
-            });
-        }
-        else{
-            dataInsert.descripcion = input.key+"@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop;
-            console.log(dataInsert);
-            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                if(err){console.log("Error Selecting : %s", err);}
-                req.app.locals.io.emit("refreshfaena"+userf);
-
-            });
-        }
-    });
-}
 function allMovFunction(input, req){
     if(typeof input['idmat[]'] === 'string'){
         input = {
@@ -527,18 +551,7 @@ function allMovFunction(input, req){
             'iddesp[]': [  input['iddesp[]'] ]
         };
     }
-    /*
-    * {
-      'idmat[]': [ '110814', '110814' ],
-      'env[]': [ '2', '1' ],
-      'to[]': [ '9', '9' ],
-      'from[]': [ '4', '4' ],
-      'coment[]': [ '', '' ],
-      'fecha[]': [ '2019-11-27', '2019-11-27' ],
-      'iddesp[]': [ '3572', '3567' ] }
-    * */
     for(var t=0; t < input['idmat[]'].length; t++){
-
         //HACIA EXTERNALIZADO => ENLAZADO CON despachos
         if(input['iddesp[]'][t].split(',').length > 1){
             for(var w=0; w < input['iddesp[]'][t].split(',').length; w++){
@@ -571,8 +584,32 @@ function allMovFunction(input, req){
             input['env[]'][t] =  '1';
         }
     }
+    console.log(input);
     recursive_save_ph(input, 0, req);
 }
+
+
+router.post('/save_production_history', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        allMovFunction(input, req);
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s", err);}
+            connection.query("UPDATE user SET block_s = true WHERE username = 'calidad'", function(err, upCdc){
+                if(err){console.log("Error Updating : %s", err);}
+
+                connection.query("INSERT INTO notificacion (`descripcion`) VALUES ('cdcBloc@@"+new Date().toLocaleString()+"')", function(err, upCdc){
+                    if(err){console.log("Error Updating : %s", err);}
+
+                    res.send("¡Movimiento Diario registrado con exito!");
+                });
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
 
 
 
@@ -662,48 +699,7 @@ router.post('/save_production_history_check_gdd', function(req, res, next){
 });
 
 
-function enviarNotificacionRechazo(req, input){
-    if(conn){
-        conn.query("SELECT fabricaciones.idmaterial,produccion.idordenproduccion as idop FROM produccion LEFT JOIN fabricaciones ON produccion.idfabricaciones = fabricaciones.idfabricaciones WHERE produccion.idproduccion in ("+input.idproduccion.split('-').join(',')+")", function(err, produccion) {
-            if(err){console.log("Error Selecting : %s", err);}
-            var idmaterial = produccion[0].idmaterial;
-            var idop = produccion[0].idop;
-            var dataInsert = {};
-            var d = new Date();
-            var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
-            dataInsert.descripcion = "jfp@"+idmaterial+"@"+input.cantidad+"@"+date+"@"+input.idproduccion+"@"+idop+"@"+input.razon+"@"+input.etapa;
-            conn.query("INSERT INTO notificacion SET ?", [dataInsert], function(err, rows){
-                if(err){console.log("Error Selecting : %s", err);}
-                req.app.locals.io.sockets.emit("notif");
-            });
-        });
-    }
-}
 
-
-
-function enviarNotificacionExternalizacion(req, input){
-    if(conn){
-        console.log("INGRESANDO NOTIFICACIÓN DE EXTERNALIZACION");
-        console.log(input);
-        //{ idproduccion: '22744-22853', cantidad: '1', key: 'fae' }
-        //odaext@idproduccion@2019-07-08 16:51:53@idmaterial@cantidad
-        conn.query("SELECT fabricaciones.idmaterial FROM produccion " +
-            "LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones " +
-            "WHERE idproduccion IN ('"+input.idproduccion.split('-').join(',')+"') GROUP BY fabricaciones.idmaterial", function(err, idmat) {
-            if(err){console.log("Error Selecting : %s", err);}
-            idmat = idmat[0].idmaterial;
-            var d = new Date();
-            var date = d.toLocaleDateString()+" "+d.toLocaleTimeString();
-            var token = "odaext@"+input.idproduccion+"@"+date+"@"+idmat+"@"+input.cantidad;
-            console.log(token);
-            conn.query("INSERT INTO notificacion (descripcion) VALUES ('"+token+"')", function(err, inNotif) {
-                if(err){console.log("Error Selecting : %s", err);}
-
-            });
-        });
-    }
-}
 
 
 

@@ -68,8 +68,6 @@ class Buscador{
     buscar_action(forpageoc, callback){
         var t = this.idtabla;
         var ispage = this.ispage;
-        console.log("datos buscardor");
-        console.log(this);
         $.ajax({
             type: 'POST',
             data: {clave: this.filtros_seleccionados.join(','),cond: this.add_cond, ispage: ispage, rango: this.rango.join('@'), page: this.page, isRango: this.datefill, columnaRango: this.columnaRango, extraInfo: this.extraInfo.join('%')  },
@@ -111,32 +109,53 @@ class Buscador{
     }
 
 
-    renderPagesIndicator(idtag){
+    renderPagesIndicator(idtag, after){
         var msj = this.mensPag.split('%S');
         if(this.ispage){
             //Muestra la cantidad de pedidos
             if(this.page === 1 && this.lastpage){
-
-                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
+                }
             }
             else if(this.page === 1){
-                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
             }
             else if(this.lastpage){
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                }
             }
             else{
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
             }
         }
         else{
-            $(idtag).html("<h5><small>"+msj[0]+" "+$(idtag).data('total')+" "+msj[1]+"(s).</small></h5>");
+            if(after){$(idtag).after("<h5><small>"+msj[0]+" "+$(idtag).data('total')+" "+msj[1]+"(s).</small></h5>");}
+            else{$(idtag).html("<h5><small>"+msj[0]+" "+$(idtag).data('total')+" "+msj[1]+"(s).</small></h5>");}
         }
 
     }
 
 
-    setIndicadorPaginas(largo, tag){
+    //render: boolean => true: renderiza contador en etiqueta con id = tag ; false : NO renderiza contador en etiqueta con id = tag;
+    setIndicadorPaginas(largo, tag, after){
         if(this.ispage){
             this.lastpage = largo < 100 ;
             if(this.lastpage){
@@ -146,11 +165,11 @@ class Buscador{
                 this.limit = ( ( (this.page-1)*100) + 1 )+","+((this.page-1)*100 + 100);
 
             }
-            this.renderPagesIndicator(tag);
+            this.renderPagesIndicator(tag, after);
         }
         else{
             $(tag).data('total', largo);
-            this.renderPagesIndicator(tag);
+            this.renderPagesIndicator(tag, after);
         }
     }
 

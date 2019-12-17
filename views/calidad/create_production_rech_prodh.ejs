@@ -15,6 +15,25 @@
         AlertaBloc("<%= alertMsg%>");
     </script>
 <%}%>
+
+
+<script>
+    function sendImg(){
+        $("#sendImg").submit();
+    }
+
+    function onChangeImg(yo){
+        var input = document.getElementById(yo);
+        var fReader = new FileReader();
+        fReader.readAsDataURL(input.files[0]);
+        fReader.onloadend = function(event){
+            var img = document.getElementById("yourImgTagModal");
+            img.src = event.target.result;
+        }
+    }
+
+</script>
+
 <!-- Modal adjuntar Movimiento-->
 <div id="crearProdRech" class="modal-primary modal fade" role="dialog">
     <div class="modal-dialog">
@@ -272,8 +291,10 @@
                     $("#prodCol"+$("#idColAux").val()).find('td[data-name="coment"]').data('valor', arr.comment);
 
 
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html(arr.image);
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html(arr.image + "<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
                     $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('valor', arr.image);
+
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').children('img').attr('src', $('#yourImgTagModal').attr('src') );
 
                     $("#editProdRech").modal("hide");
                 }
@@ -306,6 +327,7 @@
                 }
 
             </script>
+
             <!--
             data-max: cantidad máxima de causales principales
             -->
@@ -363,9 +385,10 @@
                 <div class="form-group image-group input-group" style="margin-top: 10px;">
                     <label for="" style="width: 100%;">
                         Adjuntar Imagen:
-                        <input style="margin-left: 10px;margin-top: 2px" type="file" id="imagenMovCau">
+                        <input style="margin-left: 10px;margin-top: 2px" type="file" id="imagenMovCau" onchange="onChangeImg('imagenMovCau')">
                     </label>
                 </div>
+                <img src="" alt="" id="yourImgTagModal" style="width: 80%; margin-left: 10%;">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="setDataCau()">Aplicar</button>
@@ -427,29 +450,6 @@
                 <h4 style="width: 100%">
                     Rechazos
                     <div class="pull-right" style="width: 10%; display: flex">
-                        <!-- <div class="dropdown">
-                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Ingresar Fechas <span class="caret"></span></button>
-                             <ul class="dropdown-menu" style="right: 0; left: auto; padding: 5px">
-                                 <li class="input-date">
-                                     <input id="fecha-hasta" class="form-control input-xs" type="date">
-                                 </li>
-                                 <li class="divider"></li>
-                                 <li class="input-option" style="padding: 0px 10px; width: 100%;">
-                                     <label style="color: black; margin-bottom: 0px; ">Ingresar Fecha para : </label>
-                                     <div class="radio">
-                                         <label style="color: black;"><input type="radio" name="optradio" value="esta" checked>Esta Etapa</label>
-                                     </div>
-                                     <div class="radio">
-                                         <label style="color: black;"><input type="radio" name="optradio" value="todas">Todas</label>
-                                     </div>
-                                 </li>
-                                 <li class="divider"></li>
-                                 <li class="pull-right" style="padding: 0px 10px">
-                                     <button class="btn btn-xs btn-primary" onclick="setDatesMov(this)"><i class="fa fa-refresh" aria-hidden="true"></i> Aplicar</button>
-                                 </li>
-                             </ul>
-
-                         </div>-->
                         <div class="dropdown opcion-sl">
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto;">
@@ -484,71 +484,6 @@
                         <tr class="empty-table">
                             <td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>
                         </tr>
-                        <!--<tr>
-                            <td style="white-space: nowrap">Perno Cabeza Hexagonal G8, Tuercas Cabeza Hexagonal y Golillas Campana con goma 3/4</td>
-                            <td style="text-align:center; white-space: nowrap">2</td>
-                            <td style="text-align:center; white-space: nowrap"><input type="datetime-local" class="form-control"></td>
-                            <td style="text-align:center; white-space: nowrap">Motivo de Rechazo</td>
-                            <td style="text-align:center; white-space: nowrap">19H15</td>
-                            <td style="text-align:center; white-space: nowrap">002</td>
-                            <td style="text-align:center; white-space: nowrap">Causal</td>
-                            <td style="text-align:center; white-space: nowrap">Tratamiento Térmico</td>
-                            <td style="text-align:center; white-space: nowrap">
-                                <button type="button" class="btn btn-xs btn-danger" onclick="$(this).parent().parent().remove()">&times;</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap">Alma Perforacion Revestimiento N°3 Izquierdo-Derecho</td>
-                            <td style="text-align:center; white-space: nowrap">2</td>
-                            <td style="text-align:center; white-space: nowrap"><input type="datetime-local" class="form-control"></td>
-                            <td style="text-align:center; white-space: nowrap">Motivo de Rechazo</td>
-                            <td style="text-align:center; white-space: nowrap">19H15</td>
-                            <td style="text-align:center; white-space: nowrap">002</td>
-                            <td style="text-align:center; white-space: nowrap">Causal</td>
-                            <td style="text-align:center; white-space: nowrap">Tratamiento Térmico</td>
-                            <td style="text-align:center; white-space: nowrap">
-                                <button type="button" class="btn btn-xs btn-danger" onclick="$(this).parent().parent().remove()">&times;</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap">Bowl Liner 3' S.H.</td>
-                            <td style="text-align:center; white-space: nowrap">2</td>
-                            <td style="text-align:center; white-space: nowrap"><input type="datetime-local" class="form-control"></td>
-                            <td style="text-align:center; white-space: nowrap">Motivo de Rechazo</td>
-                            <td style="text-align:center; white-space: nowrap">19H15</td>
-                            <td style="text-align:center; white-space: nowrap">002</td>
-                            <td style="text-align:center; white-space: nowrap">Causal</td>
-                            <td style="text-align:center; white-space: nowrap">Tratamiento Térmico</td>
-                            <td style="text-align:center; white-space: nowrap">
-                                <button type="button" class="btn btn-xs btn-danger" onclick="$(this).parent().parent().remove()">&times;</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style=" white-space: nowrap">Linner Botton Sag B03 173300</td>
-                            <td style="text-align:center; white-space: nowrap">2</td>
-                            <td style="text-align:center; white-space: nowrap"><input type="datetime-local" class="form-control"></td>
-                            <td style="text-align:center; white-space: nowrap">Motivo de Rechazo</td>
-                            <td style="text-align:center; white-space: nowrap">19H15</td>
-                            <td style="text-align:center; white-space: nowrap">002</td>
-                            <td style="text-align:center; white-space: nowrap">Agrietamiento por Enfriamiento Severo </td>
-                            <td style="text-align:center; white-space: nowrap">Tratamiento Térmico</td>
-                            <td style="text-align:center; white-space: nowrap">
-                                <button type="button" class="btn btn-xs btn-danger" onclick="$(this).parent().parent().remove()">&times;</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="white-space: nowrap">Bandeja Apron Feeder 88" (BPB-S)</td>
-                            <td style="text-align:center; white-space: nowrap">2</td>
-                            <td style="text-align:center; white-space: nowrap"><input type="datetime-local" class="form-control"></td>
-                            <td style="text-align:center; white-space: nowrap">Motivo de Rechazo</td>
-                            <td style="text-align:center; white-space: nowrap">19H15</td>
-                            <td style="text-align:center; white-space: nowrap">002</td>
-                            <td style="text-align:center; white-space: nowrap">Causal</td>
-                            <td style="text-align:center; white-space: nowrap">Tratamiento Térmico</td>
-                            <td style="text-align:center; white-space: nowrap">
-                                <button type="button" class="btn btn-xs btn-danger" onclick="$(this).parent().parent().remove()">&times;</button>
-                            </td>
-                        </tr>-->
                         </tbody>
                     </table>
                 </div>
@@ -567,7 +502,7 @@
             <h4 class="col-md-10">Productos Disponible (Producción): </h4>
             <div style="vertical-align: middle; display: flex">
                 <p style="margin: 0; padding: 7px 0px">Buscador:</p>
-                <input id="srProd" type="text" class="form-control" placeholder="Descripción" onchange="refreshGridProd(this)" onkeyup="refreshGridProd(this)" style="width: auto; margin-left: 2%">
+                <input id="srProd" type="text" class="form-control" placeholder="Descripción" onchange="searchDataTable($(this).val())" onkeyup="searchDataTable($(this).val())" style="width: auto; margin-left: 2%">
             </div>
         </div>
         <div class="panel-body" style="padding: 0%">
@@ -620,9 +555,8 @@
                         margin-top: 9px;
                     }
                 </style>
-
                 <div class="row listProd" style="width: 100%;margin: 0; padding: 0px 0px;">
-                    <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                    <table id="tableProduccion" style="margin-top: 0px !important;" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                         <thead>
                             <tr>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Orden de Fabricación">OF</th>
@@ -674,7 +608,6 @@
                         <%}%>
                         </tbody>
                     </table>
-
                 </div>
             </div>
         </div>
@@ -683,6 +616,14 @@
     </div>
 </div>
 
+<div class="hidden" id="hidden-form-images">
+</div>
+
+<style>
+    .dataTables_filter {
+        display: none;
+    }
+</style>
 
 <script>
 
@@ -700,7 +641,7 @@
         "Externalizado"
     ];
 
-    $('#prodTable').DataTable({
+    var tableProduccion = $('#tableProduccion').DataTable({
         paging: false,
         language: {
             "sProcessing":     "Procesando...",
@@ -724,10 +665,12 @@
             }
         }
     });
-    $("#prodTable_wrapper").css('margin-top', '-39px');
-    $("#prodTable_wrapper label").css('color', 'white');
+    //$("#prodTable_wrapper").css('margin-top', '-39px');
+    //$("#prodTable_wrapper label").css('color', 'white');
 
-
+    function searchDataTable(str){
+        tableProduccion.search( str ).draw();
+    }
     function setDatesMov(yo){
         var etp = $(".tabs-etapas li.active a").data('etp');
         var fecha = $(yo).parent().parent().children('.input-date').children('input').val();
@@ -859,6 +802,7 @@
             idprodh: [],
             image: []
         };
+        form_images = $('<form method="post" action="/upload" encType="multipart/form-data"></form>');
         $("#tbody_rech td").each(function(){
             if($(this).data('name') === 'fecha'){
                 data[$(this).data('name')].push($(this).children('input').val());
@@ -872,17 +816,30 @@
                 data['causal_check'].push($(this).data('check'));
                 data[$(this).data('name')].push($(this).data('valor'));
             }
+
+            else if( ($(this).data('name') === 'image')){
+                data[$(this).data('name')].push($(this).data('valor'));
+                form_images.append('<input type="file" name="foo" value="' + $(this).data('valor') + '" required />')
+            }
+
             else{
                 console.log($(this).data('name'));
                 data[$(this).data('name')].push($(this).data('valor'));
             }
         });
         console.log(data);
+        console.log(form_images.html());
+        $("#hidden-form-images").html(form_images);
+        alert("enviando imagenes");
+        alert($("#hidden-form-images").html());
+
+        $("#hidden-form-images").children('form').submit();
         $.ajax({
             type: 'POST',
             data: data,
             url: '/calidad/save_production_rech_prod',
             success: function(data){
+
                 Alerta(data);
                 flag = true;
                 fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
@@ -955,14 +912,22 @@
             "<td style='white-space: nowrap; text-align: center' data-name='colada' data-valor=' '><input class='form-control' type='text' placeholder='Ej: 19H15' id='coladaNum' onkeyup='if(checkExpReg(/[0-9]{2}[A-J]{1}[0-9]{2}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
             "<td style='white-space: nowrap; text-align: center' data-name='producto' data-valor=' '><input class='form-control' type='number' placeholder='Ej: 002' id='productoNum' onkeyup='if(checkExpReg(/[0-9]{1,3}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
             "<td class='tdEtp' style='white-space: nowrap; text-align: center;' data-name='from' data-valor='"+etp+"'>"+etapas[etp-1]+"</td>" +
-            "<td class='tdCom' style='text-align:center; white-space: nowrap; padding: 0px !important' data-name='image' data-valor=' '></td>" +
+            "<td class='tdImg' style='text-align:center; white-space: nowrap; padding: 2px !important' data-name='image' data-src=' ' data-valor=' '></td>" +
             "<td class='tdCom' style='text-align:center; white-space: nowrap; padding: 0px !important' data-name='coment' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('comentario')+"'><div style='padding: 0px 30px; margin: 0;'>"+$("#"+ev.dataTransfer.getData("text")).data('comentario')+"</div></td>" +
-            "<td style='text-align:center; white-space: nowrap; position: relative; padding: 0px !important' data-name='causal' data-valor=' ' data-check=' '><div style='padding: 0px 30px 0px 15px; margin: 0;'> -- Causales -- </div><i class=\"fa fa-pencil\" onclick='$(\"#idColAux\").val("+globalIdCount+");resetSelector() ;applyMoves($(this).parent().data(\"valor\").split(\"-\"));$(\"#comentarioMovCau\").val($(this).parent().parent().find(\"td.tdCom\").data(\"valor\")); $(\"#editProdRech\").modal(\"show\")' style=\"position: absolute; top: 2px; right: 3px; color: rgb(124, 123, 173);\"></i></td>" +
+            "<td style='text-align:center; white-space: nowrap; position: relative; padding: 0px !important' data-name='causal' data-valor=' ' data-check=' '><div style='padding: 0px 30px 0px 15px; margin: 0;'> -- Causales -- </div><i class=\"fa fa-pencil\" onclick='editCausales("+globalIdCount+", this)' style=\"position: absolute; top: 2px; right: 3px; color: rgb(124, 123, 173);\"></i></td>" +
             "<td style='text-align:center; white-space: nowrap' data-name='idprodh' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('idprodh')+"'><button type='button' class='btn btn-xs btn-danger' onclick='removeProd(this);'><i class='fa fa-times' aria-hidden='true'></i></button></td>" +
         "</tr>");
         $("#"+ev.dataTransfer.getData("text")).addClass('hidden');
     }
+    function editCausales(globalIdCount, yo){
+        $("#idColAux").val(globalIdCount);
+        resetSelector();
+        applyMoves($(yo).parent().data("valor").split("-"));
+        $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
 
+        $("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
+        $("#editProdRech").modal("show");
+    }
     function addProdBtn(id) {
         var arropt = false;
         var auxEtp;

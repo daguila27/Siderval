@@ -3,6 +3,8 @@ var router = express.Router();
 var path = require('path');
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
+const fileUpload = require('express-fileupload');
+
 
 var dbCredentials = require("../dbCredentials");
 dbCredentials.insecureAuth = true;
@@ -12,6 +14,8 @@ router.use(
     connection(mysql,dbCredentials,'pool')
 
 );
+// default options
+router.use(fileUpload());
 
 
 /* GET home page. */
@@ -133,6 +137,29 @@ router.get('/google_topdf', function(req, res){
                 });
             });
         });
+    });
+});
+
+
+
+router.post('/upload', function(req, res) {
+    console.log(req.body);
+    if (!req.files || Object.keys(req.files).length === 0) {
+        console.log("Error al Subir Archivo");
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    console.log("Subiendo Archivo");
+    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+    console.log(req.files);
+    let sampleFile = req.files.foo;
+
+    // Use the mv() method to place the file somewhere on your server
+    sampleFile.mv('/img/filename.jpg', function(err) {
+        if (err){return res.status(500).send(err);}
+
+        console.log("Subida Exitosa!");
+        res.send('File uploaded!');
     });
 });
 

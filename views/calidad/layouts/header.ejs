@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html>
+<html id="html-dom">
 
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -52,73 +52,100 @@
     <link type="text/css" rel="stylesheet" href="/assets/css/web.assets_backend.1.css"/>
     <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.summernote.0.css"/>
     <link type="text/css" rel="stylesheet" href="/assets/css/web_editor.assets_editor.0.css"/>
-    <%function show_user(usename){
+    <%
+    function show_user(usename){
         if(username === 'calidad'){
             return "Control de Calidad";
         }
-    }%>
+    }
+
+    function verificarPantalla(){
+        var ancho = 800;
+        if( ancho <= 320 ){
+            console.log("XXS");
+            return '1';
+        }
+        else if(ancho > 320 && ancho <= 375 ){
+            console.log("XS");
+            return '2';
+
+        }
+        else if(ancho > 375 && ancho <= 425 ){
+            console.log("S");
+            return '3';
+
+        }
+        else if(ancho > 425 && ancho <= 768 ){
+            console.log("M");
+            return '4';
+
+        }
+        else if(ancho > 768 && ancho <= 1024 ){
+            console.log("L");
+            return '5';
+
+        }
+        else if(ancho > 1024 && ancho <= 1440 ){
+            console.log("XL");
+            return '6';
+
+        }
+        else{
+            console.log("XXL");
+            return '7';
+        }
+    }
+    %>
 
 </head>
 
 <body class="o_web_client" style="overflow-y: scroll;">
 
-<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 90%;margin-left:10%; z-index: 10; transition: 0.5s">
-    <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 100%; z-index: 10; transition: 0.5s">
+    <div class="navbar-header hidden">
+        <button class="hidden" type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <div style="margin: 5px 0px" onclick="show_menu();">
                 <i style="color: white" class="fa fa-bars"></i>
             </div>
         </button>
     </div>
-    <div class="navbar-collapse collapse">
-
+    <div style="display: flex; width: 100%">
         <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
-            <li onclick="close_menu()" style="cursor:pointer;">
-                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-times"></i> Menu</span></a>
-            </li>
-            <li>
-                <a class="oe_menu_leaf"><span class="oe_menu_text"></span></a>
-            </li>
+                <li onclick="show_menu()" style="cursor:pointer;">
+                    <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-bars"></i> Menu</span></a>
+                </li>
 
+            </ul>
+        <span style="display: flex; position: absolute; right: 10px;">
+                <ul class="nav navbar-right o_mail_navbar_item open">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
+                            <i class="fa fa-envelope fa-fw"></i>
+                            <i class="fa fa-caret-down"></i>
+                            <span class="badge badge-notificaciones"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
 
-        </ul>
-
-
-        <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
-            <li style="margin-right: 10px; text-align: center;">
-                <div style="font-family: 'Lobster'; font-size: 15px; color: white; ">Bienvenido <%= show_user(username)%></div>
-            </li>
-            <li>
-                <div><a href="../user/log_out">Cerrar sesión</a></div>
-            </li>
-        </ul>
-
-        <!--<ul class="nav navbar-nav navbar-right oe_user_menu_placeholder"></ul>
-        <ul class="nav navbar-nav navbar-right oe_systray"></ul>-->
-
-
-        <ul class="nav navbar-right o_mail_navbar_item open">
-            <li class="dropdown">
-                <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
-                    <i class="fa fa-envelope fa-fw"></i>
-                    <i class="fa fa-caret-down"></i>
-                    <span class="badge badge-notificaciones"></span>
-                </a>
-                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
-
+                        </ul>
+                        <!-- /.dropdown-messages -->
+                    </li>
+                    <!-- /.dropdown -->
                 </ul>
-                <!-- /.dropdown-messages -->
-            </li>
-            <!-- /.dropdown -->
-        </ul>
+
+                <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
+                    <li style="margin-right: 10px; text-align: center;">
+                        <div style=" white-space: nowrap;font-family: 'Lobster'; font-size: 15px; color: white; ">Bienvenido <%= show_user(username)%></div>
+                    </li>
+                    <li>
+                        <div><a href="../user/log_out" style="white-space: nowrap;">Cerrar sesión</a></div>
+                    </li>
+                </ul>
+            </span>
         <ul class="nav navbar-right ">
-            <li>
-                <div style=" font-size: 15px; color: red; margin-right: 20px"></div>
-            </li>
-        </ul>
-
-
-
+                <li>
+                    <div style=" font-size: 15px; color: red; margin-right: 20px"></div>
+                </li>
+            </ul>
     </div>
 </nav>
 
@@ -126,9 +153,10 @@
 
 
 <div class="o_main">
-    <div class="o_sub_menu" style="position: fixed; z-index: 20; height: 100%; left: 0%; width: 10%; transition: 0.5s;">
+    <div class="o_sub_menu col-xs-12 col-sm-6 col-md-3 col-lg-2 col-xl-2" style="padding:0;  position: fixed; z-index: 20; height: 100%; left: 0%; transition: 0.5s;">
         <a class="o_sub_menu_logo" style="background-color: white">
-            <img src="/assets/img/logo.png" style="margin: 0; padding: 0; width: 100%">
+            <div style="padding: 6px; cursor: pointer" onclick="close_menu()"><i class="fa fa-times pull-right"></i></div>
+            <img src="/assets/img/logo.png" style="margin: 0; padding: 0; max-width: 200px">
         </a>
         <div class="o_sub_menu_content">
 
@@ -143,7 +171,13 @@
                     color: white;
                 }
             </style>
-
+            <%if(verificarPantalla() < 4){%>
+                <style>
+                    #menu-lateral-izquierdo{
+                        font-size: 20px;
+                    }
+                </style>
+            <%}%>
             <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">
                 </div>
@@ -153,46 +187,19 @@
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
                     <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Control de Calidad - Registrar Rechazos" data-link="/calidad/create_production_rech_prodh">
                         <a class="oe_menu_leaf">
-                             <span class="oe_menu_text">
-                                 Registrar Rechazos
-                             </span>
+                                 <span class="oe_menu_text">
+                                     Registrar Rechazos
+                                 </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Control de Calidad - Ver Rechazos" data-link="/calidad/view_rechazos">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Control de Calidad - Ver Rechazos" data-link="/calidad/view_rechazos" style="white-space: nowrap">
                         <a class="oe_menu_leaf">
-                             <span class="oe_menu_text">
-                                 Ver Rechazos
-                             </span>
+                                 <span class="oe_menu_text">
+                                     Ver Rechazos
+                                 </span>
                         </a>
                     </li>
                 </ul>
-                <button onclick="verificarPantalla()">AAA</button>
-                <script>
-                    var screens = [320,375,425,768,1024,1440];
-                    function verificarPantalla(){
-                        switch ($("html").width()) {
-                            case 320:
-                                alert('320')
-                                break;
-                            case 375:
-                                alert('375')
-                                break;
-                            case 425:
-                                alert('425')
-                                break;
-                            case 768:
-                                alert('768')
-                                break;
-                            case 1024:
-                                alert('1024')
-                                break;
-                            default:
-                                alert('default')
-                                break;
-                        }
-                        alert($("html").width());
-                    }
-                </script>
             </div>
         </div>
     </div>
@@ -241,4 +248,4 @@
     <ul class="notif-alert-ul">
 
     </ul>
-    <div id="page-wrapper"  data-view="/calidad/create_production_rech" style="width: 90%;margin-left:10%; transition: 0.5s;" data-tipo="1">
+    <div id="page-wrapper"  data-view="/calidad/create_production_rech" style="width: 100%; margin-left: auto; transition: 0.5s;" data-tipo="1">

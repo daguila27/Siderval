@@ -97,14 +97,69 @@
 </form>
 </body>
 </html>
+
 <script>
-    function show_menu(){
+    //$("#page-wrapper").css('width', $("html").width() - $(".o_sub_menu").width() );
+    //$("#page-wrapper").css('margin-left', $(".o_sub_menu").width() );
+
+    //$(".navbar-collapse").css('width', $("html").width() - $(".o_sub_menu").width() );
+    //$(".navbar-collapse").css('margin-left', $(".o_sub_menu").width() );
+
+
+
+    var screens = [
+        {'font': 6, 'phone': true},
+        {'font': 6, 'phone': true},
+        {'font': 6, 'phone': true},
+        {'font': 6, 'phone': true},
+        {'font': 6, 'phone': false},
+        {'font': 6, 'phone': false},
+        {'font': 6, 'phone': false}
+    ];
+    function verificarPantalla(){
+        var ancho = $("html").width();
+        if( ancho <= 320 ){
+            console.log("XXS");
+            return '1';
+        }
+        else if(ancho > 320 && ancho <= 375 ){
+            console.log("XS");
+            return '2';
+
+        }
+        else if(ancho > 375 && ancho <= 425 ){
+            console.log("S");
+            return '3';
+
+        }
+        else if(ancho > 425 && ancho <= 768 ){
+            console.log("M");
+            return '4';
+
+        }
+        else if(ancho > 768 && ancho <= 1024 ){
+            console.log("L");
+            return '5';
+
+        }
+        else if(ancho > 1024 && ancho <= 1440 ){
+            console.log("XL");
+            return '6';
+
+        }
+        else{
+            console.log("XXL");
+            return '7';
+        }
+    }
+    verificarPantalla();
+    /*function show_menu(){
         $('.o_sub_menu').css('left', '0%');
-        $("#oe_main_menu_navbar").css('width', '90%');
-        $("#oe_main_menu_navbar").css('margin-left', '10%');
-        $("#page-wrapper").css('width', '90%');
-        $("#page-wrapper").css('margin-left', '10%');
-        $("#up-fills").css('width', '90%');
+        $("#oe_main_menu_navbar").css('width', 'inherit');
+        $("#oe_main_menu_navbar").css('margin-left', 'auto');
+        $("#page-wrapper").css('width', $("html").width() - $(".o_sub_menu").width());
+        $("#page-wrapper").css('margin-left', $(".o_sub_menu").width());
+        $("#up-fills").css('width', $("html").width() - $(".o_sub_menu").width());
         if((
             $("#page-wrapper").data('view') === "/bodega/view_despachos" ||
             $("#page-wrapper").data('view') === "/bodega/view_bodega"||
@@ -123,7 +178,7 @@
 
     }
     function close_menu() {
-        $('.o_sub_menu').css('left', '-10%');
+        $('.o_sub_menu').css('left', $(".o_sub_menu").width()*-1);
         $("#oe_main_menu_navbar").css('width', '100%');
         $("#oe_main_menu_navbar").css('margin-left', '0%');
         $("#page-wrapper").css('width', '100%');
@@ -144,6 +199,13 @@
         $(".menu-icon").removeClass('fa-times');
         $(".menu-icon").addClass('fa-bars');
         $(".menu-icon").parent().parent().parent().attr('onclick', 'show_menu()');
+    }*/
+
+    function show_menu(){
+        $('.o_sub_menu').css('left', '0%');
+    }
+    function close_menu() {
+        $('.o_sub_menu').css('left', $('.o_sub_menu').width()*-1 );
     }
 
     function destroyDataTable(callback){

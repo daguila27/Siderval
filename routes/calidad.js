@@ -562,7 +562,6 @@ router.post('/save_production_rech_prod', function(req, res, next){
         var input = JSON.parse(JSON.stringify(req.body));
         var rech = [];
         var rech_causal = [];
-
         if(typeof input['idmat[]'] === 'string'){
             input = {
                 'idmat[]': [input['idmat[]']],
@@ -875,4 +874,7 @@ router.get('/drop_notif/:idnotif', function(req, res, next){
             });
     });
 });
+
+
+
 module.exports = router;

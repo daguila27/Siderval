@@ -87,7 +87,7 @@
         margin: 0;
         padding: 0;
         position: fixed;
-        width: 90%;
+        width: 100%;
         transition:0.5s;
         z-index: 9;
     }
@@ -105,46 +105,44 @@ var clase;
 if(username == 'gestionpl'){clase='busc-din-menu';}
 else{clase='busc-menu';}%>
 <div id="up-fills" class="row up-fills <%=clase%>">
-    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
-        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+    <div class="col-md-12 col-sm-12 col-xs-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="col-md-6 col-sm-12 col-12 breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
             <li class="active">Pedidos sin Despachar</li>
             <!-- Mostrar cantidad de datos -->
-            <div style="display: flex;">
+            <div style="display: flex; position: absolute">
                 <div id="indicador_paginas" data-total="0" style="margin-right: 3px"></div>
                 <div id="pedidos"></div>
             </div>
         </ol>
-        <div style="width: 50%; margin-right: 4%;">
-            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+        <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0;padding: 0;">
+        </div>
+        <div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6"></div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" style="display: flex">
+            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
+                <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista" style="display: flex"></button>
             </div>
-            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
-                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
-                <ul class="dropdown-menu">
-                    <li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+            <div style="padding: 5px; margin-left: 15px">
+                <ul class="nav nav-pills"  style="display: flex;">
+                    <li class="pill-vista active" data-name="pedido-view"><a style="padding: 6px" href="#">Pedidos</a></li>
+                    <li class="pill-vista" data-name="palets-view"><a style="padding: 6px" href="#">Palets</a></li>
                 </ul>
             </div>
-            <div style="display: flex">
-                <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
-                    <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_fabricaciones/fabricaciones.f_entrega-ASC' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista" style="display: flex"></button>
-                </div>
-                <div style="padding: 5px; margin-left: 15px">
-                    <ul class="nav nav-pills"  style="display: flex;">
-                        <li class="pill-vista active" data-name="pedido-view"><a style="padding: 6px" href="#">Pedidos</a></li>
-                        <li class="pill-vista" data-name="palets-view"><a style="padding: 6px" href="#">Palets</a></li>
-                    </ul>
-                </div>
-
-                <div class="filters" style="margin-top: 5px">
-
-                </div>
+            <div class="filters" style="margin-top: 5px">
             </div>
+            </div>
+        <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+            <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+            <ul class="dropdown-menu">
+                <li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+            </ul>
         </div>
-    </div>
+        <div style="width: 100%"><button class="btn btn-xs btn-primary pull-right" onclick="hiddenUpMenu('despachosTable')"><i class="fa fa-angle-up"></i></button></div>
 
+    </div>
 </div>
 <div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
     <div id="fw-body"  style="padding:0;margin: 0;">
-        <div class="content main-page">
+        <div class="content main-page" style="height: 100%; overflow-x: scroll">
         </div>
     </div>
 </div>
@@ -374,3 +372,13 @@ else{clase='busc-menu';}%>
 
 
 <script src="/buscador_funciones.js"></script>
+
+<button class="btn btn-primary search-button-display" id="search-button-display" onclick="showUpMenu('despachosTable')" style="
+position: fixed;
+bottom: -100px;
+transition: 1s;
+right: 10px;
+z-index:100;
+-webkit-box-shadow: 6px 6px 5px -2px rgba(0,0,0,0.75);
+-moz-box-shadow: 6px 6px 5px -2px rgba(0,0,0,0.75);
+box-shadow: 6px 6px 5px -2px rgba(0,0,0,0.75);"><i class="fa fa-search fa-3x"></i></button>

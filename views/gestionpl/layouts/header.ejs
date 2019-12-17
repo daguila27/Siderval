@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 
@@ -56,7 +54,45 @@
         if(username === 'gestionpl'){
             return "Gestión Planta";
         }
-    }%>
+    }
+    function verificarPantalla(){
+        var ancho = 300;
+        if( ancho <= 320 ){
+            console.log("XXS");
+            return '1';
+        }
+        else if(ancho > 320 && ancho <= 375 ){
+            console.log("XS");
+            return '2';
+
+        }
+        else if(ancho > 375 && ancho <= 425 ){
+            console.log("S");
+            return '3';
+
+        }
+        else if(ancho > 425 && ancho <= 768 ){
+            console.log("M");
+            return '4';
+
+        }
+        else if(ancho > 768 && ancho <= 1024 ){
+            console.log("L");
+            return '5';
+
+        }
+        else if(ancho > 1024 && ancho <= 1440 ){
+            console.log("XL");
+            return '6';
+
+        }
+        else{
+            console.log("XXL");
+            return '7';
+        }
+    }
+    %>
+    %>
 
 </head>
 
@@ -68,64 +104,51 @@
 
 
 
-<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 90%;margin-left:10%; z-index: 10; transition: 0.5s">
-    <div class="navbar-header">
+<nav id="oe_main_menu_navbar" class="navbar navbar-inverse" style="position: fixed; width: 100%; margin-left: 0%; z-index: 10; transition: 0.5s">
+    <div class="navbar-header hidden">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <div style="margin: 5px 0px" onclick="show_menu();">
                 <i style="color: white" class="fa fa-bars"></i>
             </div>
         </button>
     </div>
-
-    <div class="navbar-collapse collapse">
-
+    <div style="display: flex; width: 100%">
         <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
-            <li onclick="close_menu()" style="cursor:pointer;">
-                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-times"></i> Menu</span></a>
+            <li onclick="show_menu()" style="cursor:pointer;">
+                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-bars"></i> Menu</span></a>
             </li>
-            <li>
-                <a class="oe_menu_leaf"><span class="oe_menu_text"></span></a>
-            </li>
-
 
         </ul>
+        <span style="display: flex; position: absolute; right: 10px;">
+                <ul class="col-md-offset-2 col-md-3 nav navbar-right o_mail_navbar_item open">
+                    <li class="dropdown">
+                        <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
+                            <i class="fa fa-envelope fa-fw"></i>
+                            <i class="fa fa-caret-down"></i>
+                            <span class="badge badge-notificaciones"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
 
-
-        <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px;">
-            <li>
-                <div style="font-family: 'Lobster'; font-size: 15px; color: white; margin: 0px 10px;">Bienvenido <%= show_user(username)%></div>
-            </li>
-            <li style="margin-top: 3px; margin-right: 3px">
-                <div><a href="../user/log_out">Cerrar sesión</a></div>
-            </li>
-        </ul>
-
-        <!--<ul class="nav navbar-nav navbar-right oe_user_menu_placeholder"></ul>
-        <ul class="nav navbar-nav navbar-right oe_systray"></ul>-->
-
-
-        <ul class="nav navbar-right o_mail_navbar_item open">
-            <li class="dropdown">
-                <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
-                    <i class="fa fa-envelope fa-fw"></i>
-                    <i class="fa fa-caret-down"></i>
-                    <span class="badge badge-notificaciones"></span>
-                </a>
-                <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
-
+                        </ul>
+                        <!-- /.dropdown-messages -->
+                    </li>
+                    <!-- /.dropdown -->
                 </ul>
-                <!-- /.dropdown-messages -->
-            </li>
-            <!-- /.dropdown -->
-        </ul>
+
+                <ul class="col-md-offset-3 col-md-4 nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
+                    <li style="margin-right: 10px; text-align: center;">
+                        <div style=" white-space: nowrap;font-family: 'Lobster'; font-size: 15px; color: white; ">Bienvenido <%= show_user(username)%></div>
+                    </li>
+                    <li>
+                        <div><a href="../user/log_out" style="white-space: nowrap;">Cerrar sesión</a></div>
+                    </li>
+                </ul>
+        </span>
         <ul class="nav navbar-right ">
             <li>
-                <div style=" font-size: 15px; color: red; margin-right: 20px">INFORMACIÓN DE TESTEO | NO REPRESENTA LA REALIDAD</div>
+                <div style=" font-size: 15px; color: red; margin-right: 20px"></div>
             </li>
         </ul>
-
-
-
     </div>
 </nav>
 
@@ -133,8 +156,10 @@
 
 
 <div class="o_main">
-    <div class="o_sub_menu" style="position: fixed; z-index: 20; height: 100%; left: 0%; width: 10%; transition: 0.5s;">
+
+    <div class="o_sub_menu col-xs-12 col-sm-6 col-md-3 col-lg-2 col-xl-2" style="padding:0; position: fixed; z-index: 20; height: 100%; left: 0%; transition: 0.5s;">
         <a class="o_sub_menu_logo" style="background-color: white">
+            <div style="padding: 6px; cursor: pointer" onclick="close_menu()"><i class="fa fa-times pull-right"></i></div>
             <img src="/assets/img/logo.png" style="margin: 0; padding: 0; width: 100%">
         </a>
         <div class="o_sub_menu_content">
@@ -144,17 +169,29 @@
                     margin-top: 5px;
                 }
 
+                #menu-lateral-izquierdo ul li a:hover{
+                    cursor: pointer;
+                    background-color: rgb(190, 189, 215);
+                    color: white;
+                }
             </style>
+            <%if(verificarPantalla() < 4){%>
+                <style>
+                    #menu-lateral-izquierdo{
+                        /*font-size: 20px;*/
+                    }
+                </style>
+            <%}%>
 
 
-            <div class="oe_secondary_menu">
+            <div class="oe_secondary_menu" id="menu-lateral-izquierdo">
                 <div class="oe_secondary_menu_section">
                 </div>
                 <div class="oe_secondary_menu_section">
                     Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/gestionpl/create_production_history">
+                    <li class="active" onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Registrar Movimientos Diarios" data-link="/gestionpl/create_production_history">
                         <a class="oe_menu_leaf">
                              <span class="oe_menu_text">
                                  Registrar Movimientos Diarios
@@ -168,28 +205,28 @@
                     Despachos
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_gdd" id="view_movimientos">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Crear Guía de Despacho" data-link="/bodega/crear_gdd" id="view_movimientos">
                         <a class="oe_menu_leaf active">
                                             <span class="oe_menu_text">
                                                 Crear Guía de Despacho
                                             </span>
                         </a>
                     </li>
-                    <li  onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_despachos">
+                    <li  onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Ver Guías" data-link="/bodega/view_despachos">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Ver Guías
                                             </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/crear_recepcion">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Recepcionar Externalizados" data-link="/bodega/crear_recepcion">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Recepcionar Externalizados
                                             </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_externo">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Ver Externalizados" data-link="/bodega/view_externo">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Ver Externalizados
@@ -205,14 +242,14 @@
                 </div>
 
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_bodega">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Productos" data-link="/bodega/view_bodega">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Productos
                                             </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/bodega/view_pendientes">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Packing List" data-link="/bodega/view_pendientes">
                         <a class="oe_menu_leaf">
                                             <span class="oe_menu_text">
                                                 Packing List
@@ -226,14 +263,14 @@
                     Orden de Producción
                 </div>
                 <ul class="oe_secondary_submenu nav nav-pills nav-stacked">
-                    <li onclick="ajax(this)" data-tipo="0" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/crear_op">
+                    <li onclick="ajax(this)" data-tipo="0" data-msg="Gestión Planta - Crear OP" data-link="/jefeprod/crear_op">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                              Crear OP
                                         </span>
                         </a>
                     </li>
-                    <li onclick="ajax(this)" data-tipo="1" data-msg="Bodega Materias Primas e Insumos - Ver Reservaciones" data-link="/jefeprod/view_producciones">
+                    <li onclick="ajax(this)" data-tipo="1" data-msg="Gestión Planta - Ver Todas (Producciones - OP)" data-link="/jefeprod/view_producciones">
                         <a class="oe_menu_leaf">
                                         <span class="oe_menu_text">
                                             Ver Todas
@@ -295,4 +332,4 @@
     <ul class="notif-alert-ul">
 
     </ul>
-    <div id="page-wrapper"  data-view="/gestionpl/create_production_history" style="width: 90%;margin-left:10%; transition: 0.5s;" data-tipo="1">
+    <div id="page-wrapper"  data-view="/gestionpl/create_production_history" style="width: 100%;margin-left:0%; transition: 0.5s;" data-tipo="1">

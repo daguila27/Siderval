@@ -1,7 +1,7 @@
 <!-- Oculta cantidad de datos -->
-<div id="registros" style="display: none"><%= data.length %></div>
+<div id="registros hidden" style="display: none"><%= data.length %></div>
 
-<table id="DataTableBodega" class="o_list_view table table-condensed table-striped" style="width: 100%; margin-top: 0 !important;">
+<table id="DataTableBodega" class="o_list_view table table-condensed table-striped" style="min-width: 100%; width: auto; margin-top: 0 !important;">
     <thead>
         <tr>
             <th>Código</th>
@@ -19,7 +19,7 @@
 
         </tr>
     </thead>
-    <tbody class="ui-sortable">
+    <tbody class="column-prods">
         <%for(var i=0; i < data.length; i++){
             if(data[i].inventariados != null){
                 if(data[i].inventariados - data[i].stock == 0){%>
@@ -82,7 +82,23 @@
     setDataTableFixed("#DataTableBodega");
 
     $("#pedidos").data('total', parseInt('<%= largoData%>'));
+    $("#pedidos").css('position', 'absolute');
+
     busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#pedidos");
+
+
+    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA*/
+    $('.main-page').scroll(function(e){
+
+        //$('.fixedHeader-floating').scrollLeft($(this).scrollLeft());
+        $(".fixedHeader-floating tfoot").offset({ left: $("#DataTableBodega thead").offset().left })
+        $('.fixedHeader-floating thead').offset({ left: $("#DataTableBodega thead").offset().left });
+        //$('.fixedHeader-floating tfoot').offset({ left: $("#rechTable tfoot").offset().left });
+        //alert($('.fixedHeader-floating tfoot').left());
+        //$('.fixedHeader-floating').css('left', $(this).css('left'));
+    });
+    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA --- FIN*/
+
 </script>
 
 <% if( tipo == 'inv'){%>
@@ -94,3 +110,33 @@
 
     </script>
 <%}%>
+
+
+<style>
+    table.fixedHeader-floating thead {
+        top: 0px;
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+    table.fixedHeader-floating tfoot {
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+
+    table#DataTableBodega thead tr{
+        width: 100%;
+    }
+    table#DataTableBodega tfoot{
+        width: 100% !important;
+
+    }
+
+    table#DataTableBodega thead tr th{
+        white-space: nowrap;
+    }
+    table#DataTableBodega tbody tr td{
+        white-space: nowrap;
+    }
+</style>
