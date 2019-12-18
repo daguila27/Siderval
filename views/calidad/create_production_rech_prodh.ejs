@@ -818,8 +818,8 @@
             }
 
             else if( ($(this).data('name') === 'image')){
-                data[$(this).data('name')].push($(this).data('valor'));
-                form_images.append('<input type="file" name="foo" value="' + $(this).data('valor') + '" required />')
+                data[$(this).data('name')].push($(this).find('img').attr('src'));
+                form_images.append('<input type="file" name="foo" value="' + $(this).find('img').attr('src') + '" required />')
             }
 
             else{
@@ -833,7 +833,7 @@
         alert("enviando imagenes");
         alert($("#hidden-form-images").html());
 
-        $("#hidden-form-images").children('form').submit();
+        //$("#hidden-form-images").children('form').submit();
         $.ajax({
             type: 'POST',
             data: data,

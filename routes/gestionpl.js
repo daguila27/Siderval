@@ -373,17 +373,19 @@ function enviarNotificacionExternalizacion(req, input){
 //function recursive_save_ph(idmat,env,from,to,obs,fecha, req){
 function recursive_save_ph(data, index, req){
     if(conn){
+        console.log("Posicion "+index);
+        console.log(data);
         var q = "select " +
             "material.detalle,material.idmaterial,group_concat(produccion.idproduccion SEPARATOR '-') as idprod, group_concat(produccion."+data['from[]'][index]+" SEPARATOR '-') as cantprod " +
             "from produccion " +
             "left join fabricaciones on fabricaciones.idfabricaciones=produccion.idfabricaciones " +
             "left join material on material.idmaterial=fabricaciones.idmaterial " +
             "where produccion.cantidad > produccion.8 + produccion.standby and produccion."+data['from[]'][index]+">0 and material.idmaterial = "+data['idmat[]'][index]+" group by material.idmaterial order by produccion.idproduccion ASC";
-        console.log(q);
+        //console.log(q);
         conn.query(q, function(err, rows){
             if(err){ throw err; }
 
-            //NO QUEDA SALDO EN PRODUCCION PARA REALIZAR EL MOVIMIENTO
+            //QUEDA SALDO EN PRODUCCION PARA REALIZAR EL MOVIMIENTO
             if(rows.length > 0) {
                 /*
                 * { idprod: '22725-22716-22717',
@@ -411,7 +413,7 @@ function recursive_save_ph(data, index, req){
                     notif = {
                         idproduccion: rows[0].idprod,
                         cantidad: data['env[]'][index],
-                        razon: data['comment[]'][index],
+                        razon: data['coment[]'][index],
                         etapa: data['from[]'][index]
                     };
                     setTimeout(function(){ enviarNotificacionRechazo(req, notif); }, 666);
@@ -508,7 +510,7 @@ function recursive_save_ph(data, index, req){
                 }
                 conn.query(query ,function(err,upProd1){
                     if(err) {throw err;}
-                    console.log(1);
+
                     conn.query(query2 ,function(err,upProd2){
                         if(err){throw err;}
                         console.log(history);
@@ -523,6 +525,13 @@ function recursive_save_ph(data, index, req){
                                     key: 'fae'
                                 };
                                 enviarNotificacionExternalizacion(req, notif);
+                            }
+
+
+                            if(data['idmat[]'][++index]){
+                                recursive_save_ph(data, index, req);
+                            }else{
+                                return true;
                             }
                         });
                     });
@@ -572,6 +581,7 @@ function allMovFunction(input, req){
 
         //SI ES RECHAZO SE DEBE SEPARA EL MOVIMIENTO DE 1 EN 1
         if( input['to[]'][t] === 's' && parseInt(input['env[]'][t]) > 1 ){
+            console.log("Separando Rechazo");
             for(var e=0; e < parseInt(input['env[]'][t]); e++){
                 input['idmat[]'].push(input['idmat[]'][t]);
                 input['to[]'].push(input['to[]'][t]);
