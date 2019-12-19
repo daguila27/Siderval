@@ -299,7 +299,7 @@ However, delay the fade out process for 2.5 seconds */
                         cantidades: cant_array
                     }),
                     contentType: 'application/json',
-                    url: 'jefeprod/add_produccion',
+                    url: '/jefeprod/add_produccion',
                     success: function(data){
                         $("#session_prod").html(data);
                         $("#btn_materiales").attr("disabled",false);

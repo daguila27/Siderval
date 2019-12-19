@@ -60,29 +60,17 @@ if(username == 'gestionpl'){clase='busc-din-menu';}
 else{clase='busc-menu';}%>
 <div id="up-fills" class="row up-fills <%=clase%>">
 	<div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; z-index: 10; width: 100%; position: relative">
-		<ol class="col-md-6 col-sm-12 col-12 breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
-			<li class="active">Guía de Despacho</li>
-
-			<!-- Mostrar cantidad de datos -->
-			<div class="indicador_paginas" id="despachos" style="margin-top: 8px" data-total="0"></div>
+		<ol class=" col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 breadcrumb" style="padding: 10px 2px 0px 20px; max-height: 40px;">
+			<li class="active">
+				Guía de Despacho
+			</li>
+			<div class="indicador_paginas"></div>
 		</ol>
-		<div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0;padding: 0;">
-
-			</div>
-		<div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6"></div>
-		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" style="margin-top: 5px; display: flex">
+		<div class="col-xs-offset-1 col-sm-offset-1 col-md-offset-6 col-lg-offset-6 col-xl-offset-6 col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0; padding: 0; max-height: 32px; margin-top:5px"></div>
+		<div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6" style="max-height: 40px;"></div>
+		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" style="margin-top: 5px; display: flex; max-height: 40px;">
 			<div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px;">
 				<div style="display: flex;">
-
-					<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_despachos' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-
-					<button type="button" accesskey="k" aria-label="kanban" data-view-type="kanban" title="" data-view='item_gd' class="btn btn-icon fa fa-lg fa-th-large view-option" data-original-title="Kanban"></button>
-
-					<button type="button" aria-label="calendar" data-view-type="calendar" title="" data-view='calendar_peds' class="btn btn-icon fa fa-lg fa-calendar view-option" data-original-title="Calendario"></button>
-
-					<!--<button type="button" aria-label="pivot" data-view-type="pivot" title="" data-view='pivot' class="btn btn-icon fa fa-lg fa-table view-option" data-original-title="Pivote"></button>
-
-                 <button type="button" aria-label="graph" data-view-type="graph" title="" data-view='graph' class="btn btn-icon fa fa-lg fa-bar-chart view-option" 	data-original-title="Gráfico"></button>-->
 					<select class="form-control" id="select_tipo_despacho" style="margin-left: 30px ">
 						<option value="">Todos</option>
 						<option value="Venta">Venta</option>
@@ -105,7 +93,9 @@ else{clase='busc-menu';}%>
 				<li><a href="#" class="getcsvof" data-tipo="desp"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
 			</ul>
 		</div>
-		<div style="width: 100%"><button class="btn btn-xs btn-primary pull-right" onclick="hiddenUpMenu('gdTable')"><i class="fa fa-angle-up"></i></button></div>
+		<div style="width: 100%">
+			<button class="btn btn-xs btn-primary pull-right" onclick="hiddenUpMenu('gdTable')"><i class="fa fa-angle-up"></i></button>
+		</div>
 	</div>
 </div>
 

@@ -220,14 +220,16 @@
                 <%}%>
             </tbody>
           </table>
-
           </div>
         </div>
         <div role="tabpanel" class="tab-pane fade" id="segunOF">
-          <div class="panel panel-info">
+          <div class="panel panel-info" style="margin-bottom: 0px !important;">
             <div class="panel-heading">
               <div style="display: flex; padding-left: 30px">
-                  <input type="checkbox" id="of-fin" value="off"> Mostrar OF finalizada<br>
+                  <div>
+                      <input type="checkbox" id="of-fin" value="off"> Mostrar OF finalizada<br>
+                      <label class="pull-right">Buscar:<input type="search" class="form-control input-sm" id="buscadorDataTableOF" placeholder=""></label>
+                  </div>
               </div>
                 <script>
                     $("#of-fin").on('change', function(e){
@@ -245,7 +247,7 @@
                 </script>
             </div>
           </div>
-          <div class="panel-body renderizar_ofs">
+          <div class="panel-body renderizar_ofs" style="padding: 0 !important;">
           </div>
         </div>   
       </div>

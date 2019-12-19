@@ -73,10 +73,11 @@
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 
+
 <script type="text/javascript">
-    setDataTableFixed("#gdTable");
     busc.setIndicadorPaginas(parseInt('<%= largoData%>'), ".indicador_paginas");
-	$(".indicador_paginas").css('position', 'absolute');
+    setDataTableFixed("#gdTable");
+	//$(".indicador_paginas").css('position', 'absolute');
 
     function getxlsx(file){
 		$.ajax({

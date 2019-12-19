@@ -36,6 +36,7 @@ function completarDigitos(num, dig){
             <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario [Kg]" style="padding:auto; text-align: center; white-space: nowrap; ">Peso Unitario [Kg]</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Causal de Rechazo</th>
             <th data-toggle="tooltip" data-placement="bottom" title="Etapa Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Etapa Causal de Rechazo</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Imagen de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Imagen</th>
         </tr>
     </thead>
     <tbody id="rechTablebody">
@@ -56,17 +57,28 @@ function completarDigitos(num, dig){
                 <% pesoT += datalen[i].peso; %>
                 <td style="text-align: left;white-space: nowrap">
                     <ul style="margin: 0px">
-                        <%for(var t=0; t < datalen[i].causal.split('@').length; t++){%>
-                            <li><%= datalen[i].causal.split('@')[t] %></li>
-                        <%}%>
+                        <%for(var t=0; t < datalen[i].causal.split('@').length; t++){
+                            if(datalen[i].causal_princ.split('@')[t] === '1' ){%>
+                                <li><b><%= datalen[i].causal.split('@')[t] %> (P)</b></li>
+                            <%}else{%>
+                                <li><%= datalen[i].causal.split('@')[t] %></li>
+                            <%}
+                        }%>
                     </ul>
                 </td>
                 <td style="text-align: left;white-space: nowrap">
                     <ul style="margin: 0px">
-                        <%for(var t=0; t < datalen[i].etapacausal.split('@').length; t++){%>
+                        <%for(var t=0; t < datalen[i].etapacausal.split('@').length; t++){
+                        if(datalen[i].causal_princ.split('@')[t] === '1' ){%>
+                            <li><b><%= datalen[i].etapacausal.split('@')[t] %> (P)</b></li>
+                        <%}else{%>
                             <li><%= datalen[i].etapacausal.split('@')[t] %></li>
-                        <%}%>
+                        <%}
+                        }%>
                     </ul>
+                </td>
+                <td>
+                    <a href="/img/rechazos/rechazo<%= datalen[i].idproduccion_h%>.<%= datalen[i].imagen_tipo%>" download>Descargar</a>
                 </td>
             </tr>
     <%}
@@ -75,6 +87,7 @@ function completarDigitos(num, dig){
             <td colspan="11">
                 <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay nada por producir</small></h2>
             </td>
+            <td colspan="0"></td>
             <td colspan="0"></td>
             <td colspan="0"></td>
             <td colspan="0"></td>
@@ -99,6 +112,7 @@ function completarDigitos(num, dig){
             <td></td>
             <td></td>
             <td class="footer-pesoT parsear_nro" cs="2" style="display: flex; align-content: center"><%= pesoT%></td>
+            <td></td>
             <td></td>
             <td></td>
         </tr>

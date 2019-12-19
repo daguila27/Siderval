@@ -143,7 +143,8 @@ router.get('/google_topdf', function(req, res){
 
 
 router.post('/upload', function(req, res) {
-    console.log(req.body);
+    var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input);
     if (!req.files || Object.keys(req.files).length === 0) {
         console.log("Error al Subir Archivo");
         return res.status(400).send('No files were uploaded.');

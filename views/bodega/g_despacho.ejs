@@ -776,12 +776,12 @@ function letraMayus(string) {
                             idcliente: $("#cliente").val(),
                             idgd: $("#idguia").val()
                         },
-                        url: 'bodega/save_gdd',
+                        url: '/bodega/save_gdd',
                         success: function(data){
                             if(est !== 'Blanco'){
                                 $.ajax({
                                     type: 'GET',
-                                    url: 'bodega/gen_pdfgdd/'+idgdd,
+                                    url: '/bodega/gen_pdfgdd/'+idgdd,
                                     success: function(data2){
                                         window.open("/csvs/gdd" +idgdd+".xlsx",'_blank');
                                         alert("Guía Creada!");
@@ -818,7 +818,7 @@ function letraMayus(string) {
                 obs:$("#gddobs .form-control").val(),
                 idcliente: $("#cliente").val()
             },
-            url: 'bodega/act_gdd',
+            url: '/bodega/act_gdd',
             success: function(data){
                 alert("Guía Creada!")
                 $("#page-wrapper").html(data);

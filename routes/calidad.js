@@ -559,6 +559,7 @@ router.post('/save_production_rech', function(req, res, next){
 
 router.post('/save_production_rech_prod', function(req, res, next){
     if(verificar(req.session.userData)){
+        var base64Img = require('base64-img');
         var input = JSON.parse(JSON.stringify(req.body));
         var rech = [];
         var rech_causal = [];
@@ -575,15 +576,16 @@ router.post('/save_production_rech_prod', function(req, res, next){
                 'area[]': [input['area[]']],
                 'from[]': [input['from[]']],
                 'idprodh[]': [input['idprodh[]']],
-                'image[]': [input['image[]']]
+                'image[]': [input['image[]']],
+                'image_type[]': [input['image_type[]']]
             };
         }
-        console.log(input);
+
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connecting : %s");}
 
             for(var w=0; w < input['idmat[]'].length; w++){
-                rech.push([input['colada[]'][w], input['producto[]'][w], input['causal[]'][w], input['idprodh[]'][w] ]);
+                rech.push([input['colada[]'][w], input['producto[]'][w], input['causal[]'][w], input['idprodh[]'][w], input['image_type[]'][w] ]);
                 //DATA QUE SE INSERTA A produccionh_causal
                 //[[idcausal_etapacausal (toke), idproduccion_h],[idcausal_etapacausal (token), idproduccion_h], ...]
                 for(var q=0; q < input['causal[]'][w].split('-').length; q++){
@@ -595,10 +597,21 @@ router.post('/save_production_rech_prod', function(req, res, next){
                     }
                 }
             }
-            connection.query("INSERT INTO rechazos_cdc (`colada`, `producto`, `causal`, `idproduccion_h`) VALUES ?", [rech], function(err, inRechCdc){
+            connection.query("INSERT INTO rechazos_cdc (`colada`, `producto`, `causal`, `idproduccion_h`, `imagen_tipo`) VALUES ?", [rech], function(err, inRechCdc){
                 if(err){console.log("Error Inserting : %s", err);}
                 connection.query("INSERT INTO produccionh_causal (`idcausal_etapacausal`, `idproduccion_h`, `princ`) VALUES ?", [rech_causal], function(err, inProdHistCau) {
                     if (err) {console.log("Error Inserting : %s", err);}
+
+                    for(var w=0; w < input['idmat[]'].length; w++){
+                        //SE GUARDA LA IMAGEN
+                        base64Img.img(input['image[]'][w], "public/img/rechazos", "rechazo"+input['idprodh[]'][w],
+                            function (err, filepath) {
+                                if(err){console.log("Error al Subir Imagen : %s", err);}
+                                else{console.log(filepath);}
+                            }
+                        );
+                    }
+
 
                     res.send("¡Rechazo registrado con exito!");
                 });
@@ -656,7 +669,6 @@ router.get('/view_rechazos', function(req, res, next){
 router.post('/table_rechazos', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var agrupar = input.extraInfo;
         var array_fill = [
             "mainTable.detalle",
@@ -793,7 +805,7 @@ router.post('/table_rechazos', function(req, res, next){
 
             default:
                 query = "SELECT * FROM (SELECT \n" +
-                    "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
+                    "\t\t\t\t\trechazos_cdc.idproduccion_h,rechazos_cdc.imagen_tipo,\n" +
                     "                    material.idmaterial, \n" +
                     "                    pedido.idpedido, \n" +
                     "                    fabricaciones.idfabricaciones, \n" +
@@ -803,7 +815,8 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
-                    "                    GROUP_CONCAT(causal.causal SEPARATOR '@') AS causal,\n" +
+                    "                    GROUP_CONCAT(causal.causal SEPARATOR '@') AS causal, \n" +
+                    "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '@') AS causal_princ,\n" +
                     "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '@') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
                     "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
@@ -830,6 +843,7 @@ router.post('/table_rechazos', function(req, res, next){
                 function(err, rech){
                     if(err) throw err;
 
+                    console.log(rech);
                     res.render('calidad/'+view, {datalen: rech, user: req.session.userData.nombre });
 
                 });

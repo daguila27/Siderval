@@ -14,7 +14,7 @@
  }
 %>
 
-<table id="viewOF" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width:100%;">
+<table id="viewOF" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width:100%; padding: 0 !important;">
         <thead>
         <tr>
             <th>OF</th>
@@ -65,6 +65,7 @@
         </tr>-->
         </tfoot>
     </table>
+
 <div id="visorInsumos" class="modal fade" role="dialog">
     <div class="modal-dialog">
 
@@ -84,13 +85,14 @@
 
     </div>
 </div>
-<script>
 
+<script>
+    var tableOF;
     $(document).ready(function() {
-        $('#viewOF').DataTable({
-            "lengthChange": false,
-            "paging": false,
+        tableOF = $('#viewOF').DataTable({
             order: [[ 0, "desc" ]],
+            "lengthChange": false,
+            "paging": true,
             "language": {
                 "sProcessing":     "Procesando...",
                 "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -116,6 +118,13 @@
                 }
             }
         });
+
+        $("#viewOF_filter").parent().parent().addClass('hidden');
+        $("#viewOF_wrapper").css('margin-top', '0px !important');
+
+    });
+    $('#buscadorDataTableOF').keyup(function(){
+        tableOF.search($(this).val()).draw() ;
     });
 
     function obtener_pdf(idof, yo){
@@ -135,7 +144,7 @@
         $.ajax({
            type: 'POST',
            data: {idmaterial: $(yo).data('idmat'), addOCA: true, cant: $(yo).data('cant')},
-           url: 'abastecimiento/data_bom',
+           url: '/abastecimiento/data_bom',
            success: function(data){
                $("#modalbody-bom").html(data);
                $("#visorInsumos").modal("show");
