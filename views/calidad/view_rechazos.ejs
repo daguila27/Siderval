@@ -163,9 +163,9 @@ else{clase='busc-menu';}%>
         <div style="width: 100%"><button class="btn btn-xs btn-primary pull-right" onclick="hiddenUpMenu()"><i class="fa fa-angle-up"></i></button></div>
     </div>
 </div>
-<div id="fw-container" style="background-color: white; width: 100%; height: 100%; ">
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
     <div id="fw-body"  style="padding:0;margin: 0;">
-        <div class="content main-page" style="height: 100%">
+        <div class="content main-page" style="height: 100%; overflow-x: scroll"  >
         </div>
     </div>
 </div>
@@ -204,12 +204,13 @@ else{clase='busc-menu';}%>
         $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height() + 2 ) ;
         //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
 
-        $(".fixedHeader-floating thead").parent('.fixedHeader-floating').offset({ top: $("#rechTable thead").offset().top -  $(".fixedHeader-floating thead").height() });
-        $(".fixedHeader-floating thead").offset({ top: $("#rechTable thead").offset().top -  $(".fixedHeader-floating thead").height() });
-        $('.fixedHeader-floating tfoot').offset({ top: $("#rechTable tfoot").offset().top });
-        //dataTable.fixedHeader.headerOffset( 0 );
-
         $("#search-button-display").css('bottom', '10px');
+
+
+
+        p = $("#rechTable").first();
+        position = p.position();
+        $(".float-header").css('top', position.top+'px');
     }
 
     function showUpMenu(){
@@ -217,12 +218,14 @@ else{clase='busc-menu';}%>
         $("#fw-container").css('margin-top', $(".up-fills").height() + $("#oe_main_menu_navbar").height() ) ;
         //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
 
-        $(".fixedHeader-floating thead").parent('.fixedHeader-floating').offset({ top: $("#rechTable thead").offset().top -  $(".fixedHeader-floating thead").height() });
-        $(".fixedHeader-floating thead").offset({ top: $("#rechTable thead").offset().top -  $(".fixedHeader-floating thead").height() });
-        $('.fixedHeader-floating tfoot').offset({ top: $("#rechTable tfoot").offset().top });
-        //dataTable.fixedHeader.headerOffset( 0 );
 
         $("#search-button-display").css('bottom', '-100px');
+
+
+
+        p = $("#rechTable").first();
+        position = p.position();
+        $(".float-header").css('top', position.top+'px');
     }
 
 

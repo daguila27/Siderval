@@ -4092,16 +4092,20 @@ router.get('/new_pdf_factura/:idfactura', function(req, res, next) {
 
 router.get('/new_pdf_oca/:idoca', function(req, res, next) {
     const puppeteer = require('puppeteer');
-
-
     req.getConnection(function(err, connection){
         if(err)
             console.log("Error Connection : %s", err);
 
-        connection.query('select material.detalle, coalesce(abastecimiento.costo,0) as precio, coalesce(abastecimiento.cantidad,0) as cantidad, coalesce(abastecimiento.costo,0)*coalesce(abastecimiento.cantidad,0) as preciototal ' +
-			'from abastecimiento ' +
-			'left join oda on abastecimiento.idoda=oda.idoda ' +
-			'left join material on material.idmaterial=abastecimiento.idmaterial where oda.idoda=?', [req.params.idoca],
+        connection.query('select ' +
+            'sub_ccontable.idccontable as subcuenta, COALESCE(producto.det_producto,material.detalle) AS detalle, ' +
+            'coalesce(abastecimiento.costo,0) as precio, coalesce(abastecimiento.cantidad,0) as cantidad, ' +
+            'coalesce(abastecimiento.costo,0)*coalesce(abastecimiento.cantidad,0) as preciototal ' +
+            'from abastecimiento ' +
+            'left join oda on abastecimiento.idoda=oda.idoda ' +
+            'left join material on material.idmaterial=abastecimiento.idmaterial ' +
+            'left join producto on producto.idmaterial = material.idmaterial ' +
+            'left join sub_ccontable on abastecimiento.cc = sub_ccontable.idsub ' +
+            'WHERE oda.idoda=?', [req.params.idoca],
             function(err, mats){
                 if(err)
                     console.log("Error Selecting : %s", err);
@@ -4110,9 +4114,6 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                         console.log("Error Selecting : %s", err);
 
 
-                    console.log(oda);
-
-                    console.log(mats);
                     var array_vacio = [];
                     oda[0].moneda = oda[0].tokenoda.split('@')[6].toUpperCase();
                     oda[0].neto = 0;
@@ -4132,7 +4133,11 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                         }
 
                     }
+                    var msg = '';
+                    console.log(oda[0].tokenoda.split('@'));
+                    console.log(typeof oda[0].tokenoda.split('@')[7]);
                     if(oda[0].tokenoda.split('@')[7] === 'off'){
+
                         oda[0].dcto = oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100);
                         oda[0].neto = oda[0].neto - oda[0].dcto;
                         oda[0].iva = oda[0].neto*0.19;
@@ -4153,7 +4158,14 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
 
                     oda[0].creacion = new Date(oda[0].creacion);
                     oda[0].creacion = oda[0].creacion.getDate()+"/"+(parseInt(oda[0].creacion.getMonth()) + 1)+"/"+oda[0].creacion.getFullYear();
-
+                    console.log(oda);
+                    var dets = [{
+                        pago: oda[0].tokenoda.split('@')[3],
+                        plazo: [oda[0].tokenoda.split('@')[2].split('-')[2],oda[0].tokenoda.split('@')[2].split('-')[1],oda[0].tokenoda.split('@')[2].split('-')[0]].join('/'),
+                        obs: oda[0].tokenoda.split('@')[0],
+                        entrega: oda[0].tokenoda.split('@')[4]
+                    }];
+                    console.log(dets);
                     (async function(){
                         try{
                             const browser = await puppeteer.launch()
@@ -4162,10 +4174,12 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                             const content = await compile('oca',
                                 {
                                     "oda":oda[0],
+                                    "dets": dets[0],
                                     "mats":mats,
                                     "vacio": array_vacio,
-									"logo": base64img.base64Sync('./public/assets/img/logo.png'),
-                                    "firma": base64img.base64Sync('./public/assets/img/firma.png')
+                                    "logo": base64img.base64Sync('./public/assets/img/logo.png'),
+                                    "firma": base64img.base64Sync('./public/assets/img/firma.png'),
+                                    "msg": msg
                                 }
                             );
 
@@ -4198,9 +4212,8 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                                 });
                             }
 
-                            console.log('done');
+                            res.send('http://' + res.req.headers.host+'/pdf/odc'+req.params.idoca+'.pdf');
 
-                            res.send( res.req.headers.host+'/pdf/odc'+req.params.idoca+'.pdf');
                         }
                         catch(e){
                             console.log("Error al generar PDF : %s", e);
@@ -4211,6 +4224,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                 });
             });
     });
+
 });
 
 
