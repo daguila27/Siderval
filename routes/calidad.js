@@ -580,7 +580,6 @@ router.post('/save_production_rech_prod', function(req, res, next){
                 'image_type[]': [input['image_type[]']]
             };
         }
-
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connecting : %s");}
 
@@ -604,12 +603,14 @@ router.post('/save_production_rech_prod', function(req, res, next){
 
                     for(var w=0; w < input['idmat[]'].length; w++){
                         //SE GUARDA LA IMAGEN
-                        base64Img.img(input['image[]'][w], "public/img/rechazos", "rechazo"+input['idprodh[]'][w],
-                            function (err, filepath) {
-                                if(err){console.log("Error al Subir Imagen : %s", err);}
-                                else{console.log(filepath);}
-                            }
-                        );
+                        if(input['image[]'][w] !== ''){
+                            base64Img.img(input['image[]'][w], "public/img/rechazos", "rechazo"+input['idprodh[]'][w],
+                                function (err, filepath) {
+                                    if(err){console.log("Error al Subir Imagen : %s", err);}
+                                    else{console.log(filepath);}
+                                }
+                            );
+                        }
                     }
 
 

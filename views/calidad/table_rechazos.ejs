@@ -21,7 +21,7 @@ function completarDigitos(num, dig){
 %>
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"></div>
-<table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: auto; margin-top: -2px !important;" >
+<table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;" >
     <thead>
         <tr>
             <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Fecha de Rechazo </th>
@@ -144,30 +144,46 @@ function completarDigitos(num, dig){
 
     var p, position, html = '';
 
-
-    $(document).ready(function(){
-
-
-        $("#rechTable thead tr th").each(function(){
-            $(this).append('<i style="margin-left: 5px" class="fa fa-sort"></i>');
-        });
-        p = $("#rechTable").first();
+    function initFixed(idtable, content, first){
+        var html, p, position, font;
+        if(first){
+            $("#"+idtable+" thead tr th").each(function(){
+                $(this).append('<i style="margin-left: 5px" class="fa fa-sort"></i>');
+            });
+        }
+        font = $("#"+idtable+" thead").css('font-size');
+        p = $("#"+idtable).first();
         position = p.position();
 
-        html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-header' id='float-header' style='" +
-            "width: "+$("#rechTable").width()+"px; margin-top: -2px !important; position: fixed; top: "+(position.top+0)+"px;'>" +
-            "<thead><tr>";
-        $("#rechTable thead tr th").each(function(){
+        html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-header' data-table='"+idtable+"' id='float-header' style='" +
+            "width: "+$("#"+idtable).width()+"px; margin-top: -2px !important; position: fixed; top: "+(position.top+0)+"px;'>" +
+            "<thead style='font-size: "+font+"'><tr>";
+        $("#"+idtable+" thead tr th").each(function(){
             html += "<th style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
         });
         html += "</tr></thead></table>";
-        $(".main-page").append(html);
+
+        $("."+content).append(html);
+
+        html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-footer' data-table='"+idtable+"' id='float-footer' style='" +
+            "width: "+$("#"+idtable).width()+"px; margin-top: -2px !important; position: fixed; bottom: 0px;'>" +
+            "<tfoot style='font-size: "+font+"'><tr>";
+        $("#"+idtable+" tfoot tr td").each(function(){
+            html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
+        });
+        html += "</tr></tfoot></table>";
+        $("."+content).append(html);
+
+        $('.'+content).scroll(function(e){
+            p = $("#"+idtable).first();
+            position = p.position();
+            $(".float-header").offset({ left: position.left });
+            $(".float-footer").offset({ left: position.left });
+        });
+    }
+    $(document).ready(function(){
+        initFixed('rechTable', 'main-page', true);
     });
 
-    $('.main-page').scroll(function(e){
-        p = $("#rechTable").first();
-        position = p.position();
-        $(".float-header").offset({ left: position.left });
 
-    });
 </script>
