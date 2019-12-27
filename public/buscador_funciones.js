@@ -238,6 +238,78 @@ function previus_page(){
     busc.buscar_action();
 }
 
+function toggleColTable(ind1, ind2,  table){
+    //columna de ind1 se intercambia por la con ind2
+    var c = 0, htmlAux1 = null, htmlAux2 = null , stringHtml = '', classHtml = '', styleHtml = '', clickHtml = '';
+    //FILAS
+    htmlAux1 = $("#"+table+" tbody tr[data-ind="+ind1+"]");
+    htmlAux2 = $("#"+table+" tbody tr[data-ind="+ind2+"]");
+
+    stringHtml = htmlAux1.html();
+    classHtml = htmlAux1.attr('class');
+    styleHtml = htmlAux1.attr('style');
+    clickHtml = htmlAux1.attr('onclick');
+
+    htmlAux1.html(htmlAux2.html());
+    htmlAux1.attr('class', htmlAux2.attr('class'));
+    htmlAux1.attr('style', htmlAux2.attr('style'));
+    htmlAux1.attr('onclick', htmlAux2.attr('onclick'));
+    htmlAux1.data('ind', ind2);
+
+    htmlAux2.html(stringHtml);
+    htmlAux2.attr('class', classHtml);
+    htmlAux2.attr('style', styleHtml);
+    htmlAux2.attr('onclick', clickHtml);
+    htmlAux2.data('ind', ind1);
+}
+
+function sortTable(table, yo){
+    showLoad();
+    setTimeout(function(){
+        var indCol = $(yo).data('sort');
+        var updown = $(yo).data('updown');
+        $("#"+table+" thead tr th[data-sort="+indCol+"]").data('updown', !updown);
+        $(yo).data('updown', !updown);
+        //updown:
+        // true: se ordena de mayor a menor
+        // false: se ordena de menor a mayor
+        var c = 0, arrayAux = [],  k;
+        $("#"+table+" tbody tr td[data-sort="+indCol+"]").each(function(){
+            if($(this).data('order')){
+                arrayAux.push($(this).data('order'));
+            }else{
+                arrayAux.push($(this).html());
+            }
+        });
+        if(updown){
+            //SE ORDENA DE MAYOR A MENOR
+            for(var i=0; i<arrayAux.length; i++) {
+                for(var j=1; j < arrayAux.length; j++) {
+                    if( arrayAux[j-1] <= arrayAux[j] ) {
+                        k=arrayAux[j];
+                        arrayAux[j]=arrayAux[j-1];
+                        arrayAux[j-1]=k;
+                        toggleColTable(j-1, j, table);
+                    }
+                }
+            }
+        }else{
+            //SE ORDENA DE MENOR A MAYOR
+            for(var i=0; i<arrayAux.length; i++) {
+                for(var j=1; j < arrayAux.length; j++) {
+                    if( arrayAux[j-1] > arrayAux[j] ) {
+                        k=arrayAux[j];
+                        arrayAux[j]=arrayAux[j-1];
+                        arrayAux[j-1]=k;
+                        toggleColTable(j-1, j, table);
+                    }
+                }
+            }
+        }
+        hideLoad();
+    }, 1000);
+}
+
 
 
 

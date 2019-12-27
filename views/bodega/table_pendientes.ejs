@@ -109,10 +109,12 @@ function fechaLatino(string){
 
 <script type="text/javascript">
 
-    setDataTableFixed("#despachosTable");
+    //setDataTableFixed("#despachosTable");
     $("#indicador_paginas").data('total', parseInt('<%= largoData%>'));
     busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#indicador_paginas");
-
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
+    });
 
 
     var mouseDown = 0;
@@ -281,47 +283,14 @@ function fechaLatino(string){
         });
     });
 
-    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA*/
-    $('.main-page').scroll(function(e){
-
-        //$('.fixedHeader-floating').scrollLeft($(this).scrollLeft());
-        $(".fixedHeader-floating tfoot").offset({ left: $("#despachosTable thead").offset().left })
-        $('.fixedHeader-floating thead').offset({ left: $("#despachosTable thead").offset().left });
-        //$('.fixedHeader-floating tfoot').offset({ left: $("#rechTable tfoot").offset().left });
-        //alert($('.fixedHeader-floating tfoot').left());
-        //$('.fixedHeader-floating').css('left', $(this).css('left'));
-    });
-    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA --- FIN*/
 
 </script>
 
 
-
 <style>
-    table.fixedHeader-floating thead {
-        top: 0px;
-        width: 100% !important;
-        display: block;
-        overflow-x: unset;
-    }
-    table.fixedHeader-floating tfoot {
-        width: 100% !important;
-        display: block;
-        overflow-x: unset;
-    }
-
-    table#despachosTable thead tr{
-        width: 100%;
-    }
-    table#despachosTable tfoot{
-        width: 100% !important;
-
-    }
-
-    table#despachosTable thead tr th{
-        white-space: nowrap;
-    }
-    table#despachosTable tbody tr td{
-        white-space: nowrap;
+    td,th{
+        white-space: nowrap !important;
     }
 </style>
+
+

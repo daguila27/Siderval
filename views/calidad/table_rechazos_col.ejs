@@ -76,38 +76,8 @@ function completarDigitos(num, dig){
 <!-- Funcion para parsear nros -->
 <script src="/assets/parsear_nro.js" type="text/javascript"></script>
 <script type="text/javascript">
-    setDataTableFixed("#rechTable");
-
-    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA*/
-    $('.dataTables_scrollBody').scroll(function(e){
-        //$('.fixedHeader-floating').scrollLeft($(this).scrollLeft());
-        $(".dataTables_scrollFoot table tfoot").offset({ left: $("#rechTable thead").offset().left })
-        $('.fixedHeader-floating thead').offset({ left: $("#rechTable thead").offset().left });
-        //$('.fixedHeader-floating tfoot').offset({ left: $("#rechTable tfoot").offset().left });
-        //alert($('.fixedHeader-floating tfoot').left());
-        //$('.fixedHeader-floating').css('left', $(this).css('left'));
+    //setDataTableFixed("#rechTable");
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
     });
-    /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA --- FIN*/
-
 </script>
-
-<style>
-    table.fixedHeader-floating thead {
-        top: 0px;
-        width: 100% !important;
-        display: block;
-        overflow-x: unset;
-    }
-    table.fixedHeader-floating tfoot {
-        width: 100% !important;
-        display: block;
-        overflow-x: unset;
-    }
-
-    table#rechTable thead tr{
-        width: 100%;
-    }
-    table#rechTable tfoot{
-        width: 100% !important;
-    }
-</style>

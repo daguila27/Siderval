@@ -2811,7 +2811,7 @@ router.get("/xlsx_stock", function(req, res, next){
 
 router.get('/xlsx_of', function(req,res){
     if(verificar(req.session.userData)){
-        console.log("¡Profesor Jirafales!, ¿no gusta pasar a tomar una tasita de cafe?");
+        console.log("¡Profesor Jirafales!");
         var fs = require('fs');
         var Excel = require('exceljs');
         var workbook = new Excel.Workbook();
@@ -2819,6 +2819,8 @@ router.get('/xlsx_of', function(req,res){
         var ident  = new Date().toLocaleDateString().replace(' ','');
         ident = ident.replace('/','');
         ident = ident.replace(':','');
+
+        console.log("¡Doña Florinda!");
         sheet.columns = [
             { header: 'Código', key: 'code', width: 15 },
             { header: 'OF', key: 'of', width: 15 },
@@ -2839,6 +2841,7 @@ router.get('/xlsx_of', function(req,res){
             { header: 'Finalizados', key: 'finalizados', width: 15},
             { header: 'Fecha de Entrega', key: 'fecha', width: 15}
         ];
+        console.log("¿no gusta pasar a tomar una tasita de cafe?");
 
         sheet.getRow(1).font = {
             name: 'Calibri',

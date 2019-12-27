@@ -81,6 +81,18 @@ class Buscador{
             },
             success: function(data){
                 $(".main-page").html(data);
+                var b = 0 , c = 0;
+                $("#"+t+" tbody tr").each(function(){
+                    $(this).attr('data-ind', b);
+                    c = 0;
+                    $("#"+t+" tbody tr[data-ind='"+b+"'] td").each(function(){
+                        $(this).attr('data-sort', c++);
+                    });
+                    b++;
+                });
+                $("#"+t+" tbody tr td").css('white-space' , 'nowrap !important');
+                $("#"+t+" thead tr th").css('white-space' , 'nowrap !important');
+
                 $("#"+t).css('font-family', '12px');
                 $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height());
@@ -209,6 +221,60 @@ class Buscador{
         return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
     }
 
+    initFixed(content, first){
+        var html, p, position, font, tabla = this.idtabla;
+        if(first){
+            $("#"+tabla+" thead tr th").each(function(){
+                $(this).append('<i style="margin-left: 5px" class="fa fa-sort"></i>');
+            });
+        }
+        font = $("#"+tabla+" thead").css('font-size');
+        p = $("#"+tabla).first();
+        position = p.position();
 
+        html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-header' data-table='"+tabla+"' id='float-header' " +
+            "style='width: "+$("#"+tabla).width()+"px; margin-top: -2px !important; position: fixed; top: "+(position.top+0)+"px;'>" +
+            "<thead style='font-size: "+font+"'><tr>";
+        var c = 0;
+
+        $("#"+tabla+" thead tr th").each(function(){
+            html += "<th onclick='sortTable(\""+tabla+"\", this);' data-sort='"+c+"' data-updown='false' style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
+            c++;
+        });
+        html += "</tr></thead></table>";
+
+        $("."+content).append(html);
+
+        html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-footer' data-table='"+tabla+"' id='float-footer' style='" +
+            "width: "+$("#"+tabla).width()+"px; margin-top: -2px !important; position: fixed; bottom: 0px;'>" +
+            "<tfoot style='font-size: "+font+"'><tr>";
+        $("#"+tabla+" tfoot tr td").each(function(){
+            html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
+        });
+        html += "</tr></tfoot></table>";
+        $("."+content).append(html);
+
+        $("#"+tabla+" tbody tr td").each(function(){
+            html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
+        });
+
+        $('.'+content).scroll(function(e){
+            p = $("#"+tabla).first();
+            position = p.position();
+            $(".float-header").offset({ left: position.left });
+            $(".float-footer").offset({ left: position.left });
+        });
+    }
+
+    resetFixed(content){
+        $("table[data-table='"+this.idtabla+"']").remove();
+        this.initFixed(this.idtabla, content, false);
+    }
+
+    setTopFixed(){
+        var p = $("#"+this.idtabla).first();
+        var position = p.position();
+        $(".float-header").css('top', position.top+'px');
+    }
 }
 

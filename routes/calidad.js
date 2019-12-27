@@ -11,7 +11,7 @@ router.use(
 var conn = mysql.createConnection(dbCredentials);
 
 function verificar(usr){
-    if(usr.nombre === 'calidad'){
+    if(usr.nombre === 'calidad' || usr.nombre === 'siderval'){
         return true;
     }else{
         return false;
@@ -603,7 +603,7 @@ router.post('/save_production_rech_prod', function(req, res, next){
 
                     for(var w=0; w < input['idmat[]'].length; w++){
                         //SE GUARDA LA IMAGEN
-                        if(input['image[]'][w] !== ''){
+                        if(input['image[]'][w] !== '' && input['image[]'][w] !== ' ' && input['image[]'][w] !== null && input['image[]'][w] !== undefined){
                             base64Img.img(input['image[]'][w], "public/img/rechazos", "rechazo"+input['idprodh[]'][w],
                                 function (err, filepath) {
                                     if(err){console.log("Error al Subir Imagen : %s", err);}
@@ -843,8 +843,6 @@ router.post('/table_rechazos', function(req, res, next){
             connection.query(query,
                 function(err, rech){
                     if(err) throw err;
-
-                    console.log(rech);
                     res.render('calidad/'+view, {datalen: rech, user: req.session.userData.nombre });
 
                 });
@@ -891,5 +889,129 @@ router.get('/drop_notif/:idnotif', function(req, res, next){
 });
 
 
+
+router.get('/xlsx_rech', function(req,res){
+    if(verificar(req.session.userData)){
+        console.log("¡Profesor Jirafales!");
+        var fs = require('fs');
+        var Excel = require('exceljs');
+        var workbook = new Excel.Workbook();
+        var sheet = workbook.addWorksheet('rechmaster');
+        var ident  = new Date().toLocaleDateString().replace(' ','');
+        ident = ident.replace('/','');
+        ident = ident.replace(':','');
+
+        console.log("¡Doña Florinda!");
+        sheet.columns = [
+            { header: 'Fecha de Rechazo', key: 'fecha', width: 15 },
+            { header: 'Hora de Rechazo', key: 'hora', width: 15 },
+            { header: 'Descripción Producto', key: 'desc', width: 15 },
+            { header: 'Área de Rechazo', key: 'area', width: 15 },
+            { header: 'OF', key: 'of', width: 15 },
+            { header: 'OP', key: 'op', width: 15 },
+            { header: 'Código de Colada', key: 'codcol', width: 15 },
+            { header: 'Corr Producto', key: 'corrprod', width: 80 },
+            { header: 'Peso Unitario [Kg]', key: 'peso', width: 15 },
+            { header: 'Causal de Rechazo', key: 'causal', width: 15 },
+            { header: 'Etapa Causal de Rechazo', key: 'etapa', width: 15 }
+        ];
+        console.log("¿no gusta pasar a tomar una tasita de cafe?");
+
+        sheet.getRow(1).font = {
+            name: 'Calibri',
+            family: 4,
+            size: 11,
+            underline: false,
+            bold: true
+        };
+        req.getConnection(function(err, connection) {
+            if(err)
+                console.log("Error connection : %s", err);
+
+            var query = "SELECT mainTable.* FROM (SELECT \n" +
+                "\t\t\t\t\tproduccionh_causal.idproduccion_h,\n" +
+                "                    fabricaciones.idmaterial, \n" +
+                "                    pedido.idpedido, \n" +
+                "                    fabricaciones.idfabricaciones, \n" +
+                "                    COALESCE(cliente.sigla, ' - ') AS sigla, \n" +
+                "                    material.detalle, \n" +
+                "                    material.peso, \n" +
+                "                    produccion_history.enviados, \n" +
+                "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
+                "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
+                "                    causal.causal,\n" +
+                "                    etapacausal.nombre AS etapacausal, \n" +
+                "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
+                "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                "                    FROM produccionh_causal  \n" +
+                "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
+                "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
+                "                    LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones \n" +
+                "                    LEFT JOIN material ON material.idmaterial = fabricaciones.idmaterial \n" +
+                "                    LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido \n" +
+                "                    LEFT JOIN odc ON odc.idodc = pedido.idodc \n" +
+                "                    LEFT JOIN cliente ON cliente.idcliente = odc.idcliente \n" +
+                "                    LEFT JOIN rechazos_cdc ON rechazos_cdc.idproduccion_h = produccionh_causal.idproduccion_h \n" +
+                "                    LEFT JOIN causal_etapacausal ON causal_etapacausal.idcausal_etapacausal = produccionh_causal.idcausal_etapacausal\n" +
+                "                    LEFT JOIN causal ON causal.idcausal = causal_etapacausal.idcausal \n" +
+                "                    LEFT JOIN etapacausal ON etapacausal.idetapacausal = causal_etapacausal.idetapacausal \n" +
+                "                    LEFT JOIN etapafaena ON produccion_history.from = etapafaena.value GROUP BY rechazos_cdc.idproduccion_h) AS mainTable";
+            console.log("¿No será mucha molestia?");
+
+            connection.query(query,
+                function(err, rows){
+                    if (err)
+                        console.log("Error Select : %s ",err );
+
+                    console.log("Por supuesto que no pase usted");
+                    if(rows.length>0){
+                        var nombre = 'csvs/master_rech_' + ident + '.xlsx';
+                        var numitem = 0;
+                        var fechaInicio;
+                        var fechaFin;
+                        var diff = 0;
+                        var auxrow;
+                        // Fecha de Rechazo
+                        // Hora de Rechazo
+                        // Descripción Producto
+                        // Área de Rechazo
+                        // OF
+                        // OP
+                        // Código Único de Colada
+                        // Corr. Producto
+                        // Peso Unitario [Kg]
+                        // Causal de Rechazo
+                        // Etapa Causal de Rechazo
+                        for(var j=0; j < rows.length; j++){
+                            numitem++;
+                            auxrow = 2 + j;
+                            console.log(auxrow);
+                            sheet.getCell('A' + auxrow.toString()).value = rows[j].fecha;
+                            sheet.getCell('B' + auxrow.toString()).value = rows[j].fecha;
+                            sheet.getCell('C' + auxrow.toString()).value = rows[j].detalle;
+                            sheet.getCell('D' + auxrow.toString()).value = rows[j].etapa_desde;
+                            sheet.getCell('E' + auxrow.toString()).value = rows[j].idof;
+                            sheet.getCell('F' + auxrow.toString()).value = rows[j].idop;
+                            sheet.getCell('G' + auxrow.toString()).value = rows[j].colada;
+                            sheet.getCell('H' + auxrow.toString()).value = rows[j].producto;
+                            sheet.getCell('I' + auxrow.toString()).value = rows[j].peso;
+                            sheet.getCell('J' + auxrow.toString()).value = rows[j].causal;
+                            sheet.getCell('K' + auxrow.toString()).value = rows[j].etapacausal;
+                        }
+
+                        console.log("Despues de usted");
+                        workbook.xlsx.writeFile('public/' + nombre)
+                            .then(function() {
+                                console.log("Aaww");
+                                res.send('/csvs/master_rech_'+ ident + '.xlsx');
+
+                            });
+                    }
+
+                });
+        });
+    }
+    else res.redirect('/bad_login');
+});
 
 module.exports = router;

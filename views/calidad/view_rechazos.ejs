@@ -66,7 +66,7 @@ else{clase='busc-menu';}%>
             <li class="active">Informe de Rechazos</li>
         </ol>
         <!--Buscador-->
-        <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0;padding: 0;">
+        <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0;padding: 0; max-height: 32px">
         </div>
         <div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6"></div>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" style="margin-top: 5px; display: flex">
@@ -98,8 +98,7 @@ else{clase='busc-menu';}%>
         <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="getcsvof" data-tipo="opdetalle"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel Detalle</a></li>
-                    <li><a href="#" class="getcsvof" data-tipo="op"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                    <li><a href="#" class="getcsvrech" data-tipo="rech"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
                     <li class="divider"></li>
                     <li style="display: flex"><a href="#" class="getcsvof" data-tipo="op" style="display: flex">
                             <label for="">Tamaño de Fuente:
@@ -171,43 +170,20 @@ else{clase='busc-menu';}%>
 
     });
 
-    function hiddenUpMenu(){
-        $(".up-fills").css('top', (parseInt($(".up-fills").css('height'))*-1) + 2 );
-        $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height() + 2 ) ;
-        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+    $(".getcsvrech").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/calidad/xlsx_' + $(this).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
 
-        $("#search-button-display").css('bottom', '10px');
-
-
-
-        p = $("#rechTable").first();
-        position = p.position();
-        $(".float-header").css('top', position.top+'px');
-    }
-
-    function showUpMenu(){
-        $(".up-fills").css('top', '0' );
-        $("#fw-container").css('margin-top', $(".up-fills").height() + $("#oe_main_menu_navbar").height() ) ;
-        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+    });
 
 
-        $("#search-button-display").css('bottom', '-100px');
-
-
-
-        p = $("#rechTable").first();
-        position = p.position();
-        $(".float-header").css('top', position.top+'px');
-
-
-
-    }
-
-
-    function resetFixed(idtable, content){
-        $("table[data-table='"+idtable+"']").remove();
-        initFixed('rechTable', 'main-page', false)
-    }
 
 
 </script>

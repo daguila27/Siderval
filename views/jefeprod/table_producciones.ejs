@@ -141,7 +141,11 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-        setDataTableFixed("#prodTable");
+        //setDataTableFixed("#prodTable");
+        $(document).ready(function(){
+            busc.initFixed('main-page', true);
+        });
+
         $(".anulButton").on('click', function(e){
             e.preventDefault();
             $.ajax({
@@ -153,46 +157,11 @@ function fechaLatino(string){
                 }
             })
         });
-        /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA*/
-        $('.main-page').scroll(function(e){
-
-            //$('.fixedHeader-floating').scrollLeft($(this).scrollLeft());
-            $(".fixedHeader-floating tfoot").offset({ left: $("#prodTable thead").offset().left })
-            $('.fixedHeader-floating thead').offset({ left: $("#prodTable thead").offset().left });
-            //$('.fixedHeader-floating tfoot').offset({ left: $("#rechTable tfoot").offset().left });
-            //alert($('.fixedHeader-floating tfoot').left());
-            //$('.fixedHeader-floating').css('left', $(this).css('left'));
-        });
-        /*CODIGO NECESARIO PARA DESPLAZAR LA CABECERA DE LA TABLA DE IZQUIERDA A DERECHA --- FIN*/
 
 </script>
 
-
 <style>
-    table.fixedHeader-floating thead {
-        top: 0px;
-        width: 100% !important;
-        display: block;
-        overflow-x: unset;
-    }
-    table.fixedHeader-floating tfoot {
-        width: 100% !important;
-        display: block;
-        overflow-x: unset;
-    }
-
-    table#prodTable thead tr{
-        width: 100%;
-    }
-    table#prodTable tfoot{
-        width: 100% !important;
-
-    }
-
-    table#prodTable thead tr th{
-        white-space: nowrap;
-    }
-    table#prodTable tbody tr td{
-        white-space: nowrap;
+    td,th{
+        white-space: nowrap !important;
     }
 </style>
