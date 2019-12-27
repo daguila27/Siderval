@@ -23,7 +23,7 @@
     "express": "^4.16.4",
     "express-myconnection": "~1.0.4",
     "fs-extra": "^8.1.0",
-    "handlebars": "^4.2.0",
+    "handlebars": "^4.3.0",
     "jsreport": "^1.10.0",
     "latex": "0.0.1",
     "morgan": "~1.9.0",
