@@ -252,12 +252,7 @@ class Buscador{
         $("#"+tabla+" tfoot tr td").each(function(){
             html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
         });
-        html += "</tr>";
-        html += "<tr>";
-        $("#"+tabla+" tfoot tr td").each(function(){
-            html += "<td style='width: "+$(this).innerWidth()+"px; padding:0px; text-align: center; white-space: nowrap; height: 16px'></td>";
-        });
-        html += "</tr>";
+        html += "</tr>";    
         html += "</tfoot></table>";
         $("."+content).append(html);
 
