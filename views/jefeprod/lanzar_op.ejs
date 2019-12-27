@@ -412,7 +412,7 @@ However, delay the fade out process for 2.5 seconds */
                         type: 'POST',
                         data: JSON.stringify({list: aux, dates: aux2}),
                         contentType: 'application/json',
-                        url: 'jefeprod/save_op',
+                        url: '/jefeprod/save_op',
                         success: function (data) {
                             if (data == 'Error') {
                                 alert("Ha ocurrido un error");
