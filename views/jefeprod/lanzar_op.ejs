@@ -420,11 +420,11 @@ However, delay the fade out process for 2.5 seconds */
                             else {
 
                                 alert("Orden de producción creada. Desplegando Lista de Insumos.");
-                                $(".aux_formulario").html("<form method='post' action='jefeprod/ficha_abastecimiento' target='_blank'><input type='hidden' name='idop' value='" + data + "'></form>");
+                                $(".aux_formulario").html("<form method='post' action='/jefeprod/ficha_abastecimiento' target='_blank'><input type='hidden' name='idop' value='" + data + "'></form>");
                                 $(".aux_formulario form").submit();
                                 $.ajax({
                                     type: 'GET',
-                                    url: 'jefeprod/crear_op',
+                                    url: '/jefeprod/crear_op',
                                     success: function (data) {
                                         $("#page-wrapper").html(data);
                                     }
