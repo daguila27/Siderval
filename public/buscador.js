@@ -272,6 +272,8 @@ class Buscador{
             $(".float-header").offset({ left: position.left });
             $(".float-footer").offset({ left: position.left });
         });
+
+
     }
 
     resetFixed(content){
