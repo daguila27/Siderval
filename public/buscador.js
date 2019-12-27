@@ -247,12 +247,20 @@ class Buscador{
 
         html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-footer' data-table='"+tabla+"' id='float-footer' style='" +
             "width: "+$("#"+tabla).width()+"px; margin-top: -2px !important; position: fixed; bottom: 0px;'>" +
-            "<tfoot style='font-size: "+font+"'><tr>";
+            "<tfoot style='font-size: "+font+"'>";
+        html += "<tr>";
         $("#"+tabla+" tfoot tr td").each(function(){
             html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
         });
-        html += "</tr></tfoot></table>";
+        html += "</tr>";
+        html += "<tr>";
+        $("#"+tabla+" tfoot tr td").each(function(){
+            html += "<td style='width: "+$(this).innerWidth()+"px; padding:0px; text-align: center; white-space: nowrap; height: 16px'></td>";
+        });
+        html += "</tr>";
+        html += "</tfoot></table>";
         $("."+content).append(html);
+
 
         $("#"+tabla+" tbody tr td").each(function(){
             html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
