@@ -4206,7 +4206,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                                 });
 
                                 await page.pdf({
-                                    path : 'public/pdf/odc'+req.params.idoca+'.pdf',
+                                    path : 'public/pdf/oc'+req.params.idoca+'.pdf',
                                     format: 'Letter',
                                     printBackground : true
                                 });
