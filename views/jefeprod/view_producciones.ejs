@@ -67,16 +67,33 @@ if(username == 'gestionpl'){clase='busc-din-menu';}
 else{clase='busc-menu';}%>
 <div id="up-fills" class="row up-fills <%=clase%>">
     <div class="col-md-12 col-sm-12 col-xs-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
-        <ol class="col-md-6 col-sm-12 col-12 breadcrumb" style="width: 50%; padding: 10px 2px 0px 20px">
+        <ol class="col-md-6 col-sm-6 col-6 breadcrumb" style="padding: 10px 2px 0px 20px">
             <li class="active">Orden de Producción</li>
             <!-- Mostrar cantidad de datos -->
-            <div id="" style="position: absolute; margin-top: 8px; font-size: 12px">
+            <div id="" style="margin-top: 8px; font-size: 12px">
                 <ul class="nav nav-pills" role="tablist">
                     <li role="presentation" class="vista-pill active" data-info="ex"><a>Existencias</a></li>
                     <li role="presentation" class="vista-pill" data-info="prog"><a>Progreso</a></li>
                 </ul>
             </div>
         </ol>
+        <div class="col-md-6 col-sm-6 col-6">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;; max-height: 32px"></div>
+            <div>
+                <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
+                    <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_pedidos/pedido.f_entrega-ASC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                </div>
+                <label style="margin-left: 20px"><input type="checkbox" id="groupP">Agrupar Producciones</label>
+            </div>
+        </div>
+        <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+            <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+            <ul class="dropdown-menu">
+                <li><a href="#" class="getcsvof" data-tipo="opdetalle"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel Detalle</a></li>
+                <li><a href="#" class="getcsvof" data-tipo="op"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+            </ul>
+        </div>
+        <!--
         <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0;padding: 0;"></div>
         <div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6"></div>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
@@ -91,7 +108,7 @@ else{clase='busc-menu';}%>
                 <li><a href="#" class="getcsvof" data-tipo="opdetalle"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel Detalle</a></li>
                 <li><a href="#" class="getcsvof" data-tipo="op"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
             </ul>
-        </div>
+        </div>-->
         <div style="width: 100%"><button class="btn btn-xs btn-primary pull-right" onclick="hiddenUpMenu('prodTable')"><i class="fa fa-angle-up"></i></button></div>
 
     </div>
@@ -108,12 +125,7 @@ else{clase='busc-menu';}%>
         cursor:pointer;
     }
 
-    .main-page::-webkit-scrollbar {
-        display: none;
-    }
-    .main-page{
-        -ms-overflow-style: none;
-    }
+
 </style>
 
 <script type="text/javascript">

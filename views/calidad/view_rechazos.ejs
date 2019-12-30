@@ -62,19 +62,18 @@ if(username === 'calidad'){clase='busc-din-menu';}
 else{clase='busc-menu';}%>
 <div id="up-fills" class="row up-fills <%=clase%>">
     <div class="col-md-12 col-sm-12 col-xs-12 o_control_panel row" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
-        <ol class="col-md-6 col-sm-12 col-12 breadcrumb" style="padding: 10px 2px 0px 20px">
+        <ol class="col-md-6 col-sm-6 col-6 breadcrumb" style="padding: 10px 2px 0px 20px">
             <li class="active">Informe de Rechazos</li>
         </ol>
-        <!--Buscador-->
-        <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview" style="margin: 0;padding: 0; max-height: 32px">
-        </div>
-        <div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6"></div>
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" style="margin-top: 5px; display: flex">
-                <div class="date-fill" style="display: flex;">
+        <div class="col-md-6 col-sm-6 col-6">
+            <!--Buscador-->
+            <div class="form-group o_searchview" style="margin: 0;padding: 0; max-height: 30px"></div>
+            <div style="width: 100%; display: flex; margin-top: 10px">
+                <div class="date-fill" style="display: flex; width: 40%">
 
                 </div>
                 <div>
-                    <label style="white-space: nowrap; display: flex; margin-left: 20px">
+                    <label style="white-space: nowrap; display: flex; margin-left: 20px;">
                         <div style="margin-top: 8px;">Agrupar según : </div>
                         <select class="form-control selectGroupOption" onchange="busc.extraInfo = [$(this).val()]; busc.buscar_action();">
                             <option value="no-group" selected>No Agrupar</option>
@@ -85,7 +84,10 @@ else{clase='busc-menu';}%>
                         </select>
                     </label>
                 </div>
+            </div>
         </div>
+
+
         <style>
                 .input-xs {
                     height: 22px;

@@ -580,6 +580,7 @@ router.post('/save_production_rech_prod', function(req, res, next){
                 'image_type[]': [input['image_type[]']]
             };
         }
+        console.log(input);
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connecting : %s");}
 

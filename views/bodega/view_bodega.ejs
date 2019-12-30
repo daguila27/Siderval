@@ -104,31 +104,27 @@ if(username == 'gestionpl'){clase='busc-din-menu';}
 else{clase='busc-menu';}%>
 <div id="up-fills" class="row up-fills <%=clase%>">
     <div class="col-md-12 col-sm-12 col-xs-12 o_control_panel row" style="display: flex; margin: 0; padding: 10px; position: relative">
-        <ol class="col-md-6 col-sm-12 col-12 breadcrumb" style="padding: 10px 2px 0px 20px;">
+        <ol class="col-md-6 col-sm-6 col-6 breadcrumb" style="padding: 10px 2px 0px 20px;">
             <li class="active change-inv-title">
                 Bodega Productos Terminados
             </li>
             <div id="pedidos" data-total="0"></div>
-
-            <!--<li class="hidden-inv-buttons"><button class="btn btn-success btn-xs" onclick="save_inventario()">Guardar</button></li>
-            <li class="hidden-inv-buttons"><button class="btn btn-primary btn-xs" onclick="fin_inventario()">Finalizar</button></li>
-             Mostrar cantidad de datos -->
-
-
         </ol>
-        <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6 col-xl-6 form-group o_searchview"  style="margin: 0; padding: 0; max-height: 32px; margin-top:5px">
-        </div>
-        <div class="col-xs-0 col-sm-0 col-md-6 col-lg-6 col-xl-6"></div>
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6" style="margin-top: 5px; display: flex">
-            <div class="btn-group btn-group-sm o_cp_switch_buttons">
-                <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='Lista' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
-                <div style="display: flex">
-                    <label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
-                    <input type="checkbox" id="show_zeros" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px">
-                    <h5 style="margin-left: 10px" class="indicator-oc-check"><small>Mostrando solo productos(s) en existencia</small></h5>
+
+        <div class="col-md-6 col-sm-6 col-6">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;; max-height: 32px"></div>
+            <div>
+                <div class="btn-group btn-group-sm o_cp_switch_buttons">
+                    <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='Lista' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                    <div style="display: flex">
+                        <label style="margin-left: 30px; margin-top: 6px;">Mostrar Todos</label>
+                        <input type="checkbox" id="show_zeros" style="margin-left: 10px;margin-top: 6px; width: 20px; height: 20px">
+                        <h5 style="margin-left: 10px" class="indicator-oc-check"><small>Mostrando solo productos(s) en existencia</small></h5>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
             <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
             <ul class="dropdown-menu">
