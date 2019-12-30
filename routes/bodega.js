@@ -100,7 +100,10 @@ router.get('/crear_recepcion', function(req, res, next){
                 "WHERE (coalesce(pedido.externo, producido.ruta like '%,e%') || producido.ruta like '%,e%') AND abastecimiento.cantidad > abastecimiento.recibidos", function(err, abast){
                 //EN EL CASO DE LOS MATERIALES CON ETAPA EXTERNALIZADA INTERMEDIA
                 if(err){console.log("Error Selecting : %s", err);}
-
+                /*REQUISITOS:
+                    1. Tener enlazado algúna OCA.
+                    2. Contener 'e' (Externo) en ruta de producción.
+                */
                 //console.log(abast);
                 res.render('bodega/crear_recepcion', {data: abast});
             });
@@ -628,7 +631,6 @@ router.post('/crear_gdd_fill', function(req, res, next) {
 
 router.post('/save_gdd', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
-    console.log(input);
     req.getConnection(function (err,connection) {
         //Insertamos los valores de una GD
         let values;
@@ -665,7 +667,7 @@ router.post('/save_gdd', function (req, res, next) {
                 var act_reserv = [];
                 for (let i = 0; i < Object.keys(input).length - 5 ; i++) {
                     if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
-                        if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) == -1){
+                        if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) === -1){
                             ids_palets.push( input['list[' + i + '][]'][3].split('-')[0]);
                             case_pl.push(input['list[' + i + '][]'][3].split('-')[0]);
                         }
@@ -734,13 +736,22 @@ router.post('/save_gdd', function (req, res, next) {
                 connection.query("INSERT INTO despachos (idgd, idpedido, idmaterial, cantidad) VALUES ?", [despachos], function (err, rows) {
                     if (err) {throw err;}
                     //Variables necesarias para definir la operacion de la query
+                    //op1: Despachados de Pedido ; op2: Actualizar Stock
                     let op1, op2;
+                    console.log(input.estado);
                     if (input.estado === "Venta" || input.estado === "Traslado") {
+                        //AUMENTAN LOS DESPACHADOS
                         op1 = "+";
+                        //DISMINUYE EL STOCK
                         op2 = "-";
-                    } else if (input.estado === "Devolucion") {
-                        op2 = "+";
+                    }else if (input.estado === "Devolucion") {
+                        //DISMINUYEN LOS DESPACHADOS
                         op1 = "-";
+                        //AUMENTA EL STOCK
+                        op2 = "+";
+                    }else{
+                        //TODOS LOS DEMAS TIPOS DE GDD: Blanco, Servicio y Otro
+                        //NO MODIFICAN NI Stock NI Pedido
                     }
                     //Creamos el Query para actualizar stock de materiales
                     let update_stock = 'UPDATE material SET material.stock = CASE ';
@@ -749,10 +760,6 @@ router.post('/save_gdd', function (req, res, next) {
                     var c_aux = 0;
                     for (var i = 0; i < despachos.length; i++) {
                         //SI SE DESPACHA DESDE RESERVACION NO REQUIERE MODIFICAR STOCK
-                        console.log("Tipo de Pedido");
-                        console.log(typeof despachos_bmi[i]);
-                        console.log(despachos_bmi[i]);
-
                         if(despachos_bmi[i] === 'false' ){
                             if( array_material.indexOf(despachos[i][2]) === -1 ){
                                 array_material.push(despachos[i][2]);
@@ -769,12 +776,13 @@ router.post('/save_gdd', function (req, res, next) {
                         update_stock += 'WHEN material.idmaterial=' + array_material[q] + ' THEN material.stock' + op2 + array_stock[q] + ' ';
                     }
                     update_stock += 'ELSE material.stock END WHERE material.idmaterial IN (' + array_material.join(',')+')';
+                    console.log(update_stock);
+
                     //Se actualiza el stock de material
                     connection.query(update_stock, function (err, rows) {
-                        if (err && c_aux>0) {throw err;}
+                        if (err && c_aux>0) {console.log("Error Updating : %s", err);}
 
-                        //Si la operacion es de Traslado, no existen pedidos.
-                        if (input.estado !== "Traslado") {
+                        if (input.estado !== "Traslado" && input.estado !== "Servicio") {
                             //el array de despachos se debe agrupar según PEDIDO para realizar la actualización de los despachados
                             var idpedido = [];
                             var cantidades = [];
@@ -802,24 +810,23 @@ router.post('/save_gdd', function (req, res, next) {
                             update_saldo += 'ELSE pedido.despachados END WHERE pedido.idpedido IN ' + stringIds;
                             //Actualizamos la cantidad de despachados del pedido
                             connection.query(update_saldo, function (err, rows) {
-                                if (err) {throw err;}
-
+                                if (err) {console.log("Error Updating : %s", err);}
                                 if(update_bool){
                                     connection.query(case_p, function (err, rows) {
-                                        if (err) {throw err;}
+                                        if (err) {console.log("Error Updating : %s", err);}
                                         connection.query(case_pl, function (err, rows) {
-                                            if (err) {throw err;}
+                                            if (err) {console.log("Error Updating : %s", err);}
                                             connection.query(case_pgdd, function (err, rows) {
-                                                if (err) {throw err;}
+                                                if (err) {console.log("Error Updating : %s", err);}
                                                 connection.query(case_gdd, function (err, rows) {
-                                                    if (err) {throw err;}
+                                                    if (err) {console.log("Error Updating : %s", err);}
 
                                                     console.log("act_reserv");
                                                     console.log(up_reserv);
                                                     console.log(up_reserv2);
+                                                    console.log(input.estado);
                                                     if(act_reserv.length > 0){
                                                         //UPDATE reservacion_detalle left join fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.estado = 2 WHERE fabricaciones.idpedido IN (11125)
-
                                                         connection.query(up_reserv,
                                                             function(err, actReserv){
                                                                 if (err) {console.log("Error Selecting : %s", err);}
@@ -849,7 +856,7 @@ router.post('/save_gdd', function (req, res, next) {
                                     if(act_reserv.length > 0){
                                         connection.query(up_reserv,
                                             function(err, actReserv){
-                                                if (err) {console.log("Error Selecting : %s", err);}
+                                                if (err) {console.log("Error Updating : %s", err);}
 
                                                 connection.query(up_reserv2,
                                                     function(err, actReserv){
@@ -868,20 +875,18 @@ router.post('/save_gdd', function (req, res, next) {
 
                             });
                         }
+                        //Si la operacion es de Traslado o Servicio, no existen pedidos.
                         else {
-                            if(update_bool){
+                            if(update_bool && input.estado !== 'Servicio'){
                                 connection.query(case_p, function (err, rows) {
                                     if (err) {throw err;}
                                     connection.query(case_pl, function (err, rows) {
                                         if (err) {throw err;}
                                         res.redirect('/bodega/crear_gdd');
                                     });
-
                                 });
                             }
-                            else{
-                                res.redirect('/bodega/crear_gdd');
-                            }
+                            else{res.redirect('/bodega/crear_gdd');}
                         }
                     });
                 });
@@ -1603,7 +1608,7 @@ router.get("/gen_pdfgdd/:iddespacho", function(req, res, next){
                         }
                         sheet.mergeCells('B32:H32');
                         sheet.mergeCells('B33:H33');
-                        if(rows[0].estado === 'Traslado'){
+                        if(rows[0].estado === 'Traslado' || rows[0].estado === 'Servicio'){
                             sheet.getCell('B32').value = "NO CONSTITUYE VENTA";
                             sheet.getCell('B33').value = "En virtud del Art. 55 D.L. 825";
                         }

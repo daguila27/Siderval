@@ -85,9 +85,11 @@ function fechaLatino(string){
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableFixed("#paletsTable");
+    //setDataTableFixed("#paletsTable");
     busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#indicador_paginas");
-
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
+    });
     function refreshCount(){
         var c = 0;
         $(".select-desp.danger").each(function(){

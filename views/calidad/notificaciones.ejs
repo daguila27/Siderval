@@ -1,0 +1,104 @@
+<%if(notif.length > 0){
+for(var u=0; u < notif.length; u++){
+    var desc = notif[u].descripcion.split('@');
+    var hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];
+    var fecha = [desc[2].split(' ')[0].split('-')[2], desc[2].split(' ')[0].split('-')[1], desc[2].split(' ')[0].split('-')[0]].join('/');
+if(desc[0] === 'cdcBloc'){%>
+    <li style="cursor: pointer; display: flex">
+        <a class="notificacion" data-id="<%= notif[u].idnotificacion%>">
+            <div>
+                <strong>Registro de Rechazos</strong>
+                <span class="pull-right text-muted"><em><%= hora%></em></span>
+            </div>
+            <div>¡Usuario Gestión Planta acaba de realizar el Registro Diario de Producción hoy <%= fecha%>!</div>
+        </a>
+        <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+    </li>
+    <li class="divider"></li>
+<%}}%>
+<%}
+else{%>
+    <li>
+        <a href="#">
+            <div>
+                <strong>No hay notificaciones</strong>
+                <span class="pull-right text-muted">
+                        <em>Ahora mismo</em>
+                        </span>
+            </div>
+            <div>No tiene notificaciones.</div>
+        </a>
+    </li>
+<%}%>
+
+
+
+
+
+
+
+<script type="text/javascript">
+    var cantNotif = parseInt("<%= notif.length%>");
+    $(".open-notif").data('cant',cantNotif);
+    $(".badge-notificaciones").html($(".open-notif").data('cant'));
+
+    if(cantNotif == 0)
+        $(".badge-notificaciones").css('display', 'none');
+    else
+        $(".badge-notificaciones").css('display', 'block');
+
+    $(".notificacion").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_dataodc/'+$(this).data('idoc'),
+            success: function(data){
+                $("#crearocModal div form").html(data);
+                $("#crearocModal").modal('show');
+            }
+        });
+    });
+
+
+    $(".notificacion-of").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/drop_notifof/'+$(this).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    });
+
+    $(".notificacion-odaext").on('click', function(e){
+        e.preventDefault();
+        $.ajax({
+            type: 'GET',
+            url: '/abastecimiento/get_dataodcext/'+$(this).data('idprod')+'/'+$(this).data('cant')+'/'+$(this).data('id'),
+            success: function(data){
+                $("#crearocextModal div div form").html(data);
+                $("#crearocextModal").modal('show');
+            }
+        });
+    });
+
+    function removeNotif(yo){
+        $.ajax({
+            type: 'GET',
+            url: '/calidad/drop_notif/'+$(yo).data('id'),
+            success: function(data){
+                $(".notificaciones").html(data);
+            }
+        });
+    }
+
+
+    $(document).on('click', '.notificaciones li', function (e) {
+        e.stopPropagation();
+    });
+
+    $(document).on('click', '.notificaciones li button', function (e) {
+        e.stopPropagation();
+    });
+</script>

@@ -5,17 +5,17 @@
 	}
 %>
 
-<table id="gdTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTabla" style="width: 100%; margin-top:0px !important;">
+<table id="gdTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped dataTabla" style="min-width: 100%; width: auto;">
 		<thead>
 			<tr>
-				<th class="o_column_sortable">GDD</th>
-				<th class="o_column_sortable">Cliente</th>
-				<th class="o_column_sortable">N° Items</th>
-				<th class="o_column_sortable">Observación</th>
-				<th class="o_column_sortable" style="text-align: center;" data-order="gd.fecha-DESC">Fecha de Despacho</th>
-				<th class="o_column_sortable">Tipo</th>
+				<th class="o_column_sortable" style="padding:auto; text-align: center; white-space: nowrap; ">GDD</th>
+				<th class="o_column_sortable" style="padding:auto; text-align: center; white-space: nowrap; ">Cliente</th>
+				<th class="o_column_sortable" style="padding:auto; text-align: center; white-space: nowrap; ">N° Items</th>
+				<th class="o_column_sortable" style="padding:auto; text-align: center; white-space: nowrap; ">Observación</th>
+				<th class="o_column_sortable" style="padding:auto; text-align: center; white-space: nowrap; " data-order="gd.fecha-DESC">Fecha de Despacho</th>
+				<th class="o_column_sortable" style="padding:auto; text-align: center; white-space: nowrap; ">Tipo</th>
 				<%if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){%>
-					<th class="o_column_sortable" style="width:80px" >Acción</th>
+					<th class="o_column_sortable" style="padding:auto; text-align: center; white-space: nowrap; width:80px;" >Acción</th>
 				<%}%>
 			</tr>
 		</thead>
@@ -48,19 +48,6 @@
 			</tr>
 		<%}%>
 	</tbody>
-	<tfoot>
-		<tr>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<%if(user.nombre != 'siderval' && user.nombre != 'jefeplanta'){%>
-				<td></td>
-			<%}%>
-		</tr>
-	</tfoot>
 </table>
 
 <!-- Oculta cantidad de datos, va al final para contar la cantidad de materiales -->
@@ -73,10 +60,15 @@
 <!-- Funcion para parsear nros -->
 <script src="parsear_nro.js"></script>
 
-<script type="text/javascript">
-    setDataTableFixed("#gdTable");
-    busc.setIndicadorPaginas(parseInt('<%= largoData%>'), ".indicador_paginas");
 
+<script type="text/javascript">
+    //busc.setIndicadorPaginas(parseInt('<%= largoData%>'), ".indicador_paginas");
+    //setDataTableFixed("#gdTable");
+	//$(".indicador_paginas").css('position', 'absolute');
+
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
+    });
 
     function getxlsx(file){
 		$.ajax({
@@ -152,5 +144,17 @@
             }
         });
 	}
+
+
+
+
 </script>
+<style>
+	td,th{
+		white-space: nowrap !important;
+	}
+</style>
+
+
+
 

@@ -1,0 +1,116 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+
+function completarDigitos(num, dig){
+    var arr = [];
+    if(num.toString().length >= dig){
+        return num.toString();
+    }
+    else{
+        for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
+        return arr.join('')+num.toString();
+    }
+}
+%>
+
+<style>
+    .hiddenCol{
+        display: none;
+    }
+</style>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"></div>
+
+<table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+    <thead>
+    <tr>
+        <!--<th data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="text-align: center; white-space: nowrap; ">Fecha de Rechazo</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="text-align: center; white-space: nowrap; ">Hora de Rechazo</th>-->
+        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Causal de Rechazo" style="text-align: center; white-space: nowrap; ">Causal de Rechazo</th>
+        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Etapa Causal de Rechazo" style="text-align: center; white-space: nowrap; ">Etapa Causal de Rechazo</th>
+        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Total Rechazados" style="text-align: center; white-space: nowrap; ">Total Rechazados</th>
+        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="text-align: center; white-space: nowrap; ">Peso Total [Kg]</th>
+    </tr>
+    </thead>
+    <tbody id="rechTablebody">
+    <%
+    var pesoT = 0;
+    if(datalen.length){
+    for(var i=0; i < datalen.length; i++){%>
+    <tr class="column-prods" style="background-color: rgb(239,239,248) !important;" onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol'); $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');">
+        <!--<td style="text-align: center;white-space: nowrap"><[completarDigitos(new Date(datalen[i].fecha).getDate(),2),completarDigitos(new Date(datalen[i].fecha).getMonth()+1,2),new Date(datalen[i].fecha).getFullYear()].join('-') ></td>
+        <td style="text-align: center;white-space: nowrap"><[completarDigitos(new Date(datalen[i].fecha).getHours(),2),completarDigitos(new Date(datalen[i].fecha).getMinutes(),2)].join(':') ></td>-->
+        <% pesoT += datalen[i].peso_total;%>
+        <td colspan="1" data-order="<%=datalen[i].causal%>-<%=i%>" style="text-align: left;white-space: nowrap"><b><i class="glyphicon glyphicon-chevron-down"></i> <%=datalen[i].causal %></b></td>
+        <td colspan="1" data-order="<%=datalen[i].etapacausal%>-<%=i%>" style="text-align: left;white-space: nowrap"><b><%=datalen[i].etapacausal %></b></td>
+        <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="text-align: center;white-space: nowrap; font-weight: bold;" class="parsear_nro"><%=datalen[i].total_rechazados %></td>
+        <td colspan="1" data-order="<%=datalen[i].peso_total%>-<%=i%>" style="text-align: center;white-space: nowrap; font-weight: bold;" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso_total %>"><%= datalen[i].peso_total %> </td>
+    </tr>
+                <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
+                    <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;"  >
+                        <td colspan="1" data-order="<%=datalen[i].causal%>-<%=i%>"><%=datalen[i].det_rech.split('%')[t].split('@')[0]%></td>
+                        <td colspan="1" data-order="<%=datalen[i].etapacausal%>-<%=i%>"><%=datalen[i].det_rech.split('%')[t].split('@')[3]%></td>
+                        <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[1]%></td>
+                        <td colspan="1" data-order="<%=datalen[i].peso_total%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[2]%></td>
+                    </tr>
+                <%}%>
+
+    <%}
+    } else { %>
+        <tr>
+            <td colspan="4">
+                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay nada por producir</small></h2>
+            </td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot id="rechTablefooter">
+    <tr>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1" class="footer-pesoT parsear_nro" cs="2" style="display: flex; align-content: center"><%= pesoT%></td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="/assets/parsear_nro.js" type="text/javascript"></script>
+<script type="text/javascript">
+    //setDataTableFixed("#rechTable");
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
+    });
+
+</script>
+
+<style>
+    table.fixedHeader-floating thead {
+        top: 0px;
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+    table.fixedHeader-floating tfoot {
+        width: 100% !important;
+        display: block;
+        overflow-x: unset;
+    }
+
+    table#rechTable thead tr{
+        width: 100%;
+    }
+    table#rechTable tfoot{
+        width: 100% !important;
+    }
+</style>

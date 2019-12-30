@@ -70,6 +70,7 @@
                 <table class="table table-striped sectionSave" style="margin: 0">
                     <thead>
                     <tr>
+                        <th>Item</th>
                         <th>Descripción</th>
                         <th>Fabricación</th>
                         <th>Aleación</th>
@@ -183,6 +184,7 @@
             url: '/plan/addsession_prepeds',
             success: function(data){
                 $("#session_fabrs").append(data);
+                refreshItemNum();
                 saveState();
             }
         });
@@ -504,6 +506,13 @@
                 $(".panel-creacion").html(data);
                 $(".guardado_automatico").text(text);
             }
+        });
+    }
+
+    function refreshItemNum(){
+        var c = 1;
+        $(".itemCol").each(function(){
+            $(this).html($("#p-col").find('input:checked').val()*c++);
         });
     }
 </script>

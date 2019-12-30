@@ -11,7 +11,7 @@ function fechaLatino(string){
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"></div>
 
-<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+<table id="prodTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="min-width: 100%; width: auto; margin-top: -2px !important;">
     <thead>
         <tr>
             <th data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
@@ -138,10 +138,14 @@ function fechaLatino(string){
 </table>
 
 <!-- Funcion para parsear nros -->
-<script src="parsear_nro.js"></script>
+<script src="/parsear_nro.js"></script>
 
 <script type="text/javascript">
-        setDataTableFixed("#prodTable");
+        //setDataTableFixed("#prodTable");
+        $(document).ready(function(){
+            busc.initFixed('main-page', true);
+        });
+
         $(".anulButton").on('click', function(e){
             e.preventDefault();
             $.ajax({
@@ -155,3 +159,9 @@ function fechaLatino(string){
         });
 
 </script>
+
+<style>
+    td,th{
+        white-space: nowrap !important;
+    }
+</style>

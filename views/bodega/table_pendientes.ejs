@@ -25,7 +25,7 @@ function fechaLatino(string){
     return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
 }
 %>
-<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top:0px !important;">
+<table id="despachosTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="min-width: 100%; width: auto ; margin-top:0px !important;">
     <thead>
         <tr>
             <th class="o_column_sortable">OC</th>
@@ -109,10 +109,12 @@ function fechaLatino(string){
 
 <script type="text/javascript">
 
-    setDataTableFixed("#despachosTable");
+    //setDataTableFixed("#despachosTable");
     $("#indicador_paginas").data('total', parseInt('<%= largoData%>'));
     busc.setIndicadorPaginas(parseInt('<%= largoData%>'), "#indicador_paginas");
-
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
+    });
 
 
     var mouseDown = 0;
@@ -280,4 +282,15 @@ function fechaLatino(string){
             }
         });
     });
+
+
 </script>
+
+
+<style>
+    td,th{
+        white-space: nowrap !important;
+    }
+</style>
+
+

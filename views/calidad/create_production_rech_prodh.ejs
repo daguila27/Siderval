@@ -1,0 +1,1022 @@
+
+<%if(user){%>
+    <script>
+        function callbAlertCancel(){
+            $("#menu-lateral-izquierdo").find("li[data-link='/calidad/view_rechazos']").click();
+        }
+
+        function callbAlertConfirm(){
+            $.ajax({
+                type: 'GET',
+                url: '/calidad/change_bloc_user',
+                success: function(data){}
+            });
+        }
+        AlertaBloc("<%= alertMsg%>");
+    </script>
+<%}%>
+
+
+<script>
+    function sendImg(){
+        $("#sendImg").submit();
+    }
+
+    function onChangeImg(yo){
+        var input = document.getElementById(yo);
+        var fReader = new FileReader();
+        fReader.readAsDataURL(input.files[0]);
+        fReader.onloadend = function(event){
+            var img = document.getElementById("yourImgTagModal");
+            img.src = event.target.result;
+        }
+    }
+
+</script>
+
+<!-- Modal adjuntar Movimiento-->
+<div id="crearProdRech" class="modal-primary modal fade" role="dialog">
+    <div class="modal-dialog">
+        <form id="prodrechForm">
+            <!-- addclientform     editclientform-->
+            <!-- Modal content-->
+            <div class="modal-content panel panel-primary">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Registrar Rechazo:</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-default" id="prod_info" style="background-color: rgb(124,123,173); display: flex; margin: 0;margin-bottom: 10px">
+                        <strong style="color: white; width: 70%; font-size: 15px" id="prod_nombre" data-idmat="">Inserto 23023</strong>
+                    </div>
+                    <div class="form-group sendMov hidden" style="margin-top: 10px;margin-bottom: 10px;">
+                        <label class="control-label col-sm-2" for="email">Rechazados:</label>
+                        <div>
+                            <input type="number" class="form-control rechazados-input" id="rechazados" name="rechazados" value="1" placeholder="Rechazados" required>
+                        </div>
+                        <input type="hidden" id="idmaterial" name="idmaterial">
+                        <input type="hidden" id="nom-etapa" name="nom-etapa">
+                        <input type="hidden" id="nom-etapa-previus" name="nom-etapa-previus">
+                        <input type="hidden" id="etapa-previus" name="etapa-previus">
+                    </div>
+
+                    <div class="row info-colada" style="margin-bottom: 10px" >
+
+                        <div class="col-md-5">
+                            <div class="mycontent-left">
+                                <label>Código Colada:</label>
+                            </div>
+                            <div class="mycontent-left">
+                                <input class="form-control" type="text" placeholder="Ej: 19H15" id="coladaNum" onkeyup="checkExpReg(/[0-9]{2}[A-Z]{1}[0-9]{2}/, this);" required>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="col-md-12 mycontent-right">
+                                <label>Area de Rechazo:</label>
+                            </div>
+                            <div class="col-md-12 mycontent-right">
+                                <select class="form-control areaRechaSel" id="areaRechaSelId" onchange="fillSelectRech(this)" required>
+                                    <% for(var w=0; w < etp.length; w++){%>
+                                        <option value="<%= etp[w].value%>"><%= etp[w].nombre_etapa%></option>
+                                    <%}%>
+                                </select>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="row info-prod">
+                        <div class="col-md-5" style="display: flex">
+                            <div class="col-md-1">
+                                <label style="visibility: hidden;">A:</label>
+                                <i class="glyphicon glyphicon-arrow-right"></i>
+                            </div>
+                            <div class="col-md-11 mycontent-left">
+                                <label>Correlativo de Producto:
+                                    <input class="form-control" type="number" placeholder="Ej: 002" id="productoNum" onkeyup="checkExpReg(/[0-9]{3}/, this);" required>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7" style="display: flex">
+                            <div class="col-md-1">
+                                <label style="visibility: hidden;">A:</label>
+                                <i class="glyphicon glyphicon-arrow-right"></i>
+                            </div>
+                            <div class="col-md-11 mycontent-right">
+                                <label>Causal de Rechazo:
+                                    <select class="form-control causalRechaSel" id="causalRechaSelId" required>
+                                        <% for(var w=0; w < causal.length; w++){%>
+                                        <option value="<%=causal[w].idcausal%>" data-etapa="<%= causal[w].idetapa%>"><%= causal[w].causal%></option>
+                                        <%}%>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="comentario-rechazo" for="" style="width: 100%;">
+                            Comentario:
+                            <textarea class="form-control" name="" id="comentarioMov" cols="20" rows="3"></textarea>
+                        </label>
+                    </div>
+
+
+                    <style>
+                        .mycontent-left {
+                            border-right: 1px dashed rgb(124,123,173);
+                            padding-right: 25px;
+                        }
+
+                        .beforeArrow::before {
+                            content: '&#x25B6;';
+                            background-color: yellow;
+                            color: red;
+                            font-weight: bold;
+                        }
+
+                    </style>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <button type="button" class="btn btn-default" onclick="$('#crearProdRech').modal('hide')" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal editar Causale/Comentario-->
+<div id="editProdRech" class="modal-primary modal fade" role="dialog">
+    <input type="hidden" id="idColAux">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Registrar Rechazo:</h4>
+            </div>
+            <style>
+                .options-selectors{
+                    display: flex;
+                }
+
+                .options-selectors > div{
+                    width: 48%;
+                    border: 1px solid rgb(204,204,204);
+                    height: 200px;
+                    overflow-y: scroll;
+                    -webkit-border-radius: 10px;
+                    -moz-border-radius: 10px;
+                    border-radius: 10px;
+                    -webkit-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.16);
+                    -moz-box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.16);
+                    box-shadow: 1px 1px 5px 0px rgba(0,0,0,0.16);
+                }
+                .options-selectors > .button-section{
+                    width: 6%;
+                    border: none;
+                    box-shadow: none;
+                    text-align: center;
+                    overflow: hidden;
+                }
+                .vent-option{
+                    overflow-y: hidden;
+                    height: 0px;
+                }
+                .cau-option:hover{
+                    cursor: pointer;
+                }
+
+                .etp-option:hover{
+                    background-color: rgb(239,240,241);
+                }
+
+                .etp-option.selected{
+                    background-color: rgb(239,240,241);
+                    font-weight: bold;
+                }
+
+                .button-section > button{
+                    margin-top: 3px;
+                }
+            </style>
+            <script>
+                function toggleOptionAc(yo){
+                    if($(yo).data('state').toString() === '0'){
+                        $(yo).parent().children('div.vent-option').css('height', 'auto');
+                        $(yo).data('state', '1');
+                    }else{
+                        $(yo).parent().children('div.vent-option').css('height', '0');
+                        $(yo).data('state', '0');
+                    }
+                }
+                function selectCausal(yo){
+                    $(".cau-option").removeClass('selected');
+                    $(".cau-option").data('state', '0');
+                    //SI LA OPCION SELECCIONADA ESTÁ EN LA LISTA IZQUIERDA
+                    if($(yo).parent().parent().parent().parent().hasClass('left-section')){
+                        $(".button-section > .plus-btn").prop('disabled', false);
+                        $(".button-section > .minus-btn").prop('disabled', true);
+                    }
+                    //SI ESTÁ EN LA DERECHA
+                    else{
+                        $(".button-section > .plus-btn").prop('disabled', true);
+                        $(".button-section > .minus-btn").prop('disabled', false);
+                    }
+
+                    $(yo).data('state', '1');
+                    $(yo).addClass('selected');
+                }
+                function addCausal(yo){
+                    var sel = $(yo).parent().parent().children('.left-section').find('.cau-option.selected');
+                    var cau = sel.parent().parent().parent().find('.etp-option').html();
+                    sel.addClass('hidden');
+                    if( parseInt($(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options') ) === 0 ){
+                        $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').children('.li-empty').remove();
+                    }
+                    $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options', parseInt($(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options')) + 1);
+                    $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).children('span').html("("+parseInt($(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options'))+")" );
+                    $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').append("<li class=\"etp-option cau-option\" data-state=\"0\" data-valor='"+sel.data('valor')+"' data-html=\""+sel.data('html')+"\" onclick=\"selectCausal(this)\"><input type='checkbox' class='prin-cua' onchange='selCauPrinc(this)' style='margin-rigth: 5px'>" +cau +" "+ sel.html() + "</li>");
+                }
+
+                function removeCausal(yo){
+                    var sel = $(yo).parent().parent().children('.right-section').find('.cau-option.selected');
+                    sel.parent().data('options', parseInt(sel.parent().data('options'))-1 );
+
+                    if( parseInt(sel.parent().data('options') ) === 0 ){sel.parent().parent().parent().find('.etp-option').children('span').html(' ');}
+                    else{sel.parent().parent().parent().find('.etp-option').children('span').html('(' + sel.parent().data('options')+ ')');}
+
+                    $(".left-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').find('li[data-valor="'+sel.data('valor')+'"]').removeClass('hidden');
+
+                    var c = 0;
+                    sel.parent().find('li').each(function(){c++;});
+                    if(c === 1){
+                        //sel.parent().html('<li class=\"li-empty\"> -- Seleccione Causales -- </li>');
+                        sel.parent().html('');
+                    }else{
+                        sel.remove();
+                    }
+                }
+
+                function setDataCau(){
+                    var arr = {
+                        cau: [],
+                        html: [],
+                        check: [],
+                        image: [],
+                        image_type: [],
+                        comment: ''
+                    };
+                    //OBTENER LOS ITEM ADJUNTADOS A LA DERECHA
+                    $("#cau-body").children('.options-selectors').children('.right-section').find('li.cau-option').each(function(){
+                        arr.cau.push([$(this).data('valor')]);
+                        if($(this).find('input[type=\"checkbox\"]').is(":checked")){
+                            arr.html.unshift("<li style=\"text-align: left;font-weight: bold\">"+$(this).data('html')+" (P)</li>");
+                            arr.check.push(true);
+                        }else{
+                            arr.html.push("<li style=\"text-align: left\">"+$(this).data('html')+"</li>");
+                            arr.check.push(false);
+                        }
+                    });
+                    arr.comment = $("#comentarioMovCau").val();
+
+                    if( $("#imagenMovCau").val().length ){
+                        arr.image = $("#imagenMovCau").val().split('\\')[$("#imagenMovCau").val().split('\\').length-1];
+                        arr.image_type = $("#imagenMovCau").val().split('.');
+                        arr.image_type = arr.image_type[arr.image_type.length-1];
+
+                    }else{
+                        arr.image = null;
+                        arr.image_type = null;
+                    }
+
+
+                    arr.html = "<ul style='padding: 0 0 0 2px'>"+arr.html.join(' ')+"</ul>";
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').children('div').html(arr.html);
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').data('valor', arr.cau.join('-'));
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').data('check', arr.check.join('-'));
+
+
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="coment"]').html(arr.comment);
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="coment"]').data('valor', arr.comment);
+
+
+                    if(arr.image === null){
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html(" -<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                    }else {
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html(arr.image + "<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                    }
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('valor', arr.image);
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('tipo', arr.image_type);
+
+                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').children('img').attr('src', $('#yourImgTagModal').attr('src') );
+
+                    $("#editProdRech").modal("hide");
+                }
+
+                function resetSelector(){
+                    $('.right-section').find('.cau-option').each(function(){
+                        $(this).click();
+                        $(".minus-btn").click();
+                    });
+                }
+
+                function applyMoves(arr){
+                    //arr: [idcausal1, idcausal2, ...]
+                    for(var t=0; t < arr.length; t++){
+                        $('.left-section').find(".cau-option[data-valor='"+arr[t]+"']").click();
+                        $(".plus-btn").click();
+                    }
+                }
+                function selCauPrinc(yo){
+                    var c = 0;
+                    $(".prin-cua").each(function(){
+                        if($(this).is(':checked')){
+                            c++;
+                        }
+                    });
+
+                    if(c > parseInt($("#cau-body").data('max'))){
+                        $(yo).prop('checked', false);;
+                    }
+                }
+
+            </script>
+
+            <!--
+            data-max: cantidad máxima de causales principales
+            -->
+            <div class="modal-body" id="cau-body" data-max="1">
+                <!--<button onclick="resetSelector(); applyMoves([1,2])">reset</button>-->
+                <div class="options-selectors">
+                    <div class="left-section">
+                        <% for(var w=0; w < Object.keys(opt_causal).length; w++){ %>
+                            <div>
+                                <div class="etp-option etp<%= w%>" data-index="<%=w%>" onclick="toggleOptionAc(this)" data-state="0"><%= Object.keys(opt_causal)[w]%> :</div>
+                                <div class="vent-option">
+                                    <ul>
+                                        <% for(var t=0; t < opt_causal[Object.keys(opt_causal)[w]].length; t++){%>
+                                            <li class="etp-option cau-option" data-valor="<%= opt_causal[Object.keys(opt_causal)[w]][t][0]%>" data-state="0" data-html="<%= opt_causal[Object.keys(opt_causal)[w]][t][1]%> - <%= Object.keys(opt_causal)[w]%>" onclick="selectCausal(this)"><%= opt_causal[Object.keys(opt_causal)[w]][t][1]%></li>
+                                        <%}%>
+                                    </ul>
+                                </div>
+                            </div>
+                        <%}%>
+                    </div>
+                    <div class="button-section">
+                        <button class="btn btn-xs btn-primary plus-btn" onclick="addCausal(this)" disabled><i class="fa fa-plus"></i></button>
+                        <button class="btn btn-xs btn-primary minus-btn" onclick="removeCausal(this)" disabled><i class="fa fa-minus"></i></button>
+                    </div>
+                    <div class="right-section">
+                        <% for(var w=0; w < Object.keys(opt_causal).length; w++){ %>
+                        <div>
+                            <%if(w === 0){%>
+                                <div class="etp-option etp<%= w%> hidden" data-index="<%= w%>" onclick="toggleOptionAc(this)" data-state="1" style="height: 0px"><%= Object.keys(opt_causal)[w]%> : <span></span></div>
+                                <div class="vent-option" style="height: fit-content;">
+                                    <ul data-options="0" style="margin: 0;">
+                                        <!--<li class="li-empty"> -- Seleccione Causales -- </li>-->
+                                    </ul>
+                                </div>
+                            <%}
+                            else{%>
+                                <div class="etp-option etp<%= w%> hidden" data-index="<%= w%>" onclick="toggleOptionAc(this)" data-state="1" style="height: 0px"><%= Object.keys(opt_causal)[w]%> : <span></span></div>
+                                <div class="vent-option" style="height: fit-content;">
+                                    <ul data-options="0" style="margin: 0;">
+                                        <!--<li class="li-empty"> -- Seleccione Causales -- </li>-->
+                                    </ul>
+                                </div>
+                            <%}%>
+                        </div>
+                        <%}%>
+                    </div>
+                </div>
+                <div class="form-group comment-group" style="margin-top: 10px">
+                    <label id="comentario-rechazo" for="" style="width: 100%;">
+                        Comentario:
+                        <textarea class="form-control" name="" id="comentarioMovCau" cols="20" rows="3"></textarea>
+                    </label>
+                </div>
+
+                <div class="form-group image-group input-group" style="margin-top: 10px;">
+                    <label for="" style="width: 100%;">
+                        Adjuntar Imagen:
+                        <input style="margin-left: 10px;margin-top: 2px" type="file" id="imagenMovCau" onchange="onChangeImg('imagenMovCau')" accept=".jpg,.jpeg,.png">
+                    </label>
+                </div>
+                <img src="" alt="" id="yourImgTagModal" style="width: 80%; margin-left: 10%;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="setDataCau()">Aplicar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal adjuntar Movimiento-->
+<div id="verRutaModal" class="modal fade bs-example-modal-lg" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content panel panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Ruta de Producción: <small style="color: white;">Inserto 23023</small></h4>
+            </div>
+            <style>
+                .circulo {
+                    width: 50px;
+                    height: 50px;
+                    -moz-border-radius: 50%;
+                    -webkit-border-radius: 50%;
+                    border-radius: 50%;
+                    background: rgb(124,123,173);
+                    border: 3px solid rgb(210,210,210);
+                    text-align: center;
+                    vertical-align: center;
+                    transition: 0.2s;
+                    padding-top: 2px;
+                    color: white
+                }
+                .circulo:hover{
+                    transform: scale(1.2);
+                    cursor: pointer
+                }
+                .linea {
+                    width: 50px;
+                    height: 1px;
+                    margin-top: 24px;
+                    background: rgb(124,123,173);
+                }
+            </style>
+            <div class="modal-body" style="width: 100%;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="$('#verRutaModal').modal('hide')" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div style="margin-top: 50px; padding: 0 30px">
+    <div class="etapas-content">
+        <div class="panel panel-primary col-md-12" style="padding: 0">
+            <div class="panel-heading">
+                <h4 style="width: 100%">
+                    Rechazos
+                    <div class="pull-right" style="width: 10%; display: flex">
+                        <div class="dropdown opcion-sl">
+                            <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu" style="right: 0; left: auto;">
+                                <li class="ped-option" onclick="saveStateProdHist()"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar</a></li>
+                                <li class="ped-option" onclick="loadStateProdHist()"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar</a></li>
+                                <!--<li class="ped-option" data-toggle="modal" data-target="#saveplantModal"><a><i class="glyphicon glyphicon-floppy-save"></i> Guardar Plantilla</a></li>
+                                <li class="ped-option" data-toggle="modal" data-target="#loadplantModal"><a><i class="glyphicon glyphicon-floppy-open"></i> Cargar Plantilla</a></li>-->
+                            </ul>
+                        </div>
+                    </div>
+                </h4>
+            </div>
+            <div class="panel-body" style="padding: 0%">
+                <div style="overflow-x: scroll;overflow-y: scroll; max-height: 300px;">
+                    <table class="etp-mov o_list_view table table-condensed table-striped o_list_view_ungrouped" ondrop="drop(event)" ondragover="allowDrop(event)" style="margin-top: -2px !important;">
+                        <thead>
+                        <tr>
+                            <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
+                            <th class="hidden" style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Cantidad">Cantidad</th>
+                            <th style="white-space: nowrap ; text-align: center; width: 125px" data-toggle="tooltip" data-placement="bottom" title="Código Colada">Cód. Colada</th>
+                            <th style="white-space: nowrap ; text-align: center; width: 125px" data-toggle="tooltip" data-placement="bottom" title="Correlativo de Producto">Corr. Producto</th>
+                            <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Etapa">Etapa</th>
+                            <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Imagen">Imagen</th>
+                            <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Comentario">Comentario</th>
+                            <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Causales">Causales</th>
+                            <!--<th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento">Área</th>
+                            <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Fecha de Movimiento">Causal</th>-->
+                            <th style="white-space: nowrap ; text-align: center"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbody_rech">
+                        <tr class="empty-table">
+                            <td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="panel-footer" style="text-align: right;">
+                <button class="btn btn-primary" onclick="submit_action()" style="position: relative; top: 0px; right: 0;">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!--<button class="btn btn-primary" onclick="submit_action()" style="margin-left: 80%; margin-right: 10%; margin-bottom: 10px; width: 10%;">Enviar</button>
+    <button class="btn btn-primary" onclick="Alerta('Prueba'); fooCallBack = function(){$('.oe_secondary_submenu li.active').click();}; flag = true; foo();">Alerta</button>-->
+    <div class="panel panel-primary col-md-12" style="padding: 0">
+        <div class="panel-heading" style="display: flex;">
+            <h4 class="col-md-10">Productos Disponible (Producción): </h4>
+            <div style="vertical-align: middle; display: flex">
+                <p style="margin: 0; padding: 7px 0px">Buscador:</p>
+                <input id="srProd" type="text" class="form-control" placeholder="Descripción" onchange="searchDataTable($(this).val())" onkeyup="searchDataTable($(this).val())" style="width: auto; margin-left: 2%">
+            </div>
+        </div>
+        <div class="panel-body" style="padding: 0%">
+            <div style="display: flex">
+                <style>
+                    .col-proceso{
+                        text-align: center;
+                    }
+                    .col-proceso:hover{
+                        text-decoration-line: underline;
+                        color: blue;
+                    }
+
+                    .itemProd{
+                        padding: 10px;
+                        border: 1px solid #ccc!important;
+                    }
+                    .itemProd h2{
+                        margin: 0px 10px;
+                        padding: 10px;
+                    }
+                    .itemProd select{
+                        margin: 0px;
+                        padding: 0px;
+                        padding-left: 5px;
+                        width: 80%;
+                        margin-left: 10%;
+                    }
+
+                    .itemProd select option{
+                        margin: 0px;
+                        padding-left: 20px !important;
+                    }
+
+                    select.btn-mini {
+                        height: auto;
+                        line-height: 14px;
+                    }
+
+                    /* this is optional (see below) */
+                    select.btn {
+                        -webkit-appearance: button;
+                        -moz-appearance: button;
+                        appearance: button;
+                        padding-right: 16px;
+                    }
+
+                    select.btn-mini + .caret {
+                        margin-left: -20px;
+                        margin-top: 9px;
+                    }
+                </style>
+                <div class="row listProd" style="width: 100%;margin: 0; padding: 0px 0px;">
+                    <table id="tableProduccion" style="margin-top: 0px !important;" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
+                        <thead>
+                            <tr>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Orden de Fabricación">OF</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Descripción del Producto">Descripción</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Etapa" style="text-align: center">Etapa</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">Comentario</th>
+                                <th data-toggle="tooltip" data-placement="bottom" title="Fecha" style="text-align: center">Fecha</th>
+                                <!--<th data-toggle="tooltip" data-placement="bottom" title="Adjuntar" style="text-align: center"></th>-->
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <%if(datalen.length){
+                        for(var i = 0; i< datalen.length; i++){ %>
+                        <tr
+                                id="colProdList<%=datalen[i].idproduccion_history%>"
+                                data-nombre="<%=datalen[i].detalle%>"
+                                data-idprodh="<%=datalen[i].idproduccion_history%>"
+                                data-idmat="<%=datalen[i].idmaterial%>"
+                                data-env="<%=datalen[i].enviados%>"
+                                data-etapa="<%=datalen[i].from%>"
+                                data-comentario="<%=datalen[i].comentario%>"
+                                draggable="true" ondragstart="drag(event, this)">
+                            <td data-toggle="tooltip" data-placement="bottom" title="Orden de Fabricación"><%= datalen[i].idof%></td>
+                            <td data-toggle="tooltip" data-placement="bottom" title="Descripción del Producto"><%= datalen[i].detalle%></td>
+                            <td data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].enviados%></td>
+                            <td data-toggle="tooltip" data-placement="bottom" title="Etapa" style="text-align: center"><%= datalen[i].nombre_etapa%></td>
+                            <td data-toggle="tooltip" data-placement="bottom" title="Comentario" style="text-align: center">
+                                <% if(datalen[i].comentario === ' ' || datalen[i].comentario === '' || datalen[i].comentario === null){%>
+                                   -
+                                <%}else{%>
+                                    <%= datalen[i].comentario%>
+                                <%}%>
+                            </td>
+                            <td data-toggle="tooltip" data-placement="bottom" title="Fecha" style="text-align: center"><%= new Date(datalen[i].fecha).toLocaleString()%></td>
+                            <!--<td data-toggle="tooltip" data-placement="bottom" title="Adjuntar" style="text-align: center"><button class="btn btn-xs btn-primary">Adjuntar</button></td>-->
+                        </tr>
+                        <%}
+                        }else{%>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <!--<td></td>-->
+                            </tr>
+                        <%}%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer" style="text-align: right">
+        </div>
+    </div>
+</div>
+
+<div class="hidden" id="hidden-form-images">
+</div>
+
+<style>
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+
+<script>
+
+
+    var selectGD = false;
+    var etapas = [
+        "Moldeo",
+        "Fusión",
+        "Quiebre",
+        "Terminación",
+        "Tratamiento Térmico",
+        "Maestranza",
+        "Control de Calidad",
+        "Producto Terminado",
+        "Externalizado"
+    ];
+
+    var tableProduccion = $('#tableProduccion').DataTable({
+        paging: false,
+        language: {
+            "sProcessing":     "Procesando...",
+            "sZeroRecords":    "No se encontraron resultados",
+            "sEmptyTable":     "Ningún dato disponible en esta tabla",
+            "sInfo":           "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty":      "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered":   "(filtrado de un total de _MAX_ registros)",
+
+            "sSearch":         "Buscar:",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst":    "Primero",
+                "sLast":     "Último",
+                "sNext":     "&raquo",
+                "sPrevious": "&laquo"
+            },
+            "oAria": {
+                "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+    //$("#prodTable_wrapper").css('margin-top', '-39px');
+    //$("#prodTable_wrapper label").css('color', 'white');
+
+    function searchDataTable(str){
+        tableProduccion.search( str ).draw();
+    }
+    function setDatesMov(yo){
+        var etp = $(".tabs-etapas li.active a").data('etp');
+        var fecha = $(yo).parent().parent().children('.input-date').children('input').val();
+        var option = $(yo).parent().parent().children('.input-option').children('.radio').children('label').children('input').val();
+        $(yo).parent().parent().children('.input-option').children('.radio').children('label').children('input').each(function(){
+            if($(this).is(':checked')){
+                option = $(this).val();
+            }
+        });
+        if(option === 'esta'){
+            $(".dateInputMov-"+etp).val(fecha);
+            $(".dateInputMov-"+etp).parent().data('valor', fecha);
+        }else if(option === 'todas'){
+            $(".dateInputMov").val(fecha);
+            $(".dateInputMov").parent().data('valor', fecha);
+        }
+    }
+    function checkEmptyTable(id){
+        var c = 0;
+        $(id).children('tr').each(function(){c++;});
+        if(c === 0){
+            $(id).html("<tr class='empty-table'>" +
+                "<td colspan='10'><h2 style='text-align: center'><small><i class='fa fa-inbox fa-1x' aria-hidden='true' style='margin-right: 10px'></i> Arrastre el Producto para adjuntar...</small></h2></td>" +
+                "</tr>");
+        }
+    }
+    function verRuta(yo){
+        $("#verRutaModal").modal('show');
+        var html = "";
+        var ruta = $(yo).data('ruta').split(',');
+        //var cant = $(yo).data('cant').split(',')
+        for(var t=0; t < ruta.length; t++){
+            if(t===0){
+                html += "<div style='display: flex;'>";
+            }
+
+            html += "<div class='circulo'>"+etapas[parseInt(ruta[t])-1].substring(0,3).toUpperCase()+"<br>100</div>";
+
+            if(t === ruta.length-1){
+                html += "</div>";
+            }
+            else{
+                html += "<div class='linea'></div>";
+            }
+        }
+        $("#verRutaModal .modal-body").html(html);
+    }
+    function col_movh(yo){
+        var next;
+        var previus;
+        var r = $(yo).parent().data('ruta').split(',');
+        //SE OBTIENE LA SIGUIENTE ETAPA SEGÚN RUTA
+        //SI LA ETAPA ACTUAL NO SE ENCUENTRA EN LA RUTA DE PRODUCCION
+        if(r.indexOf($(yo).data('etapa').toString()) === -1){alert("Producto no pasa por etapa selecionada");}
+        else if(parseInt($(yo).html()) <= 0){alert("No hay piezas en la etapa seleccionada.");}
+        else{
+            //SE ALMACENA EL NOMBRE DE LA ETAPA DESDE DONDE SE LIBERA PARA REFERENCIAR
+            // A LA TABLA DONDE DEBE ADJUNTARSE LA COLUMNA, ENTRE OTRAS ACCIONES
+            $("#nom-etapa-previus").val($(yo).data('netapa'));
+
+
+            previus = r[r.indexOf($(yo).data('etapa').toString()) - 1];
+            $('#prod_info').children('strong').html($(yo).parent().data('nombre'));
+            $('#prod_info').children('strong').data('idmat', $(yo).parent().data('idmat'));
+            $("#etapa-previus").val($(yo).data('etapa'));
+
+
+            fillSelectRech(".areaRechaSel");
+            $("#nom-etapa").val($(yo).data('netapa'));
+            $("#rechazados").attr('max', parseInt($(yo).html()) )
+            $("#crearProdRech").modal('show');
+
+
+        }
+    }
+
+
+
+
+    $(".selectFormMov").change(function(){
+        if($(this).val() === '9'){changeModalMovh(true);}
+        else{changeModalMovh(false);}
+    });
+    function changeDateValue(yo){
+        $(yo).parent().data('valor', $(yo).val());
+    }
+    $("#prodrechForm").submit(function(e){
+        e.preventDefault();
+        var array = $(this).serializeArray();
+        var html;
+        var c = 0;
+        html = "<tr>" +
+            "<td style='white-space: nowrap; ' data-name='idmat' data-valor='"+$("#prod_info strong").data('idmat')+"'>"+$("#prod_info strong").html()+"</td>" +
+            "<td style='white-space: nowrap; text-align: center' data-name='env' data-valor='"+$("#rechazados").val()+"'>"+$("#rechazados").val()+"</td>" +
+            "<td style='white-space: nowrap; text-align: center' data-name='fecha' data-valor=' '><input type='datetime-local' class='form-control' name='fecha' disabled required></td>" +
+            "<td style='white-space: nowrap;' data-name='coment' data-valor=' ' onkeyup='$(this).parent().data(\"valor\", $(this).text() )'>"+$("#comentarioMov").val()+"</td>" +
+            "<td style='white-space: nowrap; text-align: center' data-name='colada' data-valor=' '><input class=\"form-control\" type=\"text\" placeholder=\"Ej: 19H15\" onkeyup=\"checkExpReg(/[0-9]{2}[A-J]{1}[0-9]{2}/, this); $(this).parent().data('valor', $(this).val()) \" required></td>" +
+            "<td style='white-space: nowrap; text-align: center' data-name='producto' data-valor=' '><input class=\"form-control\" type=\"number\" placeholder=\"Ej: 002\" id=\"productoNum\" onkeyup=\"checkExpReg(/[0-9]{3}/, this); $(this).parent().data('valor', $(this).val())\" required></td>" +
+            "<td style='white-space: nowrap; text-align: left' data-name='causal' data-valor='"+$("#causalRechaSelId").val()+"'>"+$("#causalRechaSelId").children('option:selected').html()+"</td>" +
+            "<td style='white-space: nowrap; text-align: center' data-name='area' data-valor='"+$("#areaRechaSelId").val()+"'>"+$("#areaRechaSelId").children('option:selected').html()+"</td>" +
+            "<td style='text-align:center; white-space: nowrap' data-name='del' data-valor=' '><button type='button' class='btn btn-xs btn-danger' onclick='$(this).parent().parent().remove(); checkEmptyTable(\"#tbody_rech\")'><i class='fa fa-times' aria-hidden='true'></i></button></td>" +
+            "</tr>";
+        $(".empty-table").remove();
+        $("table tbody").append(html);
+        $("table tbody tr").each(function(){c++;});
+        $("#crearProdRech").modal('hide');
+    });
+
+    function act_numcol(yo){
+        var c = 0;
+        $(".tab-content div#"+$(yo).data('preetp')+" table tbody tr").each(function(){c++;});
+        if(c===0){$(".nav-tabs li a[data-etp='"+$(yo).data('preetp')+"'] small").html("");}
+        else{$(".nav-tabs li a[data-etp='"+$(yo).data('preetp')+"'] small").html("("+c+")");}
+        //$(".tab-pane#"+id)
+    }
+
+    function submit_action(){
+        var err = false, msg;
+        var data = {
+            idmat: [],
+            env: [],
+            fecha: [],
+            coment: [],
+            colada: [],
+            producto: [],
+            causal: [],
+            causal_check: [],
+            area: [],
+            from: [],
+            idprodh: [],
+            image: [],
+            image_type: []
+        };
+        form_images = $('<form method="post" action="/upload" encType="multipart/form-data"></form>');
+        $("#tbody_rech td").each(function(){
+            if($(this).data('name') === 'fecha'){
+                data[$(this).data('name')].push($(this).children('input').val());
+            }
+            else if( ($(this).data('name') === 'colada' || $(this).data('name') === 'producto')){
+                if($(this).find('input').val() === ' ' || $(this).find('input').val() === ''){data[$(this).data('name')].push('0');}
+                else{
+                    //COMPROBAR SI STRING CUMPLE CON EL FORMATO
+                    if($(this).data('name') === 'colada'){
+                        if( !(/[0-9]{2}[A-J]{1}[0-9]{2}/.test($(this).find('input').val())) ){
+                            msg = "¡Código de Colada Incorrecto!";
+                            err = true;
+                        }
+                    }
+                    else{
+                        if( !(/[0-9]{1,3}/.test($(this).find('input').val())) ){
+                            msg = "¡Número de Producto Incorrecto!";
+                            err = true;
+                        }
+                    }
+
+                    data[$(this).data('name')].push($(this).children('input').val());
+                }
+            }
+
+            else if( ($(this).data('name') === 'causal')){
+                if(
+                    $(this).data('valor') === '' ||
+                    $(this).data('valor') === ' ' ||
+                    $(this).data('valor') === null ||
+                    $(this).data('valor') === undefined ){
+                    msg = "¡No es posible enviar Rechazos sin Causales!";
+                    err = true;
+
+                }else{
+                    data['causal_check'].push($(this).data('check'));
+                    data[$(this).data('name')].push($(this).data('valor'));
+                }
+            }
+
+            else if( ($(this).data('name') === 'image')){
+                console.log($(this).find('img').length);
+                if($(this).find('img').length){data[$(this).data('name')].push($(this).find('img').attr('src'));}
+                else{data[$(this).data('name')].push(' ');}
+
+                data['image_type'].push($(this).data('tipo'));
+                form_images.append('<input type="file" name="foo" value="' + $(this).find('img').attr('src') + '" required />')
+            }
+
+            else{
+                console.log($(this).data('name'));
+                data[$(this).data('name')].push($(this).data('valor'));
+            }
+        });
+        $("#hidden-form-images").html(form_images);
+        if(err){
+            Alerta(msg);
+        }else{
+            $.ajax({
+                type: 'POST',
+                data: data,
+                url: '/calidad/save_production_rech_prod',
+                success: function(data){
+
+                    Alerta(data);
+                    flag = true;
+                    fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
+                    foo();
+                    $("#tbody_rech").html(
+                        '<tr class="empty-table">\n' +
+                        '<td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>\n' +
+                        '</tr>'
+                    );
+                }
+            });
+        }
+
+    }
+
+    function checkExpReg(exp, yo){
+        var resp = exp.test($(yo).val());//boolean
+        if(resp){
+            $(yo).css('border-color', 'rgb(92,184,92)');
+            return true;
+        }else{
+            $(yo).css('border-color', 'rgb(217,83,79)');
+            return false;
+        }
+    }
+
+
+    function fillSelectRech(yo){
+        var idetp = $(yo).val();
+        var sel = false;
+        $("#causalRechaSelId option").each(function(){
+            if($(this).data('etapa').toString() === idetp.toString()){
+                $(this).removeClass('hidden');
+                if(!sel){
+                    $(this).prop('selected', true);
+                    sel = true;
+                }
+            }
+            else{$(this).addClass('hidden');}
+        });
+    }
+
+
+
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+        console.log("allow");
+        //SE EJECUTA SI ESQUE TENEMOS EL PRODUCTO SOBRE EL CAMPO DONDE SE PUEDE DEPOSITAR
+    }
+
+    function drag(ev, yo) {
+        //LO QUE PASA CUANDO SE ARRASTRA EL PRODUCTO
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+
+    var globalIdCount = 0;
+
+
+    function drop(ev) {
+        ev.preventDefault();
+        //LO QUE PASA CUANDO SE SUELTA EL PRODUCTO
+        var auxEtp;
+        var etp = $("#"+ev.dataTransfer.getData("text")).data('etapa');
+        $(".empty-table").remove();
+        //SE LE APLICA FILTRO A LAS CAUSALES SEGÚN ETAPA
+        globalIdCount++;
+        $("#tbody_rech").append("<tr id='prodCol"+globalIdCount+"' data-idprodh='"+ev.dataTransfer.getData("text")+"'>" +
+            "<td class='tdMat' style='white-space: nowrap; ' data-name='idmat' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('idmat')+"'>"+$("#"+ev.dataTransfer.getData("text")).data('nombre')+"</td>" +
+            "<td class='hidden' style='white-space: nowrap; text-align: center' data-name='env' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('env')+"'>"+$("#"+ev.dataTransfer.getData("text")).data('env')+"</td>" +
+            "<td style='white-space: nowrap; text-align: center' data-name='colada' data-valor=' '><input class='form-control' type='text' placeholder='Ej: 19H15' id='coladaNum' onkeyup='if(checkExpReg(/[0-9]{2}[A-J]{1}[0-9]{2}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
+            "<td style='white-space: nowrap; text-align: center' data-name='producto' data-valor=' '><input class='form-control' type='number' placeholder='Ej: 002' id='productoNum' onkeyup='if(checkExpReg(/[0-9]{1,3}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
+            "<td class='tdEtp' style='white-space: nowrap; text-align: center;' data-name='from' data-valor='"+etp+"'>"+etapas[etp-1]+"</td>" +
+            "<td class='tdImg' style='text-align:center; white-space: nowrap; padding: 2px !important' data-name='image' data-tipo=' ' data-src=' ' data-valor=' '></td>" +
+            "<td class='tdCom' style='text-align:center; white-space: nowrap; padding: 0px !important' data-name='coment' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('comentario')+"'><div style='padding: 0px 30px; margin: 0;'>"+$("#"+ev.dataTransfer.getData("text")).data('comentario')+"</div></td>" +
+            "<td style='text-align:center; white-space: nowrap; position: relative; padding: 0px !important' data-name='causal' data-valor=' ' data-check=' '><div style='padding: 0px 30px 0px 15px; margin: 0;'> -- Causales -- </div><i class=\"fa fa-pencil\" onclick='editCausales("+globalIdCount+", this)' style=\"position: absolute; top: 2px; right: 3px; color: rgb(124, 123, 173);\"></i></td>" +
+            "<td style='text-align:center; white-space: nowrap' data-name='idprodh' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('idprodh')+"'><button type='button' class='btn btn-xs btn-danger' onclick='removeProd(this);'><i class='fa fa-times' aria-hidden='true'></i></button></td>" +
+        "</tr>");
+        $("#"+ev.dataTransfer.getData("text")).addClass('hidden');
+    }
+    function editCausales(globalIdCount, yo){
+        $("#idColAux").val(globalIdCount);
+        resetSelector();
+        applyMoves($(yo).parent().data("valor").split("-"));
+        $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
+
+        $("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
+        $("#editProdRech").modal("show");
+    }
+    function addProdBtn(id) {
+        var arropt = false;
+        var auxEtp;
+        var etp = $("#"+id).children('div').children('select').val();
+        for( var t=0; t < Object.keys($("#"+id).data('seletp')).length; t++ ){
+            if($("#"+id).data('seletp')[Object.keys($("#"+id).data('seletp'))[t]] > 0){
+                arropt = true;
+            }
+        }
+        if(arropt){
+            $(".empty-table").remove();
+            //SE LE APLICA FILTRO A LAS CAUSALES SEGÚN ETAPA
+            //fillSelectRech("#areaRechaSelId");
+            globalIdCount++;
+            $("#tbody_rech").append("<tr id='prodCol"+globalIdCount+"'>" +
+                "<td class='tdMat' style='white-space: nowrap; ' data-name='idmat' data-valor='"+$("#"+id).data('idmat')+"'>"+$("#"+id).data('nombre')+"</td>" +
+                "<td class='hidden' style='white-space: nowrap; text-align: center' data-name='env' data-valor='1'>1</td>" +
+                /*"<td style='white-space: nowrap; text-align: center' data-name='fecha' data-valor=' '><input type='datetime-local' class='form-control' required></td>" +
+                  "<td style='white-space: nowrap;' data-name='coment' data-valor=''><input type='text' class='form-control' required></td>" + */
+                "<td style='white-space: nowrap; text-align: center' data-name='colada' data-valor=' '><input class='form-control' type='text' placeholder='Ej: 19H15' id='coladaNum' onkeyup='if(checkExpReg(/[0-9]{2}[A-Z]{1}[0-9]{2}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
+                "<td style='white-space: nowrap; text-align: center' data-name='producto' data-valor=' '><input class='form-control' type='number' placeholder='Ej: 002' id='productoNum' onkeyup='if(checkExpReg(/[0-9]{1,3}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
+                "<td class='tdEtp' style='white-space: nowrap; text-align: center;' data-name='from' data-valor='"+etp+"'>"+etapas[etp-1]+"</td>" +
+                "<td class='tdCom' style='text-align:center; white-space: nowrap; padding: 0px !important' data-name='coment' data-valor=' '><div style='padding: 0px 30px; margin: 0;'> -- Comentarios -- </div></td>" +
+                "<td style='text-align:center; white-space: nowrap; position: relative; padding: 0px !important' data-name='causal' data-valor=' '><div style='padding: 0px 30px; margin: 0;'> -- Causales -- </div><i class=\"fa fa-pencil\" onclick='$(\"#idColAux\").val("+globalIdCount+");resetSelector() ;applyMoves($(this).parent().data(\"valor\").split(\"-\"));$(\"#comentarioMovCau\").val($(this).parent().parent().find(\"td.tdCom\").data(\"valor\")); $(\"#editProdRech\").modal(\"show\")' style=\"position: absolute; top: 2px; right: 3px; color: rgb(124, 123, 173);\"></i></td>" +
+                /*
+            "<td style='white-space: nowrap; text-align: center' data-name='area' data-valor='"+$("#areaRechaSelId").val()+"'><select  class='form-control areaRechaSel' onchange='fillSelectRechinTable(this)' style='width: auto' required>"+$("#areaRechaSelId").html()+"</select></td>" +
+            "<td class='tdCau' style='white-space: nowrap; text-align: center' data-name='causal' data-valor='"+$('#causalRechaSelId').val()+"'><select class='form-control causalRechaSel' style='width: auto' required>"+$("#causalRechaSelId").html()+"</select></td>" +
+            */
+                "<td style='text-align:center; white-space: nowrap' data-name='del' data-valor=' '><button type='button' class='btn btn-xs btn-danger' onclick='removeProd(this);'><i class='fa fa-times' aria-hidden='true'></i></button></td>" +
+                "</tr>");
+        }else{
+            Alerta("¡No hay productos disponibles en Producción!");
+        }
+
+    }
+    function removeProd(yo){
+        $("#"+$(yo).parent().parent().data('idprodh')).removeClass('hidden');
+        $(yo).parent().parent().remove();
+        checkEmptyTable("#tbody_rech");
+    }
+
+
+
+
+</script>

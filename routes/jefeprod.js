@@ -158,7 +158,6 @@ router.get('/view_producciones', function(req, res, next){
 router.post('/table_producciones', function(req, res, next){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var agrupar = input.extraInfo;
         var array_fill = [
             "table_prod.detalle",

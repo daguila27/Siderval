@@ -54,8 +54,10 @@
 <script src="parsear_nro.js"></script>
 
 <script type="text/javascript">
-    setDataTableFixed("#DataTableExterno");
-
+    //setDataTableFixed("#DataTableExterno");
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
+    });
     //$("#pedidos").data('total', parseInt());
     //busc.setIndicadorPaginas(parseInt(), "#pedidos");
 
@@ -71,4 +73,14 @@
             }
         });
     });
+
+
 </script>
+
+
+<style>
+    td,th{
+        white-space: nowrap !important;
+    }
+</style>
+
