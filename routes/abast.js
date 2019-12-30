@@ -4214,7 +4214,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                             try{
                                 console.log("Creando pdf");
                                 await page.pdf({
-                                    path : 'public/pdf/oc_'+req.params.idoca+'.pdf',
+                                    path : 'public/pdf/OC_'+req.params.idoca+'.pdf',
                                     format: 'Letter',
                                     printBackground : true
                                 });
@@ -4230,13 +4230,13 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                                 });
 
                                 await page.pdf({
-                                    path : 'public/pdf/oc_'+req.params.idoca+'.pdf',
+                                    path : 'public/pdf/OC_'+req.params.idoca+'.pdf',
                                     format: 'Letter',
                                     printBackground : true
                                 });
                             }
 
-                            res.send( res.req.headers.host+'/pdf/oc_'+req.params.idoca+'.pdf');
+                            res.send( res.req.headers.host+'/pdf/OC_'+req.params.idoca+'.pdf');
 
                         }
                         catch(e){
