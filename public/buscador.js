@@ -68,8 +68,6 @@ class Buscador{
     buscar_action(forpageoc, callback){
         var t = this.idtabla;
         var ispage = this.ispage;
-        console.log("datos buscardor");
-        console.log(this);
         $.ajax({
             type: 'POST',
             data: {clave: this.filtros_seleccionados.join(','),cond: this.add_cond, ispage: ispage, rango: this.rango.join('@'), page: this.page, isRango: this.datefill, columnaRango: this.columnaRango, extraInfo: this.extraInfo.join('%')  },
@@ -83,6 +81,18 @@ class Buscador{
             },
             success: function(data){
                 $(".main-page").html(data);
+                var b = 0 , c = 0;
+                $("#"+t+" tbody tr").each(function(){
+                    $(this).attr('data-ind', b);
+                    c = 0;
+                    $("#"+t+" tbody tr[data-ind='"+b+"'] td").each(function(){
+                        $(this).attr('data-sort', c++);
+                    });
+                    b++;
+                });
+                $("#"+t+" tbody tr td").css('white-space' , 'nowrap !important');
+                $("#"+t+" thead tr th").css('white-space' , 'nowrap !important');
+
                 $("#"+t).css('font-family', '12px');
                 $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height());
@@ -111,32 +121,53 @@ class Buscador{
     }
 
 
-    renderPagesIndicator(idtag){
+    renderPagesIndicator(idtag, after){
         var msj = this.mensPag.split('%S');
         if(this.ispage){
             //Muestra la cantidad de pedidos
             if(this.page === 1 && this.lastpage){
-
-                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" "+msj[1]+"(s).</small></h5>");
+                }
             }
             else if(this.page === 1){
-                $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
             }
             else if(this.lastpage){
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+"  "+msj[1]+"(s).</small></h5>");
+                }
             }
             else{
-                $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                if(after){
+                    $(idtag).after("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
+                else{
+                    $(idtag).html("<h5><small>"+msj[0]+" de <b class='ch_page btn btn-xs btn-primary' onclick='previus_page()'> &laquo; </b> " + this.limit.split(',')[0] + " a "+this.limit.split(',')[1]+" <b class='ch_page btn btn-xs btn-primary' onclick='next_page()'> &raquo; </b> "+msj[1]+"(s).</small></h5>");
+                }
             }
         }
         else{
-            $(idtag).html("<h5><small>"+msj[0]+" "+$(idtag).data('total')+" "+msj[1]+"(s).</small></h5>");
+            if(after){$(idtag).after("<h5><small>"+msj[0]+" "+$(idtag).data('total')+" "+msj[1]+"(s).</small></h5>");}
+            else{$(idtag).html("<h5><small>"+msj[0]+" "+$(idtag).data('total')+" "+msj[1]+"(s).</small></h5>");}
         }
 
     }
 
 
-    setIndicadorPaginas(largo, tag){
+    //render: boolean => true: renderiza contador en etiqueta con id = tag ; false : NO renderiza contador en etiqueta con id = tag;
+    setIndicadorPaginas(largo, tag, after){
         if(this.ispage){
             this.lastpage = largo < 100 ;
             if(this.lastpage){
@@ -146,11 +177,11 @@ class Buscador{
                 this.limit = ( ( (this.page-1)*100) + 1 )+","+((this.page-1)*100 + 100);
 
             }
-            this.renderPagesIndicator(tag);
+            this.renderPagesIndicator(tag, after);
         }
         else{
             $(tag).data('total', largo);
-            this.renderPagesIndicator(tag);
+            this.renderPagesIndicator(tag, after);
         }
     }
 
@@ -190,6 +221,65 @@ class Buscador{
         return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
     }
 
+    initFixed(content, first){
+        var html, p, position, font, tabla = this.idtabla;
+        if(first){
+            $("#"+tabla+" thead tr th").each(function(){
+                $(this).append('<i style="margin-left: 5px" class="fa fa-sort"></i>');
+            });
+        }
+        font = $("#"+tabla+" thead").css('font-size');
+        p = $("#"+tabla).first();
+        position = p.position();
 
+        html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-header' data-table='"+tabla+"' id='float-header' " +
+            "style='width: "+$("#"+tabla).width()+"px; margin-top: -2px !important; position: fixed; top: "+(position.top+0)+"px;'>" +
+            "<thead style='font-size: "+font+"'><tr>";
+        var c = 0;
+
+        $("#"+tabla+" thead tr th").each(function(){
+            html += "<th onclick='sortTable(\""+tabla+"\", this);' data-sort='"+c+"' data-updown='false' style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
+            c++;
+        });
+        html += "</tr></thead></table>";
+
+        $("."+content).append(html);
+
+        html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-footer' data-table='"+tabla+"' id='float-footer' style='" +
+            "width: "+$("#"+tabla).width()+"px; margin-top: -2px !important; position: fixed; bottom: 0px;'>" +
+            "<tfoot style='font-size: "+font+"'>";
+        html += "<tr>";
+        $("#"+tabla+" tfoot tr td").each(function(){
+            html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
+        });
+        html += "</tr>";
+        html += "</tfoot></table>";
+        $("."+content).append(html);
+
+
+        $("#"+tabla+" tbody tr td").each(function(){
+            html += "<td style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</td>";
+        });
+
+        $('.'+content).scroll(function(e){
+            p = $("#"+tabla).first();
+            position = p.position();
+            $(".float-header").offset({ left: position.left });
+            $(".float-footer").offset({ left: position.left });
+        });
+
+
+    }
+
+    resetFixed(content){
+        $("table[data-table='"+this.idtabla+"']").remove();
+        this.initFixed(this.idtabla, content, false);
+    }
+
+    setTopFixed(){
+        var p = $("#"+this.idtabla).first();
+        var position = p.position();
+        $(".float-header").css('top', position.top+'px');
+    }
 }
 

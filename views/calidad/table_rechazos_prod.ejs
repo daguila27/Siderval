@@ -1,0 +1,90 @@
+<%
+function fechaLatino(string){
+    if(string.split('-').length == 3){
+        return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-');
+    }
+    else{
+        return [string.split('/')[1],string.split('/')[0],string.split('/')[2]].join('/');
+    }
+}
+
+function completarDigitos(num, dig){
+    var arr = [];
+    if(num.toString().length >= dig){
+        return num.toString();
+    }
+    else{
+        for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
+        return arr.join('')+num.toString();
+    }
+}
+%>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"></div>
+
+<style>
+    .hiddenCol{
+        display: none;
+    }
+</style>
+<table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+    <thead>
+    <tr>
+        <th data-toggle="tooltip" data-placement="bottom" title="Descripción del Producto" style="text-align: center; white-space: nowrap; ">Descripción Producto</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Total Rechazado" style="text-align: center; white-space: nowrap; ">Total Rechazado</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Peso Unitario [Kg]</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [Kg]</th>
+    </tr>
+    </thead>
+    <tbody id="rechTablebody">
+    <%
+    var pesoT = 0;
+    if(datalen.length){
+    for(var i=0; i < datalen.length; i++){%>
+    <tr class="column-prods" style="background-color: rgb(239,239,248) !important;" onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol'); $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');">
+        <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="font-weight: bold;text-align: left;white-space: nowrap"><i class="glyphicon glyphicon-chevron-down"></i><%=datalen[i].detalle %></td>
+        <td data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="cant-rech parsear_nro" data-cs="0" data-valor="<%=datalen[i].total_rechazados %>"><%= datalen[i].total_rechazados %></td>
+        <td data-order="<%=datalen[i].total_rechazados*datalen[i].peso%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso %></td>
+        <td data-order="<%=datalen[i].peso%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso*datalen[i].total_rechazados %></td>
+        <% pesoT += (datalen[i].peso*datalen[i].total_rechazados);%>
+    </tr>
+    <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
+        <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;">
+            <td colspan="1" data-order="<%=datalen[i].detalle%>-<%=i%>"></td>
+            <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>">Desde : <%=datalen[i].det_rech.split('%')[t].split('@')[0]%></td>
+            <td colspan="1" data-order="<%=datalen[i].total_rechazados*datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[1]%></td>
+            <td colspan="1" data-order="<%=datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[2]%></td>
+        </tr>
+    <%}%>
+
+
+    <%}
+    } else { %>
+        <tr>
+            <td colspan="4">
+                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay nada por producir</small></h2>
+            </td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
+        </tr>
+    <%}%>
+    </tbody>
+    <tfoot id="rechTablefooter">
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td class="footer-pesoT parsear_nro" cs="2"  style="display: flex; width: 100%; text-align: center"><%= pesoT%></td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="/assets/parsear_nro.js" type="text/javascript"></script>
+<script type="text/javascript">
+    //setDataTableFixed("#rechTable");
+    $(document).ready(function(){
+        busc.initFixed('main-page', true);
+    });
+</script>

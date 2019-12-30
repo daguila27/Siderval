@@ -14,7 +14,7 @@
  }
 %>
 
-<table id="viewOF" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width:100%;">
+<table id="viewOF" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width:100%; padding: 0 !important;">
         <thead>
         <tr>
             <th>OF</th>
@@ -61,6 +61,7 @@
         </tr>-->
         </tfoot>
     </table>
+
 <div id="visorInsumos" class="modal fade" role="dialog">
     <div class="modal-dialog">
 
@@ -80,13 +81,14 @@
 
     </div>
 </div>
-<script>
 
+<script>
+    var tableOF;
     $(document).ready(function() {
-        $('#viewOF').DataTable({
+        tableOF = $('#viewOF').DataTable({
+            order: [[ 0, "desc" ]],
             "lengthChange": false,
             "paging": true,
-            order: [[ 0, "desc" ]],
             "language": {
                 "sProcessing":     "Procesando...",
                 "sLengthMenu":     "Mostrar _MENU_ registros",
@@ -112,6 +114,13 @@
                 }
             }
         });
+
+        $("#viewOF_filter").parent().parent().addClass('hidden');
+        $("#viewOF_wrapper").css('margin-top', '0px !important');
+
+    });
+    $('#buscadorDataTableOF').keyup(function(){
+        tableOF.search($(this).val()).draw() ;
     });
 
     function obtener_pdf(idof, yo){

@@ -28,6 +28,7 @@ var matprimas = require('./routes/matprimas');
 var csvs = require('./routes/csvs');
 var test = require('./routes/test');
 var gestionpl = require('./routes/gestionpl');
+var calidad = require('./routes/calidad');
 
 //const ejslint = require('ejs-lint');
 
@@ -67,6 +68,7 @@ app.use('/matprimas', matprimas);
 app.use('/csvs', csvs);
 app.use('/test', test);
 app.use('/gestionpl', gestionpl);
+app.use('/calidad', calidad);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -300,6 +302,12 @@ io.on('connection', function (socket) {
     });
       app.locals.socket = socket;
 });
+
+
+
+
+
+
 app.locals.io = io;
 app.locals.puerto = app.get('port');
 

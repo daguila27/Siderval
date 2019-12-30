@@ -316,5 +316,59 @@
     }
 </script>
 <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA FUNCION ALERTA [FIN] -->
+<script>
+    function hiddenUpMenu(str){
+
+        $(".up-fills").css('top', (parseInt($(".up-fills").css('height'))*-1) + 2 );
+        $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height() + 2 ) ;
+        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+
+        $(".fixedHeader-floating thead").parent('.fixedHeader-floating').offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $(".fixedHeader-floating thead").offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $('.fixedHeader-floating tfoot').offset({ top: $("#"+str+" tfoot").offset().top });
+        //dataTable.fixedHeader.headerOffset( 0 );
+
+        $("#search-button-display").css('bottom', '10px');
+    }
+
+    function showUpMenu(str){
+        alert(89);
+        $(".up-fills").css('top', '0' );
+        $("#fw-container").css('margin-top', $(".up-fills").height() + $("#oe_main_menu_navbar").height() ) ;
+        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+
+        $(".fixedHeader-floating thead").parent('.fixedHeader-floating').offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $(".fixedHeader-floating thead").offset({ top: $("#"+str+" thead").offset().top -  $(".fixedHeader-floating thead").height() });
+        $('.fixedHeader-floating tfoot').offset({ top: $("#"+str+" tfoot").offset().top });
+        //dataTable.fixedHeader.headerOffset( 0 );
+
+        $("#search-button-display").css('bottom', '-100px');
+    }
+</script>
+
+<!--CÓDIGO Y FUNCIONES NECESARIAS PARA OCULTAR MENU SUPERIOR EN TABLAS DE INFORMACIÓN -->
+<script>
+    function hiddenUpMenu(){
+        $(".up-fills").css('top', (parseInt($(".up-fills").css('height'))*-1) + 2 );
+        $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height() + 2 ) ;
+        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+
+        $("#search-button-display").css('bottom', '10px');
+
+        busc.setTopFixed();
+    }
+
+    function showUpMenu(){
+        $(".up-fills").css('top', '0' );
+        $("#fw-container").css('margin-top', $(".up-fills").height() + $("#oe_main_menu_navbar").height() ) ;
+        //$("#rechTable").fixedHeader.headerOffset( $("#oe_main_menu_navbar").height() );
+
+
+        $("#search-button-display").css('bottom', '-100px');
+
+        busc.setTopFixed();
+    }
+</script>
+<!--CÓDIGO Y FUNCIONES NECESARIAS PARA OCULTAR MENU SUPERIOR EN TABLAS DE INFORMACIÓN [FIN]-->
 </body>
 </html>
