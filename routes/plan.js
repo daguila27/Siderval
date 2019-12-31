@@ -1478,8 +1478,18 @@ router.post('/addsession_prepeds', function(req,res,next){
                 "caracteristica.cnom " +
                 "FROM material " +
                 "LEFT JOIN caracteristica ON caracteristica.idcaracteristica = material.caracteristica " +
-                "LEFT JOIN (SELECT * FROM (SELECT pedido.idmaterial, material.stock as stock_m, sum(coalesce(pedido.cantidad,0)) as cantidad, sum(coalesce(pedido.despachados, 0)) as despachados, material.stock - sum(coalesce(pedido.cantidad,0) - coalesce(pedido.despachados,0) ) as disponible,  material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) " +
-                "as ped_xdesp) as disp on disp.idmaterial = material.idmaterial " +
+                "LEFT JOIN (" +
+                "   SELECT * FROM (" +
+                "       SELECT " +
+                "           pedido.idmaterial, " +
+                "           material.stock as stock_m, " +
+                "           sum(coalesce(pedido.cantidad,0)) as cantidad, " +
+                "           sum(coalesce(pedido.despachados, 0)) as despachados, " +
+                "           material.stock - sum(coalesce(pedido.cantidad,0) - coalesce(pedido.despachados,0) ) as disponible,  " +
+                "           material.stock, sum(pedido.cantidad - pedido.despachados) as xdespachar " +
+                "           from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) " +
+                "       as ped_xdesp" +
+                "   ) as disp on disp.idmaterial = material.idmaterial " +
                 " LEFT JOIN (select " +
                 "  fabricaciones.idmaterial," +
                 "  sum(produccion.1 + produccion.2 + produccion.3 + " +
@@ -1494,10 +1504,8 @@ router.post('/addsession_prepeds', function(req,res,next){
                     if(req.body.tipo === 'producido'){fabricacion='Interna'}
                     else if(req.body.tipo === 'otro'){fabricacion='Bodega M.I.'}
                     else{fabricacion='Externa'}
-                    console.log(details);
-                    var enp = details[0].enproduccion;
-                    //var stock_d = details[0].stock + details[0].enproduccion;
-                    var stock_d = details[0].stock_bodega + (details[0].cantidad-details[0].despachados);
+
+                    var stock_d = details[0].stock_bodega + (details[0].enproduccion - (details[0].cantidad-details[0].despachados));
                     if(stock_d < 0){stock_d = 0;}
                     fila = "<td>" + details[0].detalle + "<input type='hidden' name='idm' value='" + req.body.idm +"'><input type='hidden' name='idp' value='" + req.body.idp +"'><input type='hidden' name='disp' value='" + stock_d +"'></td><td><strong>" + fabricacion + "</strong></td>";
                     var inputprov = false;
@@ -1578,7 +1586,7 @@ router.post('/buscar_mat', function(req, res, next){
         req.getConnection(function(err,connection){
             connection.query("SELECT " +
                 "coalesce(producido.ruta, '') as ruta,material.*, coalesce(disp.xdespachar,0) as xdespachar, " +
-                "coalesce(disp.disponible,0) as disponible, coalesce(enp_query.enproduccion,0) as enproduccion," +
+                "coalesce(disp.disponible,0)+coalesce(enp_query.enproduccion,0) as disponible, coalesce(enp_query.enproduccion,0) as enproduccion," +
                 "caracteristica.cnom,producido.idproducto as idproducido,producto.idproducto,otro.idproducto AS idotro," +
                 "GROUP_CONCAT(aleacion.nom,'@@',subaleacion.subnom) as alea_token, (material.codigo LIKE 'M%' || material.codigo LIKE 'I%' || material.codigo LIKE 'O%') AS bmi " +
                 "FROM material " +
@@ -1586,14 +1594,21 @@ router.post('/buscar_mat', function(req, res, next){
                 " LEFT JOIN producto ON producto.idmaterial = material.idmaterial LEFT JOIN otro ON otro.idmaterial = material.idmaterial LEFT JOIN subaleacion ON producido.idsubaleacion = subaleacion.idsubaleacion" +
                 " LEFT JOIN aleacion ON aleacion.idaleacion = subaleacion.idaleacion" +
                 " LEFT JOIN (" +
-                "SELECT * FROM (SELECT pedido.idmaterial,sum(pedido.cantidad - pedido.despachados) as xdespachar, material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, material.stock from pedido left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial) as ped_xdesp"+/* where ped_xdesp.disponible > 0*/") " +
+                "   SELECT * FROM (" +
+                "       SELECT " +
+                "           pedido.idmaterial," +
+                "           sum(pedido.cantidad - pedido.despachados) as xdespachar, " +
+                "           material.stock - sum(pedido.cantidad - pedido.despachados) as disponible, " +
+                "           material.stock from pedido " +
+                "           left join material on material.idmaterial = pedido.idmaterial group by pedido.idmaterial" +
+                "   ) as ped_xdesp"+/* where ped_xdesp.disponible > 0*/") " +
                 "as disp on disp.idmaterial = material.idmaterial" +
                 " LEFT JOIN (select " +
                 "fabricaciones.idmaterial," +
                 "sum(produccion.1 + produccion.2 + produccion.3 + " +
-                "produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion" +
-                " from produccion " +
-                "left join fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
+                "produccion.4 + produccion.5 + produccion.6 + produccion.7 + produccion.e) as enproduccion " +
+                "FROM produccion " +
+                "LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones " +
                 "where produccion.1 + produccion.2 + produccion.3 + produccion.4 " +
                 "+ produccion.5 + produccion.6 + produccion.7 + produccion.e > 0 group by fabricaciones.idmaterial) as enp_query on enp_query.idmaterial = material.idmaterial " + wher + " GROUP BY material.idmaterial",function(err,rows)
             {
