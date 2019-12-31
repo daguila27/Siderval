@@ -59,22 +59,7 @@ d_max = [new Date(d_max).getFullYear(), completarDigitos(new Date(d_max).getMont
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label id="comentario-rechazo" for="" style="width: 100%;">
-                            Comentario:
-                            <textarea class="form-control" name="" id="comentarioMov" cols="20" rows="3"></textarea>
-                        </label>
-                    </div>
-                    <div class="form-group sendMovGDD">
-                        <label class="control-label" for="email" style="width: 100%">Guías de Despacho:</label>
-                        <div>
-                            <select class="form-control selectGDDForm">
-                                <%for(var e=0; e < gdds.length; e++){%>
-                                    <option value="<%= gdds[e].iddespacho%>" data-gd="<%= gdds[e].idgd%>" data-idmat="<%= gdds[e].idmaterial%>" data-cant="<%= gdds[e].cantidad%>">GDD <%= gdds[e].idgd%>: <%=gdds[e].detalle%> - <%= gdds[e].cantidad%> despachado(s).</option>
-                                <%}%>
-                            </select>
-                        </div>
-                    </div>
+
                     <div class="form-group">
                         <label id="comentario-rechazo" for="" style="width: 100%;">
                             Comentario:

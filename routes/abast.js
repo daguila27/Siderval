@@ -4235,7 +4235,7 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
                                     printBackground : true
                                 });
                             }
-                            res.send('http://' + res.req.headers.host+'/pdf/odc'+req.params.idoca+'.pdf');
+                            res.send( res.req.headers.host+'/pdf/OC_'+req.params.idoca+'.pdf');
                         }
                         catch(e){
                             console.log("Error al generar PDF : %s", e);
