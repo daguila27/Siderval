@@ -111,17 +111,16 @@
         </button>
     </div>
 
-    <% if(verificarPantalla() < 4){ %>
-        <div style="display: flex; width: 100%">
-            <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
-                <li onclick="show_menu()" style="cursor:pointer;">
-                    <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-bars"></i> Menu</span></a>
-                </li>
 
-            </ul>
+    <div style="display: flex; width: 100%">
+        <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
+            <li onclick="show_menu()" style="cursor:pointer;">
+                <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-bars"></i> Menu</span></a>
+            </li>
 
-            <span style="display: flex; position: center" class="pull-right">
-                <ul class="nav navbar-right o_mail_navbar_item open">
+        </ul>
+        <span style="display: flex; position: absolute; right: 10px;">
+                <ul class="col-md-offset-2 col-md-3 nav navbar-right o_mail_navbar_item open">
                     <li class="dropdown">
                         <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
                             <i class="fa fa-envelope fa-fw"></i>
@@ -136,8 +135,7 @@
                     <!-- /.dropdown -->
                 </ul>
 
-
-                <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
+                <ul class="col-md-offset-3 col-md-4 nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
                     <li style="margin-right: 10px; text-align: center;">
                         <div style=" white-space: nowrap;font-family: 'Lobster'; font-size: 15px; color: white; ">Bienvenido Siderval</div>
                     </li>
@@ -145,65 +143,20 @@
                         <div><a href="../user/log_out" style="white-space: nowrap;">Cerrar sesión</a></div>
                     </li>
                 </ul>
-            </span>
-            <ul class="nav navbar-right ">
-                <li>
-                    <div style=" font-size: 15px; color: red; margin-right: 20px"></div>
-                </li>
-            </ul>
-        </div>
-    <%}else{%>
-        <div style="display: flex; width: 100%">
-            <ul class="nav navbar-nav navbar-left oe_application_menu_placeholder">
-                <li onclick="close_menu()" style="cursor:pointer;">
-                    <a class="oe_menu_leaf"><span class="oe_menu_text"><i class="menu-icon fa fa-times"></i> Menu</span></a>
-                </li>
-
-            </ul>
-
-            <div style="display: flex" class="pull-right">
-                <ul class="nav navbar-right o_mail_navbar_item open">
-                    <li class="dropdown">
-                        <a class="dropdown-toggle open-notif" data-cant="0" data-toggle="dropdown" href="#" style="display: flex;">
-                            <i class="fa fa-envelope fa-fw"></i>
-                            <i class="fa fa-caret-down"></i>
-                            <span class="badge badge-notificaciones"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-messages notificaciones" style="overflow-y: scroll;max-height: 500px">
-
-                        </ul>
-                        <!-- /.dropdown-messages -->
-                    </li>
-                    <!-- /.dropdown -->
-                </ul>
-
-                <ul class="nav navbar-top-links navbar-right" style="display: flex; padding-top: 5px; margin-left: 2%">
-                    <li style="margin-right: 10px; text-align: center;">
-                        <div style="font-family: 'Lobster'; font-size: 15px; color: white; ">Bienvenido <%= show_user(username)%></div>
-                    </li>
-                    <li>
-                        <div><a href="../user/log_out">Cerrar sesión</a></div>
-                    </li>
-                </ul>
-            </div>
-            <ul class="nav navbar-right ">
-                <li>
-                    <div style=" font-size: 15px; color: red; margin-right: 20px"></div>
-                </li>
-            </ul>
-        </div>
-    <%}%>
+        </span>
+        <ul class="nav navbar-right ">
+            <li>
+                <div style=" font-size: 15px; color: red; margin-right: 20px"></div>
+            </li>
+        </ul>
+    </div>
 </nav>
 
 
 
 
 <div class="o_main">
-    <% if(verificarPantalla() < 4){%>
-        <div class="o_sub_menu col-md-7 col-xs-7" style="padding:0;  position: fixed; z-index: 20; height: 100%; left: 0%; transition: 0.5s;">
-    <%}else{%>
-        <div class="o_sub_menu" style="padding:0;  position: fixed; z-index: 20; height: 100%; left: 0%; width: inherit; transition: 0.5s;">
-    <%}%>
+    <div class="o_sub_menu col-xs-12 col-sm-6 col-md-3 col-lg-2 col-xl-2" style="padding:0; position: fixed; z-index: 20; height: 100%; left: 0%; transition: 0.5s;">
         <a class="o_sub_menu_logo" style="background-color: white">
             <div style="padding: 6px; cursor: pointer" onclick="close_menu()"><i class="fa fa-times pull-right"></i></div>
             <img src="/assets/img/logo.png" style="margin: 0; padding: 0; width: 100%; max-width: 200px">
