@@ -3419,8 +3419,14 @@ router.get('/crear_reservacion', function(req, res){
                 "LEFT JOIN material ON material.idmaterial = pedido.idmaterial " +
                 "LEFT JOIN odc ON odc.idodc = pedido.idodc " +
                 "LEFT JOIN cliente ON cliente.idcliente = odc.idcliente " +
-                "LEFT JOIN (SELECT fabricaciones.idfabricaciones, fabricaciones.idmaterial, coalesce(coalesce(sum(reservacion_detalle.sin_prep),0) + coalesce(sum(reservacion_detalle.prep),0), 0) AS nodisponible from reservacion_detalle left join fabricaciones on fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones group by fabricaciones.idfabricaciones" +
-                ") AS queryDisp ON queryDisp.idfabricaciones = fabricaciones.idfabricaciones " +
+                "LEFT JOIN (" +
+                "   SELECT " +
+                "fabricaciones.idfabricaciones, " +
+                "fabricaciones.idmaterial, " +
+                "coalesce(coalesce(sum(reservacion_detalle.sin_prep),0) + coalesce(sum(reservacion_detalle.prep),0), 0) AS nodisponible " +
+                "from reservacion_detalle " +
+                "left join fabricaciones on fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones group by fabricaciones.idmaterial" +
+                ") AS queryDisp ON queryDisp.idmaterial = fabricaciones.idmaterial " +
                 "LEFT JOIN (" +
                 "SELECT abastecimiento.idfabricacion, sum(abastecimiento.cantidad) AS abastecidos FROM " +
                 "abastecimiento " +

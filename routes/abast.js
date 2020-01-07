@@ -1456,7 +1456,6 @@ router.get('/get_dataoda/:idoda', function(req, res, next){
 router.get('/get_dataodc/:idodc', function(req, res, next){
     if(verificar(req.session.userData)){
 		var idodc = req.params.idodc;
-		console.log(idodc);
 		req.getConnection(function(err, connection){
         	if(err)
         		console.log("Error Connection : %s", err);
