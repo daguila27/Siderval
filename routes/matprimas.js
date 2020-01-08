@@ -403,7 +403,6 @@ Object.size = function(obj) {
 router.post("/save_recepcion",function(req,res,next){
     if(req.session.userData){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log(input);
         var recep = [[input.numgdd, new Date().toLocaleDateString()]];
         var recep_d = [];
         var ids = [];
@@ -434,13 +433,10 @@ router.post("/save_recepcion",function(req,res,next){
         for(var e=0; e < idsm.length; e++){
             query2 += " WHEN idmaterial = "+idsm[e]+" THEN stock+"+idsm_c[e];
         }
-        console.log("here 3");
 
         query += " ELSE recibidos END WHERE idabast IN ("+ids.join(',')+")";
         query2 += " ELSE stock END WHERE idmaterial IN ("+idsm.join(',')+")";
 
-        console.log(query);
-        console.log(query2);
         var notif_tokens = [];
         //var notif_tokens_bmi = [];
         //EN recep_bmi ESTAN TODOS LOS oca_items (abastecimiento) VINCULADOS CON UN pedido DE TIPO bmi
@@ -450,34 +446,26 @@ router.post("/save_recepcion",function(req,res,next){
             notif_tokens.push(["bmiReserv@"+idabast+"@"+ new Date().toLocaleString()]);
             //notif_tokens_bmi.push(["bmiOca@"+idabast+"@"+ new Date().toLocaleString()]);
         });
-        console.log("here 4");
 
-        console.log(notif_tokens);
         req.getConnection(function(err, connection){
             if(err){ console.log("Error Connection : %s", err);}
 
             connection.query("INSERT INTO recepcion (numgd, fecha) VALUES ?", [recep], function(err, inRecep){
                 if(err){ console.log("Error Insert : %s", err);}
 
-                //console.log(inRecep);
                 for(var p=0; p < recep_d.length; p++){
                     recep_d[p][0] = inRecep.insertId;
                 }
-                console.log(recep_d);
                 connection.query("INSERT INTO recepcion_detalle (idrecepcion, idabast, cantidad) VALUES ?", [recep_d], function(err, inRecepD){
                     if(err) {console.log("Error Insert : %s", err);}
 
-                    console.log(inRecepD);
                     connection.query(query, function(err, upAbast){
                         if(err) {console.log("Error Insert : %s", err);}
 
-                        console.log(upAbast);
                         connection.query(query2, function(err, upMat){
                             if(err) {console.log("Error Insert : %s", err);}
 
-                            console.log(upMat);
                             if(notif_tokens.length > 0){
-                                console.log(notif_tokens);
                                 connection.query("INSERT INTO notificacion (descripcion) VALUES ?", [notif_tokens], function(err, inNotif){
                                     if(err) {console.log("Error Insert : %s", err);}
 

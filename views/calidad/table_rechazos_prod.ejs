@@ -32,8 +32,8 @@ function completarDigitos(num, dig){
     <tr>
         <th data-toggle="tooltip" data-placement="bottom" title="Descripción del Producto" style="text-align: center; white-space: nowrap; ">Descripción Producto</th>
         <th data-toggle="tooltip" data-placement="bottom" title="Total Rechazado" style="text-align: center; white-space: nowrap; ">Total Rechazado</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Peso Unitario [Kg]</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [Kg]</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Peso Unitario [kg]</th>
+        <th data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [kg]</th>
     </tr>
     </thead>
     <tbody id="rechTablebody">
@@ -49,9 +49,17 @@ function completarDigitos(num, dig){
         <% pesoT += (datalen[i].peso*datalen[i].total_rechazados);%>
     </tr>
     <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
+        <%if( t===0 ){%>
+            <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: rgb(238,238,238); color: rgb(76,76,112);">
+                <th style="text-align: center; white-space: nowrap; "></th>
+                <th data-toggle="tooltip" data-placement="bottom" title="Total Rechazado" style="text-align: center; white-space: nowrap; ">Etapa de Rechazo</th>
+                <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Número de Colada</th>
+                <th data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Correlativo de Producto</th>
+            </tr>
+        <%}%>
         <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;">
             <td colspan="1" data-order="<%=datalen[i].detalle%>-<%=i%>"></td>
-            <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>">Desde : <%=datalen[i].det_rech.split('%')[t].split('@')[0]%></td>
+            <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[0]%></td>
             <td colspan="1" data-order="<%=datalen[i].total_rechazados*datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[1]%></td>
             <td colspan="1" data-order="<%=datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[2]%></td>
         </tr>

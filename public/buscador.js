@@ -187,7 +187,7 @@ class Buscador{
 
 
     setFechas(){
-        if($("#fecha-desde").val() == '' || $("#fecha-hasta").val() == ''){
+        if($("#fecha-desde").val() === '' || $("#fecha-hasta").val() === ''){
             alert("Debe ingresar ambas fechas.");
         }
         else{
@@ -211,13 +211,13 @@ class Buscador{
     getMonday(d) {
         d = new Date(d);
         var day = d.getDay(),
-            diff = d.getDate() - day + (day == 0 ? -6:1); // adjust when day is sunday
+            diff = d.getDate() - day + (day === 0 ? -6:1); // adjust when day is monday
         return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
     }
     getSunday(d) {
         d = new Date(d);
         var day = d.getDay(),
-            diff = d.getDate() - day + (day == 0 ? -6:1) + 6; // adjust when day is sunday
+            diff = d.getDate() - day + (day === 0 ? -6:1) + 6; // adjust when day is sunday
         return new Date(d.setDate(diff)).toLocaleDateString().split(' ')[0];
     }
 

@@ -32,7 +32,7 @@ function completarDigitos(num, dig){
     <tr>
         <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="text-align: center; white-space: nowrap;">Código Único de Colada</th>
         <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Total Rechazados" style="text-align: center; white-space: nowrap; ">Total Rechazados</th>
-        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [Kg]</th>
+        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [kg]</th>
     </tr>
     </thead>
     <tbody id="rechTablebody">
@@ -47,6 +47,13 @@ function completarDigitos(num, dig){
         <% pesoT += datalen[i].peso;%>
     </tr>
     <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
+    <%if( t===0 ){%>
+        <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: rgb(238,238,238); color: rgb(76,76,112);">
+            <th data-toggle="tooltip" data-placement="bottom" title="Etapa de Rechazo" style="text-align: center; white-space: nowrap; ">Etapa de Rechazo</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Cantidad Rechazada" style="text-align: center; white-space: nowrap; ">Cantidad Rechazada</th>
+            <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Peso Unitario [kg]</th>
+        </tr>
+    <%}%>
         <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;">
             <td colspan="1" data-order="<%=datalen[i].colada%>-<%=i%>"><%=datalen[i].det_rech.split('%')[t].split('@')[0]%> - <%=datalen[i].det_rech.split('%')[t].split('@')[3]%></td>
             <td colspan="1" data-order="<%=datalen[i].enviadosTotal%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[1]%></td>

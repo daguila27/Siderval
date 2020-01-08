@@ -232,11 +232,14 @@ function next_page(){
     busc.page = (parseInt(busc.page) + 1).toString();
     busc.buscar_action();
 }
+
 function previus_page(){
 
     busc.page = (parseInt(busc.page) - 1).toString();
     busc.buscar_action();
 }
+
+
 
 function toggleColTable(ind1, ind2,  table){
     //columna de ind1 se intercambia por la con ind2
@@ -281,7 +284,16 @@ function sortTable(table, yo){
                 arrayAux.push($(this).html());
             }
         });
+        $(".float-header thead tr th i").each(function(){
+            $(this).addClass('fa-sort');
+            $(this).removeClass('fa-sort-up');
+            $(this).removeClass('fa-sort-down');
+            $(this).css('color', 'black');
+        });
         if(updown){
+            $(yo).find('i').removeClass('fa-sort-up');
+            $(yo).find('i').addClass('fa-sort-down');
+            $(yo).find('i').css('color', 'rgb(124, 123, 173)');
             //SE ORDENA DE MAYOR A MENOR
             for(var i=0; i<arrayAux.length; i++) {
                 for(var j=1; j < arrayAux.length; j++) {
@@ -294,6 +306,10 @@ function sortTable(table, yo){
                 }
             }
         }else{
+            $(yo).find('i').removeClass('fa-sort-down');
+            $(yo).find('i').addClass('fa-sort-up');
+            $(yo).find('i').css('color', 'rgb(124, 123, 173)');
+
             //SE ORDENA DE MENOR A MAYOR
             for(var i=0; i<arrayAux.length; i++) {
                 for(var j=1; j < arrayAux.length; j++) {
