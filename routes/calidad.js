@@ -701,10 +701,31 @@ router.post('/table_rechazos', function(req, res, next){
         var limit = result[1];
         var query;
         var view = '';
+        /*Fecha ,
+                    Descripción Producto (p),
+                    Área de Rechazo,
+                    OF,	OP,
+                    Código Único de Colada,
+                    Correlativo Producto,
+                    Peso Unitario [kg] (p),
+                    Causal de Rechazo,
+                    Etapa Causal de Rechazo,
+                    Imagen
+
+                    CANTIDAD*/
         switch(agrupar){
             case 'desc':
                 query = "SELECT mainTable.*, SUM(mainTable.enviados) AS total_rechazados," +
-                    "GROUP_CONCAT(CONCAT(mainTable.etapa_desde,'@', mainTable.colada,'@', mainTable.producto) SEPARATOR '%') AS det_rech" +
+                    "GROUP_CONCAT(CONCAT(" +
+                    "mainTable.etapa_desde,'@', " +
+                    "mainTable.colada,'@', " +
+                    "mainTable.producto,'@', " +
+                    "mainTable.fecha,'@', " +
+                    "mainTable.causal,'@', " +
+                    "mainTable.etapacausal,'@', " +
+                    "mainTable.idop,'@', " +
+                    "mainTable.idof,'@', " +
+                    "mainTable.causal_princ) SEPARATOR '%') AS det_rech" +
                     " FROM (SELECT \n" +
                     "\t\t\t\t\tproduccionh_causal.idproduccion_h,\n" +
                     "                    fabricaciones.idmaterial, \n" +
@@ -716,8 +737,9 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
-                    "                    causal.causal,\n" +
-                    "                    etapacausal.nombre AS etapacausal, \n" +
+                    "                    GROUP_CONCAT(causal.causal SEPARATOR '-') AS causal,\n" +
+                    "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '-') AS causal_princ,\n" +
+                    "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '-') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
                     "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
@@ -738,7 +760,20 @@ router.post('/table_rechazos', function(req, res, next){
                 break;
 
             case 'colada':
-                query = "SELECT mainTable.*,SUM(COALESCE(mainTable.peso,0)) AS pesoTotal, SUM(COALESCE(mainTable.enviados,0)) AS enviadosTotal, GROUP_CONCAT(CONCAT(mainTable.detalle,'@',mainTable.enviados,'@', mainTable.peso,'@', mainTable.etapa_desde) SEPARATOR '%') AS det_rech FROM (SELECT \n" +
+                query = "SELECT mainTable.*,SUM(COALESCE(mainTable.peso,0)) AS pesoTotal, SUM(COALESCE(mainTable.enviados,0)) AS enviadosTotal, " +
+                    "GROUP_CONCAT(" +
+                    "CONCAT(" +
+                    "mainTable.detalle,'@'," +
+                    "mainTable.enviados,'@'," +
+                    "mainTable.peso,'@'," +
+                    "mainTable.etapa_desde,'@'," +
+                    "mainTable.producto,'@'," +
+                    "mainTable.fecha,'@'," +
+                    "mainTable.causal,'@'," +
+                    "mainTable.etapacausal,'@'," +
+                    "mainTable.idop,'@'," +
+                    "mainTable.idof,'@'," +
+                    "mainTable.causal_princ) SEPARATOR '%') AS det_rech FROM (SELECT \n" +
                     "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
                     "                    material.idmaterial, \n" +
                     "                    pedido.idpedido, \n" +
@@ -749,8 +784,9 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
-                    "                    causal.causal,\n" +
-                    "                    etapacausal.nombre AS etapacausal, \n" +
+                    "                    GROUP_CONCAT(causal.causal SEPARATOR '-') AS causal,\n" +
+                    "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '-') AS causal_princ,\n" +
+                    "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '-') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
                     "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
@@ -841,12 +877,18 @@ router.post('/table_rechazos', function(req, res, next){
         }
         req.getConnection(function(err, connection){
             if(err) throw err;
-            connection.query(query,
-                function(err, rech){
-                    if(err) throw err;
-                    res.render('calidad/'+view, {datalen: rech, user: req.session.userData.nombre });
 
-                });
+            connection.query("SET SESSION group_concat_max_len = 1000000",
+                function(err, setLength){
+                    if(err) throw err;
+
+                    connection.query(query,
+                        function(err, rech){
+                            if(err) throw err;
+
+                            res.render('calidad/'+view, {datalen: rech, user: req.session.userData.nombre });
+                    });
+            });
         });
     }
     else{res.redirect('bad_login');}

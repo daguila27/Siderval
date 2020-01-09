@@ -29,41 +29,144 @@ function completarDigitos(num, dig){
 </style>
 <table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
     <thead>
-    <tr>
-        <th data-toggle="tooltip" data-placement="bottom" title="Descripción del Producto" style="text-align: center; white-space: nowrap; ">Descripción Producto</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Total Rechazado" style="text-align: center; white-space: nowrap; ">Total Rechazado</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Peso Unitario [Kg]</th>
-        <th data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [Kg]</th>
-    </tr>
+        <tr>
+            <th onclick="sortTable('rechTable', this);" data-sort='0' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Fecha de Rechazo </th>
+            <th onclick="sortTable('rechTable', this);" data-sort='1' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Hora de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Hora de Rechazo</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='2' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Descripción Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Descripción Producto</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='3' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Área de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Área de Rechazo</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='4' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OF" style="padding:auto; text-align: center; white-space: nowrap; ">OF</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='5' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OP" style="padding:auto; text-align: center; white-space: nowrap; ">OP</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='6' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="padding:auto; text-align: center; white-space: nowrap; ">Código Único de Colada</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='7' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Corr. Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Correlativo Producto</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='8' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="padding:auto; text-align: center; white-space: nowrap; ">Cantidad</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='9' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Peso Unitario [Kg]" style="padding:auto; text-align: center; white-space: nowrap; ">Peso Unitario [kg]</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='10' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Causal de Rechazo</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='11' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Etapa Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Etapa Causal de Rechazo</th>
+            <th onclick="sortTable('rechTable', this);" data-sort='12' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Imagen de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Imagen</th>
+        </tr>
     </thead>
     <tbody id="rechTablebody">
     <%
     var pesoT = 0;
     if(datalen.length){
-    for(var i=0; i < datalen.length; i++){%>
-    <tr class="column-prods" style="background-color: rgb(239,239,248) !important;" onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol'); $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');">
-        <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="font-weight: bold;text-align: left;white-space: nowrap"><i class="glyphicon glyphicon-chevron-down"></i><%=datalen[i].detalle %></td>
-        <td data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="cant-rech parsear_nro" data-cs="0" data-valor="<%=datalen[i].total_rechazados %>"><%= datalen[i].total_rechazados %></td>
-        <td data-order="<%=datalen[i].total_rechazados*datalen[i].peso%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso %></td>
-        <td data-order="<%=datalen[i].peso%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso*datalen[i].total_rechazados %></td>
-        <% pesoT += (datalen[i].peso*datalen[i].total_rechazados);%>
-    </tr>
-    <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
-        <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;">
-            <td colspan="1" data-order="<%=datalen[i].detalle%>-<%=i%>"></td>
-            <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>">Desde : <%=datalen[i].det_rech.split('%')[t].split('@')[0]%></td>
-            <td colspan="1" data-order="<%=datalen[i].total_rechazados*datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[1]%></td>
-            <td colspan="1" data-order="<%=datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[2]%></td>
+
+      for(var i=0; i < datalen.length; i++){%>
+        <tr class="column-prods"
+            onclick="
+                    $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+                    $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                    busc.resetFixed('main-page');">
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="padding: auto; text-align: left;white-space: nowrap"><%=datalen[i].detalle %></td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%= datalen[i].det_rech.split('%').length%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="0" data-valor="<%=datalen[i].det_rech.split('%').length%>"><%= datalen[i].det_rech.split('%').length%></td>
+            <td data-order="<%= datalen[i].det_rech.split('%').length*datalen[i].peso%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso %></td>
+            <% pesoT += datalen[i].peso; %>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center"> -- </td>
         </tr>
-    <%}%>
-
-
-    <%}
+    <% for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
+        <tr class="column-prods hiddenCol hiddenCol<%= i%> danger">
+            <!--
+            0"mainTable.etapa_desde,'@', " +
+            1"mainTable.colada,'@', " +
+            2"mainTable.producto,'@', " +
+            3"mainTable.fecha,'@', " +
+            4"mainTable.causal,'@', " +
+            5"mainTable.etapacausal,'@', " +
+            6"mainTable.idop,'@', " +
+            7"mainTable.idof,'@', " +
+            8"mainTable.causal_princ-->
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getDate(),2),completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getMonth()+1,2),new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getFullYear()].join('-') %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getHours(),2),completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getMinutes(),2)].join(':') %></td>
+            <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="text-align: left;white-space: nowrap"></td>
+            <td data-order="<%=i%>" style="text-align: left;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[0] %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[7] %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[6] %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[1] %></td>
+            <td data-order="<%=completarDigitos(datalen[i].det_rech.split('%')[t].split('@')[2],3) %>-<%=i%>" style="text-align: center;white-space: nowrap"><%=completarDigitos(datalen[i].det_rech.split('%')[t].split('@')[2],3) %></td>
+            <td data-order="<%= datalen[i].det_rech.split('%').length%>0-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="0" data-valor="<%=1%>">1</td>
+            <td data-order="<%= datalen[i].peso %>-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso %></td>
+            <% pesoT += datalen[i].peso; %>
+            <td data-order="<%=i%>" style="text-align: left;white-space: nowrap">
+                <ul style="margin: 0px">
+                    <%for(var e=0; e < 1; e++){%>
+                        <li data-toggle="collapse" data-target=".demo<%= t%>">
+                            <% if(datalen[i].det_rech.split('%')[t].split('@')[8].split('-')[e] === '1'){%>
+                                <b><%= datalen[i].det_rech.split('%')[t].split('@')[4].split('-')[e] %> (P)</b>
+                            <%}else{%>
+                                <%= datalen[i].det_rech.split('%')[t].split('@')[4].split('-')[e] %>
+                            <%}%>
+                            <% if(datalen[i].det_rech.split('%')[t].split('@')[4].split('-').length > 1 ){%>
+                                <i class="fa fa-plus"></i>
+                            <%}%>
+                        </li>
+                    <%}%>
+                    <div class="collapse demo<%= t%>">
+                        <% for(var w=1; w < datalen[i].det_rech.split('%')[t].split('@')[4].split('-').length; w++){%>
+                            <li>
+                                <%if(datalen[i].det_rech.split('%')[t].split('@')[8].split('-')[w] === '1' ){%>
+                                    <b>
+                                        <%= datalen[i].det_rech.split('%')[t].split('@')[4].split('-')[w] %>(P)
+                                    </b>
+                                <%}else{%>
+                                    <%= datalen[i].det_rech.split('%')[t].split('@')[4].split('-')[w] %>
+                                <%}%>
+                            </li>
+                        <%}%>
+                    </div>
+                </ul>
+            </td>
+            <td data-order="<%=i%>" style="text-align: left;white-space: nowrap">
+                <ul style="margin: 0px">
+                    <%for(var e=0; e < 1; e++){%>
+                        <li data-toggle="collapse" data-target=".demo<%= t%>">
+                            <% if(datalen[i].det_rech.split('%')[t].split('@')[8].split('-')[e] === '1'){%>
+                                <b><%= datalen[i].det_rech.split('%')[t].split('@')[5].split('-')[e] %> (P)</b>
+                            <%}else{%>
+                                <%= datalen[i].det_rech.split('%')[t].split('@')[5].split('-')[e] %>
+                            <%}%>
+                            <% if(datalen[i].det_rech.split('%')[t].split('@')[4].split('-').length > 1 ){%>
+                                <i class="fa fa-plus"></i>
+                            <%}%>
+                        </li>
+                    <%}%>
+                    <div class="collapse demo<%= t%>">
+                        <% for(var w=1; w < datalen[i].det_rech.split('%')[t].split('@')[5].split('-').length; w++){%>
+                        <li>
+                            <%if(datalen[i].det_rech.split('%')[t].split('@')[8].split('-')[w] === '1' ){%>
+                                <b>
+                                    <%= datalen[i].det_rech.split('%')[t].split('@')[5].split('-')[w] %>(P)
+                                </b>
+                            <%}else{%>
+                                <%= datalen[i].det_rech.split('%')[t].split('@')[5].split('-')[w] %>
+                            <%}%>
+                        </li>
+                        <%}%>
+                    </div>
+                </ul>
+            </td>
+            <td data-order="<%=i%>" style="text-align: center">
+                <a href="/img/rechazos/rechazo<%= datalen[i].idproduccion_h%>.<%= datalen[i].imagen_tipo%>" download><i class="fa fa-download" aria-hidden="true"></i></a>
+            </td>
+        </tr>
+    <%}}
     } else { %>
         <tr>
             <td colspan="4">
                 <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay nada por producir</small></h2>
             </td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
+            <td colspan="0"></td>
             <td colspan="0"></td>
             <td colspan="0"></td>
             <td colspan="0"></td>

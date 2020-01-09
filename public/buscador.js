@@ -272,8 +272,14 @@ class Buscador{
     }
 
     resetFixed(content){
+        //ELIMINA float-header Y float-footer
         $("table[data-table='"+this.idtabla+"']").remove();
-        this.initFixed(this.idtabla, content, false);
+        //CREA LA float-header Y float-footer
+        this.initFixed(content, false);
+        //ACOMODA LA header Y footer
+        var position = $("#"+this.idtabla).first().position();
+        $(".float-header").offset({ left: position.left });
+        $(".float-footer").offset({ left: position.left });
     }
 
     setTopFixed(){
