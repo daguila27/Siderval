@@ -926,22 +926,24 @@ router.post('/save_gdd', function (req, res, next) {
 
 
 router.get('/send_data_addin', function (req, res, next){
-    enviar_gdd_soap(22220, req);
+    enviar_gdd_soap(22009, req, function(){
+        res.sendStatus(200)
+    });
 });
 
-function enviar_gdd_soap(idgd, req){
+function enviar_gdd_soap(idgd, req, callback){
     req.getConnection(function(err, connection){
         if(err){console.log("Error Conecting : %s", err);}
 
         connection.query("SELECT CONCAT(\n" +
             "'SIDERVAL',',', \n" +
             "despachos.idgd, ',', \n" +
-            "',',\n" +
-            "',',\n" +
-            "gd.fecha,',', \n" +
-            "'llave',',', \n" +
+            "'S',',',\n" +
+            "'T',',',\n" +
+            "DATE_FORMAT(gd.fecha, '%Y/%m/%d'),',', \n" +
+            "'01',',', \n" +
             "gd.obs,',', \n" +
-            "cliente.idcliente,',', \n" +
+            "REPLACE(SUBSTRING_INDEX(cliente.rut, '-', 1), '.', ''),',', \n" +
             "cliente.sigla, ',',\n" +
             "cliente.rut, ',',\n" +
             "cliente.giro, ',',\n" +
@@ -1011,7 +1013,7 @@ function enviar_gdd_soap(idgd, req){
             "',',\n" +
             "',',\n" +
             "',',\n" +
-            "',',\n" +
+            "'S',',',\n" +
             "',',\n" +
             "',',\n" +
             "',',\n" +
@@ -1035,17 +1037,18 @@ function enviar_gdd_soap(idgd, req){
             "LEFT JOIN gd ON gd.idgd = despachos.idgd \n" +
             "LEFT JOIN cliente ON cliente.idcliente = gd.idcliente \n" +
             "LEFT JOIN material ON material.idmaterial = despachos.idmaterial \n" +
-            "WHERE despachos.idgd in ('"+idgd+"')", function(err, desp){
+            "WHERE despachos.idgd = ? group by despachos.iddespacho", idgd, function(err, desp){
             if(err){console.log("Error Selecting : %s", err);}
 
             const fs = require('fs');
-
-            var stream = fs.createWriteStream("./tmp/test.txt");
+            console.log(desp)
+            var stream = fs.createWriteStream("./test.txt");
             stream.once('open', function(fd) {
                 for(var e=0; e < desp.length; e++){
                     stream.write(desp[e].token+"\n");
                 }
                 stream.end();
+                callback()
             });
         });
     });
