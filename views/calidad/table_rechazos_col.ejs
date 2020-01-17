@@ -49,10 +49,9 @@ function completarDigitos(num, dig){
     <%
     var pesoT = 0;
     if(datalen.length){
-    for(var i=0; i < datalen.length; i++){%>
+    for(var i=0; i < datalen.length; i++){ %>
         <tr class="column-prods"
-            onclick="
-                    $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+            onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol');
                     $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
                     busc.resetFixed('main-page');">
             <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
@@ -63,13 +62,13 @@ function completarDigitos(num, dig){
             <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
             <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> <%= datalen[i].colada%></td>
             <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
-            <td data-order="<%= datalen[i].det_rech.split('%').length%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="0" data-valor="<%=datalen[i].det_rech.split('%').length%>"><%= datalen[i].det_rech.split('%').length%></td>
-            <td data-order="<%= datalen[i].det_rech.split('%').length*1%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= 'peso total'%></td>
+            <td data-order="<%= datalen[i].det_rech.split('%%').length%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="0" data-valor="<%=datalen[i].det_rech.split('%%').length%>"><%= datalen[i].det_rech.split('%%').length%></td>
+            <td data-order="<%= datalen[i].det_rech.split('%%').length*1%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso*datalen[i].det_rech.split('%%').length%></td>
             <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
             <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
             <td data-order="<%=i%>" style="padding: auto; text-align: center"> -- </td>
         </tr>
-        <% for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
+        <% for(var t=0; t < datalen[i].det_rech.split('%%').length; t++){%>
             <tr class="column-prods hiddenCol hiddenCol<%= i%> danger">
                 <!--
                     0"mainTable.detalle,'@'," +
@@ -83,40 +82,40 @@ function completarDigitos(num, dig){
                     8"mainTable.idop,'@', " +
                     9"mainTable.idof,'@', " +
                     10"mainTable.causal_princ-->
-                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[5]).getDate(),2),completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[5]).getMonth()+1,2),new Date(datalen[i].det_rech.split('%')[t].split('@')[5]).getFullYear()].join('-') %></td>
-                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[5]).getHours(),2),completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[5]).getMinutes(),2)].join(':') %></td>
-                <td data-order="<%=datalen[i].det_rech.split('%')[t].split('@')[0]%>-<%=i%>" style="text-align: left;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[0] %></td>
-                <td data-order="<%=i%>" style="text-align: left;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[0] %></td>
-                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[9] %></td>
-                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[8] %></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[5]).getDate(),2),completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[5]).getMonth()+1,2),new Date(datalen[i].det_rech.split('%%')[t].split('@')[5]).getFullYear()].join('-') %></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[5]).getHours(),2),completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[5]).getMinutes(),2)].join(':') %></td>
+                <td data-order="<%=datalen[i].det_rech.split('%%')[t].split('@')[0]%>-<%=i%>" style="text-align: left;white-space: nowrap"><%=datalen[i].det_rech.split('%%')[t].split('@')[0] %></td>
+                <td data-order="<%=i%>" style="text-align: left;white-space: nowrap"><%=datalen[i].det_rech.split('%%')[t].split('@')[3] %></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%%')[t].split('@')[9] %></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%%')[t].split('@')[8] %></td>
                 <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"></td>
-                <td data-order="<%=completarDigitos(datalen[i].det_rech.split('%')[t].split('@')[2],3) %>-<%=i%>" style="text-align: center;white-space: nowrap"><%=completarDigitos(datalen[i].det_rech.split('%')[t].split('@')[4],3) %></td>
-                <td data-order="<%= datalen[i].det_rech.split('%').length%>0-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="0" data-valor="<%=1%>">1</td>
-                <td data-order="<%= datalen[i].det_rech.split('%')[t].split('@')[2] %>-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].det_rech.split('%')[t].split('@')[2] %>"><%= datalen[i].det_rech.split('%')[t].split('@')[2]%></td>
-                <% pesoT += datalen[i].det_rech.split('%')[t].split('@')[2]; %>
+                <td data-order="<%=completarDigitos(datalen[i].det_rech.split('%%')[t].split('@')[2],3) %>-<%=i%>" style="text-align: center;white-space: nowrap"><%=completarDigitos(datalen[i].det_rech.split('%%')[t].split('@')[4],3) %></td>
+                <td data-order="<%= datalen[i].det_rech.split('%%').length%>0-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="0" data-valor="<%=1%>">1</td>
+                <td data-order="<%= datalen[i].det_rech.split('%%')[t].split('@')[2] %>-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].det_rech.split('%%')[t].split('@')[2] %>"><%= datalen[i].det_rech.split('%%')[t].split('@')[2]%></td>
+                <% pesoT += datalen[i].det_rech.split('%%')[t].split('@')[2]; %>
                 <td data-order="<%=i%>" style="text-align: left;white-space: nowrap">
                     <ul style="margin: 0px">
                         <%for(var e=0; e < 1; e++){%>
-                            <li data-toggle="collapse" data-target=".demo<%= t%>">
-                                <% if(datalen[i].det_rech.split('%')[t].split('@')[10].split('-')[e] === '1'){%>
-                                    <b><%= datalen[i].det_rech.split('%')[t].split('@')[6].split('-')[e] %> (P)</b>
+                            <li data-toggle="collapse" data-target=".demo<%= i%><%=t%>">
+                                <% if(datalen[i].det_rech.split('%%')[t].split('@')[10].split('-')[e] === '1'){%>
+                                    <b><%= datalen[i].det_rech.split('%%')[t].split('@')[6].split('-')[e] %> (P)</b>
                                 <%}else{%>
-                                    <%= datalen[i].det_rech.split('%')[t].split('@')[6].split('-')[e] %>
+                                    <%= datalen[i].det_rech.split('%%')[t].split('@')[6].split('-')[e] %>
                                 <%}%>
-                                <% if(datalen[i].det_rech.split('%')[t].split('@')[6].split('-').length > 1 ){%>
+                                <% if(datalen[i].det_rech.split('%%')[t].split('@')[6].split('-').length > 1 ){%>
                                     <i class="fa fa-plus"></i>
                                 <%}%>
                             </li>
                         <%}%>
-                        <div class="collapse demo<%= t%>">
-                            <% for(var w=1; w < datalen[i].det_rech.split('%')[t].split('@')[6].split('-').length; w++){%>
+                        <div class="collapse demo<%= i%><%=t%>">
+                            <% for(var w=1; w < datalen[i].det_rech.split('%%')[t].split('@')[6].split('-').length; w++){%>
                             <li>
-                                <%if(datalen[i].det_rech.split('%')[t].split('@')[10].split('-')[w] === '1' ){%>
+                                <%if(datalen[i].det_rech.split('%%')[t].split('@')[10].split('-')[w] === '1' ){%>
                                     <b>
-                                        <%= datalen[i].det_rech.split('%')[t].split('@')[6].split('-')[w] %>(P)
+                                        <%= datalen[i].det_rech.split('%%')[t].split('@')[6].split('-')[w] %>(P)
                                     </b>
                                 <%}else{%>
-                                    <%= datalen[i].det_rech.split('%')[t].split('@')[6].split('-')[w] %>
+                                    <%= datalen[i].det_rech.split('%%')[t].split('@')[6].split('-')[w] %>
                                 <%}%>
                             </li>
                             <%}%>
@@ -126,26 +125,26 @@ function completarDigitos(num, dig){
                 <td data-order="<%=i%>" style="text-align: left;white-space: nowrap">
                     <ul style="margin: 0px">
                         <%for(var e=0; e < 1; e++){%>
-                            <li data-toggle="collapse" data-target=".demo<%= t%>">
-                                <% if(datalen[i].det_rech.split('%')[t].split('@')[10].split('-')[e] === '1'){%>
-                                    <b><%= datalen[i].det_rech.split('%')[t].split('@')[7].split('-')[e] %> (P)</b>
+                            <li data-toggle="collapse" data-target=".demo<%= i%><%=t%>">
+                                <% if(datalen[i].det_rech.split('%%')[t].split('@')[10].split('-')[e] === '1'){%>
+                                    <b><%= datalen[i].det_rech.split('%%')[t].split('@')[7].split('-')[e] %> (P)</b>
                                 <%}else{%>
-                                    <%= datalen[i].det_rech.split('%')[t].split('@')[7].split('-')[e] %>
+                                    <%= datalen[i].det_rech.split('%%')[t].split('@')[7].split('-')[e] %>
                                 <%}%>
-                                <% if(datalen[i].det_rech.split('%')[t].split('@')[7].split('-').length > 1 ){%>
+                                <% if(datalen[i].det_rech.split('%%')[t].split('@')[7].split('-').length > 1 ){%>
                                     <i class="fa fa-plus"></i>
                                 <%}%>
                             </li>
                         <%}%>
-                        <div class="collapse demo<%= t%>">
-                            <% for(var w=1; w < datalen[i].det_rech.split('%')[t].split('@')[7].split('-').length; w++){%>
+                        <div class="collapse demo<%= i%><%=t%>">
+                            <% for(var w=1; w < datalen[i].det_rech.split('%%')[t].split('@')[7].split('-').length; w++){%>
                             <li>
-                                <%if(datalen[i].det_rech.split('%')[t].split('@')[10].split('-')[w] === '1' ){%>
+                                <%if(datalen[i].det_rech.split('%%')[t].split('@')[10].split('-')[w] === '1' ){%>
                                     <b>
-                                        <%= datalen[i].det_rech.split('%')[t].split('@')[7].split('-')[w] %>(P)
+                                        <%= datalen[i].det_rech.split('%%')[t].split('@')[7].split('-')[w] %>(P)
                                     </b>
                                 <%}else{%>
-                                    <%= datalen[i].det_rech.split('%')[t].split('@')[7].split('-')[w] %>
+                                    <%= datalen[i].det_rech.split('%%')[t].split('@')[7].split('-')[w] %>
                                 <%}%>
                             </li>
                             <%}%>
@@ -178,7 +177,16 @@ function completarDigitos(num, dig){
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
         <td class="footer-pesoT parsear_nro" cs="2"  style="display: flex; width: 100%; text-align: center"></td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
     </tfoot>
 </table>

@@ -773,7 +773,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "mainTable.etapacausal,'@'," +
                     "mainTable.idop,'@'," +
                     "mainTable.idof,'@'," +
-                    "mainTable.causal_princ) SEPARATOR '%') AS det_rech FROM (SELECT \n" +
+                    "mainTable.causal_princ) SEPARATOR '%%') AS det_rech FROM (SELECT \n" +
                     "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
                     "                    material.idmaterial, \n" +
                     "                    pedido.idpedido, \n" +
@@ -807,7 +807,18 @@ router.post('/table_rechazos', function(req, res, next){
                 break;
 
             case 'causal':
-                query = "SELECT mainTable.*, SUM(peso_total) AS peso_total, GROUP_CONCAT(CONCAT(mainTable.detalle,'@',mainTable.enviados,'@', mainTable.peso,'@', mainTable.etapa_desde) SEPARATOR '%') AS det_rech, " +
+                query = "SELECT mainTable.*, SUM(peso_total) AS peso_total, " +
+                    "GROUP_CONCAT(" +
+                    "CONCAT(" +
+                    "mainTable.detalle,'@'," +
+                    "mainTable.fecha,'@', " +
+                    "mainTable.idof,'@', " +
+                    "mainTable.idop,'@', " +
+                    "mainTable.colada,'@', " +
+                    "mainTable.producto,'@', " +
+                    "mainTable.enviados,'@', " +
+                    "mainTable.peso,'@', " +
+                    "mainTable.etapa_desde) SEPARATOR '%%') AS det_rech, " +
                     "SUM(mainTable.enviados) AS total_rechazados " +
                     "FROM (SELECT \n" +
                     "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
@@ -822,7 +833,8 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
                     "                    causal.causal,\n" +
                     "                    etapacausal.nombre AS etapacausal, \n" +
-                    "                    etapafaena.nombre_etapa AS etapa_desde, produccionh_causal.idcausal_etapacausal, \n" +
+                    "                    etapafaena.nombre_etapa AS etapa_desde, " +
+                    "                    produccionh_causal.idcausal_etapacausal, \n" +
                     "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
@@ -886,6 +898,7 @@ router.post('/table_rechazos', function(req, res, next){
                         function(err, rech){
                             if(err) throw err;
 
+                            console.log('calidad/'+view);
                             res.render('calidad/'+view, {datalen: rech, user: req.session.userData.nombre });
                     });
             });
@@ -926,7 +939,7 @@ router.get('/drop_notif/:idnotif', function(req, res, next){
                 if(err){
                     console.log("Error Selecting : %s", err);
                 }
-                res.redirect('/abastecimiento/notif_abast');
+                res.redirect('/calidad/render_notificaciones');
             });
     });
 });

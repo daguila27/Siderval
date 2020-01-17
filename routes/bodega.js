@@ -835,7 +835,7 @@ router.post('/save_gdd', function (req, res, next) {
                                                                         //SI SE ENVIA INFORMACION DE DESPACHO
                                                                         //gdd de VENTA/DEVOLUCION/OTRO
                                                                         console.log("ENVIANDO INFO "+input.estado);
-                                                                        //enviar_gdd_soap(idgdd);
+                                                                        io.emit('requestByEmail', idgd);
                                                                         res.redirect('/bodega/crear_gdd');
                                                                     });
 
@@ -845,6 +845,7 @@ router.post('/save_gdd', function (req, res, next) {
                                                         //SI SE ENVIA INFORMACION DE DESPACHO
                                                         //gdd de VENTA/DEVOLUCION/OTRO
                                                         console.log("ENVIANDO INFO "+input.estado);
+                                                        io.emit('requestByEmail', idgd);
                                                         //enviar_gdd_soap(idgdd);
                                                         res.redirect('/bodega/crear_gdd');
                                                     }
@@ -856,9 +857,6 @@ router.post('/save_gdd', function (req, res, next) {
                                     });
                                 }
                                 else{
-                                    console.log("act_reserv");
-                                    console.log(up_reserv);
-                                    console.log(up_reserv2);
                                     if(act_reserv.length > 0){
                                         connection.query(up_reserv,
                                             function(err, actReserv){
@@ -873,6 +871,7 @@ router.post('/save_gdd', function (req, res, next) {
                                                         //gdd de VENTA/DEVOLUCION/OTRO
                                                         console.log("ENVIANDO INFO "+input.estado);
                                                         //enviar_gdd_soap(idgdd);
+                                                        io.emit('requestByEmail', idgd);
                                                         res.redirect('/bodega/crear_gdd');
                                                     });
 
@@ -883,6 +882,7 @@ router.post('/save_gdd', function (req, res, next) {
                                         //gdd de VENTA/DEVOLUCION/OTRO
                                         console.log("ENVIANDO INFO "+input.estado);
                                         //enviar_gdd_soap(idgdd);
+                                        io.emit('requestByEmail', idgd);
                                         res.redirect('/bodega/crear_gdd');
                                     }
                                 }
@@ -899,14 +899,17 @@ router.post('/save_gdd', function (req, res, next) {
 
 
                                         //NO SE ENVIA INFORMACION DE DESPACHO¿?
-                                        console.log("NO SE ENVIA INFORMACION DE DESPACHO"+input.estado);
+                                        //console.log("NO SE ENVIA INFORMACION DE DESPACHO"+input.estado);
+                                        io.emit('requestByEmail', idgd);
                                         res.redirect('/bodega/crear_gdd');
                                     });
                                 });
                             }
                             else{
                                 //NO SE ENVIA INFORMACION DE DESPACHO¿?
-                                console.log("NO SE ENVIA INFORMACION DE DESPACHO" + input.estado);
+                                //console.log("NO SE ENVIA INFORMACION DE DESPACHO" + input.estado);
+                                io.emit('requestByEmail', idgd);
+
                                 res.redirect('/bodega/crear_gdd');
                             }
                         }
@@ -916,6 +919,7 @@ router.post('/save_gdd', function (req, res, next) {
             else {
 
                 //NO SE ENVIA INFORMACION DE DESPACHO
+                //AQUI NO
                 console.log("NO SE ENVIA INFORMACION DE DESPACHO" + input.estado);
                 res.redirect('/bodega/crear_gdd');
             }
@@ -1213,6 +1217,7 @@ router.post('/act_gdd', function(req, res, next){
                                             connection.query(case_gdd, function (err, rows) {
                                                 if (err) {throw err;}
 
+                                                io.emit('requestByEmail', idgd);
                                                 res.redirect('/bodega/crear_gdd');
                                             });
 
@@ -1221,6 +1226,7 @@ router.post('/act_gdd', function(req, res, next){
                                     });
                                 }
                                 else{
+                                    io.emit('requestByEmail', idgd);
                                     res.redirect('/bodega/crear_gdd');
                                 }
 
@@ -1232,18 +1238,22 @@ router.post('/act_gdd', function(req, res, next){
                                     if (err) {throw err;}
                                     connection.query(case_pl, function (err, rows) {
                                         if (err) {throw err;}
+
+                                        io.emit('requestByEmail', idgd);
                                         res.redirect('/bodega/crear_gdd');
                                     });
 
                                 });
                             }
                             else{
+                                io.emit('requestByEmail', idgd);
                                 res.redirect('/bodega/crear_gdd');
                             }
                         }
                     });
                 });
             } else {
+                io.emit('requestByEmail', idgd);
                 res.redirect('/bodega/crear_gdd');
             }
         });

@@ -317,7 +317,7 @@
             "</div>");
         $(".alert-screen").css('display', 'block');
         $(".alert-screen").css("background-color", "rgba(0,0,0,0.4)");
-        $(".alert-screen").css('z-index', '100');
+        $(".alert-screen").css('z-index', '10000');
         $(".alert-screen .mensaje div").css('background-color', 'rgb(124,126,126)');
 
         $(".alert-screen .mensaje div button").focus();
@@ -341,18 +341,30 @@
     <div style="height: 45%; width: 100%"></div>
 </div>
 <script>
-    function AlertaBloc(msg){
-        $(".alert-screen-bloc .mensaje").html(
-            "<div class='div-msg' style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; padding: 50px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>"+msg+"</div>"+
-            "<div style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; text-align: center;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>\n" +
-            "<button class='btn btn-danger' style='position: relative; bottom: 15px;' onclick='cancelarAlertaBloc()'>Cancelar</button>" +
-            "<button class='btn btn-primary' style='position: relative; bottom: 15px;' onclick='continuarAlertaBloc()'>Confirmar</button>" +
-            "</div>");
+    function AlertaBloc(msg, noshow){
+        if(noshow){
+            $(".alert-screen-bloc .mensaje").html(
+                "<div class='div-msg' style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; padding: 50px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>"+msg+"</div>"+
+                "<div style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; padding: 2px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'><input type='checkbox' id='noshow-alert'> No volver a mostrar</div>"+
+                "<div style='width: 30%; margin-left: 35%; margin-right: 35%; padding-bottom: 10px; background-color: white; color: white; text-align: center;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>\n" +
+                "<button class='btn btn-danger' style='' onclick='cancelarAlertaBloc()'>Cancelar</button>" +
+                "<button class='btn btn-primary' style='' onclick='continuarAlertaBloc()'>Confirmar</button>" +
+                "</div>");
+        }
+        else{
+            $(".alert-screen-bloc .mensaje").html(
+                "<div class='div-msg' style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; padding: 50px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>"+msg+"</div>"+
+                "<div class='hidden' style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; padding: 5px;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'><input type='checkbox' id='noshow-alert'> No volver a mostrar</div>"+
+                "<div style='width: 30%; margin-left: 35%; margin-right: 35%; background-color: white; color: white; text-align: center;-webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);'>\n" +
+                "<button class='btn btn-danger' style='position: relative; bottom: 15px;' onclick='cancelarAlertaBloc()'>Cancelar</button>" +
+                "<button class='btn btn-primary' style='position: relative; bottom: 15px;' onclick='continuarAlertaBloc()'>Confirmar</button>" +
+                "</div>");
+        }
+
         $(".alert-screen-bloc").css('display', 'block');
         $(".alert-screen-bloc").css("background-color", "rgba(0,0,0,0.4)");
         $(".alert-screen-bloc").css('z-index', '100');
         $(".alert-screen-bloc .mensaje div").css('background-color', 'rgb(124,126,126)');
-
         $(".alert-screen-bloc .mensaje div button").focus();
     }
     function cerrarAlertaBloc() {
