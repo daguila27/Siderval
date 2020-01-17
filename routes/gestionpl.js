@@ -157,7 +157,7 @@ router.get('/render_notificaciones', function(req, res, next){
             "LEFT JOIN odc ON odc.idodc=pedido.idodc " +
             "LEFT JOIN (SELECT * FROM material) AS material2 ON material2.idmaterial=pedido.idmaterial " +
             "LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value " +
-            "WHERE (SUBSTRING(notificacion.descripcion,1,3) = 'jfp' OR SUBSTRING(notificacion.descripcion,1,3) = 'idm' OR SUBSTRING(notificacion.descripcion,1,5) = 'crgdd') AND notificacion.active = true", function(err, notif){
+            "WHERE (SUBSTRING(notificacion.descripcion,1,3) = 'jfp' OR SUBSTRING(notificacion.descripcion,1,3) = 'idm' OR SUBSTRING(notificacion.descripcion,1,5) = 'crgdd' OR SUBSTRING(notificacion.descripcion,1,9) = 'dtegddgpl') AND notificacion.active = true", function(err, notif){
             if(err){console.log("Error Selecting : %s", err);}
             var idprods = [];
             for(var e=0; e < notif.length; e++){
