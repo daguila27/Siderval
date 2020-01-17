@@ -30,6 +30,8 @@
             var img = document.getElementById("yourImgTagModal");
             img.src = event.target.result;
         }
+        $("#yourImgTagModal-empty").addClass('hidden');
+        $("#yourImgTagModal").removeClass('hidden');
     }
 
 </script>
@@ -211,6 +213,7 @@
                         $(yo).data('state', '0');
                     }
                 }
+
                 function selectCausal(yo){
                     $(".cau-option").removeClass('selected');
                     $(".cau-option").data('state', '0');
@@ -228,6 +231,7 @@
                     $(yo).data('state', '1');
                     $(yo).addClass('selected');
                 }
+
                 function addCausal(yo){
                     var sel = $(yo).parent().parent().children('.left-section').find('.cau-option.selected');
                     var cau = sel.parent().parent().parent().find('.etp-option').html();
@@ -237,7 +241,22 @@
                     }
                     $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options', parseInt($(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options')) + 1);
                     $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).children('span').html("("+parseInt($(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options'))+")" );
-                    $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').append("<li class=\"etp-option cau-option\" data-state=\"0\" data-valor='"+sel.data('valor')+"' data-html=\""+sel.data('html')+"\" onclick=\"selectCausal(this)\"><input type='checkbox' class='prin-cua' onchange='selCauPrinc(this)' style='margin-rigth: 5px'>" +cau +" "+ sel.html() + "</li>");
+                    //APPEND
+                    $(".right-section").find(
+                        '.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').append(
+                            "<li class=\"etp-option cau-option\" data-state=\"0\" data-valor='"+sel.data('valor')+"' data-html=\""+sel.data('html')+"\" onclick=\"selectCausal(this)\" style=\"white-space: nowrap; overflow-x: hidden;\"><input type='checkbox' class='prin-cua' onchange='selCauPrinc(this)' style='margin-rigth: 5px'>" +cau +" "+ sel.html() + "</li>"
+                    );
+
+                    //SI ES LA PRIMERA CAUSAL EN ADJUNTARSE
+                    //POR DEFECTO SE SELECCIONA COMO PRINCIPAL
+                    var c=0;
+                    $(".prin-cua").each(function(){
+                        c++;
+                    });
+                    if(c===1){$(".prin-cua").click();}
+
+
+                    $(yo).prop('disabled', true);
                 }
 
                 function removeCausal(yo){
@@ -257,6 +276,15 @@
                     }else{
                         sel.remove();
                     }
+                    $(yo).prop('disabled', true);
+                    //SI LUEGO DE ELIMINAR EL ITEM SOLO QUEDA UNO
+                    //POR DEFECTO SE SELECCIONA COMO PRINCIPAL
+                    var c=0;
+                    $(".prin-cua").each(function(){
+                        c++;
+                    });
+                    if(c===1){$(".prin-cua").click();}
+
                 }
 
                 function setDataCau(){
@@ -303,9 +331,9 @@
 
 
                     if(arr.image === null){
-                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html(" -<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
                     }else {
-                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html(arr.image + "<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
                     }
                     $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('valor', arr.image);
                     $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('tipo', arr.image_type);
@@ -320,6 +348,7 @@
                         $(this).click();
                         $(".minus-btn").click();
                     });
+                    delImg();
                 }
 
                 function applyMoves(arr){
@@ -330,18 +359,60 @@
                     }
                 }
                 function selCauPrinc(yo){
+                    //CANTIDAD DE CHECK SELECCIONADOS
                     var c = 0;
-                    $(".prin-cua").each(function(){
-                        if($(this).is(':checked')){
-                            c++;
-                        }
-                    });
+                    //VARIABLE PARA UBICAR EL PRIMER CHECKBOX
+                    var firts = 0;
+                    var count = 0;
+                    var fbool = false;
+                    //SE INTENTA MARCAR CHECKBOX
+                    if($(yo).prop('checked')){
+                        $(yo).prop('checked', false);
+                        $(".prin-cua").each(function(){
+                            count++;
+                            if($(this).is(':checked')){
+                                c++;
+                            }
 
-                    if(c > parseInt($("#cau-body").data('max'))){
-                        $(yo).prop('checked', false);;
+
+                            if( c === 1 && !fbool ){
+                                firts = count;
+                                fbool = true;
+                            }
+                        });
+                        //NO HAY SELECCIONADOS
+                        if(c === 0){
+                            firts = 0;
+                        }
+                        var aux = 0;
+                        if(c >= parseInt($("#cau-body").data('max'))){
+                            //NO PERMITE SELECCIONAR
+                            //SE DESMARCA EL PRIMER CHECK (SIN CONTAR EL SELECCIONADO RECIEN)
+                            $('.prin-cua').each(function(){
+                                aux++;
+                                if(aux === firts){
+                                    $(this).prop('checked', false);
+                                }
+                            });
+                            $(yo).prop('checked', true);
+                        }else{
+                            $(yo).prop('checked', true);
+                        }
+                    }
+                    //SE INTENTA DESMARCAR CHECKBOX
+                    else{
+                        $(yo).prop('checked', false);
+                        $(".prin-cua").each(function(){
+                            if($(this).is(':checked')){
+                                c++;
+                            }
+                        });
+                        if(c === 0){
+                            $(yo).prop('checked', true);
+                            Alerta("¡Debe seleccionar al menos una Causal Principal!");
+                        }
                     }
                 }
-
             </script>
 
             <!--
@@ -398,13 +469,35 @@
                     </label>
                 </div>
 
-                <div class="form-group image-group input-group" style="margin-top: 10px;">
+                <div class="form-group image-group input-group" style=" width: 100% ; margin-bottom:0px;margin-left:0px;margin-right:0px;margin-top: 10px;">
+                    <script>
+                        function delImg(){
+                            $('#imagenMovCau').val('');
+                            $('#yourImgTagModal').attr('src', '');
+                            $('#yourImgTagModal').addClass('hidden');
+                            $('#yourImgTagModal-empty').removeClass('hidden');
+                        }
+
+                        function setImg(src, name){
+                            alert($('#imagenMovCau').val());
+                            if($('#yourImgTagModal').hasClass('hidden')){
+                                $('#imagenMovCau').val(name.toString());
+                                $('#yourImgTagModal').attr('src', src);
+                                $('#yourImgTagModal').removeClass('hidden');
+                                $('#yourImgTagModal-empty').addClass('hidden');
+                            }
+                        }
+                    </script>
+                    <button class="btn btn-xs btn-primary pull-right" onclick="delImg();">&times;</button>
                     <label for="" style="width: 100%;">
                         Adjuntar Imagen:
                         <input style="margin-left: 10px;margin-top: 2px" type="file" id="imagenMovCau" onchange="onChangeImg('imagenMovCau')" accept=".jpg,.jpeg,.png">
                     </label>
                 </div>
-                <img src="" alt="" id="yourImgTagModal" style="width: 80%; margin-left: 10%;">
+                <div style="padding: 10px; background-color: rgb(239,239,248);">
+                    <div id="yourImgTagModal-empty"><h2 style="text-align: center; margin: 0px !important;"><small><i class="fa fa-exclamation"></i> Ingrese Imagen ... </small></h2></div>
+                    <img style="margin-left: 10%;width: 80%" src="" alt="" id="yourImgTagModal" class="hidden">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="setDataCau()">Aplicar</button>
@@ -803,8 +896,12 @@
         //$(".tab-pane#"+id)
     }
 
+    //SE USA PARA SABER SI SE DEBE MOSTRAR ALERTA O NO
+    //PERDURA HASTA QUE SE ACTUALIZA LA PAGINA
+    var noshowAlertEmptyDOM = false;
     function submit_action(){
         var err = false, msg;
+        var emptyInput = false;
         var data = {
             idmat: [],
             env: [],
@@ -826,7 +923,11 @@
                 data[$(this).data('name')].push($(this).children('input').val());
             }
             else if( ($(this).data('name') === 'colada' || $(this).data('name') === 'producto')){
-                if($(this).find('input').val() === ' ' || $(this).find('input').val() === ''){data[$(this).data('name')].push('0');}
+                if($(this).find('input').val() === ' ' || $(this).find('input').val() === ''){
+                    data[$(this).data('name')].push('0');
+                    emptyInput = true;
+                    msg = "Se va a registrar Rechazo sin Código de Colada o Correlativo Producto. \n ¿Está seguro?";
+                }
                 else{
                     //COMPROBAR SI STRING CUMPLE CON EL FORMATO
                     if($(this).data('name') === 'colada'){
@@ -878,26 +979,53 @@
         $("#hidden-form-images").html(form_images);
         if(err){
             Alerta(msg);
-        }else{
-            $.ajax({
-                type: 'POST',
-                data: data,
-                url: '/calidad/save_production_rech_prod',
-                success: function(data){
-
-                    Alerta(data);
-                    flag = true;
-                    fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
-                    foo();
-                    $("#tbody_rech").html(
-                        '<tr class="empty-table">\n' +
-                        '<td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>\n' +
-                        '</tr>'
-                    );
-                }
-            });
         }
+        else{
+            if(emptyInput){
+                    callbAlertCancel = function(){
+                        //no hagas nada
+                    };
+                    callbAlertConfirm = function(){
+                        $.ajax({
+                            type: 'POST',
+                            data: data,
+                            url: '/calidad/save_production_rech_prod',
+                            success: function(data){
 
+                                Alerta(data);
+                                flag = true;
+                                fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
+                                foo();
+                                $("#tbody_rech").html(
+                                    '<tr class="empty-table">\n' +
+                                    '<td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>\n' +
+                                    '</tr>'
+                                );
+                            }
+                        });
+                    };
+                    AlertaBloc(msg);
+            }
+            else{
+                $.ajax({
+                    type: 'POST',
+                    data: data,
+                    url: '/calidad/save_production_rech_prod',
+                    success: function(data){
+
+                        Alerta(data);
+                        flag = true;
+                        fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
+                        foo();
+                        $("#tbody_rech").html(
+                            '<tr class="empty-table">\n' +
+                            '<td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>\n' +
+                            '</tr>'
+                        );
+                    }
+                });
+            }
+        }
     }
 
     function checkExpReg(exp, yo){
@@ -966,14 +1094,48 @@
         "</tr>");
         $("#"+ev.dataTransfer.getData("text")).addClass('hidden');
     }
-    function editCausales(globalIdCount, yo){
-        $("#idColAux").val(globalIdCount);
-        resetSelector();
-        applyMoves($(yo).parent().data("valor").split("-"));
-        $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
 
-        $("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
-        $("#editProdRech").modal("show");
+    //SE USA PARA SABER SI SE DEBE MOSTRAR ALERTA O NO
+    //PERDURA HASTA QUE SE ACTUALIZA LA PAGINA
+    var noshowAlertDOM = false;
+    function editCausales(globalIdCount, yo){
+        if(noshowAlertDOM){
+            $("#idColAux").val(globalIdCount);
+
+            resetSelector();
+            applyMoves($(yo).parent().data("valor").split("-"));
+            $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
+
+            /*$("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
+            $("#imagenMovCau").val( $(yo).parent().parent().find("td.tdImg").find('img').parent().data('valor') );*/
+            //setImg($(yo).parent().parent().find("td.tdImg").find('img').attr('src'), 'C:\\fakepath\\imagendeprueba.png');
+
+            $("#editProdRech").modal("show");
+        }
+        else{
+            callbAlertCancel = function(){
+                //no hagas nada
+            };
+            callbAlertConfirm = function(){
+                $("#idColAux").val(globalIdCount);
+
+                resetSelector();
+                applyMoves($(yo).parent().data("valor").split("-"));
+                $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
+
+                /*$("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
+                $("#imagenMovCau").val( $(yo).parent().parent().find("td.tdImg").find('img').parent().data('valor') );*/
+                //setImg($(yo).parent().parent().find("td.tdImg").find('img').attr('src'), 'C:\\fakepath\\imagendeprueba.png');
+
+                $("#editProdRech").modal("show");
+
+                if($("#noshow-alert").is(':checked')){
+                    noshowAlertDOM = true;
+                }
+            };
+            AlertaBloc("¡Atención! \n El editar información hará que tengas que volver a ingresar las Imagenes de Rechazo.", true);
+        }
+
     }
     function addProdBtn(id) {
         var arropt = false;
