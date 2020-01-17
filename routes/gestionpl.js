@@ -177,7 +177,7 @@ router.get('/render_notificaciones', function(req, res, next){
                 if(err){console.log("Error Selecting : %s", err);}
 
                 for(var e=0; e < notif.length; e++){
-                    if(notif[e].descripcion.split('@')[0] !== 'crgdd') {
+                    if(notif[e].descripcion.split('@')[0] === 'idm' || notif[e].descripcion.split('@')[0] === 'jfp') {
                         for (var w = 0; w < notif[e].descripcion.split('@')[4].split('-').length; w++) {
                             for (var q = 0; q < ext.length; q++) {
                                 if (ext[q].idproduccion.toString() === notif[e].descripcion.split('@')[4].split('-')[w]) {
