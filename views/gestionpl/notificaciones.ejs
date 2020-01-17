@@ -106,6 +106,27 @@ if(notif[u].externo){%>
         <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
     </li>
 <li class="divider"></li>
+<%}else if(desc[0] === 'dtegddgpl'){
+    hora = desc[2].split(' ')[1].split(':')[0] +":"+desc[2].split(' ')[1].split(':')[1];%>
+<li style="cursor: pointer;">
+    <a <%if(desc[3] === 'true'){%> href="http://192.168.0.25:4200<%= desc[4]%>" target="_blank" <%}%> class="notif-dte" data-wasCreated="<%= desc[3]%>" data-pdfPath="<%= desc[4]%>" data-id="<%= notif[u].idnotificacion%>" style="width: 100%">
+        <div style="width: 100% !important;">
+            <small style="margin: 0; margin-bottom: 10px; font-size: 125%; color: rgb(119, 119, 119)">Información de DTE en SII: </small>
+            <span class="pull-right text-muted" style="top: 0px"><em><%= hora%></em></span>
+        </div>
+        <div style="color: black !important; width: 100% !important;">
+            La <b>GDD <%= desc[1]%></b>
+            <% if(desc[3] === 'true'){%>
+                fue existosamente creada. Haz click aquí para ver el documento timbrado.
+            <%} else {%>
+                tuvo errores al ser enviada al servicio externo. Haz click para reintentar el timbrado.
+
+            <%}%>
+        </div>
+    </a>
+    <button type="button" class="close" style="position: absolute; top: 1px; right: 3px" data-id="<%= notif[u].idnotificacion%>" onclick="removeNotif(this)">&times;</button>
+</li>
+<li class="divider"></li>
 <%}}} else {%>
     <li>
         <a href="#">
@@ -211,4 +232,9 @@ if(notif[u].externo){%>
     $(document).on('click', '.notificaciones li button', function (e) {
         e.stopPropagation();
     });
+    $('.notif-dte').on('click', function(e){
+        e.preventDefault();
+        var data = $(this).data()
+        if(data.)
+    })
 </script>
