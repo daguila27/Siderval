@@ -3489,14 +3489,20 @@ router.get('/notif_plan', function(req, res, next){
             "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
             "LEFT JOIN odc ON odc.idodc = pedido.idodc " +
             "LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial " +
-            "WHERE ((descripcion LIKE 'bmiReserv@%' OR descripcion LIKE 'dtegddplan@%') AND active = true)",
+            "WHERE ((descripcion LIKE 'bmiReserv@%') AND active = true)",
             function(err, notif){
                 if(err){
                     console.log("Error Selecting : %s", err);
                 }
-
-                res.render('plan/notificaciones', {notif: notif});
-
+                connection.query("SELECT * from notificacion WHERE descripcion LIKE 'dtegddplan@%' AND active = 1", function(err, rows){
+                    if(err){
+                        console.log("Error Selecting : %s", err);
+                        res.render('plan/notificaciones', {notif: notif});                    
+                    } else{
+                        notif = notif.concat(rows)
+                        res.render('plan/notificaciones', {notif: notif});                    
+                    }
+                })
         });
     });
 });

@@ -33,7 +33,7 @@ if( notif[0].descripcion.split('@')[0] === 'crgdd' ){%>
         </a>
     </li>
 <%}else if( notif[0].descripcion.split('@')[0] === 'dtegddgpl' ){
-    let desc = notif[0].descripcion.split('@');%>
+    var desc = notif[0].descripcion.split('@');%>
 <li style="cursor: pointer;">
     <a <%if(desc[3] === 'true'){%> href="http://192.168.0.25:4200<%= desc[4]%>" target="_blank" <%}%> class="notif-dte" data-wasCreated="<%= desc[3]%>" data-pdfPath="<%= desc[4]%>" data-id="<%= notif[u].idnotificacion%>" style="width: 100%">
         <div style="width: 100% !important;">
