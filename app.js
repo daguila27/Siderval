@@ -300,6 +300,42 @@ io.on('connection', function (socket) {
         console.log(idnotifs);
         io.sockets.emit("refreshPlanNotif", idnotifs);
     });
+    socket.on('dteError', function(obj){
+      var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
+      connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegdd@@' + obj.idgdd + '@@' + fecha + '@@false@@' + obj.msg}, function(err){
+        if(err){
+          console.log(err);
+        }
+      });
+    })
+    socket.on('dteSuccess', function(obj) {
+      connection.query('UPDATE gd SET timbrado = 1 where idgd = ?', obj.idgdd, function(err, rows){
+        if(err){
+          console.log(err);
+        } else {
+          var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
+          if(err){
+            console.log(err);
+          } else {
+            connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddgpl@@' + obj.idgdd + '@@' + fecha + '@@true@@' + obj.path}, function(err, rows){
+              if(err){
+                console.log(err);
+              } else {
+                io.sockets.emit('refreshGestionplNotif', [rows.insertId]);
+                connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddplan@@' + obj.idgdd + '@@' + fecha + '@@true@@' + obj.path}, function(err, rows){
+                  if(err){
+                    console.log(err);
+                  } else {
+                    io.sockets.emit('refreshPlanNotif', [rows.insertId]);
+                  }
+                });
+
+              }
+            });
+          }
+        }
+      });
+    });
       app.locals.socket = socket;
 });
 
