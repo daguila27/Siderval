@@ -317,12 +317,12 @@ io.on('connection', function (socket) {
           if(err){
             console.log(err);
           } else {
-            connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddgpl@@' + obj.idgdd + '@@' + fecha + '@@true@@' + obj.path}, function(err, rows){
+            connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddgpl@' + obj.idgdd + '@' + fecha + '@true@' + obj.path}, function(err, rows){
               if(err){
                 console.log(err);
               } else {
                 io.sockets.emit('refreshGestionplNotif', [rows.insertId]);
-                connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddplan@@' + obj.idgdd + '@@' + fecha + '@@true@@' + obj.path}, function(err, rows){
+                connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddplan@' + obj.idgdd + '@' + fecha + '@true@' + obj.path}, function(err, rows){
                   if(err){
                     console.log(err);
                   } else {
