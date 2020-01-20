@@ -3513,7 +3513,7 @@ router.get('/notif_plan', function(req, res, next){
             "LEFT JOIN pedido ON pedido.idpedido = fabricaciones.idpedido " +
             "LEFT JOIN odc ON odc.idodc = pedido.idodc " +
             "LEFT JOIN material ON material.idmaterial = abastecimiento.idmaterial " +
-            "WHERE (descripcion LIKE 'bmiReserv@%' AND active = true)",
+            "WHERE ((descripcion LIKE 'bmiReserv@%' OR descripcion LIKE 'dtegddplan@%') AND active = true)",
             function(err, notif){
                 if(err){
                     console.log("Error Selecting : %s", err);

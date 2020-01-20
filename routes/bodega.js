@@ -776,7 +776,6 @@ router.post('/save_gdd', function (req, res, next) {
                         update_stock += 'WHEN material.idmaterial=' + array_material[q] + ' THEN material.stock' + op2 + array_stock[q] + ' ';
                     }
                     update_stock += 'ELSE material.stock END WHERE material.idmaterial IN (' + array_material.join(',')+')';
-                    console.log(update_stock);
 
                     //Se actualiza el stock de material
                     connection.query(update_stock, function (err, rows) {
@@ -821,10 +820,6 @@ router.post('/save_gdd', function (req, res, next) {
                                                 connection.query(case_gdd, function (err, rows) {
                                                     if (err) {console.log("Error Updating : %s", err);}
 
-                                                    console.log("act_reserv");
-                                                    console.log(up_reserv);
-                                                    console.log(up_reserv2);
-                                                    console.log(input.estado);
                                                     if(act_reserv.length > 0){
                                                         //UPDATE reservacion_detalle left join fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.estado = 2 WHERE fabricaciones.idpedido IN (11125)
                                                         connection.query(up_reserv,
@@ -834,12 +829,23 @@ router.post('/save_gdd', function (req, res, next) {
                                                                 connection.query(up_reserv2,
                                                                     function(err, actReserv){
                                                                         if (err) {console.log("Error Selecting : %s", err);}
-                                                                    res.redirect('/bodega/crear_gdd');
+
+
+                                                                        //SI SE ENVIA INFORMACION DE DESPACHO
+                                                                        //gdd de VENTA/DEVOLUCION/OTRO
+                                                                        console.log("ENVIANDO INFO "+input.estado);
+                                                                        req.app.locals.io.sockets.emit('requestByEmail', idgd);
+                                                                        res.redirect('/bodega/crear_gdd');
                                                                     });
 
                                                         });
                                                     }
                                                     else{
+                                                        //SI SE ENVIA INFORMACION DE DESPACHO
+                                                        //gdd de VENTA/DEVOLUCION/OTRO
+                                                        console.log("ENVIANDO INFO "+input.estado);
+                                                        req.app.locals.io.sockets.emit('requestByEmail', idgd);
+                                                        //enviar_gdd_soap(idgdd);
                                                         res.redirect('/bodega/crear_gdd');
                                                     }
                                                 });
@@ -850,9 +856,6 @@ router.post('/save_gdd', function (req, res, next) {
                                     });
                                 }
                                 else{
-                                    console.log("act_reserv");
-                                    console.log(up_reserv);
-                                    console.log(up_reserv2);
                                     if(act_reserv.length > 0){
                                         connection.query(up_reserv,
                                             function(err, actReserv){
@@ -863,12 +866,22 @@ router.post('/save_gdd', function (req, res, next) {
                                                         if (err) {console.log("Error Selecting : %s", err);}
 
 
+                                                        //SI SE ENVIA INFORMACION DE DESPACHO
+                                                        //gdd de VENTA/DEVOLUCION/OTRO
+                                                        console.log("ENVIANDO INFO "+input.estado);
+                                                        //enviar_gdd_soap(idgdd);
+                                                        req.app.locals.io.sockets.emit('requestByEmail', idgd);
                                                         res.redirect('/bodega/crear_gdd');
                                                     });
 
                                             });
                                     }
                                     else{
+                                        //SI SE ENVIA INFORMACION DE DESPACHO
+                                        //gdd de VENTA/DEVOLUCION/OTRO
+                                        console.log("ENVIANDO INFO "+input.estado);
+                                        //enviar_gdd_soap(idgdd);
+                                        req.app.locals.io.sockets.emit('requestByEmail', idgd);
                                         res.redirect('/bodega/crear_gdd');
                                     }
                                 }
@@ -882,20 +895,169 @@ router.post('/save_gdd', function (req, res, next) {
                                     if (err) {throw err;}
                                     connection.query(case_pl, function (err, rows) {
                                         if (err) {throw err;}
+
+
+                                        //NO SE ENVIA INFORMACION DE DESPACHO¿?
+                                        //console.log("NO SE ENVIA INFORMACION DE DESPACHO"+input.estado);
+                                        req.app.locals.io.sockets.emit('requestByEmail', idgd);
                                         res.redirect('/bodega/crear_gdd');
                                     });
                                 });
                             }
-                            else{res.redirect('/bodega/crear_gdd');}
+                            else{
+                                //NO SE ENVIA INFORMACION DE DESPACHO¿?
+                                //console.log("NO SE ENVIA INFORMACION DE DESPACHO" + input.estado);
+                                req.app.locals.io.sockets.emit('requestByEmail', idgd);
+
+                                res.redirect('/bodega/crear_gdd');
+                            }
                         }
                     });
                 });
-            } else {
+            }
+            else {
+
+                //NO SE ENVIA INFORMACION DE DESPACHO
+                //AQUI NO
+                console.log("NO SE ENVIA INFORMACION DE DESPACHO" + input.estado);
                 res.redirect('/bodega/crear_gdd');
             }
         });
     });
 });
+
+
+
+router.get('/send_data_addin', function (req, res, next){
+    enviar_gdd_soap(22009, req, function(){
+        res.sendStatus(200)
+    });
+});
+
+function enviar_gdd_soap(idgd, req, callback){
+    req.getConnection(function(err, connection){
+        if(err){console.log("Error Conecting : %s", err);}
+
+        connection.query("SELECT CONCAT(\n" +
+            "'SIDERVAL',',', \n" +
+            "despachos.idgd, ',', \n" +
+            "'S',',',\n" +
+            "'T',',',\n" +
+            "DATE_FORMAT(gd.fecha, '%Y/%m/%d'),',', \n" +
+            "'01',',', \n" +
+            "gd.obs,',', \n" +
+            "REPLACE(SUBSTRING_INDEX(cliente.rut, '-', 1), '.', ''),',', \n" +
+            "cliente.sigla, ',',\n" +
+            "cliente.rut, ',',\n" +
+            "cliente.giro, ',',\n" +
+            "cliente.direccion, ',',\n" +
+            "cliente.ciudad, ',',\n" +
+            "cliente.ciudad, ',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "material.codigo, ',',\n" +
+            "material.detalle, ',',\n" +
+            "material.detalle, ',',\n" +
+            "material.u_medida, ',',\n" +
+            "despachos.cantidad, ',',\n" +
+            "material.precio,\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "'S',',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "',',\n" +
+            "','\n" +
+            ") AS token FROM despachos \n" +
+            "LEFT JOIN gd ON gd.idgd = despachos.idgd \n" +
+            "LEFT JOIN cliente ON cliente.idcliente = gd.idcliente \n" +
+            "LEFT JOIN material ON material.idmaterial = despachos.idmaterial \n" +
+            "WHERE despachos.idgd = ? group by despachos.iddespacho", idgd, function(err, desp){
+            if(err){console.log("Error Selecting : %s", err);}
+
+            const fs = require('fs');
+            console.log(desp)
+            var stream = fs.createWriteStream("./test.txt");
+            stream.once('open', function(fd) {
+                for(var e=0; e < desp.length; e++){
+                    stream.write(desp[e].token+"\n");
+                }
+                stream.end();
+                callback()
+            });
+        });
+    });
+
+
+}
 
 //Renderizar la página de GDD específica de odoo.
 router.get('/page_gdd/:idgd', function(req, res, next){
@@ -1057,6 +1219,7 @@ router.post('/act_gdd', function(req, res, next){
                                             connection.query(case_gdd, function (err, rows) {
                                                 if (err) {throw err;}
 
+                                                req.app.locals.io.sockets.emit('requestByEmail', idgd);
                                                 res.redirect('/bodega/crear_gdd');
                                             });
 
@@ -1065,6 +1228,7 @@ router.post('/act_gdd', function(req, res, next){
                                     });
                                 }
                                 else{
+                                    req.app.locals.io.sockets.emit('requestByEmail', idgd);
                                     res.redirect('/bodega/crear_gdd');
                                 }
 
@@ -1076,18 +1240,22 @@ router.post('/act_gdd', function(req, res, next){
                                     if (err) {throw err;}
                                     connection.query(case_pl, function (err, rows) {
                                         if (err) {throw err;}
+
+                                        req.app.locals.io.sockets.emit('requestByEmail', idgd);
                                         res.redirect('/bodega/crear_gdd');
                                     });
 
                                 });
                             }
                             else{
+                                req.app.locals.io.sockets.emit('requestByEmail', idgd);
                                 res.redirect('/bodega/crear_gdd');
                             }
                         }
                     });
                 });
             } else {
+                req.app.locals.io.sockets.emit('requestByEmail', idgd);
                 res.redirect('/bodega/crear_gdd');
             }
         });
