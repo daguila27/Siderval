@@ -720,7 +720,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "mainTable.etapa_desde,'@', " +
                     "mainTable.colada,'@', " +
                     "mainTable.producto,'@', " +
-                    "mainTable.fecha,'@', " +
+                    "mainTable.fecha_rech,'@', " +
                     "mainTable.causal,'@', " +
                     "mainTable.etapacausal,'@', " +
                     "mainTable.idop,'@', " +
@@ -741,7 +741,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '-') AS causal_princ,\n" +
                     "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '-') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha AS fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -768,7 +768,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "mainTable.peso,'@'," +
                     "mainTable.etapa_desde,'@'," +
                     "mainTable.producto,'@'," +
-                    "mainTable.fecha,'@'," +
+                    "mainTable.fecha_rech,'@'," +
                     "mainTable.causal,'@'," +
                     "mainTable.etapacausal,'@'," +
                     "mainTable.idop,'@'," +
@@ -788,7 +788,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '-') AS causal_princ,\n" +
                     "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '-') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha as fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -811,7 +811,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "GROUP_CONCAT(" +
                     "CONCAT(" +
                     "mainTable.detalle,'@'," +
-                    "mainTable.fecha,'@', " +
+                    "mainTable.fecha_rech,'@', " +
                     "mainTable.idof,'@', " +
                     "mainTable.idop,'@', " +
                     "mainTable.colada,'@', " +
@@ -831,11 +831,11 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
-                    "                    causal.causal,\n" +
-                    "                    etapacausal.nombre AS etapacausal, \n" +
+                    "                    causal.causal,causal.idcausal,\n" +
+                    "                    etapacausal.nombre AS etapacausal,etapacausal.idetapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, " +
                     "                    produccionh_causal.idcausal_etapacausal, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha as fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -869,7 +869,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '@') AS causal_princ,\n" +
                     "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '@') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha as fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -893,6 +893,7 @@ router.post('/table_rechazos', function(req, res, next){
             connection.query("SET SESSION group_concat_max_len = 1000000",
                 function(err, setLength){
                     if(err) throw err;
+
 
                     connection.query(query,
                         function(err, rech){
@@ -1027,6 +1028,19 @@ router.get('/xlsx_rech', function(req,res){
                         var fechaFin;
                         var diff = 0;
                         var auxrow;
+
+                        sheet.getRow(1).fill = {
+                            type: 'pattern',
+                            pattern:'solid',
+                            fgColor:{argb:'F4D03F'}
+                        };
+                        sheet.getRow(1).font = {
+                            name: 'Comic Sans MS',
+                            family: 4,
+                            size: 11,
+                            underline: false,
+                            bold: true
+                        };
                         // Fecha de Rechazo
                         // Hora de Rechazo
                         // Descripción Producto
@@ -1069,5 +1083,7 @@ router.get('/xlsx_rech', function(req,res){
     }
     else res.redirect('/bad_login');
 });
+
+
 
 module.exports = router;

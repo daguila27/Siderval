@@ -69,7 +69,7 @@ else{clase='busc-menu';}%>
             <!--Buscador-->
             <div class="form-group o_searchview" style="margin: 0;padding: 0; max-height: 30px"></div>
             <div style="width: 100%; display: flex; margin-top: 10px">
-                <div class="date-fill" style="display: flex; width: 40%">
+                <div class="date-fill" style="display: flex">
 
                 </div>
                 <div>
@@ -82,6 +82,11 @@ else{clase='busc-menu';}%>
                             <option value="causal">Causal</option>
 
                         </select>
+                    </label>
+                </div>
+                <div>
+                    <label style="white-space: nowrap; display: flex; margin-left: 20px;" class="selectGroup">
+
                     </label>
                 </div>
             </div>
@@ -97,7 +102,7 @@ else{clase='busc-menu';}%>
                     border-radius: 3px;
                 }
         </style>
-        <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+        <div class="dropdown pull-right" style="position: absolute; top: 8px; right: 1px">
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
                     <li><a href="#" class="getcsvrech" data-tipo="rech"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
@@ -158,7 +163,7 @@ else{clase='busc-menu';}%>
         "Producto@info",
         "Cliente@info",
     ];
-    var busc = new Buscador("buscar_rechazo", ".o_searchview", array_fill, "/calidad/table_rechazos", "rechTable", false, true, '.date-fill', 'produccion_history.fecha');
+    var busc = new Buscador("buscar_rechazo", ".o_searchview", array_fill, "/calidad/table_rechazos", "rechTable", false, true, '.date-fill', 'mainTable.fecha_rech');
 
     busc.add_cond = "";
     busc.extraInfo = [$(".selectGroupOption").val()];

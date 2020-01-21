@@ -3626,6 +3626,282 @@ router.get('/render_alert_notificacion/:idnotif', function(req, res, next) {
     });
 });
 
+
+router.get('/xlsx_prod_plan', function(req,res){
+    if(verificar(req.session.userData)){
+        console.log("¡Profesor Jirafales!");
+        var fs = require('fs');
+        var Excel = require('exceljs');
+        var workbook = new Excel.Workbook();
+        var sheet = workbook.addWorksheet('Maestro');
+        var sheet2 = workbook.addWorksheet('GDD');
+
+        var ident  = new Date().toLocaleDateString().replace(' ','');
+        ident = ident.replace('/','');
+        ident = ident.replace(':','');
+
+        console.log("¡Doña Florinda!");
+        /*
+        * estado,
+        * idorden_f,
+        * numitem,
+        * rut,
+        * sigla,
+        * numoc,
+        * codigo,
+        * detalle,
+        * cantidad_ped,
+        * despachados,
+        * xdespachar,
+        * aleacion,
+        * peso,
+        * pesototal,
+        * f_gen
+        * f_entrega,
+        * standby,
+        * */
+        sheet.columns = [
+            { header: 'Estado', key: 'estado', width: 15 },
+            { header: 'OF', key: 'of', width: 15 },
+            { header: 'Item', key: 'item', width: 15 },
+            { header: 'Rut de Cliente', key: 'rut', width: 15 },
+            { header: 'Cliente', key: 'cliente', width: 15 },
+            { header: 'OC', key: 'oc', width: 15 },
+            { header: 'Código', key: 'cod', width: 15 },
+            { header: 'Descripción', key: 'det', width: 80 },
+            { header: 'Cantidad Solicitada', key: 'ped', width: 15 },
+            { header: 'Cantidad Despachada', key: 'desp', width: 15 },
+            { header: 'Cantidad por Entregar', key: 'xdesp', width: 15 },
+            { header: 'Aleación', key: 'ale', width: 15 },
+            { header: 'Peso Unitario [kg]', key: 'peso', width: 15 },
+            { header: 'Peso Total [kg]', key: 'pesototal', width: 15 },
+            { header: 'Fecha de Ingreso', key: 'ingreso', width: 15 },
+            { header: 'Fecha de Entrega', key: 'entrega', width: 15 },
+            { header: 'Cantidad Rechazada', key: 'rech', width: 15 }
+        ];
+
+
+        /*
+        idgd, fecha_despacho, idorden_f, numitem, numoc,
+        sigla, codigo, detalle, despachados, u_medida,
+        aleacion, peso, pesototal, obs, migo, estado
+         */
+        sheet2.columns = [
+            { header: 'GDD', key: 'gdd', width: 15 },
+            { header: 'Fecha de Despacho', key: 'desp', width: 15 },
+            { header: 'OF', key: 'of', width: 15 },
+            { header: 'Item', key: 'item', width: 15 },
+            { header: 'OC', key: 'oc', width: 15 },
+            { header: 'Cliente', key: 'cliente', width: 15 },
+            { header: 'Código', key: 'cod', width: 15 },
+            { header: 'Descripción', key: 'det', width: 80 },
+            { header: 'Cantidad Despachada', key: 'desp', width: 15 },
+            { header: 'Unidad de Medida', key: 'med', width: 15 },
+            { header: 'Cantidad por Entregar', key: 'xdesp', width: 15 },
+            { header: 'Aleación', key: 'ale', width: 15 },
+            { header: 'Peso Unitario [kg]', key: 'peso', width: 15 },
+            { header: 'Peso Total [kg]', key: 'pesototal', width: 15 },
+            { header: 'Observación', key: 'Observación', width: 15 },
+            { header: 'MIGO', key: 'migo', width: 15 },
+            { header: 'Estado', key: 'estado', width: 15 }
+        ];
+        console.log("¿no gusta pasar a tomar una tasita de cafe?");
+
+        sheet.getRow(1).font = {
+            name: 'Calibri',
+            family: 4,
+            size: 11,
+            underline: false,
+            bold: true
+        };
+        req.getConnection(function(err, connection) {
+            if(err)
+                console.log("Error connection : %s", err);
+
+            var query = "select \n" +
+                "odc.numoc,\n" +
+                "fabricaciones.idorden_f,\n" +
+                "pedido.numitem,\n" +
+                "pedido.cantidad as cantidad_ped,\n" +
+                "pedido.cantidad-pedido.despachados as xdespachar,\n" +
+                "pedido.f_entrega,\n" +
+                "material.codigo,\n" +
+                "material.detalle,\n" +
+                "material.peso,\n" +
+                "'ALEACIÓN' AS aleacion,\n" +
+                "material.peso*pedido.cantidad as pesototal,\n" +
+                "cliente.rut,\n" +
+                "cliente.sigla,\n" +
+                "produccion.* \n" +
+                "from pedido \n" +
+                "left join fabricaciones on fabricaciones.idpedido = pedido.idpedido \n" +
+                "left join produccion on produccion.idfabricaciones = fabricaciones.idfabricaciones \n" +
+                "left join material on material.idmaterial = pedido.idmaterial \n" +
+                "left join ordenproduccion on ordenproduccion.idordenproduccion = produccion.idordenproduccion \n" +
+                "left join odc on odc.idodc = pedido.idodc \n" +
+                "left join cliente on cliente.idcliente = odc.idcliente \n" +
+                "where produccion.cantidad > produccion.standby + produccion.`8`";
+
+
+            var query2 = "select \n" +
+                "gd.idgd,\n" +
+                "gd.fecha as fecha_despacho,\n" +
+                "fabricaciones.idorden_f,\n" +
+                "pedido.numitem,\n" +
+                "odc.numoc,\n" +
+                "cliente.sigla,\n" +
+                "material.codigo, \n" +
+                "material.detalle,\n" +
+                "despachos.cantidad as despachados,\n" +
+                "material.u_medida,\n" +
+                "'ALEACION' AS aleacion,\n" +
+                "material.peso,\n" +
+                "material.peso*despachos.cantidad AS pesototal,\n" +
+                "gd.obs,\n" +
+                "'MIGO' as migo,\n" +
+                "gd.estado\n" +
+                "from despachos \n" +
+                "left join gd on gd.idgd = despachos.idgd\n" +
+                "left join material on material.idmaterial = despachos.idmaterial\n" +
+                "left join pedido on pedido.idpedido = despachos.idpedido\n" +
+                "left join odc on pedido.idodc = odc.idodc\n" +
+                "left join fabricaciones on fabricaciones.idpedido = pedido.idpedido \n" +
+                "left join cliente on cliente.idcliente = odc.idcliente limit 100";
+            console.log("¿No será mucha molestia?");
+
+            connection.query(query,
+                function(err, rows){
+                    if (err)
+                        console.log("Error Select : %s ",err );
+
+                    console.log("Por supuesto que no pase usted");
+
+                    sheet.getRow(1).fill = {
+                        type: 'pattern',
+                        pattern:'solid',
+                        fgColor:{argb:'F4D03F'}
+                    };
+                    sheet.getRow(1).font = {
+                        name: 'Comic Sans MS',
+                        family: 4,
+                        size: 11,
+                        underline: false,
+                        bold: true
+                    };
+
+                    sheet2.getRow(1).fill = {
+                        type: 'pattern',
+                        pattern:'solid',
+                        fgColor:{argb:'F4D03F'}
+                    };
+                    sheet2.getRow(1).font = {
+                        name: 'Comic Sans MS',
+                        family: 4,
+                        size: 11,
+                        underline: false,
+                        bold: true
+                    };
+
+                    if(rows.length>0){
+                        var nombre = 'csvs/master_prod_plan_' + ident + '.xlsx';
+                        var numitem = 0;
+                        var fechaInicio;
+                        var fechaFin;
+                        var diff = 0;
+                        var auxrow;
+
+                        for(var j=0; j < rows.length; j++){
+                            numitem++;
+                            auxrow = 2 + j;
+                            /*
+                            * A estado,
+                            * B idorden_f,
+                            * C numitem,
+                            * D rut,
+                            * E sigla,
+                            * F numoc,
+                            * G codigo,
+                            * H detalle,
+                            * I cantidad_ped,
+                            * J despachados,
+                            * K xdespachar,
+                            * L aleacion,
+                            * M peso,
+                            * N pesototal,
+                            * O f_gen
+                            * P f_entrega,
+                            * Q standby,
+                            * */
+                            sheet.getCell('A' + auxrow.toString()).value = 'Estado';
+                            sheet.getCell('B' + auxrow.toString()).value = rows[j].idorden_f;
+                            sheet.getCell('C' + auxrow.toString()).value = rows[j].numitem;
+                            sheet.getCell('D' + auxrow.toString()).value = rows[j].rut;
+                            sheet.getCell('E' + auxrow.toString()).value = rows[j].sigla;
+                            sheet.getCell('F' + auxrow.toString()).value = rows[j].numoc;
+                            sheet.getCell('G' + auxrow.toString()).value = rows[j].codigo;
+                            sheet.getCell('H' + auxrow.toString()).value = rows[j].detalle;
+                            sheet.getCell('I' + auxrow.toString()).value = rows[j].cantidad_ped;
+                            sheet.getCell('J' + auxrow.toString()).value = rows[j].despachados;
+                            sheet.getCell('K' + auxrow.toString()).value = rows[j].xdespachar;
+                            sheet.getCell('L' + auxrow.toString()).value = rows[j].aleacion;
+                            sheet.getCell('M' + auxrow.toString()).value = rows[j].peso;
+                            sheet.getCell('N' + auxrow.toString()).value = rows[j].pesototal;
+                            sheet.getCell('O' + auxrow.toString()).value = rows[j].f_gen;
+                            sheet.getCell('P' + auxrow.toString()).value = rows[j].f_entrega;
+                            sheet.getCell('Q' + auxrow.toString()).value = rows[j].standby;
+                        }
+
+
+
+                        connection.query(query2,
+                            function(err, rows2) {
+                                if (err)
+                                    console.log("Error Select : %s ", err);
+
+                                for(var j=0; j < rows2.length; j++){
+                                    numitem++;
+                                    auxrow = 2 + j;
+                                    /*
+                                    A idgd, B fecha_despacho,C  idorden_f,D numitem,E numoc,
+                                    F sigla,G codigo,H detalle,I despachados,J u_medida,
+                                    K aleacion, L peso, M pesototal, N obs, O migo,
+                                    P estado
+                                     */
+                                    sheet2.getCell('A' + auxrow.toString()).value = rows2[j].idgd;
+                                    sheet2.getCell('B' + auxrow.toString()).value = rows2[j].fecha_despacho;
+                                    sheet2.getCell('C' + auxrow.toString()).value = rows2[j].idorden_f;
+                                    sheet2.getCell('D' + auxrow.toString()).value = rows2[j].numitem;
+                                    sheet2.getCell('E' + auxrow.toString()).value = rows2[j].numoc;
+                                    sheet2.getCell('F' + auxrow.toString()).value = rows2[j].sigla;
+                                    sheet2.getCell('G' + auxrow.toString()).value = rows2[j].codigo;
+                                    sheet2.getCell('H' + auxrow.toString()).value = rows2[j].detalle;
+                                    sheet2.getCell('I' + auxrow.toString()).value = rows2[j].despachados;
+                                    sheet2.getCell('J' + auxrow.toString()).value = rows2[j].u_medida;
+                                    sheet2.getCell('K' + auxrow.toString()).value = rows2[j].aleacion;
+                                    sheet2.getCell('L' + auxrow.toString()).value = rows2[j].peso;
+                                    sheet2.getCell('M' + auxrow.toString()).value = rows2[j].pesototal;
+                                    sheet2.getCell('N' + auxrow.toString()).value = rows2[j].obs;
+                                    sheet2.getCell('O' + auxrow.toString()).value = rows2[j].migo;
+                                    sheet2.getCell('P' + auxrow.toString()).value = rows2[j].estado;
+                                }
+                                console.log("Despues de usted");
+                                workbook.xlsx.writeFile('public/' + nombre).then(
+                                    function() {
+                                        console.log("Aaww");
+                                        res.send('/csvs/master_prod_plan_'+ ident + '.xlsx');
+                                });
+                        });
+                    }
+
+                });
+        });
+    }
+    else res.redirect('/bad_login');
+});
+
+
+
+
 module.exports = router;
 
 
