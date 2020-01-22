@@ -943,7 +943,12 @@ function completarDigitos(num, dig){
                     data[$(this).data('name')].push('0');
                     emptyInput = true;
                     emptyInputCant += 1;
-                    msg = "Se va a registrar Rechazo sin Código de Colada o Correlativo Producto (¡"+emptyInputCant+" campos vacios!). \n ¿Está seguro?";
+                    if(emptyInputCant === 1){
+                        msg = "Se va a registrar Rechazo sin Código de Colada o Correlativo Producto (¡"+emptyInputCant+" campo vacio!). \n ¿Está seguro?";
+                    }
+                    else{
+                        msg = "Se va a registrar Rechazo sin Código de Colada o Correlativo Producto (¡"+emptyInputCant+" campos vacios!). \n ¿Está seguro?";
+                    }
                 }
                 else{
                     //COMPROBAR SI STRING CUMPLE CON EL FORMATO
