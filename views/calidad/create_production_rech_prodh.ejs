@@ -917,6 +917,7 @@ function completarDigitos(num, dig){
     function submit_action(){
         var err = false, msg;
         var emptyInput = false;
+        var emptyInputCant = 0;
         var data = {
             idmat: [],
             env: [],
@@ -941,7 +942,8 @@ function completarDigitos(num, dig){
                 if($(this).find('input').val() === ' ' || $(this).find('input').val() === ''){
                     data[$(this).data('name')].push('0');
                     emptyInput = true;
-                    msg = "Se va a registrar Rechazo sin Código de Colada o Correlativo Producto. \n ¿Está seguro?";
+                    emptyInputCant += 1;
+                    msg = "Se va a registrar Rechazo sin Código de Colada o Correlativo Producto (¡"+emptyInputCant+" campos vacios!). \n ¿Está seguro?";
                 }
                 else{
                     //COMPROBAR SI STRING CUMPLE CON EL FORMATO
