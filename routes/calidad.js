@@ -773,7 +773,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "COALESCE(mainTable.etapacausal,''),'@'," +
                     "COALESCE(mainTable.idop,0),'@'," +
                     "COALESCE(mainTable.idof,0),'@'," +
-                    "COALESCE(mainTable.causal_princ, '') SEPARATOR '%%') AS det_rech FROM (SELECT \n" +
+                    "COALESCE(mainTable.causal_princ, '')) SEPARATOR '%%') AS det_rech FROM (SELECT \n" +
                     "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
                     "                    material.idmaterial, \n" +
                     "                    pedido.idpedido, \n" +
