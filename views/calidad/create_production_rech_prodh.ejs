@@ -1100,6 +1100,10 @@ function completarDigitos(num, dig){
         //LO QUE PASA CUANDO SE SUELTA EL PRODUCTO
         var auxEtp;
         var etp = $("#"+ev.dataTransfer.getData("text")).data('etapa');
+
+        if( etp === 'e'){
+            etp = 9;
+        }
         $(".empty-table").remove();
         //SE LE APLICA FILTRO A LAS CAUSALES SEGÚN ETAPA
         globalIdCount++;

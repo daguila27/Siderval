@@ -219,7 +219,8 @@ function completarDigitos(num, dig){
                     // id="demo" class="collapse"
                     if(e === 0){
                         if(parseInt(princ[e]) === 1){
-                            html.push("<li data-toggle=\"collapse\" data-target=\".causal-"+$(this).data('key')+"\"><b>"+sec[e]+" (P)</b></li>");
+                            //SE COLOCA LA FLECHA QUE INDICA QUE SE PUEDE DESPLEGAR
+                            html.push("<li data-toggle=\"collapse\" onclick=\"$(this).find('i').toggleClass('fa-angle-double-down fa-angle-double-up');\" data-target=\".causal-"+$(this).data('key')+"\"><i class=\"fa fa-angle-double-down\" style=\"margin-right: 3px\"></i><b>"+sec[e]+" (P)</b></li>");
                         }else{
                             html.push("<li data-toggle=\"collapse\" data-target=\".causal-"+$(this).data('key')+"\">"+sec[e]+"</li>");
                         }

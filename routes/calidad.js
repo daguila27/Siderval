@@ -763,17 +763,17 @@ router.post('/table_rechazos', function(req, res, next){
                 query = "SELECT mainTable.*,SUM(COALESCE(mainTable.peso,0)) AS pesoTotal, SUM(COALESCE(mainTable.enviados,0)) AS enviadosTotal, " +
                     "GROUP_CONCAT(" +
                     "CONCAT(" +
-                    "mainTable.detalle,'@'," +
-                    "mainTable.enviados,'@'," +
-                    "mainTable.peso,'@'," +
-                    "mainTable.etapa_desde,'@'," +
-                    "mainTable.producto,'@'," +
-                    "mainTable.fecha_rech,'@'," +
-                    "mainTable.causal,'@'," +
-                    "mainTable.etapacausal,'@'," +
-                    "mainTable.idop,'@'," +
-                    "mainTable.idof,'@'," +
-                    "mainTable.causal_princ) SEPARATOR '%%') AS det_rech FROM (SELECT \n" +
+                    "COALESCE(mainTable.detalle,''),'@'," +
+                    "COALESCE(mainTable.enviados,0),'@'," +
+                    "COALESCE(mainTable.peso,0),'@'," +
+                    "COALESCE(mainTable.etapa_desde,''),'@'," +
+                    "COALESCE(mainTable.producto,''),'@'," +
+                    "COALESCE(mainTable.fecha_rech,''),'@'," +
+                    "COALESCE(mainTable.causal,''),'@'," +
+                    "COALESCE(mainTable.etapacausal,''),'@'," +
+                    "COALESCE(mainTable.idop,0),'@'," +
+                    "COALESCE(mainTable.idof,0),'@'," +
+                    "COALESCE(mainTable.causal_princ, '') SEPARATOR '%%') AS det_rech FROM (SELECT \n" +
                     "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
                     "                    material.idmaterial, \n" +
                     "                    pedido.idpedido, \n" +
@@ -887,6 +887,7 @@ router.post('/table_rechazos', function(req, res, next){
                 view = "table_rechazos"
                 break;
         }
+
         req.getConnection(function(err, connection){
             if(err) throw err;
 
@@ -960,17 +961,17 @@ router.get('/xlsx_rech', function(req,res){
 
         console.log("¡Doña Florinda!");
         sheet.columns = [
-            { header: 'Fecha de Rechazo', key: 'fecha', width: 15 },
-            { header: 'Hora de Rechazo', key: 'hora', width: 15 },
-            { header: 'Descripción Producto', key: 'desc', width: 15 },
-            { header: 'Área de Rechazo', key: 'area', width: 15 },
-            { header: 'OF', key: 'of', width: 15 },
-            { header: 'OP', key: 'op', width: 15 },
-            { header: 'Código de Colada', key: 'codcol', width: 15 },
-            { header: 'Corr Producto', key: 'corrprod', width: 80 },
-            { header: 'Peso Unitario [Kg]', key: 'peso', width: 15 },
-            { header: 'Causal de Rechazo', key: 'causal', width: 15 },
-            { header: 'Etapa Causal de Rechazo', key: 'etapa', width: 15 }
+            { header: 'Fecha de Rechazo', key: 'fecha', width: 20 },
+            { header: 'Hora de Rechazo', key: 'hora', width: 20 },
+            { header: 'Descripción Producto', key: 'desc', width: 30 },
+            { header: 'Área de Rechazo', key: 'area', width: 20 },
+            { header: 'OF', key: 'of', width: 5 },
+            { header: 'OP', key: 'op', width: 5 },
+            { header: 'Código de Colada', key: 'codcol', width: 20 },
+            { header: 'Corr Producto', key: 'corrprod', width: 15 },
+            { header: 'Peso Unitario [Kg]', key: 'peso', width: 20 },
+            { header: 'Causal de Rechazo', key: 'causal', width: 20 },
+            { header: 'Etapa Causal de Rechazo', key: 'etapa', width: 27 }
         ];
         console.log("¿no gusta pasar a tomar una tasita de cafe?");
 
@@ -1035,7 +1036,7 @@ router.get('/xlsx_rech', function(req,res){
                             fgColor:{argb:'F4D03F'}
                         };
                         sheet.getRow(1).font = {
-                            name: 'Comic Sans MS',
+                            name: 'Calibri',
                             family: 4,
                             size: 11,
                             underline: false,
