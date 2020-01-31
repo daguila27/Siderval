@@ -28,7 +28,7 @@ class Buscador{
             "</div>" +
             "<input class='buscador_eventos' id='"+idinput+"' style='border: none;' placeholder='Buscar…' type='text' data-cfiltros='"+this.array_fill.length+"' autocomplete='off'>" +
             "<input id='"+idinput+"-value' style='display: none' type='text'>" +
-            "<select style='margin: 0; padding: 0; width: 20%' class='btn btn-default select-busc' id='fill-change'>" ;
+            "<select style='margin: 0; padding: 0; width: max-content' class='btn btn-default select-busc' id='fill-change'>" ;
         this.columnaRango = columnaRango;
         for(var e=0; e < array_fill.length; e++){
             this.html += "<option value='"+e+"' class='item"+e+" fill-item-abast o-selection-focus'>"+array_fill[e].split('@')[0]+"</option>";
@@ -234,20 +234,38 @@ class Buscador{
         var html, p, position, font, tabla = this.idtabla;
         if(first){
             $("#"+tabla+" thead tr th").each(function(){
-                $(this).append('<i style="margin-left: 5px" class="fa fa-sort"></i>');
+                //SI ESTA HABILITADO 'ORDENAR'
+                if($(this).data('habfill') || $(this).data('habfill') === undefined){
+                    $(this).append('<i style="margin-left: 5px" class="fa fa-sort"></i>');
+                }
             });
         }
         font = $("#"+tabla+" thead").css('font-size');
         p = $("#"+tabla).first();
         position = p.position();
 
+
         html = "<table class='o_list_view table table-condensed table-striped o_list_view_ungrouped float-header' data-table='"+tabla+"' id='float-header' " +
-            "style='width: "+$("#"+tabla).width()+"px; margin-top: -2px !important; position: fixed; top: "+(position.top+0)+"px;'>" +
+            "style='width: "+$("#"+tabla).width()+"px; margin-top: 0px !important;  position: fixed; top: "+(position.top+0)+"px;'>" +
             "<thead style='font-size: "+font+"'><tr>";
         var c = 0;
 
         $("#"+tabla+" thead tr th").each(function(){
-            html += "<th onclick='sortTable(\""+tabla+"\", this);' data-sort='"+c+"' data-updown='false' style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
+            //SI ESTA HABILITADO 'ORDENAR'
+            if($(this).data('habfill') || $(this).data('habfill') === undefined){
+                html += "<th onclick='sortTable(\""+tabla+"\", this);' data-sort='"+c+"' data-updown='false' style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
+            }else{
+                html += "<th style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
+            }
+
+            //si ordenar está deshabilitado.
+            if(!$(this).data('habfill') || $(this).data('habfill') !== undefined){
+                //html += "<th style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
+            }
+            //si ordenar está habilitado o no definido.
+            else{
+                //html += "<th onclick='sortTable(\""+tabla+"\", this);' data-sort='"+c+"' data-updown='false' style='width: "+$(this).innerWidth()+"px; padding:auto; text-align: center; white-space: nowrap; '>"+$(this).html()+"</th>";
+            }
             c++;
         });
         html += "</tr></thead></table>";

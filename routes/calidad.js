@@ -704,7 +704,16 @@ router.post('/table_rechazos', function(req, res, next){
         switch(agrupar){
             case 'desc':
                 query = "SELECT mainTable.*, SUM(mainTable.enviados) AS total_rechazados," +
-                    "GROUP_CONCAT(CONCAT(mainTable.etapa_desde,'@', mainTable.colada,'@', mainTable.producto) SEPARATOR '%') AS det_rech" +
+                    "GROUP_CONCAT(CONCAT(" +
+                    "mainTable.etapa_desde,'@', " +
+                    "mainTable.colada,'@', " +
+                    "mainTable.producto,'@', " +
+                    "mainTable.fecha_rech,'@', " +
+                    "mainTable.causal,'@', " +
+                    "mainTable.etapacausal,'@', " +
+                    "mainTable.idop,'@', " +
+                    "mainTable.idof,'@', " +
+                    "mainTable.causal_princ) SEPARATOR '%') AS det_rech" +
                     " FROM (SELECT \n" +
                     "\t\t\t\t\tproduccionh_causal.idproduccion_h,\n" +
                     "                    fabricaciones.idmaterial, \n" +
@@ -719,7 +728,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    causal.causal,\n" +
                     "                    etapacausal.nombre AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha AS fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -738,7 +747,20 @@ router.post('/table_rechazos', function(req, res, next){
                 break;
 
             case 'colada':
-                query = "SELECT mainTable.*,SUM(COALESCE(mainTable.peso,0)) AS pesoTotal, SUM(COALESCE(mainTable.enviados,0)) AS enviadosTotal, GROUP_CONCAT(CONCAT(mainTable.detalle,'@',mainTable.enviados,'@', mainTable.peso,'@', mainTable.etapa_desde) SEPARATOR '%') AS det_rech FROM (SELECT \n" +
+                query = "SELECT mainTable.*,SUM(COALESCE(mainTable.peso,0)) AS pesoTotal, SUM(COALESCE(mainTable.enviados,0)) AS enviadosTotal, " +
+                    "GROUP_CONCAT(" +
+                    "CONCAT(" +
+                    "COALESCE(mainTable.detalle,''),'@'," +
+                    "COALESCE(mainTable.enviados,0),'@'," +
+                    "COALESCE(mainTable.peso,0),'@'," +
+                    "COALESCE(mainTable.etapa_desde,''),'@'," +
+                    "COALESCE(mainTable.producto,''),'@'," +
+                    "COALESCE(mainTable.fecha_rech,''),'@'," +
+                    "COALESCE(mainTable.causal,''),'@'," +
+                    "COALESCE(mainTable.etapacausal,''),'@'," +
+                    "COALESCE(mainTable.idop,0),'@'," +
+                    "COALESCE(mainTable.idof,0),'@'," +
+                    "COALESCE(mainTable.causal_princ, '')) SEPARATOR '%%') AS det_rech FROM (SELECT \n" +
                     "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
                     "                    material.idmaterial, \n" +
                     "                    pedido.idpedido, \n" +
@@ -752,7 +774,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    causal.causal,\n" +
                     "                    etapacausal.nombre AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha as fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -771,7 +793,18 @@ router.post('/table_rechazos', function(req, res, next){
                 break;
 
             case 'causal':
-                query = "SELECT mainTable.*, SUM(peso_total) AS peso_total, GROUP_CONCAT(CONCAT(mainTable.detalle,'@',mainTable.enviados,'@', mainTable.peso,'@', mainTable.etapa_desde) SEPARATOR '%') AS det_rech, " +
+                query = "SELECT mainTable.*, SUM(peso_total) AS peso_total, " +
+                    "GROUP_CONCAT(" +
+                    "CONCAT(" +
+                    "mainTable.detalle,'@'," +
+                    "mainTable.fecha_rech,'@', " +
+                    "mainTable.idof,'@', " +
+                    "mainTable.idop,'@', " +
+                    "mainTable.colada,'@', " +
+                    "mainTable.producto,'@', " +
+                    "mainTable.enviados,'@', " +
+                    "mainTable.peso,'@', " +
+                    "mainTable.etapa_desde) SEPARATOR '%%') AS det_rech, " +
                     "SUM(mainTable.enviados) AS total_rechazados " +
                     "FROM (SELECT \n" +
                     "\t\t\t\t\trechazos_cdc.idproduccion_h,\n" +
@@ -784,10 +817,11 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
-                    "                    causal.causal,\n" +
-                    "                    etapacausal.nombre AS etapacausal, \n" +
-                    "                    etapafaena.nombre_etapa AS etapa_desde, produccionh_causal.idcausal_etapacausal, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    causal.causal,causal.idcausal,\n" +
+                    "                    etapacausal.nombre AS etapacausal,etapacausal.idetapacausal, \n" +
+                    "                    etapafaena.nombre_etapa AS etapa_desde, " +
+                    "                    produccionh_causal.idcausal_etapacausal, \n" +
+                    "                    rechazos_cdc.fecha as fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -821,7 +855,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '@') AS causal_princ,\n" +
                     "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '@') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    produccion_history.fecha, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha as fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -839,13 +873,13 @@ router.post('/table_rechazos', function(req, res, next){
                 view = "table_rechazos"
                 break;
         }
+
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query(query,
                 function(err, rech){
                     if(err) throw err;
                     res.render('calidad/'+view, {datalen: rech, user: req.session.userData.nombre });
-
                 });
         });
     }
@@ -904,17 +938,17 @@ router.get('/xlsx_rech', function(req,res){
 
         console.log("¡Doña Florinda!");
         sheet.columns = [
-            { header: 'Fecha de Rechazo', key: 'fecha', width: 15 },
-            { header: 'Hora de Rechazo', key: 'hora', width: 15 },
-            { header: 'Descripción Producto', key: 'desc', width: 15 },
-            { header: 'Área de Rechazo', key: 'area', width: 15 },
-            { header: 'OF', key: 'of', width: 15 },
-            { header: 'OP', key: 'op', width: 15 },
-            { header: 'Código de Colada', key: 'codcol', width: 15 },
-            { header: 'Corr Producto', key: 'corrprod', width: 80 },
-            { header: 'Peso Unitario [Kg]', key: 'peso', width: 15 },
-            { header: 'Causal de Rechazo', key: 'causal', width: 15 },
-            { header: 'Etapa Causal de Rechazo', key: 'etapa', width: 15 }
+            { header: 'Fecha de Rechazo', key: 'fecha', width: 20 },
+            { header: 'Hora de Rechazo', key: 'hora', width: 20 },
+            { header: 'Descripción Producto', key: 'desc', width: 30 },
+            { header: 'Área de Rechazo', key: 'area', width: 20 },
+            { header: 'OF', key: 'of', width: 5 },
+            { header: 'OP', key: 'op', width: 5 },
+            { header: 'Código de Colada', key: 'codcol', width: 20 },
+            { header: 'Corr Producto', key: 'corrprod', width: 15 },
+            { header: 'Peso Unitario [Kg]', key: 'peso', width: 20 },
+            { header: 'Causal de Rechazo', key: 'causal', width: 20 },
+            { header: 'Etapa Causal de Rechazo', key: 'etapa', width: 27 }
         ];
         console.log("¿no gusta pasar a tomar una tasita de cafe?");
 
@@ -1031,5 +1065,7 @@ router.get('/xlsx_rech', function(req,res){
     }
     else res.redirect('/bad_login');
 });
+
+
 
 module.exports = router;

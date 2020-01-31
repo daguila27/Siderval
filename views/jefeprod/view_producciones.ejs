@@ -91,6 +91,9 @@ else{clase='busc-menu';}%>
             <ul class="dropdown-menu">
                 <li><a href="#" class="getcsvof" data-tipo="opdetalle"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel Detalle</a></li>
                 <li><a href="#" class="getcsvof" data-tipo="op"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                <% if(username === 'plan'){%>
+                    <li><a href="#" class="getcsvplan" data-tipo="prod_plan"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel (Planificación)</a></li>
+                <%}%>
             </ul>
         </div>
         <!--
@@ -221,6 +224,19 @@ else{clase='busc-menu';}%>
             type: 'GET',
             contentType: 'application/json',
             url: '/jefeprod/xlsx_' + $(yo).data('tipo'),
+            success: function(data) {
+                window.open(data,'_blank');
+            }
+        });
+
+    });
+
+    $(".getcsvplan").click(function(e){
+        var yo = $(this);
+        $.ajax({
+            type: 'GET',
+            contentType: 'application/json',
+            url: '/plan/xlsx_' + $(yo).data('tipo'),
             success: function(data) {
                 window.open(data,'_blank');
             }
