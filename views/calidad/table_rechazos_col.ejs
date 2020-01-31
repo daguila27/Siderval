@@ -27,31 +27,54 @@ function completarDigitos(num, dig){
 </style>
 <div id="registros" style="display: none"></div>
 
-<table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%; margin-top: -2px !important;">
+
+<table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="min-width: 100%; margin-top: -2px !important;">
     <thead>
     <tr>
-        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="text-align: center; white-space: nowrap;">Código Único de Colada</th>
-        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Total Rechazados" style="text-align: center; white-space: nowrap; ">Total Rechazados</th>
-        <th colspan="1" data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [kg]</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='0' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Fecha de <br>Rechazo </th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='1' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Hora de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Hora de <br>Rechazo</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='2' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Descripción Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Descripción <br>Producto</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='3' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Área de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Área de Rechazo</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='4' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OF" style="padding:auto; text-align: center; white-space: nowrap; ">OF</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='5' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OP" style="padding:auto; text-align: center; white-space: nowrap; ">OP</th>
+        <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='6' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="padding:auto; text-align: center; white-space: nowrap; ">Código Único <br>de Colada</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='7' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Corr. Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Correlativo <br>Producto</th>
+        <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='8' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="padding:auto; text-align: center; white-space: nowrap; ">Cantidad</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='9' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Peso Unitario [Kg]" style="padding:auto; text-align: center; white-space: nowrap; ">Peso <br>Unitario [kg]</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='10' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Causal de Rechazo</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='11' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Etapa Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Etapa Causal de Rechazo</th>
+        <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='12' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Imagen de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Imagen</th>
     </tr>
     </thead>
     <tbody id="rechTablebody">
     <%
     var pesoT = 0;
     if(datalen.length){
-    for(var i=0; i < datalen.length; i++){%>
-    <tr class="column-prods" style="background-color: rgb(239,239,248) !important;" onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol'); $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');">
-        <td colspan="1" data-order="<%=datalen[i].colada%>-<%=i%>" style="text-align: left;"><b><i class="glyphicon glyphicon-chevron-down"></i> <%=datalen[i].colada %></b></td>
-        <td colspan="1" data-order="<%=datalen[i].enviadosTotal%>-<%=i%>" style="text-align: center;white-space: nowrap;font-weight: bold;" class="parsear_nro" data-cs="1" data-valor="<%=datalen[i].enviadosTotal %>"><%= datalen[i].enviadosTotal %></td>
-        <td colspan="1" data-order="<%=datalen[i].pesoTotal%>-<%=i%>" style="text-align: center;white-space: nowrap;font-weight: bold;" class="parsear_nro" data-cs="1" data-valor="<%=datalen[i].pesoTotal %>"><%= datalen[i].pesoTotal %></td>
-        <% pesoT += datalen[i].peso;%>
-    </tr>
-    <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
-    <%if( t===0 ){%>
-        <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: rgb(238,238,238); color: rgb(76,76,112);">
-            <th data-toggle="tooltip" data-placement="bottom" title="Etapa de Rechazo" style="text-align: center; white-space: nowrap; ">Etapa de Rechazo</th>
-            <th data-toggle="tooltip" data-placement="bottom" title="Cantidad Rechazada" style="text-align: center; white-space: nowrap; ">Cantidad Rechazada</th>
-            <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Peso Unitario [kg]</th>
+    for(var i=0; i < datalen.length; i++){ %>
+    <%if(i === 0){%>
+            <tr class="column-prods col<%= datalen[i].colada%>"
+                onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+                $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                busc.resetFixed('main-page');">
+        <%}else{%>
+            <tr class="col<%= datalen[i].colada%> column-prods"
+                onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+                        $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                        busc.resetFixed('main-page');">
+        <%}%>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="padding: auto; text-align: left;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> <%= datalen[i].colada%></td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%= (datalen[i].det_rech.split('%%').length).toString()%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="parsear_nro" data-cs="0" data-valor="<%=datalen[i].det_rech.split('%%').length%>"><%= datalen[i].det_rech.split('%%').length%></td>
+            <td data-order="<%= (datalen[i].det_rech.split('%%').length*1).toString()%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" data-valor="<%=datalen[i].peso %>"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center"> -- </td>
         </tr>
     <%}%>
         <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;">
