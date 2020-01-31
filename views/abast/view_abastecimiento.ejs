@@ -89,7 +89,7 @@
 		</div>
 	</div>
 </div>
-<div id="fw-container" style="background-color: white; width: 100%; height: 100%; transition: 0.5s">
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%; transition: 0s">
 	<div id="fw-body"  style="padding:0;margin: 0;">
 		<div class="content main-page">
 		</div>
@@ -114,13 +114,12 @@
         $('.up-fills').css('height', alto_buscador);
         $('#fw-container').css('margin-top', margen_tabla+'px');
         $('.up-fills').removeClass('hidden');
-        busc.buscar_action(true);
 	}
     function restaurar_buscador(){
         $('.up-fills').css('top', alto_buscador);
         $('.up-fills').css('height', alto_buscador);
         $('#fw-container').css('margin-top', margen_tabla+'px');
-        busc.buscar_action(true);
+		busc.buscar_action();
         $('.up-fills').css('transition', '0.5s');
     }
 	function ocultar_buscador(){
@@ -137,8 +136,9 @@
         $('#fw-container').css('margin-top', margen_tabla+'px');
         $('#fw-container').css('padding-top', '0px');
         $('.up-fills').removeClass('hidden');
-        busc.buscar_action(true);
-        $("#pageView").val('0');
+
+		busc.buscar_action();
+		$("#pageView").val('0');
     }
 
 
@@ -166,13 +166,13 @@
         }else{
             busc.add_cond = "abastecimiento.cantidad>abastecimiento.facturados AND !abastecimiento.anulado";
         }
-        busc.buscar_action();
+		busc.buscar_action();
     });
 
 
     $(document).ready(function(){
         $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
-        busc.buscar_action();
+		busc.buscar_action();
     });
 
 	function saveinSession(option){

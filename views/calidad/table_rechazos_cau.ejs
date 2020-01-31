@@ -42,6 +42,7 @@ function completarDigitos(num, dig){
         sel.push('<option value="'+'<%= datalen[t].idcausal%>-<%= datalen[t].idetapacausal%>'+'">'+'<%= datalen[t].causal%> - <%= datalen[t].etapacausal%>'+'</option>');
         <%}%>
         sel = "<div style=\"margin-top: 8px;\">Selecciona una Causal : </div><select style='width: inherit' class='form-control' onchange='$(\".column-prods\").addClass(\"hidden\"); $(\".causal\" +$(this).val()).removeClass(\"hidden\"); $(\".causal\" +$(this).val()).click(); reCalcularPeso();'>"+sel.join(' ')+'</select>';
+        sel = "<select class='form-control' onchange='$(\".column-prods\").addClass(\"hidden\"); $(\".causal\" +$(this).val()).removeClass(\"hidden\"); $(\".causal\" +$(this).val()).click(); reCalcularPeso();'>"+sel.join(' ')+'</select>';
         $(this).html(sel);
     });
 </script>
@@ -71,41 +72,84 @@ function completarDigitos(num, dig){
     var pesoT = 0;
     if(datalen.length){
     for(var i=0; i < datalen.length; i++){%>
-    <tr class="column-prods" style="background-color: rgb(239,239,248) !important;" onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol'); $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');">
-        <!--<td style="text-align: center;white-space: nowrap"><[completarDigitos(new Date(datalen[i].fecha).getDate(),2),completarDigitos(new Date(datalen[i].fecha).getMonth()+1,2),new Date(datalen[i].fecha).getFullYear()].join('-') ></td>
-        <td style="text-align: center;white-space: nowrap"><[completarDigitos(new Date(datalen[i].fecha).getHours(),2),completarDigitos(new Date(datalen[i].fecha).getMinutes(),2)].join(':') ></td>-->
-        <% pesoT += datalen[i].peso_total;%>
-        <td colspan="1" data-order="<%=datalen[i].causal%>-<%=i%>" style="text-align: left;white-space: nowrap"><b><i class="glyphicon glyphicon-chevron-down"></i> <%=datalen[i].causal %></b></td>
-        <td colspan="1" data-order="<%=datalen[i].etapacausal%>-<%=i%>" style="text-align: left;white-space: nowrap"><b><%=datalen[i].etapacausal %></b></td>
-        <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="text-align: center;white-space: nowrap; font-weight: bold;" class="parsear_nro"><%=datalen[i].total_rechazados %></td>
-        <td colspan="1" data-order="<%=datalen[i].peso_total%>-<%=i%>" style="text-align: center;white-space: nowrap; font-weight: bold;" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso_total %>"><%= datalen[i].peso_total %> </td>
-    </tr>
-                <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
-                    <%if( t===0 ){%>
-                        <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: rgb(238,238,238); color: rgb(76,76,112);">
-                            <th data-toggle="tooltip" data-placement="bottom" title="Causal de Rechazo" style="text-align: left; white-space: nowrap; ">Causal de Rechazo</th>
-                            <th data-toggle="tooltip" data-placement="bottom" title="Etapa de Rechazo" style=" text-align: left; white-space: nowrap; ">Etapa de Rechazo</th>
-                            <th data-toggle="tooltip" data-placement="bottom" title="Cantidad Rechazada" style="text-align: center; white-space: nowrap; ">Cantidad Rechazada</th>
-                            <th data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Peso Total [kg]</th>
-                        </tr>
-                    <%}%>
-                    <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;"  >
-                        <td colspan="1" data-order="<%=datalen[i].causal%>-<%=i%>"><%=datalen[i].det_rech.split('%')[t].split('@')[0]%></td>
-                        <td colspan="1" data-order="<%=datalen[i].etapacausal%>-<%=i%>"><%=datalen[i].det_rech.split('%')[t].split('@')[3]%></td>
-                        <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[1]%></td>
-                        <td colspan="1" data-order="<%=datalen[i].peso_total%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[2]%></td>
-                    </tr>
-                <%}%>
+        <%if(i === 0){%>
+            <tr class="column-prods causal<%= datalen[i].idcausal%>-<%= datalen[i].idetapacausal%>"
+                onclick="
+                $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+                $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                busc.resetFixed('main-page');">
+        <%}else{%>
+            <tr class="hidden column-prods causal<%= datalen[i].idcausal%>-<%= datalen[i].idetapacausal%>"
+                onclick="
+                $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+                $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                busc.resetFixed('main-page');">
+        <%}%>
 
-    <%}
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"><%= datalen[i].det_rech.split('%%').length%></td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="peso-rech" data-valor="0"> -- </td>
+            <td data-order="<%= datalen[i].causal%><%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> <%= datalen[i].causal%> </td>
+            <td data-order="<%= datalen[i].etapacausal%><%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> <%= datalen[i].etapacausal%> </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center"> -- </td>
+        </tr>
+        <% for(var t=0; t < datalen[i].det_rech.split('%%').length; t++){%>
+            <%if(i === 0){%>
+                <tr class="column-prods hiddenCol hiddenCol<%= i%> danger causal<%= datalen[i].idcausal%>-<%= datalen[i].idetapacausal%>">
+            <%}else{%>
+                <tr class="column-prods hiddenCol hiddenCol<%= i%> danger causal<%= datalen[i].idcausal%>-<%= datalen[i].idetapacausal%> hidden">
+            <%}%>
+                <!--
+                0"mainTable.detalle,'@'," +
+                1"mainTable.fecha,'@', " +
+                2"mainTable.idof,'@', " +
+                3"mainTable.idop,'@', " +
+                4"mainTable.colada,'@', " +
+                5"mainTable.producto,'@', " +
+                6"mainTable.enviados,'@', " +
+                7"mainTable.peso,'@', " +
+                8"mainTable.etapa_desde-->
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[1]).getDate(),2),completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[1]).getMonth()+1,2),new Date(datalen[i].det_rech.split('%%')[t].split('@')[1]).getFullYear()].join('-') %></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[1]).getHours(),2),completarDigitos(new Date(datalen[i].det_rech.split('%%')[t].split('@')[1]).getMinutes(),2)].join(':') %></td>
+                <td data-order="<%=i%>" style="text-align: left;white-space: nowrap"><%= datalen[i].det_rech.split('%%')[t].split('@')[0]%></td>
+                <td data-order="<%=i%>" style="text-align: left;white-space: nowrap"><%= datalen[i].det_rech.split('%%')[t].split('@')[8]%></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%= datalen[i].det_rech.split('%%')[t].split('@')[2]%></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%= datalen[i].det_rech.split('%%')[t].split('@')[3]%></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%= datalen[i].det_rech.split('%%')[t].split('@')[4]%></td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%= datalen[i].det_rech.split('%%')[t].split('@')[5]%></td>
+                <td data-order="<%= datalen[i].det_rech.split('%%').length%><%=i%>" style="text-align: center;white-space: nowrap">1</td>
+                <td data-order="<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech" data-cs="1" data-valor="<%= datalen[i].det_rech.split('%%')[t].split('@')[7]%>"><%= datalen[i].det_rech.split('%%')[t].split('@')[7]%></td>
+                <% if(i === 0){pesoT += parseFloat(datalen[i].det_rech.split('%%')[t].split('@')[7])}%>
+                <td data-order="<%= datalen[i].causal%><%=i%>" style="text-align: center;white-space: nowrap"> -- </td>
+                <td data-order="<%= datalen[i].etapacausal%><%=i%>" style="text-align: center;white-space: nowrap"> -- </td>
+                <td data-order="<%=i%>" style="text-align: center">
+                    <a href="/img/rechazos/rechazo.png" download><i class="fa fa-download" aria-hidden="true"></i></a>
+                </td>
+            </tr>
+    <%}}
     } else { %>
         <tr>
-            <td colspan="4">
-                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay nada por producir</small></h2>
+            <td colspan="12">
+                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay Productos Rechazados</small></h2>
             </td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
         </tr>
     <%}%>
     </tbody>
@@ -114,7 +158,16 @@ function completarDigitos(num, dig){
         <td colspan="1"></td>
         <td colspan="1"></td>
         <td colspan="1"></td>
-        <td colspan="1" class="footer-pesoT parsear_nro" cs="2" style="display: flex; align-content: center"><%= pesoT%></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1" class="footer-pesoT" style="text-align: center"><%= pesoT%></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
+        <td colspan="1"></td>
     </tr>
     </tfoot>
 </table>

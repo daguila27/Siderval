@@ -21,7 +21,33 @@ function completarDigitos(num, dig){
 %>
 <!-- Oculta cantidad de datos -->
 <div id="registros" style="display: none"></div>
+<!--<script>
+    function reCalcularPeso(){
+        var t = 0;
+        $(".peso-rech").each(function(){
+            if(!$(this).parent().hasClass('hidden')){
+                t += $(this).data('valor');
+            }
+        });
+        $(".footer-pesoT").html(t);
+    }
+    $(".selectGroup").each(function(){
+        var sel = [];
+    <# for(var t=0; t < datalen.length; t++ ){#>
+            sel.push('<option value="'+'<#= datalen[t].idmaterial#>'+'">'+'<#= datalen[t].detalle#>'+'</option>');
+        <#}#>
+        sel = "<select class='form-control' onchange='$(\".column-prods\").addClass(\"hidden\"); $(\".idmat\" +$(this).val()).removeClass(\"hidden\"); $(\".idmat\" +$(this).val()).click(); reCalcularPeso()'>"+sel.join(' ')+'</select>';
+        $(this).html(sel);
+    });
 
+
+</script>-->
+
+<script>
+    $(".selectGroup").each(function(){
+        $(this).html('');
+    });
+</script>
 <style>
     .hiddenCol{
         display: none;
@@ -30,16 +56,16 @@ function completarDigitos(num, dig){
 <table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="min-width: 100%; margin-top: -2px !important;">
     <thead>
         <tr>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='0' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Fecha de <br>Rechazo </th>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='1' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Hora de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Hora de <br>Rechazo</th>
-            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='2' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Descripción Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Descripción <br>Producto</th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='0' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Fecha de Rechazo </th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='1' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Hora de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Hora de Rechazo</th>
+            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='2' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Descripción Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Descripción Producto</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='3' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Área de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Área de Rechazo</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='4' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OF" style="padding:auto; text-align: center; white-space: nowrap; ">OF</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='5' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OP" style="padding:auto; text-align: center; white-space: nowrap; ">OP</th>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='6' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="padding:auto; text-align: center; white-space: nowrap; ">Código Único <br>de Colada</th>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='7' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Correlativo Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Correlativo <br>Producto</th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='6' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="padding:auto; text-align: center; white-space: nowrap; ">Código Único de Colada</th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='7' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Corr. Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Correlativo Producto</th>
             <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='8' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="padding:auto; text-align: center; white-space: nowrap; ">Cantidad</th>
-            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='9' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Peso Unitario [Kg]" style="padding:auto; text-align: center; white-space: nowrap; ">Peso <br>Unitario [kg]</th>
+            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='9' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Peso Unitario [Kg]" style="padding:auto; text-align: center; white-space: nowrap; ">Peso Unitario [kg]</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='10' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Causal de Rechazo</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='11' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Etapa Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Etapa Causal de Rechazo</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='12' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Imagen de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Imagen</th>
@@ -49,28 +75,64 @@ function completarDigitos(num, dig){
     <%
     var pesoT = 0;
     if(datalen.length){
-    for(var i=0; i < datalen.length; i++){%>
-    <tr class="column-prods" style="background-color: rgb(239,239,248) !important;" onclick="$('.hiddenCol<%= i%>').toggleClass('hiddenCol'); $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');">
-        <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="font-weight: bold;text-align: left;white-space: nowrap"><i class="glyphicon glyphicon-chevron-down"></i><%=datalen[i].detalle %></td>
-        <td data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="cant-rech parsear_nro" data-cs="0" data-valor="<%=datalen[i].total_rechazados %>"><%= datalen[i].total_rechazados %></td>
-        <td data-order="<%=datalen[i].total_rechazados*datalen[i].peso%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso %></td>
-        <td data-order="<%=datalen[i].peso%>-<%=i%>" style="font-weight: bold;text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso*datalen[i].total_rechazados %></td>
-        <% pesoT += (datalen[i].peso*datalen[i].total_rechazados);%>
-    </tr>
-    <%for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
-        <%if( t===0 ){%>
-            <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: rgb(238,238,238); color: rgb(76,76,112);">
-                <th style="text-align: center; white-space: nowrap; "></th>
-                <th data-toggle="tooltip" data-placement="bottom" title="Total Rechazado" style="text-align: center; white-space: nowrap; ">Etapa de Rechazo</th>
-                <th data-toggle="tooltip" data-placement="bottom" title="Peso Unitario" style="text-align: center; white-space: nowrap; ">Número de Colada</th>
-                <th data-toggle="tooltip" data-placement="bottom" title="Peso Total" style="text-align: center; white-space: nowrap; ">Correlativo de Producto</th>
-            </tr>
+      for(var i=0; i < datalen.length; i++){%>
+        <%if(i === 0){%>
+            <tr class="column-prods idmat<%= datalen[i].idmaterial%>"
+                onclick="
+                        $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+                        $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                        busc.resetFixed('main-page');">
+        <%}else{%>
+            <tr class="column-prods idmat<%= datalen[i].idmaterial%>"
+                onclick="
+                        $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
+                        $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+                        busc.resetFixed('main-page');">
         <%}%>
-        <tr class="column-prods hiddenCol hiddenCol<%= i%>" style="background-color: #f2dede;">
-            <td colspan="1" data-order="<%=datalen[i].detalle%>-<%=i%>"></td>
-            <td colspan="1" data-order="<%=datalen[i].total_rechazados%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[0]%></td>
-            <td colspan="1" data-order="<%=datalen[i].total_rechazados*datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[1]%></td>
-            <td colspan="1" data-order="<%=datalen[i].peso%>-<%=i%>" style="text-align: center"><%=datalen[i].det_rech.split('%')[t].split('@')[2]%></td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="padding: auto; text-align: left;white-space: nowrap"><%=datalen[i].detalle %></td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%= datalen[i].det_rech.split('%').length%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="parsear_nro" data-cs="0" data-valor="<%=datalen[i].det_rech.split('%').length%>"><%= datalen[i].det_rech.split('%').length%></td>
+            <td data-order="<%= datalen[i].det_rech.split('%').length*datalen[i].peso%>-<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap" class="parsear_nro" data-cs="1" data-valor="0"><%= datalen[i].peso %></td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center;white-space: nowrap"> -- </td>
+            <td data-order="<%=i%>" style="padding: auto; text-align: center"> -- </td>
+        </tr>
+    <% for(var t=0; t < datalen[i].det_rech.split('%').length; t++){%>
+        <tr class="column-prods hiddenCol hiddenCol<%= i%> danger idmat<%= datalen[i].idmaterial%>">
+            <!--
+            0"mainTable.etapa_desde,'@', " +
+            1"mainTable.colada,'@', " +
+            2"mainTable.producto,'@', " +
+            3"mainTable.fecha,'@', " +
+            4"mainTable.causal,'@', " +
+            5"mainTable.etapacausal,'@', " +
+            6"mainTable.idop,'@', " +
+            7"mainTable.idof,'@', " +
+            8"mainTable.causal_princ-->
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getDate(),2),completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getMonth()+1,2),new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getFullYear()].join('-') %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=[completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getHours(),2),completarDigitos(new Date(datalen[i].det_rech.split('%')[t].split('@')[3]).getMinutes(),2)].join(':') %></td>
+            <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="text-align: left;white-space: nowrap"></td>
+            <td data-order="<%=i%>" style="text-align: left;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[0] %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[7] %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[6] %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[1] %></td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=completarDigitos(datalen[i].det_rech.split('%')[t].split('@')[2],3) %></td>
+            <td data-order="<%= datalen[i].det_rech.split('%').length%>-<%=i%>" style="text-align: center;white-space: nowrap" class="parsear_nro" data-cs="0" data-valor="<%=1%>">1</td>
+            <td data-order="<%= datalen[i].peso %>-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso %></td>
+            <% if(i === 0){pesoT += datalen[i].peso;}%>
+            <td data-order="<%=i%>" class="causal-order" data-key="<%=i%>-<%=t%>" data-princ="<%= datalen[i].det_rech.split('%')[t].split('@')[8]%>" data-sec="<%= datalen[i].det_rech.split('%')[t].split('@')[4]%>" style="text-align: left;white-space: nowrap">
+            </td>
+            <td data-order="<%=i%>" class="causal-order" data-key="<%=i%>-<%=t%>" data-princ="<%= datalen[i].det_rech.split('%')[t].split('@')[8]%>" data-sec="<%= datalen[i].det_rech.split('%')[t].split('@')[5]%>" style="text-align: left;white-space: nowrap">
+            </td>
+            <td data-order="<%=i%>" style="text-align: center">
+                <a href="/img/rechazos/rechazo<%= datalen[i].idproduccion_h%>.<%= datalen[i].imagen_tipo%>" download><i class="fa fa-download" aria-hidden="true"></i></a>
+            </td>
         </tr>
     <%}%>
 
@@ -78,12 +140,20 @@ function completarDigitos(num, dig){
     <%}
     } else { %>
         <tr>
-            <td colspan="4">
-                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay nada por producir</small></h2>
+            <td colspan="12">
+                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay Productos Rechazados</small></h2>
             </td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
         </tr>
     <%}%>
     </tbody>
@@ -102,6 +172,89 @@ function completarDigitos(num, dig){
 <script type="text/javascript">
     //setDataTableFixed("#rechTable");
     $(document).ready(function(){
+
+        /*causal-order RECIBE data-princ Y data-sec (2 ARREGLOS)
+                   data-princ [int]: ARRAY PRINCIPAL QUE DEBE SER ORDENADO DE MAYOR A MENOR O VICEVERSA
+                   data-sec [*]: ARRAY SECUNDARIO QUE SE LE APLICARÁN LOS MISMOS MOVIMIENTO QUE data-princ
+                   ¡AMBOS ARRAYS DEBEN TENER EL MISMO TAMAÑO!
+                */
+        $(".causal-order").each(function(){
+            var princ;
+            if(typeof $(this).data('princ') === 'number'){
+                princ = [$(this).data('princ')];
+            }
+            else{
+                princ = $(this).data('princ').split('-');
+            }
+            var sec = $(this).data('sec').split('-');
+            var k;
+            for(var i=1;i<princ.length;i++) {
+                for(var j=0;j<(princ.length-i);j++) {
+                    if(parseInt(princ[j])<=parseInt(princ[j+1])){
+                        k=princ[j+1];
+                        princ[j+1]=princ[j];
+                        princ[j]=k;
+
+                        k=sec[j+1];
+                        sec[j+1]=sec[j];
+                        sec[j]=k;
+                    }
+                }
+            }
+            var html = [];
+            if(sec.length === 1){
+                if(parseInt(princ[0]) === 1){
+                    html.push("<li><b>"+sec[0]+" (P)</b></li>");
+                }else{
+                    html.push("<li>"+sec[0]+"</li>");
+                }
+            }
+            else{
+                for(var e=0; e < sec.length; e++){
+                    // data-toggle="collapse" data-target="#demo"
+                    // id="demo" class="collapse"
+                    if(e === 0){
+                        if(parseInt(princ[e]) === 1){
+                            //SE COLOCA LA FLECHA QUE INDICA QUE SE PUEDE DESPLEGAR
+                            html.push("<li data-toggle=\"collapse\" onclick=\"$(this).find('i').toggleClass('fa-angle-double-down fa-angle-double-up');\" data-target=\".causal-"+$(this).data('key')+"\"><i class=\"fa fa-angle-double-down\" style=\"margin-right: 3px\"></i><b>"+sec[e]+" (P)</b></li>");
+                        }else{
+                            html.push("<li data-toggle=\"collapse\" data-target=\".causal-"+$(this).data('key')+"\">"+sec[e]+"</li>");
+                        }
+                    }
+                    else if(e === 1){
+                        html.push("<div class=\"causal-"+$(this).data('key')+" collapse\" class=\"collapse\">");
+                        if(parseInt(princ[e]) === 1){
+                            html.push("<li><b>"+sec[e]+" (P)</b></li>");
+                        }else{
+                            html.push("<li>"+sec[e]+"</li>");
+                        }
+
+                    }
+
+                    else if(e === sec.length-1){
+                        if(parseInt(princ[e]) === 1){
+                            html.push("<li><b>"+sec[e]+" (P)</b></li>");
+                        }else{
+                            html.push("<li>"+sec[e]+"</li>");
+                        }
+                        html.push("</div>");
+
+                    }
+                    else{
+                        if(parseInt(princ[e]) === 1){
+                            html.push("<li><b>"+sec[e]+" (P)</b></li>");
+                        }else{
+                            html.push("<li>"+sec[e]+"</li>");
+                        }
+                    }
+                }
+            }
+            $(this).html("<ul>"+html.join(' ')+"</ul>");
+            $('.collapse').collapse("hide");
+        });
         busc.initFixed('main-page', true);
     });
+
+
+
 </script>

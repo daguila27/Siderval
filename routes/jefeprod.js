@@ -71,7 +71,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
 
 
 function verificar(usr){
-	if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'gestionpl'){
+	if(usr.nombre === 'jefeprod' || usr.nombre === 'gerencia' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'gestionpl' || usr.nombre === 'plan'){
 		return true;
 	}else{
 		return false;
@@ -80,7 +80,7 @@ function verificar(usr){
 
 /* GET users listing. */
 router.get('/', function(req, res, next){
-	if(req.session.userData.nombre == 'jefeprod' ){
+	if(req.session.userData.nombre === 'jefeprod' ){
         req.getConnection(function(err, connection){
             if(err)
                 console.log("Error Connection : %s", err);
