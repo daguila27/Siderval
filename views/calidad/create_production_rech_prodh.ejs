@@ -216,7 +216,6 @@ function completarDigitos(num, dig){
                 }
             </style>
             <script>
-                
                 function toggleOptionAc(yo){
                     if($(yo).data('state').toString() === '0'){
                         $(yo).parent().children('div.vent-option').css('height', 'auto');
@@ -226,6 +225,7 @@ function completarDigitos(num, dig){
                         $(yo).data('state', '0');
                     }
                 }
+
                 function selectCausal(yo){
                     $(".cau-option").removeClass('selected');
                     $(".cau-option").data('state', '0');
@@ -243,6 +243,7 @@ function completarDigitos(num, dig){
                     $(yo).data('state', '1');
                     $(yo).addClass('selected');
                 }
+
                 function addCausal(yo){
                     var sel = $(yo).parent().parent().children('.left-section').find('.cau-option.selected');
                     var cau = sel.parent().parent().parent().find('.etp-option').html();
@@ -252,7 +253,22 @@ function completarDigitos(num, dig){
                     }
                     $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options', parseInt($(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options')) + 1);
                     $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).children('span').html("("+parseInt($(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').data('options'))+")" );
-                    $(".right-section").find('.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').append("<li class=\"etp-option cau-option\" data-state=\"0\" data-valor='"+sel.data('valor')+"' data-html=\""+sel.data('html')+"\" onclick=\"selectCausal(this)\"><input type='checkbox' class='prin-cua' onchange='selCauPrinc(this)' style='margin-rigth: 5px'>" +cau +" "+ sel.html() + "</li>");
+                    //APPEND
+                    $(".right-section").find(
+                        '.etp'+sel.parent().parent().parent().find('.etp-option').data('index')).parent().find('ul').append(
+                        "<li class=\"etp-option cau-option\" data-state=\"0\" data-valor='"+sel.data('valor')+"' data-html=\""+sel.data('html')+"\" onclick=\"selectCausal(this)\" style=\"white-space: nowrap; overflow-x: hidden;\"><input type='checkbox' class='prin-cua' onchange='selCauPrinc(this)' style='margin-rigth: 5px'>" +cau +" "+ sel.html() + "</li>"
+                    );
+
+                    //SI ES LA PRIMERA CAUSAL EN ADJUNTARSE
+                    //POR DEFECTO SE SELECCIONA COMO PRINCIPAL
+                    var c=0;
+                    $(".prin-cua").each(function(){
+                        c++;
+                    });
+                    if(c===1){$(".prin-cua").click();}
+
+
+                    $(yo).prop('disabled', true);
                 }
 
                 function removeCausal(yo){
@@ -272,6 +288,15 @@ function completarDigitos(num, dig){
                     }else{
                         sel.remove();
                     }
+                    $(yo).prop('disabled', true);
+                    //SI LUEGO DE ELIMINAR EL ITEM SOLO QUEDA UNO
+                    //POR DEFECTO SE SELECCIONA COMO PRINCIPAL
+                    var c=0;
+                    $(".prin-cua").each(function(){
+                        c++;
+                    });
+                    if(c===1){$(".prin-cua").click();}
+
                 }
 
                 function setDataCau(){
@@ -287,32 +312,13 @@ function completarDigitos(num, dig){
                     $("#cau-body").children('.options-selectors').children('.right-section').find('li.cau-option').each(function(){
                         arr.cau.push([$(this).data('valor')]);
                         if($(this).find('input[type=\"checkbox\"]').is(":checked")){
-                            //COLOCA LA PRINCIPAL PRIMERO
-                            //arr.html.unshift("<li style=\"text-align: left;font-weight: bold\">"+$(this).data('html')+" (P)</li>");
-                            arr.html.unshift($(this).data('html'));
+                            arr.html.unshift("<li style=\"text-align: left;font-weight: bold\">"+$(this).data('html')+" (P)</li>");
                             arr.check.push(true);
-                            princ = true;
-                        }
-                        else{
-                            //arr.html.push("<li style=\"text-align: left\">"+$(this).data('html')+"</li>");
-                            arr.html.push($(this).data('html'));
+                        }else{
+                            arr.html.push("<li style=\"text-align: left\">"+$(this).data('html')+"</li>");
                             arr.check.push(false);
                         }
                     });
-                    if(arr.check.indexOf(true) === -1 && arr.check.length > 0 ){
-                        arr.check[0] = true;
-                    }
-
-                    for(var t=0; t < arr.check.length; t++){
-                        if(arr.check[t] === true){
-                            arr.html[t] = "<li style='text-align: left;font-weight: bold'>"+arr.html[t]+" (P)</li>";
-                        }
-                        else{
-                            arr.html[t] = "<li style='text-align: left;'>"+arr.html[t]+"</li>";
-
-                        }
-                    }
-
                     arr.comment = $("#comentarioMovCau").val();
 
                     if( $("#imagenMovCau").val().length ){
@@ -337,9 +343,9 @@ function completarDigitos(num, dig){
 
 
                     if(arr.image === null){
-                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\""+$('#yourImgTagModal').attr('src')+"\" alt=\"\">");
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
                     }else {
-                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\""+$('#yourImgTagModal').attr('src')+"\" alt=\"\">");
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
                     }
                     $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('valor', arr.image);
                     $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('tipo', arr.image_type);
@@ -354,6 +360,7 @@ function completarDigitos(num, dig){
                         $(this).click();
                         $(".minus-btn").click();
                     });
+                    delImg();
                 }
 
                 function applyMoves(arr){
@@ -364,19 +371,63 @@ function completarDigitos(num, dig){
                     }
                 }
                 function selCauPrinc(yo){
+                    //CANTIDAD DE CHECK SELECCIONADOS
                     var c = 0;
-                    $(".prin-cua").each(function(){
-                        if($(this).is(':checked')){
-                            c++;
-                        }
-                    });
+                    //VARIABLE PARA UBICAR EL PRIMER CHECKBOX
+                    var firts = 0;
+                    var count = 0;
+                    var fbool = false;
+                    //SE INTENTA MARCAR CHECKBOX
+                    if($(yo).prop('checked')){
+                        $(yo).prop('checked', false);
+                        $(".prin-cua").each(function(){
+                            count++;
+                            if($(this).is(':checked')){
+                                c++;
+                            }
 
-                    if(c > parseInt($("#cau-body").data('max'))){
-                        $(yo).prop('checked', false);;
+
+                            if( c === 1 && !fbool ){
+                                firts = count;
+                                fbool = true;
+                            }
+                        });
+                        //NO HAY SELECCIONADOS
+                        if(c === 0){
+                            firts = 0;
+                        }
+                        var aux = 0;
+                        if(c >= parseInt($("#cau-body").data('max'))){
+                            //NO PERMITE SELECCIONAR
+                            //SE DESMARCA EL PRIMER CHECK (SIN CONTAR EL SELECCIONADO RECIEN)
+                            $('.prin-cua').each(function(){
+                                aux++;
+                                if(aux === firts){
+                                    $(this).prop('checked', false);
+                                }
+                            });
+                            $(yo).prop('checked', true);
+                        }else{
+                            $(yo).prop('checked', true);
+                        }
+                    }
+                    //SE INTENTA DESMARCAR CHECKBOX
+                    else{
+                        $(yo).prop('checked', false);
+                        $(".prin-cua").each(function(){
+                            if($(this).is(':checked')){
+                                c++;
+                            }
+                        });
+                        if(c === 0){
+                            $(yo).prop('checked', true);
+                            Alerta("¡Debe seleccionar al menos una Causal Principal!");
+                        }
                     }
                 }
-
             </script>
+
+
 
             <!--
             data-max: cantidad máxima de causales principales
@@ -431,8 +482,26 @@ function completarDigitos(num, dig){
                         <textarea class="form-control" name="" id="comentarioMovCau" cols="20" rows="3"></textarea>
                     </label>
                 </div>
+                <div class="form-group image-group input-group" style=" width: 100% ; margin-bottom:0px;margin-left:0px;margin-right:0px;margin-top: 10px;">
+                    <script>
+                        function delImg(){
+                            $('#imagenMovCau').val('');
+                            $('#yourImgTagModal').attr('src', '');
+                            $('#yourImgTagModal').addClass('hidden');
+                            $('#yourImgTagModal-empty').removeClass('hidden');
+                        }
 
-                <div class="form-group image-group input-group" style="margin-top: 10px;">
+                        function setImg(src, name){
+                            alert($('#imagenMovCau').val());
+                            if($('#yourImgTagModal').hasClass('hidden')){
+                                $('#imagenMovCau').val(name.toString());
+                                $('#yourImgTagModal').attr('src', src);
+                                $('#yourImgTagModal').removeClass('hidden');
+                                $('#yourImgTagModal-empty').addClass('hidden');
+                            }
+                        }
+                    </script>
+                    <button class="btn btn-xs btn-primary pull-right" onclick="delImg();">&times;</button>
                     <label for="" style="width: 100%;">
                         Adjuntar Imagen:
                         <input style="margin-left: 10px;margin-top: 2px" type="file" id="imagenMovCau" onchange="onChangeImg('imagenMovCau')" accept=".jpg,.jpeg,.png">
