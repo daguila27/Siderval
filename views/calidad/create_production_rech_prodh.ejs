@@ -30,7 +30,6 @@ function completarDigitos(num, dig){
 }
 
 %>
-
 <script>
     function sendImg(){
         $("#sendImg").submit();
@@ -44,6 +43,8 @@ function completarDigitos(num, dig){
             var img = document.getElementById("yourImgTagModal");
             img.src = event.target.result;
         }
+        $("#yourImgTagModal-empty").addClass('hidden');
+        $("#yourImgTagModal").removeClass('hidden');
     }
 
 </script>
@@ -507,7 +508,10 @@ function completarDigitos(num, dig){
                         <input style="margin-left: 10px;margin-top: 2px" type="file" id="imagenMovCau" onchange="onChangeImg('imagenMovCau')" accept=".jpg,.jpeg,.png">
                     </label>
                 </div>
-                <img src="" alt="" id="yourImgTagModal" style="width: 80%; margin-left: 10%;">
+                <div style="padding: 10px; background-color: rgb(239,239,248);">
+                    <div id="yourImgTagModal-empty"><h2 style="text-align: center; margin: 0px !important;"><small><i class="fa fa-exclamation"></i> Ingrese Imagen ... </small></h2></div>
+                    <img style="margin-left: 10%;width: 80%" src="" alt="" id="yourImgTagModal" class="hidden">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="setDataCau()">Aplicar</button>
