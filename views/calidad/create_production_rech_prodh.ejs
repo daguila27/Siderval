@@ -504,8 +504,8 @@
                         <tr>
                             <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Nombre">Descripción</th>
                             <th class="hidden" style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Cantidad">Cantidad</th>
-                            <th style="white-space: nowrap ; text-align: center; width: 125px" data-toggle="tooltip" data-placement="bottom" title="Código Colada">Cód. Colada</th>
-                            <th style="white-space: nowrap ; text-align: center; width: 125px" data-toggle="tooltip" data-placement="bottom" title="Correlativo de Producto">Corr. Producto</th>
+                            <th style="white-space: nowrap ; text-align: center; width: 125px" data-toggle="tooltip" data-placement="bottom" title="Código Colada">Código Colada</th>
+                            <th style="white-space: nowrap ; text-align: center; width: 125px" data-toggle="tooltip" data-placement="bottom" title="Correlativo de Producto">Correlativo Producto</th>
                             <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Etapa">Etapa</th>
                             <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Imagen">Imagen</th>
                             <th style="white-space: nowrap ; text-align: center" data-toggle="tooltip" data-placement="bottom" title="Comentario">Comentario</th>
@@ -845,7 +845,18 @@
                 data[$(this).data('name')].push($(this).children('input').val());
             }
             else if( ($(this).data('name') === 'colada' || $(this).data('name') === 'producto')){
-                if($(this).find('input').val() === ' ' || $(this).find('input').val() === ''){data[$(this).data('name')].push('0');}
+                if($(this).find('input').val() === ' ' || $(this).find('input').val() === ''){
+                    data[$(this).data('name')].push('0');
+                    emptyInput = true;
+                    emptyInputCant += 1;
+                    if(emptyInputCant === 1){
+                        //SE VAN A REGISTRAR 4 CAMPOS VACIOS DE CODIGO DE COLADA Y/O CORRELATIVO DE PRODUCTO.
+                        msg = "Se van a registrar "+emptyInputCant+" campo vacio de Código de Colada y/o Correlativo. \n ¿Está seguro?";
+                    }
+                    else{
+                        msg = "Se van a registrar "+emptyInputCant+" campos vacios de Código de Colada y/o Correlativo. \n ¿Está seguro?";
+                    }
+                }
                 else{
                     //COMPROBAR SI STRING CUMPLE CON EL FORMATO
                     if($(this).data('name') === 'colada'){

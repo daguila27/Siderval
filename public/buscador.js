@@ -35,8 +35,8 @@ class Buscador{
         }
         this.html += "</select></div>";
         if(this.datefill){
-            $(this.iddate).html("<div class='dropdown' style='margin-left: 15px'>" +
-                "<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'>Acotar Fecha " +
+            $(this.iddate).html("<div class='dropdown' style='margin-left: 15px'><label style='margin-bottom: 0px;'>Acotar Fecha: </label>" +
+                "<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'><label id='fecha-label' style='margin-bottom: 0px'>dd/mm/aaaa - dd/mm/aaaa</label> " +
                 "<span class='caret'></span></button>" +
                 "<ul class='dropdown-menu' style='padding: 7px'>" +
                 "<li style='padding: 0px 10px; display:flex; width: 100%'>" +
@@ -81,6 +81,7 @@ class Buscador{
             },
             success: function(data){
                 $(".main-page").html(data);
+
                 var b = 0 , c = 0;
                 $("#"+t+" tbody tr").each(function(){
                     $(this).attr('data-ind', b);
@@ -94,6 +95,7 @@ class Buscador{
                 $("#"+t+" thead tr th").css('white-space' , 'nowrap !important');
 
                 $("#"+t).css('font-family', '12px');
+
                 $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").height());
                 $("#fw-container").css('margin-top', $("#oe_main_menu_navbar").height()+$(".up-fills").height());
 
@@ -195,6 +197,12 @@ class Buscador{
             $(".indicator-of-check").css('display', 'none');
             this.rango = [$("#fecha-desde").val(),$("#fecha-hasta").val()];
 
+            $("#fecha-label").html(
+                [$("#fecha-desde").val().split('-')[2],$("#fecha-desde").val().split('-')[1],$("#fecha-desde").val().split('-')[0]].join('/')
+                +" "+
+                [$("#fecha-hasta").val().split('-')[2],$("#fecha-hasta").val().split('-')[1],$("#fecha-hasta").val().split('-')[0]].join('/')
+            );
+
             this.buscar_action();
         }
     }
@@ -202,6 +210,7 @@ class Buscador{
     restartFechas(){
         this.rango = [];
         $(".indicator-of-check").css('display', 'block');
+        $("#fecha-label").html("dd/mm/aaaa dd/mm/aaaa");
         this.buscar_action();
     }
 

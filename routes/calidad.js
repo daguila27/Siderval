@@ -173,7 +173,7 @@ router.get('/create_production_rech', function(req, res, next){
                                                 [notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[2], notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[1], notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[0]].join('/')+
                                                 " a las "+
                                                 [notifMax[0].descripcion.split('@')[2].split(' ')[1].split(':')[0] , notifMax[0].descripcion.split('@')[2].split(' ')[1].split(':')[1]].join(':')+ " "+notifMax[0].descripcion.split('@')[2].split(' ')[2] +
-                                                ". Para continuar presione Confirmar.";
+                                                ".";
                                     }
                                     res.render('calidad/create_production_rech', {datalen: prods, etp: dataEtp, causal: causal, opt_causal: cau, user: userDat[0].block_s, alertMsg: alertMsg});
                             });
@@ -246,7 +246,7 @@ router.get('/create_production_rech_prodh', function(req, res, next){
                                             [notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[2], notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[1], notifMax[0].descripcion.split('@')[2].split(' ')[0].split('-')[0]].join('/')+
                                             " a las "+
                                             [notifMax[0].descripcion.split('@')[2].split(' ')[1].split(':')[0] , notifMax[0].descripcion.split('@')[2].split(' ')[1].split(':')[1]].join(':')+ " "+notifMax[0].descripcion.split('@')[2].split(' ')[2] +
-                                            ". Para continuar presione Confirmar.";
+                                            ".";
                                     }
                                     //res.render('calidad/create_production_rech', {datalen: prods, etp: dataEtp, causal: causal, opt_causal: cau, user: userDat[0].block_s, alertMsg: alertMsg});
                                     res.render('calidad/create_production_rech_prodh', {datalen: prods, etp: dataEtp, causal: causal, opt_causal: cau, user: userDat[0].block_s, alertMsg: alertMsg});
@@ -972,6 +972,23 @@ router.get('/xlsx_rech', function(req,res){
                         var fechaFin;
                         var diff = 0;
                         var auxrow;
+
+                        sheet.getRow(1).fill = {
+                            type: 'pattern',
+                            pattern:'solid',
+                            fgColor:{argb:'F4D03F'}
+                        };
+                        sheet.getRow(1).font = {
+                            name: 'Calibri',
+                            family: 4,
+                            size: 11,
+                            underline: false,
+                            bold: true
+                        };
+                        sheet.autoFilter = {
+                            from: 'A1',
+                            to: 'K1',
+                        };
                         // Fecha de Rechazo
                         // Hora de Rechazo
                         // Descripción Producto

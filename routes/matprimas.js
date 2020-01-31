@@ -314,7 +314,11 @@ router.post('/table_mprimas', function(req,res,next){
         if(err) throw err;
         connection.query("select * from (select material.show_abast, material.show_mp, material.codigo, material.idmaterial as idmatpri, detalle"
             +" as descripcion, stock,stock_i,stock_c, u_medida,precio as costoxu, coalesce(cliente.sigla, 'No Definido') as sigla"
-            +" from material left join recurso on recurso.idmaterial=material.idmaterial left join abastecimiento on abastecimiento.idmaterial = material.idmaterial left join oda on oda.idoda = abastecimiento.idoda left join cliente on cliente.idcliente=oda.idproveedor " +
+            +" from material " +
+            "left join recurso on recurso.idmaterial=material.idmaterial " +
+            "left join abastecimiento on abastecimiento.idmaterial = material.idmaterial " +
+            "left join oda on oda.idoda = abastecimiento.idoda " +
+            "left join cliente on cliente.idcliente=oda.idproveedor " +
             "GROUP BY material.idmaterial) as table_query " +
             where +" "+limit ,
             function(err, mat){

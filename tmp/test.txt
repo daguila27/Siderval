@@ -1,0 +1,3 @@
+SIDERVAL,22220,,,2019-11-07 12:43:58,llave, ,6365,DEL VALLE,77.570.010-6,Mineria,Talcuna S/N,Vicuña,Vicuña,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,O00000057003,Perno Labio,Perno Labio,und,5,3540,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+SIDERVAL,22220,,,2019-11-07 12:43:58,llave, ,6365,DEL VALLE,77.570.010-6,Mineria,Talcuna S/N,Vicuña,Vicuña,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,P01020860036,Placa Desgaste P25 (Proy Los Colorados),Placa Desgaste P25 (Proy Los Colorados),und,4,11625,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+SIDERVAL,22220,,,2019-11-07 12:43:58,llave, ,6365,DEL VALLE,77.570.010-6,Mineria,Talcuna S/N,Vicuña,Vicuña,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,O00000057003,Perno Labio,Perno Labio,und,5,3540,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

@@ -13,6 +13,7 @@
         },
         success: function(data){
             setTimeout(function(){
+                close_menu();
                 $("#page-wrapper").data('view', '<%= route%>');
                 $("#page-wrapper").html(data);
                 hideLoad();
