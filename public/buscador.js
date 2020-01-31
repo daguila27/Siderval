@@ -300,7 +300,7 @@ class Buscador{
 
     resetFixed(content){
         $("table[data-table='"+this.idtabla+"']").remove();
-        this.initFixed(this.idtabla, content, false);
+        this.initFixed(content, false);
     }
 
     setTopFixed(){

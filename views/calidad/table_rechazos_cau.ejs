@@ -42,7 +42,7 @@ function completarDigitos(num, dig){
         sel.push('<option value="'+'<%= datalen[t].idcausal%>-<%= datalen[t].idetapacausal%>'+'">'+'<%= datalen[t].causal%> - <%= datalen[t].etapacausal%>'+'</option>');
         <%}%>
         sel = "<div style=\"margin-top: 8px;\">Selecciona una Causal : </div><select style='width: inherit' class='form-control' onchange='$(\".column-prods\").addClass(\"hidden\"); $(\".causal\" +$(this).val()).removeClass(\"hidden\"); $(\".causal\" +$(this).val()).click(); reCalcularPeso();'>"+sel.join(' ')+'</select>';
-        sel = "<select class='form-control' onchange='$(\".column-prods\").addClass(\"hidden\"); $(\".causal\" +$(this).val()).removeClass(\"hidden\"); $(\".causal\" +$(this).val()).click(); reCalcularPeso();'>"+sel.join(' ')+'</select>';
+        //sel = "<select class='form-control' onchange='$(\".column-prods\").addClass(\"hidden\"); $(\".causal\" +$(this).val()).removeClass(\"hidden\"); $(\".causal\" +$(this).val()).click(); reCalcularPeso();'>"+sel.join(' ')+"</select>";
         $(this).html(sel);
     });
 </script>
