@@ -1026,13 +1026,42 @@ function completarDigitos(num, dig){
         $("#"+ev.dataTransfer.getData("text")).addClass('hidden');
     }
     function editCausales(globalIdCount, yo){
-        $("#idColAux").val(globalIdCount);
-        resetSelector();
-        applyMoves($(yo).parent().data("valor").split("-"));
-        $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
+        if(noshowAlertDOM){
+            $("#idColAux").val(globalIdCount);
 
-        $("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
-        $("#editProdRech").modal("show");
+            resetSelector();
+            applyMoves($(yo).parent().data("valor").split("-"));
+            $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
+
+            /*$("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
+            $("#imagenMovCau").val( $(yo).parent().parent().find("td.tdImg").find('img').parent().data('valor') );*/
+            //setImg($(yo).parent().parent().find("td.tdImg").find('img').attr('src'), 'C:\\fakepath\\imagendeprueba.png');
+
+            $("#editProdRech").modal("show");
+        }
+        else{
+            callbAlertCancel = function(){
+                //no hagas nada
+            };
+            callbAlertConfirm = function(){
+                $("#idColAux").val(globalIdCount);
+
+                resetSelector();
+                applyMoves($(yo).parent().data("valor").split("-"));
+                $("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
+
+                /*$("#yourImgTagModal").attr('src', $(yo).parent().parent().find("td.tdImg").find('img').attr('src') );
+                $("#imagenMovCau").val( $(yo).parent().parent().find("td.tdImg").find('img').parent().data('valor') );*/
+                //setImg($(yo).parent().parent().find("td.tdImg").find('img').attr('src'), 'C:\\fakepath\\imagendeprueba.png');
+
+                $("#editProdRech").modal("show");
+
+                if($("#noshow-alert").is(':checked')){
+                    noshowAlertDOM = true;
+                }
+            };
+            AlertaBloc("¡Atención! \n El editar información hará que tengas que volver a ingresar las Imagenes de Rechazo.", true);
+        }
     }
     function addProdBtn(id) {
         var arropt = false;
