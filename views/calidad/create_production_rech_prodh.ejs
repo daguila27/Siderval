@@ -999,26 +999,53 @@ function completarDigitos(num, dig){
         $("#hidden-form-images").html(form_images);
         if(err){
             Alerta(msg);
-        }else{
-            $.ajax({
-                type: 'POST',
-                data: data,
-                url: '/calidad/save_production_rech_prod',
-                success: function(data){
-
-                    Alerta(data);
-                    flag = true;
-                    fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
-                    foo();
-                    $("#tbody_rech").html(
-                        '<tr class="empty-table">\n' +
-                        '<td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>\n' +
-                        '</tr>'
-                    );
-                }
-            });
         }
+        else{
+            if(emptyInput){
+                    callbAlertCancel = function(){
+                        //no hagas nada
+                    };
+                    callbAlertConfirm = function(){
+                        $.ajax({
+                            type: 'POST',
+                            data: data,
+                            url: '/calidad/save_production_rech_prod',
+                            success: function(data){
 
+                                Alerta(data);
+                                flag = true;
+                                fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
+                                foo();
+                                $("#tbody_rech").html(
+                                    '<tr class="empty-table">\n' +
+                                    '<td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>\n' +
+                                    '</tr>'
+                                );
+                            }
+                        });
+                    };
+                    AlertaBloc(msg);
+                }
+            else{
+                    $.ajax({
+                        type: 'POST',
+                        data: data,
+                        url: '/calidad/save_production_rech_prod',
+                        success: function(data){
+
+                            Alerta(data);
+                            flag = true;
+                            fooCallBack = function(){$(".oe_secondary_submenu li.active").click();};
+                            foo();
+                            $("#tbody_rech").html(
+                                '<tr class="empty-table">\n' +
+                                '<td colspan="10"><h2 style="text-align: center"><small><i class="fa fa-inbox fa-1x" aria-hidden="true" style="margin-right: 10px"></i>Arrastre el Producto para adjuntar...</small></h2></td>\n' +
+                                '</tr>'
+                            );
+                        }
+                    });
+                }
+        }
     }
 
     function checkExpReg(exp, yo){
