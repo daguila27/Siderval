@@ -674,11 +674,13 @@
         //$('body').loading('toggle');
         $.ajax({
             type: 'get',
-            url: '/abastecimiento/view_facturapdf/' + id,
+            url: '/abastecimiento/new_pdf_factura/' + id,
             success: function(data){
-                $("#vpdf_btn").attr('disabled',false);
+
+                window.open("http://"+data, '_blank');
+                //$("#vpdf_btn").attr('disabled',false);
                 //$("body").loading('toggle');
-                window.open(data,'_blank')
+                //window.open(data,'_blank')
             }
         })
     }
