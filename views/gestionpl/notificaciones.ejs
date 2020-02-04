@@ -64,7 +64,7 @@ if(notif[u].externo){%>
 <li class="divider"></li>
 <%}else{%>
 <li>
-    <a class="notificacion-jfp" data-toggle="modal" data-target="#rechazoModal" data-well="<%=translate(desc[6])%>" data-ext="false" data-idph="<%= desc[8]%>" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>">
+    <a class="notificacion-jfp" data-well="<%=translate(desc[6])%>" data-ext="false" data-idph="<%= desc[8]%>" data-idop="<%= desc[5]%>" data-idp="<%= desc[4]%>" data-detalle="<%= notif[u].detalle%>" data-id="<%= notif[u].idnotificacion%>" data-cant="<%= parseInt(desc[2])%>" onclick="removeNotif(this)">
         <div>
             <strong><%= desc[2]%> <%= notif[u].detalle%> Rechazado(s)</strong>
             <span class="pull-right text-muted">

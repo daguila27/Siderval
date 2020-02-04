@@ -121,6 +121,7 @@
                 //$("#"+busc.idtabla).DataTable().destroy();
 			},
 			success: function(data){
+				ocultar_buscador();
 				$(".main-page").html(data);
 			}
 		});

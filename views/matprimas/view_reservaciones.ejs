@@ -54,25 +54,27 @@
             <div class="form-group o_searchview" style="margin: 0;padding: 0;">
 
             </div>
-            <div class="btn-group btn-group-sm o_cp_switch_buttons pull-right" style="display: flex;margin-top: 15px">
+            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="display: flex;margin-top: 10px">
                 <!--<button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_movimientos' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>-->
-                <div class="date-fill" style="display: flex; margin-right: 10px">
+                <div class="date-fill">
 
                 </div>
                 <div class="form-group" style="width: 35%;">
-                    <select class="form-control" id="selectTipoReserv" onchange="busc.add_cond = $('#selectTipoReserv').val(); busc.buscar_action();">
-                        <option value="reservacion_detalle.sin_prep>0" selected>Sin Preparar</option>
-                        <option value="reservacion_detalle.prep>0">Preparado</option>
-                        <option value="reservacion_detalle.ret>0">Retirados</option>
-                        <!--<option value="reservacion_detalle.desp>0">Despachados</option>
-                        <option value="true">Todos</option>-->
-                    </select>
+                    <label for="">Estado:
+                        <select class="form-control" id="selectTipoReserv" onchange="busc.add_cond = $('#selectTipoReserv').val(); busc.buscar_action();">
+                            <option value="reservacion_detalle.sin_prep>0" selected>Sin Retirar</option>
+                            <!--<option value="reservacion_detalle.prep>0">Preparado</option>-->
+                            <option value="reservacion_detalle.ret>0">Retirados</option>
+                            <!--<option value="reservacion_detalle.desp>0">Despachados</option>
+                            <option value="true">Todos</option>-->
+                        </select>
+                    </label>
                     <h5 style=" display: none;margin-left: 10px"><small>¡Solo es posible selecccionar en la opción <b>Sin Preparar</b> o <b>Sin Retirar</b>!</small></h5>
                 </div>
                 <div class="form-group" style="margin-left: 10px">
-                    <button class="btn btn-primary btn-xs action-button hidden" id="preparar-boton" onclick="renderMovMaker(this)" data-estado="0">Preparar Reservación</button>
+                    <button class="btn btn-primary btn-xs action-button hidden" id="preparar-boton" onclick="renderMovMaker(this)" data-estado="0">Retirar Reservación</button>
                     <button class="btn btn-primary btn-xs action-button hidden" id="retirar-boton" onclick="renderMovMaker(this)" data-estado="1">Retirar Reservación</button>
-                    <h5 style="margin-left: 10px" class="hidden" id="indicator-option-select"><small>4 pedidos seleccionados</small></h5>
+                    <h5 style="margin-left: 10px" class="hidden" id="indicator-option-select"><small>0 pedidos seleccionados</small></h5>
                 </div>
             </div>
         </div>
@@ -174,6 +176,7 @@
                 $("#preparar-boton").prop('disabled', true);
                 $("#retirar-boton").prop('disabled', false);
             }
+            $("#indicator-option-select").html('<small>0 pedidos seleccionados</small>');
         }
         else{
             $(".select-desp").each(function(){
@@ -183,7 +186,8 @@
             $("#retirar-boton").prop('disabled', true);
             $("#preparar-boton").addClass('hidden');
             $("#retirar-boton").addClass('hidden');
-            $("#indicator-option-select").addClass('hidden');
+            //$("#indicator-option-select").addClass('hidden');
+            $("#indicator-option-select").html('<small>¡No es posible realizar acciones!</small>');
         }
     }
 

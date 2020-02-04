@@ -1,14 +1,10 @@
 //llamamos al paquete mysql que hemos instalado
 var mysql = require('mysql');
+
+var dbCredentials = require("../dbCredentials");
+dbCredentials.insecureAuth = true;
 //creamos la conexion a nuestra base de datos con los datos de acceso de cada uno
-var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'admin',
-    password : 'tempo123',
-    port : 3306,
-    database:'siderval',
-    insecureAuth : true
-});
+var connection = mysql.createConnection(dbCredentials);
 
 var informe = {};
 
