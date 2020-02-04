@@ -4053,6 +4053,13 @@ router.get('/new_pdf_factura/:idfactura', function(req, res, next) {
                     oda[0].fecha = new Date(oda[0].fecha);
                     oda[0].fecha = oda[0].fecha.getDate()+"/"+(parseInt(oda[0].fecha.getMonth()) + 1)+"/"+oda[0].fecha.getFullYear();
 
+					var dets = [{
+						pago: oda[0].tokenoda.split('@')[3],
+						plazo: [oda[0].tokenoda.split('@')[2].split('-')[2],oda[0].tokenoda.split('@')[2].split('-')[1],oda[0].tokenoda.split('@')[2].split('-')[0]].join('/'),
+						obs: oda[0].tokenoda.split('@')[0],
+						entrega: oda[0].tokenoda.split('@')[4]
+					}];
+
                     (async function(){
                         try{
                             const browser = await puppeteer.launch()
@@ -4061,6 +4068,7 @@ router.get('/new_pdf_factura/:idfactura', function(req, res, next) {
                             const content = await compile('factura',
                                 {
                                     "oda":oda[0],
+									"dets": dets[0],
                                     "mats":mats,
 									"vacio": array_vacio,
 									"logo": base64img.base64Sync('./public/assets/img/logo.png'),
