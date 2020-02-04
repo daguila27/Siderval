@@ -923,8 +923,6 @@ router.get("/view_reservaciones",function(req,res,next){
 router.post("/table_reservaciones",function(req,res,next){
     if(req.session.userData){
         var input = JSON.parse(JSON.stringify(req.body));
-        console.log("INPUT");
-        console.log(input);
         var array_fill = [
             "reservacion.idreservacion",
             "material.detalle"

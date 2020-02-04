@@ -69,6 +69,7 @@
                 <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
                 <ul class="dropdown-menu">
                     <li><a class="getcsvof" data-tipo="of" onclick="cierreMensual()"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar IDS</a></li>
+                    <li><a class="getcsvof" data-tipo="of" onclick="cierreMensualICM()"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar ICM</a></li>
                 </ul>
             </div>
             <div style="display: flex">
@@ -187,6 +188,18 @@
         $.ajax({
             type: 'get',
             url: '/abastecimiento/xlsx_ids_fabrs/' + $("#dateSelect").val()+"@"+idvista,
+            success: function(data){
+                window.open("/csvs/" + data,'_blank');
+                chargeList("#dateSelect");
+            }
+        });
+
+    }
+
+    function cierreMensualICM(){
+        $.ajax({
+            type: 'get',
+            url: '/abastecimiento/xlsx_icm/' + $("#dateSelect").val()+"@"+idvista,
             success: function(data){
                 window.open("/csvs/" + data,'_blank');
                 chargeList("#dateSelect");

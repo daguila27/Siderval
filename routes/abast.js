@@ -2396,6 +2396,313 @@ router.get('/xlsx_ids_fabrs/:token', function (req, res, next) {
 });
 
 
+// Descargar xlsx de fabrs
+router.get('/xlsx_icm/:token', function (req, res, next) {
+	if(verificar(req.session.userData)){
+		let fecha = new Date();
+		var nombre;
+		console.log(req.params.token);
+		console.log(req.params.token.split('@')[2]);
+		if(parseInt(req.params.token.split('@')[2]) == 1){
+			nombre = "ICM-producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+		}
+		else if(parseInt(req.params.token.split('@')[2]) == 2){
+			nombre = "ICM-matp&insumos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+		}
+		else{
+			nombre = "ICM-pedidos&producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
+		}
+
+		var Excel = require('exceljs');
+		var workbook = new Excel.Workbook();
+		var sheet = workbook.addWorksheet('Informe ICM');
+		var sheet2 = workbook.addWorksheet('Detalle Producto');
+		var sheet3 = workbook.addWorksheet('Detalle Abastecimiento');
+		var sheet4 = workbook.addWorksheet('Detalle Planta');
+		/*sheet.columns = [
+			{ header: 'Código', key: 'id', width: 15, style: 'text-aling: center' },
+			{ header: 'Detalle', key: 'name', width: 50 },
+			{ header: 'Unidad Med.', key: 'unit', width: 10},
+			{ header: 'Stock Inicio Mes', key: 'initial', width: 15},
+			{ header: 'Pendientes Totales en OC', key: 'asked', width: 15},
+			{ header: 'Solicitado en OC (Mensual)', key: 'asked', width: 15},
+			{ header: 'Solicitado en OC atrasado', key: 'asked', width: 20},
+			{ header: 'Solicitada según OP', key: 'asked', width: 20},
+			{ header: 'Solicitada según entradas a BPT', key: 'asked', width: 28},
+			{ header: 'Stock en producción', key: 'virtual', width: 15},
+			{ header: 'Rechazados', key: 'virtual', width: 15},
+			{ header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 25},
+			{ header: 'Aceptados por CC', key: 'income', width: 15},
+			{ header: 'Devolución a BMI', key: 'income', width: 15},
+			{ header: 'Recepcion GDD', key: 'income', width: 15},
+			{ header: 'Retiros en BMI', key: 'departures', width: 15},
+			{ header: 'Salidas en GDD', key: 'departures', width: 15},
+			{ header: 'Facturados', key: 'departures', width: 15},
+			{ header: 'Por Facturar', key: 'departures', width: 15},
+			{ header: 'Stock Final', key: 'final', width: 15}
+		];
+		sheet2.columns = [
+			{ header: 'Código', key: 'id', width: 15 },
+			{ header: 'Detalle', key: 'name', width: 50 },
+			{ header: 'Unidad Med.', key: 'unit', width: 10},
+			{ header: 'Solicitado en OP', key: 'asked', width: 15},
+			{ header: 'Moldeo', key: 'virtual', width: 10},
+			{ header: 'Fusion', key: 'income', width: 10},
+			{ header: 'Quiebre', key: 'income', width: 10},
+			{ header: 'Terminación', key: 'departures', width: 10},
+			{ header: 'Tratamiento Térmico', key: 'income', width: 15},
+			{ header: 'Maestranza', key: 'departures', width: 10},
+			{ header: 'Control de Calidad', key: 'final', width: 15},
+			{ header: 'Rechazado', key: 'final', width: 15},
+			{ header: 'Ingresado a BPT', key: 'final', width: 15}
+		];
+		sheet3.columns = [
+			{ header: 'Código', key: 'id', width: 15 },
+			{ header: 'Detalle', key: 'name', width: 50 },
+			{ header: 'Unidad Med.', key: 'unit', width: 10},
+			{ header: 'Retiro Bodega', key: 'virtual', width: 10},
+			{ header: 'GDD Venta', key: 'income', width: 10},
+			{ header: 'GDD Traslado', key: 'income', width: 10},
+			{ header: 'GDD Devolucion', key: 'departures', width: 10},
+			{ header: 'GDD Anulada', key: 'income', width: 15}
+		];
+		sheet4.columns = [
+			{ header: 'Código', key: 'id', width: 13, height: 13.43},
+			{ header: 'Detalle', key: 'name', width: 42.14 },
+			{ header: 'Unidad', key: 'unit', width: 7.86},
+			{ header: 'Peso Unitario (KG)', key: 'virtual', width: 14.71},
+			{ header: 'Inicial BPT', key: 'virtual', width: 14.71},
+			{ header: 'Inicial Planta', key: 'income', width: 14.71},
+			{ header: 'Total Fusión Mes', key: 'income', width: 13.57},
+			{ header: 'Entradas a Producción', key: 'income', width: 13.57},
+			{ header: 'Actual en Planta', key: 'income', width: 13.57},
+			{ header: 'Total Despachado GDD', key: 'departures', width: 14.71},
+			{ header: 'Total Rechazos Mes', key: 'income', width: 14.71},
+			{ header: 'Total Externalizado Mes', key: 'income', width: 14.71},
+			{ header: 'Stock en Siderval', key: 'income', width: 11}
+		];*/
+		var env = [
+			req.params.token.split("@")[0],
+			req.params.token.split("@")[1],
+			req.params.token.split("@")[2]
+		];
+		adminModel.getdatos(env ,function(err,ops){
+			if(err) console.log(err);
+			sheet.getRow(1).fill = {
+				type: 'pattern',
+				pattern:'solid',
+				fgColor:{argb:'F4D03F'}
+			};
+			sheet.getRow(1).font = {
+				name: 'Comic Sans MS',
+				family: 4,
+				size: 11,
+				underline: false,
+				bold: true
+			};
+
+			sheet2.getRow(1).fill = {
+				type: 'pattern',
+				pattern:'solid',
+				fgColor:{argb:'F4D03F'}
+			};
+			sheet2.getRow(1).font = {
+				name: 'Comic Sans MS',
+				family: 4,
+				size: 11,
+				underline: false,
+				bold: true
+			};
+
+			sheet3.getRow(1).fill = {
+				type: 'pattern',
+				pattern:'solid',
+				fgColor:{argb:'F4D03F'}
+			};
+			sheet3.getRow(1).font = {
+				name: 'Comic Sans MS',
+				family: 4,
+				size: 11,
+				underline: false,
+				bold: true
+			};
+
+			sheet4.getRow(1).fill = {
+				type: 'pattern',
+				pattern:'solid',
+				fgColor:{argb:'F4D03F'}
+			};
+			sheet4.getRow(1).font = {
+				name: 'Comic Sans MS',
+				family: 4,
+				size: 11,
+				underline: false,
+				bold: true
+			};
+
+			sheet.getCell('B1').value = "Fecha Solicitado";
+			sheet.getCell('C1').value = "Enero 2020";
+
+			sheet.getCell('A3').value = "Código";
+			sheet.getCell('B3').value = "Descripción";
+			sheet.getCell('C3').value = "Unidad";
+			sheet.getCell('D3').value = "Valor Medida Unitaria";
+			sheet.getCell('E3').value = "Stock Inicial";
+			sheet.getCell('F3').value = "Ingreso";
+			sheet.getCell('G3').value = "Salida";
+			sheet.getCell('H3').value = "Stock Final";
+
+			sheet2.getCell('B1').value = "Código";
+			sheet2.getCell('C1').value = "Descripción";
+			sheet2.getCell('D1').value = "Unidad";
+			sheet2.getCell('E1').value = "Peso [kg]";
+			sheet2.getCell('F1').value = "Inicial BPT";
+			sheet2.getCell('G1').value = "Inicial Planta";
+			sheet2.getCell('H1').value = "Ingresos (por ingreso a fusión)";
+			sheet2.getCell('I1').value = "Salidas (dada por las guías)";
+			sheet2.getCell('J1').value = "Total Rechazo";
+			sheet2.getCell('K1').value = "Bodega Externa";
+			sheet2.getCell('L1').value = "Stock en Siderval";
+
+
+			sheet3.getCell('B1').value = "Código";
+			sheet3.getCell('C1').value = "Detalle";
+			sheet3.getCell('D1').value = "Unidad Med";
+			sheet3.getCell('E1').value = "Stock Inicio Mes";
+			sheet3.getCell('F1').value = "Ingreso (Por GDD)";
+			sheet3.getCell('G1').value = "Salidas (por GDD)";
+			sheet3.getCell('H1').value = "Solicitado a Producción";
+			sheet3.getCell('I1').value = "Devolución Producción";
+			sheet3.getCell('J1').value = "Retirados BMI";
+			sheet3.getCell('K1').value = "Stock Final Mes";
+
+
+			sheet4.getCell('A1').value = "Fecha Solicitud";
+			sheet4.getCell('B1').value = "2020";
+			sheet4.getCell('C1').value = "Cantidad Inicial";
+			sheet4.getCell('D1').value = "Peso Inicial";
+
+			sheet4.mergeCells('E1:M1');
+			sheet4.getCell('E1').value = "Inicio Mes 2020";
+
+			sheet4.getCell('N1').value = "Cantidad Final";
+			sheet4.getCell('O1').value = "Peso Inicial";
+
+			sheet4.mergeCells('P1:X1');
+			sheet4.getCell('P1').value = "Final Mes 2020";
+
+			sheet4.getCell('A2').value = "Código";
+			sheet4.getCell('B2').value = "Descripción";
+			sheet4.getCell('C2').value = "Total Unidades";
+			sheet4.getCell('D2').value = "Total Peso";
+			sheet4.getCell('E2').value = "Planta";
+			sheet4.getCell('F2').value = "MOL";
+			sheet4.getCell('G2').value = "FUS";
+			sheet4.getCell('H2').value = "QUI";
+			sheet4.getCell('I2').value = "TER";
+			sheet4.getCell('J2').value = "TTO";
+			sheet4.getCell('K2').value = "MTR";
+			sheet4.getCell('L2').value = "CAL";
+			sheet4.getCell('M2').value = "BPT";
+			sheet4.getCell('N2').value = "Total";
+			sheet4.getCell('O2').value = "Total Peso";
+			sheet4.getCell('P2').value = "Planta";
+			sheet4.getCell('Q2').value = "MOL";
+			sheet4.getCell('R2').value = "FUS";
+			sheet4.getCell('S2').value = "QUI";
+			sheet4.getCell('T2').value = "TER";
+			sheet4.getCell('U2').value = "TTO";
+			sheet4.getCell('V2').value = "MTR";
+			sheet4.getCell('W2').value = "CAL";
+			sheet4.getCell('X2').value = "BPT";
+
+
+			for(var i = 4; i < ops.length+4; i++){
+				sheet.getCell('A'+i.toString()).value = ops[i-4].codigo;
+				sheet.getCell('B'+i.toString()).value = ops[i-4].detalle;
+				sheet.getCell('C'+i.toString()).value = ops[i-4].u_medida;
+				sheet.getCell('D'+i.toString()).value = ops[i-4].u_medida;
+				//Stock Inicial
+				sheet.getCell('E'+i.toString()).value = ops[i-4].s_inicial;
+				sheet.getCell('F'+i.toString()).value = parseInt(ops[i-4].fabricados) + parseInt(ops[i-4].sum_dev) + parseInt(ops[i-4].ing_oda);
+				sheet.getCell('G'+i.toString()).value = parseInt(ops[i-4].despachados) - parseInt(ops[i-4].sum_sal);
+				sheet.getCell('H'+i.toString()).value =
+					parseInt(ops[i-4].s_inicial) +
+					parseInt(ops[i-4].fabricados) +
+					parseInt(ops[i-4].sum_dev) +
+					parseInt(ops[i-4].ing_oda) -
+					parseInt(ops[i-4].despachados) -
+					parseInt(ops[i-4].sum_sal);
+
+
+
+
+				/*sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
+				sheet4.getCell('B'+i.toString()).value = ops[i-2].detalle;
+				sheet4.getCell('C'+i.toString()).value = ops[i-2].u_medida;
+				sheet4.getCell('D'+i.toString()).value = ops[i-2].peso;
+				sheet4.getCell('E'+i.toString()).value = ops[i-2].s_inicial;
+				sheet4.getCell('F'+i.toString()).value = ops[i-2].p_inicial;
+				sheet4.getCell('G'+i.toString()).value = ops[i-2].fundidos;
+
+				sheet4.getCell('H'+i.toString()).value = ops[i-2].virtuales + (ops[i-2].fabricados+ops[i-2].rechazados)-ops[i-2].p_inicial;
+				sheet4.getCell('I'+i.toString()).value = ops[i-2].virtuales;
+
+
+				sheet4.getCell('J'+i.toString()).value = ops[i-2].despachados;
+				sheet4.getCell('K'+i.toString()).value = ops[i-2].rechazados;
+				sheet4.getCell('L'+i.toString()).value = ops[i-2].ing_oda;
+				sheet4.getCell('M'+i.toString()).value =
+					ops[i-2].s_inicial +
+					ops[i-2].p_inicial +
+					ops[i-2].ing_oda +
+					ops[i-2].fundidos -
+					ops[i-2].despachados -
+					ops[i-2].rechazados -
+					(ops[i-2].sum_sal - ops[i-2].sum_dev);*/
+				//STOCK_SIDERVAL_FINAL = STOCK_I + PROD_I + RECEP_GDD + FUND - DESP_GDD - RECH - (RET_BMP - DEV_BMP)
+				//STOCK_BPT_FINAL = STOCK_I + RECEP_GDD + ACEP_CC - DESP_GDD - (RET_BMP - DEV_BMP)
+				//STOCK_PRODUCCION_FINAL = PROD_I + FUND - ACEP_CC - RECH
+				//STOCK_SIDERVAL_FINAL = STOCK_BPT_FINAL + STOCK_PRODUCCION_FINAL
+			}
+
+			sheet.autoFilter = {
+				from: 'A3',
+				to: 'H3',
+			};
+
+
+
+
+			workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+				console.log(nombre);
+				res.send(nombre);
+			});
+
+
+			/*adminModel.produccion(req.params.token.split("@"),function(err,prods){
+				if(err) throw err;
+				for(let i=0;i<prods.length;i++){
+					sheet2.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre
+						,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
+				}
+				adminModel.salidas(req.params.token.split("@"),function(err,salidas){
+					if(err) throw err;
+					for(let i=0;i<salidas.length;i++){
+						sheet3.addRow([salidas[i].codigo,salidas[i].detalle,salidas[i].u_medida,salidas[i].salidas,salidas[i].venta,salidas[i].traslado,salidas[i].devolucion, salidas[i].anulado]);
+					}
+					workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+						console.log(nombre);
+						res.send(nombre);
+					});
+				});
+			});*/
+
+		});
+	}
+});
+
+
 
 /*  Funcion que renderiza la cabecera que posee un buscador de abastecimientos*/
 router.get('/view_abastecimiento', function(req, res, next) {

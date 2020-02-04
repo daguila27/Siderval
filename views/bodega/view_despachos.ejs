@@ -81,7 +81,7 @@ else{clase='busc-menu';}%>
 						<option value="Blanco">Blanco</option>
 					</select>
 
-					<div class="filters">
+					<div class="filters" style="display: flex">
 
 					</div>
 				</div>
@@ -210,6 +210,39 @@ else{clase='busc-menu';}%>
     });
 
 
+	var alto_buscador = $(".up-fills").height();
+	var margen_tabla = $('#fw-container').css('margin-top');
+	function mostrar_buscador(){
+		$('.up-fills').css('top', alto_buscador);
+		$('.up-fills').css('height', alto_buscador);
+		$('#fw-container').css('margin-top', margen_tabla+'px');
+		$('.up-fills').removeClass('hidden');
+		busc.buscar_action(true);
+	}
+	function restaurar_buscador(){
+		$('.up-fills').css('top', alto_buscador);
+		$('.up-fills').css('height', alto_buscador);
+		$('#fw-container').css('margin-top', margen_tabla+'px');
+		busc.buscar_action(true);
+		$('.up-fills').css('transition', '0.5s');
+	}
+	function ocultar_buscador(){
+		$('.up-fills').css('z-index', '0');
+		$('.up-fills').css('top', '-'+$('.up-fills').height()+'px');
+		$('#fw-container').css('margin-top', '0px');
+		$('#fw-container').css('padding-top', '30px');
+		$("#pageView").val('1');
+		//busc.buscar_action();
+	}
+	function volver_tabla(){
+		$('.up-fills').css('z-index', '9');
+		$('.up-fills').css('top', 0);
+		$('#fw-container').css('margin-top', margen_tabla+'px');
+		$('#fw-container').css('padding-top', '0px');
+		$('.up-fills').removeClass('hidden');
+		busc.buscar_action();
+		$("#pageView").val('0');
+	}
 
 
 </script>

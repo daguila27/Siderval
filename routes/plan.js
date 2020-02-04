@@ -3156,15 +3156,19 @@ router.get('/xlsx_desp', function(req,res){
         sheet.columns = [
             { header: 'N° GD', key: 'gdd', width: 15 },
             { header: 'N° OC', key: 'oc', width: 15 },
+            { header: 'Item', key: 'item', width: 15 },
+            { header: 'N° OF', key: 'of', width: 15 },
             { header: 'Nombre', key: 'name', width: 15 },
             { header: 'Cantidad', key: 'cantidad', width: 15 },
-            { header: 'Fecha de Despacho', key: 'fechadesp', width: 15 }
+            { header: 'Fecha de Despacho', key: 'fechadesp', width: 15 },
+            { header: 'Estado', key: 'estado', width: 15 },
+            { header: 'Cliente', key: 'cliente', width: 15 }
         ];
         req.getConnection(function(err, connection) {
             if(err)
                 console.log("Error connection : %s", err);
             connection.query("select " +
-                "gd.idgd, coalesce(fabricaciones.idorden_f,'Sin OF') as idorden_f, " +
+                "pedido.numitem as item, gd.idgd, coalesce(fabricaciones.idorden_f,'Sin OF') as idorden_f, " +
                 "coalesce(odc.numoc, 'Sin OC') as numoc, material.detalle, despachos.cantidad, " +
                 "gd.fecha, gd.estado, coalesce(cliente.sigla,'No Definido') as sigla " +
                 "from despachos " +
@@ -3188,21 +3192,23 @@ router.get('/xlsx_desp', function(req,res){
                         var nombre = 'csvs/z_despachos_hasta_' + f_gen + '.xlsx';
                         sheet.getCell('A1').value = 'N° GD';
                         sheet.getCell('B1').value = 'N° OC';
-                        sheet.getCell('C1').value = 'N° OF';
-                        sheet.getCell('D1').value = 'Nombre';
-                        sheet.getCell('E1').value = 'Cantidad';
-                        sheet.getCell('F1').value = 'Fecha de Despacho';
-                        sheet.getCell('G1').value = 'Estado';
-                        sheet.getCell('H1').value = 'Cliente';
+                        sheet.getCell('C1').value = 'Item';
+                        sheet.getCell('D1').value = 'N° OF';
+                        sheet.getCell('E1').value = 'Nombre';
+                        sheet.getCell('F1').value = 'Cantidad';
+                        sheet.getCell('G1').value = 'Fecha de Despacho';
+                        sheet.getCell('H1').value = 'Estado';
+                        sheet.getCell('I1').value = 'Cliente';
                         for (var i = 0; i < rows.length; i++) {
                             sheet.getCell('A' + (i+2).toString()).value = rows[i].idgd;
                             sheet.getCell('B' + (i+2).toString()).value = rows[i].numoc;
-                            sheet.getCell('C' + (i+2).toString()).value = rows[i].idorden_f;
-                            sheet.getCell('D' + (i+2).toString()).value = rows[i].detalle;
-                            sheet.getCell('E' + (i+2).toString()).value = rows[i].cantidad;
-                            sheet.getCell('F' + (i+2).toString()).value = new Date(rows[i].fecha);
-                            sheet.getCell('G' + (i+2).toString()).value = rows[i].estado;
-                            sheet.getCell('H' + (i+2).toString()).value = rows[i].sigla;
+                            sheet.getCell('C' + (i+2).toString()).value = rows[i].item;
+                            sheet.getCell('D' + (i+2).toString()).value = rows[i].idorden_f;
+                            sheet.getCell('E' + (i+2).toString()).value = rows[i].detalle;
+                            sheet.getCell('F' + (i+2).toString()).value = rows[i].cantidad;
+                            sheet.getCell('G' + (i+2).toString()).value = new Date(rows[i].fecha);
+                            sheet.getCell('H' + (i+2).toString()).value = rows[i].estado;
+                            sheet.getCell('I' + (i+2).toString()).value = rows[i].sigla;
                         }
                         workbook.xlsx.writeFile('public/' + nombre)
                             .then(function() {
@@ -3405,6 +3411,8 @@ router.get('/crear_reservacion', function(req, res){
             }
             connection.query("SELECT " +
                 "pedido.idpedido, " +
+                "pedido.numitem, " +
+                "pedido.f_entrega, " +
                 "cliente.sigla, " +
                 "pedido.idodc,odc.numoc,material.stock," +
                 "fabricaciones.idfabricaciones, coalesce(queryDisp.nodisponible, 0) as nodisponible, " +

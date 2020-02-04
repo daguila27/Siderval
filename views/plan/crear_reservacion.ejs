@@ -1,3 +1,16 @@
+<%
+function completarDigitos(num, dig){
+    var arr = [];
+    if(num.toString().length >= dig){
+        return num.toString();
+    }
+    else{
+        for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
+        return arr.join('')+num.toString();
+    }
+}
+
+%>
 <div class="row" style="margin: 0 ;padding-top: 0;margin-right: 2%;margin-left: 2%;background-color: white; height: 100%; margin-top: 20px;">
     <div class="col-md-12 panel-creacion" style="margin-top: 20px">
         <div class="panel panel-primary cargando-panel" style="display: none;">
@@ -20,15 +33,16 @@
                         <thead>
                         <tr>
                             <th>OC</th>
+                            <th>Item</th>
                             <th>OF</th>
-                            <th>ODA</th>
+                            <th>OCA</th>
                             <th>Cliente</th>
                             <th>Descripción</th>
                             <th>Solicitados</th>
                             <th>Reservar</th>
                             <th>Reservados</th>
-                            <th>Stock</th>
                             <th>Disponible</th>
+                            <th>Entrega</th>
                             <th>Eliminar</th>
                         </tr>
                         </thead>
@@ -56,6 +70,7 @@
                     <thead>
                     <tr>
                         <th>OC</th>
+                        <th>Item</th>
                         <th>OF</th>
                         <th>OCA</th>
                         <th>Cliente</th>
@@ -63,8 +78,8 @@
                         <th>Solicitados</th>
                         <th>Recibidos OCA</th>
                         <th>Reservados</th>
-                        <th>Stock</th>
-                        <th>Disponible</th>
+                        <th>Stock Disponible</th>
+                        <th>Entrega</th>
                         <th>Adjuntar</th>
                     </tr>
                     </thead>
@@ -76,6 +91,7 @@
                         <tr data-idped="<%= data[e].idpedido%>" data-idfab="<%= data[e].idfabricaciones%>">
                             <input type="hidden" name="idfab" value="<%= data[e].idfabricaciones%>">
                             <td style="text-align: center"><%= data[e].numoc%></td>
+                            <td style="text-align: center"><%= data[e].numitem%></td>
                             <td style="text-align: center"><%= data[e].idof%></td>
                             <td style="text-align: center"><%= data[e].idoda%></td>
                             <td style="text-align: center"><%= data[e].sigla%></td>
@@ -92,8 +108,9 @@
                                 <td style="text-align: center"> - </td>
                             <%}%>
                             <td style="text-align: center"><%= data[e].reservados%></td>
-                            <td style="text-align: center"><%= data[e].stock%></td>
+                            <!--<td style="text-align: center"> data[e].stock></td>-->
                             <td style="text-align: center"><%= data[e].stock - data[e].nodisponible%></td>
+                            <td style="text-align: center"><%= [completarDigitos(new Date(data[e].f_entrega).toLocaleDateString().split('-')[2],2), completarDigitos(new Date(data[e].f_entrega).toLocaleDateString().split('-')[1],2), completarDigitos(new Date(data[e].f_entrega).toLocaleDateString().split('-')[0],2)].join('-')%></td>
 
                             <td style="text-align: center; align-content: center">
                                 <% if(data[e].stock - data[e].nodisponible > 0 ){%>
