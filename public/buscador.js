@@ -35,7 +35,7 @@ class Buscador{
         }
         this.html += "</select></div>";
         if(this.datefill){
-            $(this.iddate).html("<div class='dropdown' style='margin-left: 15px'><label style='margin-bottom: 0px;'>Acotar Fecha: </label>" +
+            $(this.iddate).html("<div class='dropdown' style='margin-left: 15px;'><label style='margin-bottom: 0px;'>Acotar Fecha: </label>" +
                 "<button class='btn btn-default dropdown-toggle' type='button' data-toggle='dropdown'><label id='fecha-label' style='margin-bottom: 0px'>dd/mm/aaaa - dd/mm/aaaa</label> " +
                 "<span class='caret'></span></button>" +
                 "<ul class='dropdown-menu' style='padding: 7px'>" +
