@@ -604,7 +604,7 @@ function allMovFunction(input, req){
         //SI ES RECHAZO SE DEBE SEPARA EL MOVIMIENTO DE 1 EN 1
         if( input['to[]'][t] === 's' && parseInt(input['env[]'][t]) > 1 ){
             console.log("Separando Rechazo");
-            for(var e=0; e < parseInt(input['env[]'][t]); e++){
+            for(var e=0; e < parseInt(input['env[]'][t])-1; e++){
                 input['idmat[]'].push(input['idmat[]'][t]);
                 input['to[]'].push(input['to[]'][t]);
                 input['from[]'].push(input['from[]'][t]);
@@ -616,7 +616,6 @@ function allMovFunction(input, req){
             input['env[]'][t] =  '1';
         }
     }
-    console.log(input);
     recursive_save_ph(input, 0, req);
 }
 

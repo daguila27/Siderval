@@ -3930,7 +3930,7 @@ router.get('/visualizar_ofs', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);
         connection.query("SELECT " +
-			"material.*,ordenfabricacion.*, pedido.externo, fabricaciones.*, COALESCE(fabricaciones.restantes,false) > 0 AS encurso " +
+			"COALESCE(pedido.idpedido, 'no') AS idpedido, material.*,ordenfabricacion.*, pedido.externo, fabricaciones.*, COALESCE(fabricaciones.restantes,false) > 0 AS encurso " +
 			"FROM fabricaciones " +
 			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
 			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
@@ -4062,7 +4062,9 @@ router.get('/new_pdf_factura/:idfactura', function(req, res, next) {
                                 {
                                     "oda":oda[0],
                                     "mats":mats,
-									"vacio": array_vacio
+									"vacio": array_vacio,
+									"logo": base64img.base64Sync('./public/assets/img/logo.png'),
+									"firma": base64img.base64Sync('./public/assets/img/firma.png')
                                 }
 								);
 
@@ -4096,7 +4098,7 @@ router.get('/new_pdf_factura/:idfactura', function(req, res, next) {
                             }
 
                             console.log('done');
-                            res.send('public/pdf/fact_N'+numfac+'.pdf');
+                            res.send(res.req.headers.host+'/pdf/fact_N'+numfac+'.pdf');
                         }
                         catch(e){
                             console.log("Error al generar PDF : %s", e);
@@ -4157,8 +4159,6 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
 
                     }
                     var msg = '';
-                    console.log(oda[0].tokenoda.split('@'));
-                    console.log(typeof oda[0].tokenoda.split('@')[7]);
                     if(oda[0].tokenoda.split('@')[7] === 'off'){
 
                         oda[0].dcto = oda[0].neto * (parseInt(oda[0].tokenoda.split('@')[8])/100);
@@ -4181,14 +4181,12 @@ router.get('/new_pdf_oca/:idoca', function(req, res, next) {
 
                     oda[0].creacion = new Date(oda[0].creacion);
                     oda[0].creacion = oda[0].creacion.getDate()+"/"+(parseInt(oda[0].creacion.getMonth()) + 1)+"/"+oda[0].creacion.getFullYear();
-                    console.log(oda);
                     var dets = [{
                         pago: oda[0].tokenoda.split('@')[3],
                         plazo: [oda[0].tokenoda.split('@')[2].split('-')[2],oda[0].tokenoda.split('@')[2].split('-')[1],oda[0].tokenoda.split('@')[2].split('-')[0]].join('/'),
                         obs: oda[0].tokenoda.split('@')[0],
                         entrega: oda[0].tokenoda.split('@')[4]
                     }];
-                    console.log(dets);
                     (async function(){
                         try{
                             const browser = await puppeteer.launch()

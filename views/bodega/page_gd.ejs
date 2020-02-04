@@ -3,7 +3,22 @@ function fechaLatino(string){
     return [string.split('-')[2],string.split('-')[1],string.split('-')[0]].join('-')
 }
 %>
+<style>
+    .volver-tabla:hover{
+        background-color: rgb(124,123,173);
+        color: white;
+        cursor: pointer;
+    }
+    .volver-tabla{
+        position: relative;
+        left: 10px;
+        top: 10px;
+        padding: 5px;
+        border-radius: 25%;
+    }
+</style>
 
+<i class="fa fa-arrow-left volver-tabla" id="gddBack" onclick="volver_tabla()"></i>
 
 <div class="o_view_manager_content" style="padding-top: 3%">
     <div class="pull-left" style="font-size: 150%; margin-left: 20px" onclick="change_gdd(-1)"><i class="fa fa-arrow-left"></i>Anterior</div>
@@ -35,11 +50,11 @@ function fechaLatino(string){
                             <h1 style="width: 100%; margin-top: 0"><span class="o_field_char o_field_widget o_readonly_modifier o_required_modifier" name="name">Guia de Despacho N°<%=oda.idgd%></span></h1>
                         </div>
                         <div class="col-md-2" style="margin-left: 12.7%">
-                            <h1 style="width: 100%; margin-top: 0">
+                            <!--<h1 style="width: 100%; margin-top: 0">
                                 <a class="pull-right" style="z-index: 10; margin-left: 10px;" data-numgd="<%= oda.idgd%>" data-idgd="<%= oda.idgd%>">
                                     <i data-toggle="tooltip" title="Ver PDF" class="fa fa-file-pdf-o"></i>
                                 </a>
-                            </h1>
+                            </h1>-->
                         </div>
                     </div>
                     <div class="o_group">

@@ -918,7 +918,7 @@ router.get('/drop_notif/:idnotif', function(req, res, next){
                 if(err){
                     console.log("Error Selecting : %s", err);
                 }
-                res.redirect('/abastecimiento/notif_abast');
+                res.redirect('/calidad/render_notificaciones');
             });
     });
 });
