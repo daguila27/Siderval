@@ -194,11 +194,11 @@
     </table>
 
     <div class='obs'>
-        <div>OBSERVACIONES: OBS</div>
-        <div>DESTINO: </div>
-        <div>PLAZO DE ENTREGA: 30 días</div>
-        <div>FORMA DE PAGO: CONTADO</div>
-        <div>LUGAR DE ENTREGA: Siderval</div>
+        <div>OBSERVACIONES: {{dets.obs}}</div>
+        <div>DESTINO: <!--AQUI VA EL oda[0].tokenoda[0]--></div>
+        <div>PLAZO DE ENTREGA: {{ dets.plazo}}</div>
+        <div>FORMA DE PAGO: {{dets.pago}}</div>
+        <div>LUGAR DE ENTREGA: {{dets.entrega}}</div>
     </div>
     <div class='firma' style='width: 100%; padding-left: 75%; padding-top: 2%'>
         <img style='width: 25%' src='{{firma}}'>
