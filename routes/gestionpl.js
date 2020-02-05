@@ -190,7 +190,18 @@ router.get('/render_notificaciones', function(req, res, next){
                         }
                     }
                 }
-                res.render('gestionpl/notificaciones', {notif: notif});
+
+                console.log(req.session.msgNotif);
+                var auxmsg;
+                if(req.session.msgNotif){
+                    auxmsg = req.session.msgNotif;
+                    req.session.msgNotif = false;
+                    console.log(req.session.msgNotif);
+                    res.render('gestionpl/notificaciones', {notif: notif, msgNotif: auxmsg});
+                }
+                else{
+                    res.render('gestionpl/notificaciones', {notif: notif, msgNotif: false});
+                }
             });
         });
     });

@@ -1495,7 +1495,8 @@ router.get('/render_notificaciones', function(req, res, next){
             "LEFT JOIN (SELECT * FROM material) AS material2 ON material2.idmaterial=pedido.idmaterial " +
             "WHERE (SUBSTRING(notificacion.descripcion,1,3) = 'idm' OR SUBSTRING(notificacion.descripcion,1,5) = 'crgdd') AND notificacion.active = true", function(err, notif){
 			if(err){console.log("Error Selecting : %s", err);}
-			res.render('bodega/notificaciones', {notif: notif})
+
+			res.render('bodega/notificaciones', {notif: notif});
 		});
 	});
 });
@@ -1506,21 +1507,32 @@ router.get('/confirm_notificacion/:idnotificacion/:cantidad', function(req,res,n
 		req.getConnection(function(err, connection){
 			connection.query("SELECT * FROM notificacion WHERE idnotificacion = ?", [idnotificacion], function(err, mat){
 				if(err){console.log("Error Selecting : %s", err);}
-				connection.query("UPDATE material SET stock = stock + ? WHERE idmaterial = ?", [cantidad, mat[0].descripcion.split('@')[1]], function(err, rows){
-					if(err){console.log("Error Selecting : %s", err);}
-					connection.query('UPDATE notificacion SET active = false WHERE idnotificacion = ?', [idnotificacion],function(err, notif){
-						if(err){console.log("Error Selecting : %s", err);}
-						console.log(notif);
 
-						console.log(req.session.userData);
-						if(req.session.userData.nombre === 'faena'){
-							res.redirect('/faena/render_notificaciones/'+req.session.myValue);
-						}
-						else if(req.session.userData.nombre === 'bodega' || req.session.userData.nombre === 'gestionpl'){
-					    	res.redirect('/'+req.session.userData.nombre+'/render_notificaciones');
-						}
-					});
-				});
+                connection.query("SELECT * FROM material WHERE idmaterial = ?", [mat[0].descripcion.split('@')[1]], function(err, mats){
+                    if(err){console.log("Error Selecting : %s", err);}
+                    var stock_a = mats[0].stock;
+                    connection.query("UPDATE material SET stock = stock + ? WHERE idmaterial = ?", [parseInt(mat[0].descripcion.split('@')[2]), mat[0].descripcion.split('@')[1]], function(err, rows){
+                        if(err){console.log("Error Selecting : %s", err);}
+                        connection.query('UPDATE notificacion SET active = false WHERE idnotificacion = ?', [idnotificacion],function(err, notif){
+                            if(err){console.log("Error Selecting : %s", err);}
+                            console.log(notif);
+                            connection.query("SELECT * FROM material WHERE idmaterial = ?", [mat[0].descripcion.split('@')[1]], function(err, mats2){
+                                if(err){console.log("Error Selecting : %s", err);}
+                                var stock_d = mats2[0].stock;
+                                console.log("Stock Antes: "+stock_a+"\n Ingresados: "+parseInt(mat[0].descripcion.split('@')[2])+"\n Stock Despues: "+stock_d);
+                                req.session.msgNotif = "Stock Antes: "+stock_a+" Ingresados: "+parseInt(mat[0].descripcion.split('@')[2])+" Stock Despues: "+stock_d;
+                                console.log(req.session.userData);
+                                if(req.session.userData.nombre === 'faena'){
+                                    res.redirect('/faena/render_notificaciones/'+req.session.myValue);
+                                }
+                                else if(req.session.userData.nombre === 'bodega' || req.session.userData.nombre === 'gestionpl'){
+                                    res.redirect('/'+req.session.userData.nombre+'/render_notificaciones');
+                                }
+
+                            });
+                        });
+                    });
+                });
 			});	
 		});
 });
