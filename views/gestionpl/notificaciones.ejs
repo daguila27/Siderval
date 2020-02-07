@@ -120,6 +120,12 @@ if(notif[u].externo){%>
 <%}%>
 
 <script type="text/javascript">
+    <%if(msgNotif){%>
+        alert('<%= msgNotif%>');
+    <%}%>
+
+
+
     var cantNotif = parseInt("<%= notif.length%>");
     $(".open-notif").data('cant',cantNotif);
     $(".badge-notificaciones").html($(".open-notif").data('cant'));
@@ -133,7 +139,7 @@ if(notif[u].externo){%>
         var data = $(esto).data();
         $.ajax({
             type: 'GET',
-            url: 'bodega/confirm_notificacion/'+data.id+'/'+data.cant,
+            url: '/bodega/confirm_notificacion/'+data.id+'/'+data.cant,
             success: function(data){
                 $(".notificaciones").html(data);
             }
