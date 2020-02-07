@@ -249,7 +249,7 @@ router.get('/create_production_rech_prodh', function(req, res, next){
                                             ".";
                                     }
                                     //res.render('calidad/create_production_rech', {datalen: prods, etp: dataEtp, causal: causal, opt_causal: cau, user: userDat[0].block_s, alertMsg: alertMsg});
-                                    res.render('calidad/create_production_rech_prodh', {datalen: prods, etp: dataEtp, causal: causal, opt_causal: cau, user: userDat[0].block_s, alertMsg: alertMsg});
+                                    res.render('calidad/create_production_rech_prodh', {datalen: prods, etp: dataEtp, causal: causal, opt_causal: cau, user: userDat[0].block_s, alertMsg: alertMsg, noshowAlert: userDat[0].block_msg});
 
                                 });
                         });
@@ -624,6 +624,26 @@ router.post('/save_production_rech_prod', function(req, res, next){
 });
 
 
+
+router.get('/change_block_status_cal', function(req, res, next){
+    if(verificar(req.session.userData)){
+        req.getConnection(function(err, connection){
+            if(err){console.log("Error Connecting : %s");}
+
+            connection.query("UPDATE `siderval`.`user` SET `block_msg` = '0' WHERE (`iduser` = '15')", function(err, inRechCdc){
+                if(err){console.log("Error Inserting : %s", err);}
+
+
+                res.send("ok");
+
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+
 function getArrayKey(key, obj){
     var arr = [];
     obj.map(function(item){
@@ -713,7 +733,7 @@ router.post('/table_rechazos', function(req, res, next){
                     "mainTable.etapacausal,'@', " +
                     "mainTable.idop,'@', " +
                     "mainTable.idof,'@', " +
-                    "mainTable.causal_princ) SEPARATOR '%') AS det_rech" +
+                    "coalesce(mainTable.causal_princ,0)) SEPARATOR '%') AS det_rech" +
                     " FROM (SELECT \n" +
                     "\t\t\t\t\tproduccionh_causal.idproduccion_h,\n" +
                     "                    fabricaciones.idmaterial, \n" +
@@ -725,10 +745,13 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
-                    "                    causal.causal,\n" +
-                    "                    etapacausal.nombre AS etapacausal, \n" +
+                    "                    GROUP_CONCAT(causal.causal SEPARATOR '&') AS causal, \n" +
+                    "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '&') AS causal_princ,\n" +
+                    "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '&') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    rechazos_cdc.fecha AS fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha AS fecha_rech, " +
+                    "                    fabricaciones.idorden_f AS idof, " +
+                    "                    produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +
@@ -771,10 +794,13 @@ router.post('/table_rechazos', function(req, res, next){
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
-                    "                    causal.causal,\n" +
-                    "                    etapacausal.nombre AS etapacausal, \n" +
+                    "                    GROUP_CONCAT(causal.causal SEPARATOR '&') AS causal, \n" +
+                    "                    GROUP_CONCAT(produccionh_causal.princ SEPARATOR '&') AS causal_princ,\n" +
+                    "                    GROUP_CONCAT(etapacausal.nombre SEPARATOR '&') AS etapacausal, \n" +
                     "                    etapafaena.nombre_etapa AS etapa_desde, \n" +
-                    "                    rechazos_cdc.fecha as fecha_rech, fabricaciones.idorden_f AS idof, produccion.idordenproduccion AS idop \n" +
+                    "                    rechazos_cdc.fecha as fecha_rech, " +
+                    "                    fabricaciones.idorden_f AS idof, " +
+                    "                    produccion.idordenproduccion AS idop \n" +
                     "                    FROM produccionh_causal  \n" +
                     "                    LEFT JOIN produccion_history ON produccion_history.idproduccion_history = produccionh_causal.idproduccion_h \n" +
                     "                    LEFT JOIN produccion ON produccion.idproduccion = produccion_history.idproduccion \n" +

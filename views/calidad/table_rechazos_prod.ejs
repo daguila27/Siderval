@@ -56,16 +56,16 @@ function completarDigitos(num, dig){
 <table id="rechTable" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="min-width: 100%; margin-top: -2px !important;">
     <thead>
         <tr>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='0' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Fecha de Rechazo </th>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='1' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Hora de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Hora de Rechazo</th>
-            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='2' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Descripción Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Descripción Producto</th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='0' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Fecha de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Fecha de<br> Rechazo </th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='1' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Hora de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Hora de<br> Rechazo</th>
+            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='2' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Descripción Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Descripción <br>Producto</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='3' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Área de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Área de Rechazo</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='4' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OF" style="padding:auto; text-align: center; white-space: nowrap; ">OF</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='5' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="OP" style="padding:auto; text-align: center; white-space: nowrap; ">OP</th>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='6' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="padding:auto; text-align: center; white-space: nowrap; ">Código Único de Colada</th>
-            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='7' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Corr. Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Correlativo Producto</th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='6' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Código Único de Colada" style="padding:auto; text-align: center; white-space: nowrap; ">Código Único <br>de Colada</th>
+            <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='7' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Corr. Producto" style="padding:auto; text-align: center; white-space: nowrap; ">Correlativo <br>Producto</th>
             <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='8' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="padding:auto; text-align: center; white-space: nowrap; ">Cantidad</th>
-            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='9' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Peso Unitario [Kg]" style="padding:auto; text-align: center; white-space: nowrap; ">Peso Unitario [kg]</th>
+            <th data-habfill="true" onclick="sortTable('rechTable', this);" data-sort='9' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Peso Unitario [Kg]" style="padding:auto; text-align: center; white-space: nowrap; ">Peso <br>Unitario [kg]</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='10' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Causal de Rechazo</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='11' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Etapa Causal de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Etapa Causal de Rechazo</th>
             <th data-habfill="false" onclick="sortTable('rechTable', this);" data-sort='12' data-updown='false' data-toggle="tooltip" data-placement="bottom" title="Imagen de Rechazo" style="padding:auto; text-align: center; white-space: nowrap; ">Imagen</th>
@@ -162,7 +162,16 @@ function completarDigitos(num, dig){
         <td></td>
         <td></td>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
         <td class="footer-pesoT parsear_nro" cs="2"  style="display: flex; width: 100%; text-align: center"><%= pesoT%></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
     </tr>
     </tfoot>
 </table>
@@ -184,9 +193,9 @@ function completarDigitos(num, dig){
                 princ = [$(this).data('princ')];
             }
             else{
-                princ = $(this).data('princ').split('-');
+                princ = $(this).data('princ').split('&');
             }
-            var sec = $(this).data('sec').split('-');
+            var sec = $(this).data('sec').split('&');
             var k;
             for(var i=1;i<princ.length;i++) {
                 for(var j=0;j<(princ.length-i);j++) {

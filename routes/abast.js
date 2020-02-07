@@ -79,7 +79,7 @@ var updOcaRouter = require('./modelos/ocaRouter');
 router.use('/updOca',updOcaRouter);
 
 router.get('/', function(req, res, next) {
-	if(req.session.userData.nombre == 'abastecimiento'){
+	if(req.session.userData.nombre === 'abastecimiento'){
 		req.getConnection(function(err, connection){
 			if(err)
 				console.log("Error Connection : %s",err);
@@ -2624,17 +2624,54 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				sheet.getCell('D'+i.toString()).value = ops[i-4].u_medida;
 				//Stock Inicial
 				sheet.getCell('E'+i.toString()).value = ops[i-4].s_inicial;
-				sheet.getCell('F'+i.toString()).value = parseInt(ops[i-4].fabricados) + parseInt(ops[i-4].sum_dev) + parseInt(ops[i-4].ing_oda);
-				sheet.getCell('G'+i.toString()).value = parseInt(ops[i-4].despachados) - parseInt(ops[i-4].sum_sal);
+				sheet.getCell('F'+i.toString()).value = parseInt(ops[i-4].fundidos) + parseInt(ops[i-4].sum_dev) + parseInt(ops[i-4].ing_oda);
+				sheet.getCell('G'+i.toString()).value = parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados);
 				sheet.getCell('H'+i.toString()).value =
-					parseInt(ops[i-4].s_inicial) +
-					parseInt(ops[i-4].fabricados) +
+					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
+					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
-					parseInt(ops[i-4].ing_oda) -
-					parseInt(ops[i-4].despachados) -
-					parseInt(ops[i-4].sum_sal);
+					parseInt(ops[i-4].ing_oda) - (
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)
+					);//STOCK FINAL SIDERVAL
 
 
+
+				sheet2.getCell('B'+(i-2)).value = ops[i-4].codigo;
+				sheet2.getCell('C'+(i-2)).value = ops[i-4].detalle;
+				sheet2.getCell('D'+(i-2)).value = ops[i-4].u_medida;
+				sheet2.getCell('E'+(i-2)).value = ops[i-4].peso;
+				sheet2.getCell('F'+(i-2)).value = ops[i-4].s_inicial;
+				sheet2.getCell('G'+(i-2)).value = ops[i-4].p_inicial;
+				sheet2.getCell('H'+(i-2)).value = ops[i-4].fundidos;
+				sheet2.getCell('I'+(i-2)).value = ops[i-4].despachados;
+				sheet2.getCell('J'+(i-2)).value = ops[i-4].rechazados;
+				sheet2.getCell('K'+(i-2)).value = "Bodega Externa";
+				sheet2.getCell('L'+(i-2)).value =
+					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
+					parseInt(ops[i-4].fundidos) +
+					parseInt(ops[i-4].sum_dev) +
+					parseInt(ops[i-4].ing_oda) - (
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados));
+				//STOCK FINAL SIDERVAL
+
+
+
+
+
+				sheet3.getCell('B'+(i-2)).value = ops[i-4].codigo;
+				sheet3.getCell('C'+(i-2)).value = ops[i-4].detalle;
+				sheet3.getCell('D'+(i-2)).value = ops[i-4].u_medida;
+				sheet3.getCell('E'+(i-2)).value = ops[i-4].s_inicial;
+				sheet3.getCell('F'+(i-2)).value = ops[i-4].ing_oda;
+				sheet3.getCell('G'+(i-2)).value = ops[i-4].despachados;
+				sheet3.getCell('H'+(i-2)).value = "Solicitado a Producción";
+				sheet3.getCell('I'+(i-2)).value = ops[i-4].sum_dev;
+				sheet3.getCell('J'+(i-2)).value = ops[i-4].sum_sal;
+				sheet3.getCell('K'+(i-2)).value =
+					parseInt(ops[i-4].s_inicial) +
+					parseInt(ops[i-4].sum_dev) +
+					parseInt(ops[i-4].ing_oda) - (
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal));//STOCK FINAL BODEGA
 
 
 				/*sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
@@ -2784,7 +2821,7 @@ router.post('/table_abastecimientos', function(req, res, next){
                 connection.query("select * from (select abastecimiento.*,oda.anulado,oda.creacion as oda_creacion,coalesce(recepciones.cantidad,0) as recib,coalesce(facturacion.cantidad,0) as facturados, facturacion.factura_token, facturacion.fanulado_token, recepciones.gd_token, " +
                     "COALESCE(cliente.sigla, 'Sin Proveedor') as sigla, COALESCE(sub_ccontable.nombre, 'NO DEFINIDO') as subcuenta,COALESCE(cuenta_g.cuenta, 'NO DEFINIDO') as cuenta_g,COALESCE(ccontable.cuenta, 'NO DEFINIDO') as cuenta,coalesce(sub_ccontable.idccontable, 'Indefinido') as idccontable,oda.idoda as idodabast, oda.creacion, material.u_medida, material.detalle from abastecimiento " +
                     "left join (select facturacion.idabast, sum(facturacion.cantidad) as cantidad,GROUP_CONCAT(DISTINCT CONCAT(coalesce(factura.numfac,'Sin N°'),'@',factura.idfactura)) as factura_token,GROUP_CONCAT(factura.anulado) as fanulado_token from facturacion left join factura on factura.idfactura = facturacion.idfactura WHERE !factura.anulado group by facturacion.idabast) as facturacion on facturacion.idabast = abastecimiento.idabast " +
-                    "left join (select recepcion_detalle.idabast,sum(recepcion_detalle.cantidad) as cantidad, group_concat(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token from recepcion_detalle left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion group by recepcion_detalle.idabast) as recepciones on recepciones.idabast = abastecimiento.idabast " +
+                    "left join (select recepcion_detalle.idabast,sum(recepcion_detalle.cantidad) as cantidad, group_concat(DISTINCT CONCAT(recepcion.numgd,'@',recepcion.idrecepcion)) as gd_token from recepcion_detalle left join recepcion on recepcion.idrecepcion = recepcion_detalle.idrecepcion where !recepcion.anulado group by recepcion_detalle.idabast) as recepciones on recepciones.idabast = abastecimiento.idabast " +
                     "LEFT JOIN oda ON oda.idoda=abastecimiento.idoda " +
                     "LEFT JOIN material ON abastecimiento.idmaterial=material.idmaterial " +
                     "LEFT JOIN cliente ON cliente.idcliente=oda.idproveedor " +
