@@ -4274,11 +4274,17 @@ router.get('/visualizar_ofs', function(req, res, next) {
     req.getConnection(function(err, connection) {
         if(err) console.log("Error Selecting : %s", err);
         connection.query("SELECT " +
-			"COALESCE(pedido.idpedido, 'no') AS idpedido, material.*,ordenfabricacion.*, pedido.externo, fabricaciones.*, COALESCE(fabricaciones.restantes,false) > 0 AS encurso " +
+			"COALESCE(pedido.idpedido, 'no') AS idpedido, " +
+			"material.*," +
+			"ordenfabricacion.*, " +
+			"pedido.externo, " +
+			"fabricaciones.*, " +
+			"COALESCE(fabricaciones.restantes,false) > 0 AS encurso " +
 			"FROM fabricaciones " +
 			"LEFT JOIN ordenfabricacion on ordenfabricacion.idordenfabricacion=fabricaciones.idorden_f " +
 			"left join pedido on pedido.idpedido=fabricaciones.idpedido " +
-			"left join material on material.idmaterial=fabricaciones.idmaterial WHERE fabricaciones.restantes > 0 order by ordenfabricacion.idordenfabricacion DESC", function (err, ofs) {
+			"left join material on material.idmaterial=fabricaciones.idmaterial " +
+			"order by ordenfabricacion.idordenfabricacion DESC", function (err, ofs) {
             if (err) console.log('We got an error! - '+err);
 
             res.render('abast/visualizar_ofs', {of: ofs});
