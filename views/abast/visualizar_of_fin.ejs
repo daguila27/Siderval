@@ -14,7 +14,7 @@ function setZeros(str){
 }
 %>
 
-<table id="viewOF_fin" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width:100%;">
+<table id="viewOF_fin" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width:100%; padding: 0 !important;">
     <thead>
     <tr>
         <th>OF</th>
@@ -82,8 +82,9 @@ function setZeros(str){
 </div>
 <script>
 
+    var tableOFfin;
     $(document).ready(function() {
-        $('#viewOF_fin').DataTable({
+        tableOFfin = $('#viewOF_fin').DataTable({
             "lengthChange": false,
             "paging": true,
             order: [[ 0, "desc" ]],
@@ -112,8 +113,12 @@ function setZeros(str){
                 }
             }
         });
+        $("#viewOF_fin_filter").parent().parent().addClass('hidden');
+        $("#viewOF_fin_wrapper").css('margin-top', '0px !important');
     });
-
+    $('#buscadorDataTableOFfin').keyup(function(){
+        tableOFfin.search($(this).val()).draw() ;
+    });
     function obtener_pdf(idof, yo){
         $.ajax({
             type: 'get',

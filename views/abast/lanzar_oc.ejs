@@ -161,7 +161,7 @@
       <ul class="nav nav-tabs">
           <li class="active"><a href="#buscador" aria-controls="home" role="tab" data-toggle="tab">Buscador</a></li>
           <li><a href="#segunOF" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación</a></li>
-          <!--<li><a href="#segunOF_fin" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación Finalizadas</a></li>-->
+          <li><a href="#segunOF_fin" aria-controls="home" role="tab" data-toggle="tab">Ordenes de Fabricación Finalizadas</a></li>
       </ul>
     <div>
       <div class="tab-content">
@@ -228,24 +228,9 @@
             <div class="panel-heading">
               <div style="display: flex; padding-left: 30px">
                   <div>
-                      <input type="checkbox" id="of-fin" value="off"> Mostrar OF finalizada<br>
                       <label class="pull-right">Buscar:<input type="search" class="form-control input-sm" id="buscadorDataTableOF" placeholder=""></label>
                   </div>
               </div>
-                <script>
-                    $("#of-fin").on('change', function(e){
-                        e.preventDefault();
-                        if( $(this).is(':checked') ) {
-                            alert('Seleccionado');
-                            $(".encurso").removeClass('hidden');
-                        }else{
-                            alert('no');
-                            $(".encurso").addClass('hidden');
-
-                        }
-                    });
-
-                </script>
             </div>
           </div>
           <div class="panel-body renderizar_ofs" style="padding: 0 !important;">
@@ -254,6 +239,11 @@
           <div role="tabpanel" class="tab-pane fade" id="segunOF_fin">
               <div class="panel panel-info">
                   <div class="panel-heading">
+                      <div style="display: flex; padding-left: 30px">
+                          <div>
+                              <label class="pull-right">Buscar:<input type="search" class="form-control input-sm" id="buscadorDataTableOFfin" placeholder=""></label>
+                          </div>
+                      </div>
                   </div>
               </div>
               <div class="panel-body renderizar_of_fin">
