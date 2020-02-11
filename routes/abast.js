@@ -2419,68 +2419,6 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 		var sheet2 = workbook.addWorksheet('Detalle Producto');
 		var sheet3 = workbook.addWorksheet('Detalle Abastecimiento');
 		var sheet4 = workbook.addWorksheet('Detalle Planta');
-		/*sheet.columns = [
-			{ header: 'Código', key: 'id', width: 15, style: 'text-aling: center' },
-			{ header: 'Detalle', key: 'name', width: 50 },
-			{ header: 'Unidad Med.', key: 'unit', width: 10},
-			{ header: 'Stock Inicio Mes', key: 'initial', width: 15},
-			{ header: 'Pendientes Totales en OC', key: 'asked', width: 15},
-			{ header: 'Solicitado en OC (Mensual)', key: 'asked', width: 15},
-			{ header: 'Solicitado en OC atrasado', key: 'asked', width: 20},
-			{ header: 'Solicitada según OP', key: 'asked', width: 20},
-			{ header: 'Solicitada según entradas a BPT', key: 'asked', width: 28},
-			{ header: 'Stock en producción', key: 'virtual', width: 15},
-			{ header: 'Rechazados', key: 'virtual', width: 15},
-			{ header: 'Stock de ODA sin recepcionar', key: 'virtual', width: 25},
-			{ header: 'Aceptados por CC', key: 'income', width: 15},
-			{ header: 'Devolución a BMI', key: 'income', width: 15},
-			{ header: 'Recepcion GDD', key: 'income', width: 15},
-			{ header: 'Retiros en BMI', key: 'departures', width: 15},
-			{ header: 'Salidas en GDD', key: 'departures', width: 15},
-			{ header: 'Facturados', key: 'departures', width: 15},
-			{ header: 'Por Facturar', key: 'departures', width: 15},
-			{ header: 'Stock Final', key: 'final', width: 15}
-		];
-		sheet2.columns = [
-			{ header: 'Código', key: 'id', width: 15 },
-			{ header: 'Detalle', key: 'name', width: 50 },
-			{ header: 'Unidad Med.', key: 'unit', width: 10},
-			{ header: 'Solicitado en OP', key: 'asked', width: 15},
-			{ header: 'Moldeo', key: 'virtual', width: 10},
-			{ header: 'Fusion', key: 'income', width: 10},
-			{ header: 'Quiebre', key: 'income', width: 10},
-			{ header: 'Terminación', key: 'departures', width: 10},
-			{ header: 'Tratamiento Térmico', key: 'income', width: 15},
-			{ header: 'Maestranza', key: 'departures', width: 10},
-			{ header: 'Control de Calidad', key: 'final', width: 15},
-			{ header: 'Rechazado', key: 'final', width: 15},
-			{ header: 'Ingresado a BPT', key: 'final', width: 15}
-		];
-		sheet3.columns = [
-			{ header: 'Código', key: 'id', width: 15 },
-			{ header: 'Detalle', key: 'name', width: 50 },
-			{ header: 'Unidad Med.', key: 'unit', width: 10},
-			{ header: 'Retiro Bodega', key: 'virtual', width: 10},
-			{ header: 'GDD Venta', key: 'income', width: 10},
-			{ header: 'GDD Traslado', key: 'income', width: 10},
-			{ header: 'GDD Devolucion', key: 'departures', width: 10},
-			{ header: 'GDD Anulada', key: 'income', width: 15}
-		];
-		sheet4.columns = [
-			{ header: 'Código', key: 'id', width: 13, height: 13.43},
-			{ header: 'Detalle', key: 'name', width: 42.14 },
-			{ header: 'Unidad', key: 'unit', width: 7.86},
-			{ header: 'Peso Unitario (KG)', key: 'virtual', width: 14.71},
-			{ header: 'Inicial BPT', key: 'virtual', width: 14.71},
-			{ header: 'Inicial Planta', key: 'income', width: 14.71},
-			{ header: 'Total Fusión Mes', key: 'income', width: 13.57},
-			{ header: 'Entradas a Producción', key: 'income', width: 13.57},
-			{ header: 'Actual en Planta', key: 'income', width: 13.57},
-			{ header: 'Total Despachado GDD', key: 'departures', width: 14.71},
-			{ header: 'Total Rechazos Mes', key: 'income', width: 14.71},
-			{ header: 'Total Externalizado Mes', key: 'income', width: 14.71},
-			{ header: 'Stock en Siderval', key: 'income', width: 11}
-		];*/
 		var env = [
 			req.params.token.split("@")[0],
 			req.params.token.split("@")[1],
@@ -2674,6 +2612,8 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal));//STOCK FINAL BODEGA
 
 
+
+
 				/*sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
 				sheet4.getCell('B'+i.toString()).value = ops[i-2].detalle;
 				sheet4.getCell('C'+i.toString()).value = ops[i-2].u_medida;
@@ -2709,12 +2649,43 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			};
 
 
+			adminModel.produccion(req.params.token.split("@"),function(err,prods){
+				if(err) throw err;
+				for(let i=3;i<prods.length+3;i++){
+					sheet4.getCell('A'+(i)).value = ops[i-3].codigo;
+					sheet4.getCell('B'+(i)).value = prods[i-3].detalle;
+					sheet4.getCell('C'+(i)).value = "Total Unidades";
+					sheet4.getCell('D'+(i)).value = "Total Peso";
+					sheet4.getCell('E'+(i)).value = "Planta";
+					sheet4.getCell('F'+(i)).value = "MOL";
+					sheet4.getCell('G'+(i)).value = "FUS";
+					sheet4.getCell('H'+(i)).value = "QUI";
+					sheet4.getCell('I'+(i)).value = "TER";
+					sheet4.getCell('J'+(i)).value = "TTO";
+					sheet4.getCell('K'+(i)).value = "MTR";
+					sheet4.getCell('L'+(i)).value = "CAL";
+					sheet4.getCell('M'+(i)).value = "BPT";
+					sheet4.getCell('N'+(i)).value = "Total";
+					sheet4.getCell('O'+(i)).value = "Total Peso";
+					sheet4.getCell('P'+(i)).value = "Planta";
+					sheet4.getCell('Q'+(i)).value = prods[i-3].moldeo;
+					sheet4.getCell('R'+(i)).value = prods[i-3].fusion;
+					sheet4.getCell('S'+(i)).value = prods[i-3].quiebre;
+					sheet4.getCell('T'+(i)).value = prods[i-3].terminacion;
+					sheet4.getCell('U'+(i)).value = prods[i-3].tt;
+					sheet4.getCell('V'+(i)).value = prods[i-3].maestranza;
+					sheet4.getCell('W'+(i)).value = prods[i-3].cc;
+					sheet4.getCell('X'+(i)).value = prods[i-3].fabricados;
+					//sheet4.addRow([prods[i].codigo,prods[i].detalle,prods[i].u_medida,prods[i].cant_total,prods[i].moldeo,prods[i].fusion,prods[i].quiebre,prods[i].terminacion,prods[i].tt,prods[i].maestranza,prods[i].cc,prods[i].rechazados,prods[i].fabricados]);
+				}
 
+				workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
+					console.log(nombre);
+					res.send(nombre);
+				});
 
-			workbook.xlsx.writeFile('public/csvs/' + nombre).then(function() {
-				console.log(nombre);
-				res.send(nombre);
 			});
+
 
 
 			/*adminModel.produccion(req.params.token.split("@"),function(err,prods){
