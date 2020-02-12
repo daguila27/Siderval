@@ -2583,7 +2583,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				sheet2.getCell('H'+(i-2)).value = ops[i-4].fundidos;
 				sheet2.getCell('I'+(i-2)).value = ops[i-4].despachados;
 				sheet2.getCell('J'+(i-2)).value = ops[i-4].rechazados;
-				sheet2.getCell('K'+(i-2)).value = ops[i-4].externalizado;
+				sheet2.getCell('K'+(i-2)).value = ops[i-4].externalizados;
 				sheet2.getCell('L'+(i-2)).value =
 					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
 					parseInt(ops[i-4].fundidos) +
