@@ -51,9 +51,13 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
         var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct', 'nov', 'dic'];
         var mes = meses[parseInt(fecha[0].split('-')[1]) - 1];
         console.log(where);
-        connection.query("select material.codigo,material.stock,coalesce(stock_mes."+mes+"_si, 0) as s_inicial,coalesce(stock_mes."+mes+"_sp, 0) as p_inicial,material.detalle, material.precio,material.u_medida, material.peso , coalesce(facturados.facturados, 0) as sum_fact," +
+        connection.query("select " +
+            "material.codigo,material.stock,coalesce(stock_mes."+mes+"_si, 0) as s_inicial," +
+            "coalesce(stock_mes."+mes+"_sp, 0) as p_inicial,material.detalle, " +
+            "material.precio,material.u_medida, material.peso, " +
+            "coalesce(facturados.facturados, 0) as sum_fact," +
             "COALESCE(fabrs.fabricados,0) as fabricados, coalesce(peds_totales.totales, 0) as pendientes,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
-            ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales,COALESCE(virts_oda.sum_virtual,0) as virtuales_oda" +
+            ",COALESCE(desps.despachados,0) AS despachados,COALESCE(virts.virtuales,0) as virtuales,COALESCE(virts.externalizados,0) as externalizados,COALESCE(virts_oda.sum_virtual,0) as virtuales_oda" +
             ",COALESCE(necesario.neto,0) AS necesario_neto,COALESCE(rechazados.rechazados,0) AS rechazados,COALESCE(fundidos.fundidos,0) AS fundidos, COALESCE(necesario.necesarios,0) AS necesarios,COALESCE(salidas_mp.sum_sal,0) as sum_sal" +
             ",coalesce(devs.sum_devs,0) as sum_dev, coalesce(ing_oda.sum_ing,0) as ing_oda FROM material" +
             " LEFT JOIN stock_mes ON stock_mes.idmaterial_stock = material.idmaterial" +
@@ -122,8 +126,9 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
             " FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
             " LEFT JOIN gd ON gd.idgd = despachos.idgd WHERE (gd.fecha BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " AND (gd.estado = 'Venta' OR (gd.estado = 'Traslado' AND (gd.idcliente = 6341  OR gd.idcliente = 6439) )) GROUP BY material.idmaterial) AS desps ON desps.idmaterial = material.idmaterial" +
-            // LEFT JOIN produccion AKA cantidad en produccion
-            " LEFT JOIN (SELECT fabricaciones.idmaterial,SUM(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1` - produccion.`2`) as virtuales" +
+            // LEFT JOIN produccion AKA cantidad en produccion se incluyen exteralizados
+            " LEFT JOIN (SELECT fabricaciones.idmaterial," +
+            "SUM(produccion.cantidad - produccion.`8` - produccion.standby - produccion.`1` - produccion.`2`) as virtuales, SUM(produccion.e) AS externalizados" +
             " FROM produccion" +
             " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = produccion.idfabricaciones" +
             " GROUP BY fabricaciones.idmaterial) AS virts ON virts.idmaterial = material.idmaterial" +
