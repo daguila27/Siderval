@@ -2489,6 +2489,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet.getCell('F3').value = "Ingreso";
 			sheet.getCell('G3').value = "Salida";
 			sheet.getCell('H3').value = "Stock Final";
+			sheet.getCell('I3').value = "Ingreso a Produccion por ODV";
 
 			sheet2.getCell('B1').value = "Código";
 			sheet2.getCell('C1').value = "Descripción";
@@ -2571,7 +2572,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].ing_oda) - (
 						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)
 					);//STOCK FINAL SIDERVAL
-
+				sheet.getCell('I'+i.toString()).value = ops[i-4].ingresoproduccion;
 
 
 				sheet2.getCell('B'+(i-2)).value = ops[i-4].codigo;
