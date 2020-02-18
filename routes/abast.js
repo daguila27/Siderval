@@ -2401,8 +2401,6 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 	if(verificar(req.session.userData)){
 		let fecha = new Date();
 		var nombre;
-		console.log(req.params.token);
-		console.log(req.params.token.split('@')[2]);
 		if(parseInt(req.params.token.split('@')[2]) == 1){
 			nombre = "ICM-producidos-" + fecha.getDate()  + "-" + (fecha.getMonth() + 1).toString() + "-" + fecha.getFullYear() + "---" + fecha.getTime() + '.xlsx';
 		}
@@ -2432,7 +2430,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				fgColor:{argb:'F4D03F'}
 			};
 			sheet.getRow(1).font = {
-				name: 'Comic Sans MS',
+				name: 'Calibri',
 				family: 4,
 				size: 11,
 				underline: false,
@@ -2445,7 +2443,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				fgColor:{argb:'F4D03F'}
 			};
 			sheet2.getRow(1).font = {
-				name: 'Comic Sans MS',
+				name: 'Calibri',
 				family: 4,
 				size: 11,
 				underline: false,
@@ -2458,7 +2456,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				fgColor:{argb:'F4D03F'}
 			};
 			sheet3.getRow(1).font = {
-				name: 'Comic Sans MS',
+				name: 'Calibri',
 				family: 4,
 				size: 11,
 				underline: false,
@@ -2471,7 +2469,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				fgColor:{argb:'F4D03F'}
 			};
 			sheet4.getRow(1).font = {
-				name: 'Comic Sans MS',
+				name: 'Calibri',
 				family: 4,
 				size: 11,
 				underline: false,
@@ -2562,7 +2560,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				sheet.getCell('C'+i.toString()).value = ops[i-4].u_medida;
 				sheet.getCell('D'+i.toString()).value = ops[i-4].u_medida;
 				//Stock Inicial
-				sheet.getCell('E'+i.toString()).value = ops[i-4].s_inicial;
+				sheet.getCell('E'+i.toString()).value = ops[i-4].s_inicial + ops[i-4].p_inicial;
 				sheet.getCell('F'+i.toString()).value = parseInt(ops[i-4].fundidos) + parseInt(ops[i-4].sum_dev) + parseInt(ops[i-4].ing_oda);
 				sheet.getCell('G'+i.toString()).value = parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados);
 				sheet.getCell('H'+i.toString()).value =
@@ -2646,7 +2644,20 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 
 			sheet.autoFilter = {
 				from: 'A3',
-				to: 'H3',
+				to: 'I3',
+			};
+
+			sheet2.autoFilter = {
+				from: 'B1',
+				to: 'L1',
+			};
+			sheet3.autoFilter = {
+				from: 'B1',
+				to: 'K1',
+			};
+			sheet4.autoFilter = {
+				from: 'A2',
+				to: 'X2',
 			};
 
 

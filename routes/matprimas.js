@@ -978,7 +978,7 @@ router.get("/crear_movimiento_vista/:idreservaciones_det/:estado",function(req,r
             msg = '¡Reservación Preparada con Exito!';
         }
         else if(req.params.estado === '1'){
-            cant = "COALESCE(reservacion_detalle.prep, 0) AS cant_reserv,";
+            cant = "COALESCE(reservacion_detalle.sin_prep, 0) AS cant_reserv,";
             url = '/matprimas/crear_movimiento_reserva';
             titulo = 'Retirando Reservación';
             msg = '¡Reservación Retirada con Exito!';
@@ -1049,7 +1049,7 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
         for(var e=0; e < input.length; e++){
             if(e === 0){
                 upReserv += "UPDATE reservacion_detalle SET ret = CASE ";
-                upReserv2 += "UPDATE reservacion_detalle SET prep = CASE ";
+                upReserv2 += "UPDATE reservacion_detalle SET sin_prep = CASE ";
             }
             mov.push([input[e][0], parseInt(input[e][2]) ]);
             idreserv.push(input[e][1]);
@@ -1065,11 +1065,11 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
 
 
             upReserv += " WHEN idreservacion_d = "+input[e][1]+" THEN ret + "+input[e][2];
-            upReserv2 += " WHEN idreservacion_d = "+input[e][1]+" THEN prep - "+input[e][2];
+            upReserv2 += " WHEN idreservacion_d = "+input[e][1]+" THEN sin_prep - "+input[e][2];
 
             if(e === input.length - 1){
                 upReserv += " ELSE ret END WHERE idreservacion_d IN ("+idreserv.join(',')+")";
-                upReserv2 += " ELSE prep END WHERE idreservacion_d IN ("+idreserv.join(',')+")";
+                upReserv2 += " ELSE sin_prep END WHERE idreservacion_d IN ("+idreserv.join(',')+")";
             }
         }
         console.log(upReserv);
@@ -1087,7 +1087,7 @@ router.post("/crear_movimiento_reserva",function(req,res,next){
             }
 
             //INSERT INTO `siderval`.`movimiento` (`etapa`, `receptor`, `tipo`, `esanulacion`) VALUES ('11', 'Retiro por Reservación', '1', '0');
-            connection.query("INSERT INTO movimiento (etapa, receptor, tipo, esanulacion) VALUES ('11', 'Retiro por Reservación', '1', '0')",
+            connection.query("INSERT INTO movimiento (etapa, receptor, tipo, esanulacion) VALUES ('11', 'Retiro por Reservación', '0', '0')",
                 function(err, inMov){
                 if(err){console.log("Error Inserting : %s", err);
                     msg = "error";
@@ -1173,14 +1173,14 @@ router.post("/preparar_reserva",function(req,res,next){
         for(var e=0; e < input.length; e++){
             console.log(e);
             if(e === 0){
-                updateReserv+="UPDATE reservacion_detalle SET prep = CASE ";
+                updateReserv+="UPDATE reservacion_detalle SET ret = CASE ";
                 updateReserv2+="UPDATE reservacion_detalle SET sin_prep = CASE ";
             }
-            updateReserv += " WHEN idreservacion_d = "+input[e][1]+" THEN prep + "+input[e][2];
+            updateReserv += " WHEN idreservacion_d = "+input[e][1]+" THEN ret + "+input[e][2];
             updateReserv2 += " WHEN idreservacion_d = "+input[e][1]+" THEN sin_prep - "+input[e][2];
             id_rd.push(input[e][1]);
             if(e === input.length - 1){
-                updateReserv += " ELSE prep END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
+                updateReserv += " ELSE ret END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
                 updateReserv2 += " ELSE sin_prep END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
             }
         }
