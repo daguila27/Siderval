@@ -1266,7 +1266,7 @@ router.post('/anular_gdd', function(req, res, next){
     var input = JSON.parse(JSON.stringify(req.body));
     var idgd = input.idgd;
     req.getConnection(function(err, connection){
-        connection.query("SELECT * FROM despachos WHERE idgd = ?", idgd, function(err, desp){
+        connection.query("SELECT despachos.*,fabricaciones.idfabricaciones FROM despachos LEFT JOIN fabricaciones ON fabricaciones.idpedido = despachos.idpedido WHERE idgd = ?", idgd, function(err, desp){
         if(err) console.log("Error Selecting : %s", err);
             if(desp.length == 0){
                 connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado", idgd],function(err, up){
@@ -1278,7 +1278,9 @@ router.post('/anular_gdd', function(req, res, next){
                 console.log("DESPACHOS");
                 console.log(desp);
                 var idpedido = [];
+                var idfabricaciones = [];
                 var cant_ped = [];
+                var cant_fabs = [];
                 var idmaterial = [];
                 var cant_mat = [];
                 for(var w=0; w < desp.length; w++){
@@ -1294,12 +1296,29 @@ router.post('/anular_gdd', function(req, res, next){
                     }else{
                         cant_mat[idmaterial.indexOf(desp[w].idmaterial)] += parseInt(desp[w].cantidad);
                     }
+
+                    if(idfabricaciones.indexOf(desp[w].idfabricaciones) === -1 && desp[w].idfabricaciones !== null){
+                        idfabricaciones.push(desp[w].idfabricaciones);
+                        cant_fabs.push(parseInt(desp[w].cantidad) );
+                    }else if(desp[w].idfabricaciones !== null){
+                        cant_fabs[idfabricaciones.indexOf(desp[w].idfabricaciones)] += parseInt(desp[w].cantidad);
+                    }
+
+
                 }
                 var ped_query = "UPDATE pedido SET pedido.despachados = CASE";
                 var ped_where = "WHERE pedido.idpedido in (";
+
+                var reserv_query_desp = "UPDATE reservacion_detalle SET reservacion_detalle.desp = CASE";
+                var reserv_where_desp = [];
+
+                var reserv_query_ret = "UPDATE reservacion_detalle SET reservacion_detalle.ret = CASE";
+                var reserv_where_ret = "WHERE reservacion_detalle.idfabricaciones in (";
+
                 for(var i=0; i < idpedido.length; i++){
                     ped_query += " WHEN pedido.idpedido=" + idpedido[i] + " THEN pedido.despachados-" + cant_ped[i];
                     ped_where += "" + idpedido[i];
+
                     if(i+1 != idpedido.length){
                         ped_where += ",";
                     }
@@ -1317,6 +1336,16 @@ router.post('/anular_gdd', function(req, res, next){
                         }
                     }
                     mat_query += " END " + mat_where + ")";
+                    for(var i=0; i < idfabricaciones.length; i++){
+                        reserv_query_desp += " WHEN reservacion_detalle.idfabricaciones=" + idpedido[i] + " THEN reservacion_detalle.desp-" + cant_fabs[i];
+                        reserv_where_desp.push(idfabricaciones[i]);
+                        reserv_query_ret += " WHEN reservacion_detalle.idfabricaciones=" + idfabricaciones[i] + " THEN reservacion_detalle.ret+" + cant_fabs[i];
+                    }
+                    reserv_where_desp = " WHERE reservacion_detalle.idfabricaciones in ("+reserv_where_desp.join(',')+")";
+                    reserv_where_ret = " WHERE reservacion_detalle.idfabricaciones in ("+reserv_where_desp.join(',')+")";
+
+                    reserv_query_desp += reserv_where_desp;
+                    reserv_query_ret += reserv_where_ret;
                     connection.query(mat_query, function(err, ped){
                         if(err) console.log("Error Selecting : %s", err);
                         connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
