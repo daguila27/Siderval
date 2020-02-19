@@ -48,7 +48,7 @@ function fechaLatino(string){
     var to_ext = 0;
     if(datalen.length){
     for(var i = 0; i< datalen.length; i++){
-            to_can += datalen[i].cantidad - datalen[i]['8'];
+            to_can += datalen[i].cantidad - datalen[i]['8'] - datalen[i].standby;
             to_mol += datalen[i]['1'];
             to_fus += datalen[i]['2'];
             to_qui += datalen[i]['3'];
