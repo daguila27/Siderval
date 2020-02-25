@@ -71,7 +71,7 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as rechazados FROM produccion_history" +
             " LEFT JOIN produccion on produccion.idproduccion=produccion_history.idproduccion" +
             " LEFT JOIN fabricaciones on fabricaciones.idfabricaciones = produccion.idfabricaciones" +
-            " WHERE (produccion_history.to='s' AND produccion_history.from != '1') AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
+            " WHERE (!produccion_history.reg) AND (produccion_history.to='s' AND produccion_history.from != '1') AND (produccion_history.fecha between '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59')" +
             " GROUP BY fabricaciones.idmaterial) AS rechazados ON rechazados.idmaterial = material.idmaterial" +
             //SE OBTIENEN LAS SALIDAS DE FUSION SIN CONTAR LOS RECHAZOS
             " LEFT JOIN (SELECT fabricaciones.idmaterial,sum(produccion_history.enviados) as fundidos FROM produccion_history" +
