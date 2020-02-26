@@ -2625,6 +2625,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				sheet3.getCell('K'+(i-2)).value =
 					parseInt(ops[i-4].s_inicial) +
 					parseInt(ops[i-4].sum_dev) +
+					parseInt(ops[i-4].fabricados) +
 					parseInt(ops[i-4].ing_oda) - (
 						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal));//STOCK FINAL BODEGA
 
