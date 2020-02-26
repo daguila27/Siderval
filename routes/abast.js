@@ -2522,7 +2522,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet3.getCell('E1').value = "Stock Inicio Mes";
 			sheet3.getCell('F1').value = "Ingreso (Por GDD)";
 			sheet3.getCell('G1').value = "Salidas (por GDD)";
-			sheet3.getCell('H1').value = "Solicitado a Producción";
+			sheet3.getCell('H1').value = "Fabricados (Aceptados CdC)";
 			sheet3.getCell('I1').value = "Devolución Producción";
 			sheet3.getCell('J1').value = "Retirados BMI";
 			sheet3.getCell('K1').value = "Stock Final Mes";
@@ -2619,7 +2619,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				sheet3.getCell('E'+(i-2)).value = ops[i-4].s_inicial;
 				sheet3.getCell('F'+(i-2)).value = ops[i-4].ing_oda;
 				sheet3.getCell('G'+(i-2)).value = ops[i-4].despachados;
-				sheet3.getCell('H'+(i-2)).value = "Solicitado a Producción";
+				sheet3.getCell('H'+(i-2)).value = ops[i-4].fabricados;
 				sheet3.getCell('I'+(i-2)).value = ops[i-4].sum_dev;
 				sheet3.getCell('J'+(i-2)).value = ops[i-4].sum_sal;
 				sheet3.getCell('K'+(i-2)).value =
