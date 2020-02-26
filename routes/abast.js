@@ -2417,6 +2417,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 		var sheet2 = workbook.addWorksheet('Detalle Producto');
 		var sheet3 = workbook.addWorksheet('Detalle Abastecimiento');
 		var sheet4 = workbook.addWorksheet('Detalle Planta');
+		var sheet5 = workbook.addWorksheet('Ajustes');
 		var env = [
 			req.params.token.split("@")[0],
 			req.params.token.split("@")[1],
@@ -2476,6 +2477,19 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				bold: true
 			};
 
+			sheet5.getRow(1).fill = {
+				type: 'pattern',
+				pattern:'solid',
+				fgColor:{argb:'F4D03F'}
+			};
+			sheet5.getRow(1).font = {
+				name: 'Calibri',
+				family: 4,
+				size: 11,
+				underline: false,
+				bold: true
+			};
+
 			sheet.getCell('B1').value = "Fecha Solicitado";
 			sheet.getCell('C1').value = "Enero 2020";
 
@@ -2487,7 +2501,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet.getCell('F3').value = "Ingreso";
 			sheet.getCell('G3').value = "Salida";
 			sheet.getCell('H3').value = "Stock Final";
-			sheet.getCell('I3').value = "Ingreso a Produccion por ODV";
+			//sheet.getCell('I3').value = "Ingreso a Produccion por ODV";
 
 			sheet2.getCell('B1').value = "Código";
 			sheet2.getCell('C1').value = "Descripción";
@@ -2554,6 +2568,11 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet4.getCell('X2').value = "BPT";
 
 
+			sheet5.getCell('A1').value = "Código";
+			sheet5.getCell('B1').value = "Ajuste Bodega";
+			sheet5.getCell('C1').value = "Ajuste Producción";
+
+
 			for(var i = 4; i < ops.length+4; i++){
 				sheet.getCell('A'+i.toString()).value = ops[i-4].codigo;
 				sheet.getCell('B'+i.toString()).value = ops[i-4].detalle;
@@ -2567,10 +2586,11 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
 					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
+					(ops[i-4].ingresoproduccion - ops[i-4].rechazados_reg) +
 					parseInt(ops[i-4].ing_oda) - (
 						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)
 					);//STOCK FINAL SIDERVAL
-				sheet.getCell('I'+i.toString()).value = ops[i-4].ingresoproduccion;
+				//sheet.getCell('I'+i.toString()).value = ops[i-4].ingresoproduccion;
 
 
 				sheet2.getCell('B'+(i-2)).value = ops[i-4].codigo;
@@ -2587,9 +2607,9 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
 					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
+					(ops[i-4].ingresoproduccion - ops[i-4].rechazados_reg) +
 					parseInt(ops[i-4].ing_oda) - (
-						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados));
-				//STOCK FINAL SIDERVAL
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados));//STOCK FINAL SIDERVAL
 
 
 
@@ -2610,7 +2630,9 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].ing_oda) - (
 						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal));//STOCK FINAL BODEGA
 
-
+				sheet5.getCell('A'+(i-2)).value = ops[i-4].codigo;
+				sheet5.getCell('B'+(i-2)).value = 0;
+				sheet5.getCell('C'+(i-2)).value = ops[i-4].ingresoproduccion - ops[i-4].rechazados_reg;
 
 
 				/*sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
@@ -2644,7 +2666,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 
 			sheet.autoFilter = {
 				from: 'A3',
-				to: 'I3',
+				to: 'H3',
 			};
 
 			sheet2.autoFilter = {
@@ -2658,6 +2680,10 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet4.autoFilter = {
 				from: 'A2',
 				to: 'X2',
+			};
+			sheet5.autoFilter = {
+				from: 'A1',
+				to: 'C1',
 			};
 
 
