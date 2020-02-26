@@ -198,9 +198,10 @@ router.get('/create_production_rech_prodh', function(req, res, next){
             "            LEFT JOIN rechazos_cdc ON rechazos_cdc.idproduccion_h = produccion_history.idproduccion_history \n" +
             "            LEFT JOIN etapafaena ON etapafaena.value = produccion_history.from \n" +
             "            WHERE produccion_history.to = 's' \n" +
-            "            AND produccion_history.fecha > '2019-11-01'\n" +
+            "            AND produccion_history.fecha > '2020-02-01'\n" +
             "            AND produccion_history.enviados = 1 \n" +
-            "            AND rechazos_cdc.idproduccion_h IS NULL";
+            "            AND rechazos_cdc.idproduccion_h IS NULL"+
+            "            AND !produccion_history.reg";
         req.getConnection(function(err, connection){
             if(err){console.log("Error Connection: %s", err);}
             connection.query(query, function(err, prods){
@@ -726,8 +727,8 @@ router.post('/table_rechazos', function(req, res, next){
                 query = "SELECT mainTable.*, SUM(mainTable.enviados) AS total_rechazados," +
                     "GROUP_CONCAT(CONCAT(" +
                     "mainTable.etapa_desde,'@', " +
-                    "mainTable.colada,'@', " +
-                    "mainTable.producto,'@', " +
+                    "COALESCE(mainTable.colada,0),'@', " +
+                    "COALESCE(mainTable.producto,0),'@', " +
                     "mainTable.fecha_rech,'@', " +
                     "mainTable.causal,'@', " +
                     "mainTable.etapacausal,'@', " +
@@ -899,7 +900,7 @@ router.post('/table_rechazos', function(req, res, next){
                 view = "table_rechazos"
                 break;
         }
-
+        console.log(query);
         req.getConnection(function(err, connection){
             if(err) throw err;
             connection.query(query,
@@ -1092,6 +1093,78 @@ router.get('/xlsx_rech', function(req,res){
     else res.redirect('/bad_login');
 });
 
+//SI value_in ES null SE RETORNA value_out
+function Coalesce(value_in, value_out){
+    if(value_in===null){return value_out;}
+    else{return value_in;}
+}
 
+
+router.post('/saveState_rech_prodh', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var info = input.info;
+        info = JSON.parse(info);
+        /*
+        *{   coment: [ null, null ],
+              colada: [ '19L66', '20A20' ],
+              producto: [ '002', '222' ],
+              causal: [ '19-20', null ],
+              causal_check: [ 'true-false', null ],
+              idprodh: [ 14893, 14516 ]}
+        * */
+        var token = [];
+        for(var i=0; i < info['idprodh'].length; i++ ){
+            token.push([info['idprodh'][i], Coalesce(info['colada'][i], 0),Coalesce(info['producto'][i], 0),Coalesce(info['coment'][i], ''),Coalesce(info['causal'][i] , ''),Coalesce(info['causal_check'][i], '')].join('%'));
+        }
+        token = token.join('@');
+        console.log(token);
+        //idprodh%colada%producto%comentario%causal1-causal2%causalprincipal1-causalprincipal2
+        //@
+        //idprodh%colada%producto%comentario%causal1-causal2%causalprincipal1-causalprincipal2
+        var error = false;
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("INSERT INTO save (`llave`, `token`) VALUES ('cdc', '"+token+"')",
+                function(err, inSave){
+                    if(err){
+                      console.log("Error Inserting : %s", err);
+                      error = true;
+                    }
+                if(error){
+                    res.send(false);
+                }
+                else{
+                    res.send(true);
+                }
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+
+
+router.get('/loadState_rech_prodh', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var error = false;
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM save WHERE llave = 'cdc' ORDER BY idsave DESC",
+                function(err, save){
+                    if(err){
+                        console.log("Error Inserting : %s", err);
+                        error = true;
+                    }
+                    if(error){
+                        res.send(0);
+                    }
+                    else{
+                        res.send(save[0].token);
+                    }
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
 
 module.exports = router;
