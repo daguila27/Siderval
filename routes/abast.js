@@ -2586,9 +2586,8 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
 					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
-					(ops[i-4].ingresoproduccion - ops[i-4].rechazados_reg) +
 					parseInt(ops[i-4].ing_oda) - (
-						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados) + parseInt(ops[i-4].rechazados_reg)
 					);//STOCK FINAL SIDERVAL
 				//sheet.getCell('I'+i.toString()).value = ops[i-4].ingresoproduccion;
 
@@ -2607,9 +2606,8 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
 					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
-					(ops[i-4].ingresoproduccion - ops[i-4].rechazados_reg) +
 					parseInt(ops[i-4].ing_oda) - (
-						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados));//STOCK FINAL SIDERVAL
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados) + parseInt(ops[i-4].rechazados_reg));//STOCK FINAL SIDERVAL
 
 
 
@@ -2632,7 +2630,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 
 				sheet5.getCell('A'+(i-2)).value = ops[i-4].codigo;
 				sheet5.getCell('B'+(i-2)).value = 0;
-				sheet5.getCell('C'+(i-2)).value = ops[i-4].ingresoproduccion - ops[i-4].rechazados_reg;
+				sheet5.getCell('C'+(i-2)).value = 0 - ops[i-4].rechazados_reg;
 
 
 				/*sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
