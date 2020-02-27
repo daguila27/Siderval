@@ -2415,7 +2415,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 		var workbook = new Excel.Workbook();
 		var sheet = workbook.addWorksheet('Informe ICM');
 		var sheet2 = workbook.addWorksheet('Detalle Producto');
-		var sheet3 = workbook.addWorksheet('Detalle Abastecimiento');
+		var sheet3 = workbook.addWorksheet('Detalle Bodegas');
 		var sheet4 = workbook.addWorksheet('Detalle Planta');
 		var sheet5 = workbook.addWorksheet('Ajustes');
 		var env = [
@@ -2500,7 +2500,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet.getCell('E3').value = "Stock Inicial";
 			sheet.getCell('F3').value = "Ingreso";
 			sheet.getCell('G3').value = "Salida";
-			sheet.getCell('H3').value = "Stock Final (+ ajuste)";
+			sheet.getCell('H3').value = "Stock Final";
 			//sheet.getCell('I3').value = "Ingreso a Produccion por ODV";
 
 			sheet2.getCell('B1').value = "Código";
@@ -2513,7 +2513,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet2.getCell('I1').value = "Salidas (dada por las guías)";
 			sheet2.getCell('J1').value = "Total Rechazo";
 			sheet2.getCell('K1').value = "Bodega Externa";
-			sheet2.getCell('L1').value = "Stock en Siderval (+ ajuste)";
+			sheet2.getCell('L1').value = "Stock en Siderval";
 
 
 			sheet3.getCell('B1').value = "Código";
@@ -2525,7 +2525,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet3.getCell('H1').value = "Fabricados (Aceptados CdC)";
 			sheet3.getCell('I1').value = "Devolución Producción";
 			sheet3.getCell('J1').value = "Retirados BMI";
-			sheet3.getCell('K1').value = "Stock Final Mes (+ ajuste)";
+			sheet3.getCell('K1').value = "Stock Final Mes";
 
 
 			sheet4.getCell('A1').value = "Fecha Solicitud";
