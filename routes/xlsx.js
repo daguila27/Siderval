@@ -154,7 +154,7 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
             // NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND salidas_mp.sum_sal = 0" +
             //" AND necesario.necesarios = 0 AND virts.virtuales = 0 AND peds_atrasados.solicitados = 0 AND virts_oda.sum_virtual = 0 AND devs.sum_devs = 0" +
             //" AND ing_oda.sum_ing = 0) OR
-            "material.s_inicial != 0 OR material.stock != 0" +
+            " stock_mes."+mes+"_si != 0 OR stock_mes."+mes+"_sp != 0 OR stock_mes."+mes+"_si_aj != 0 OR stock_mes."+mes+"_sp_aj != 0 OR material.stock != 0" +
             " )" +
             " GROUP BY material.idmaterial "+limit,function(err, prods){
             if(err){
