@@ -53,7 +53,7 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
         console.log(where);
         connection.query("select " +
             "material.codigo,material.stock,coalesce(stock_mes."+mes+"_si, 0) as s_inicial," +
-            "coalesce(stock_mes."+mes+"_sp, 0) as p_inicial,material.detalle, " +
+            "coalesce(stock_mes."+mes+"_sp, 0) as p_inicial,coalesce(stock_mes."+mes+"_si_aj, 0) as ajuste_bodega,coalesce(stock_mes."+mes+"_sp_aj, 0) as ajuste_produccion,material.detalle, " +
             "material.precio,material.u_medida, material.peso, " +
             "coalesce(facturados.facturados, 0) as sum_fact," +
             "COALESCE(fabrs.fabricados,0) as fabricados, coalesce(peds_totales.totales, 0) as pendientes,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +

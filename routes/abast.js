@@ -2500,7 +2500,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet.getCell('E3').value = "Stock Inicial";
 			sheet.getCell('F3').value = "Ingreso";
 			sheet.getCell('G3').value = "Salida";
-			sheet.getCell('H3').value = "Stock Final";
+			sheet.getCell('H3').value = "Stock Final (+ ajuste)";
 			//sheet.getCell('I3').value = "Ingreso a Produccion por ODV";
 
 			sheet2.getCell('B1').value = "Código";
@@ -2513,7 +2513,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet2.getCell('I1').value = "Salidas (dada por las guías)";
 			sheet2.getCell('J1').value = "Total Rechazo";
 			sheet2.getCell('K1').value = "Bodega Externa";
-			sheet2.getCell('L1').value = "Stock en Siderval";
+			sheet2.getCell('L1').value = "Stock en Siderval (+ ajuste)";
 
 
 			sheet3.getCell('B1').value = "Código";
@@ -2525,7 +2525,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet3.getCell('H1').value = "Fabricados (Aceptados CdC)";
 			sheet3.getCell('I1').value = "Devolución Producción";
 			sheet3.getCell('J1').value = "Retirados BMI";
-			sheet3.getCell('K1').value = "Stock Final Mes";
+			sheet3.getCell('K1').value = "Stock Final Mes (+ ajuste)";
 
 
 			sheet4.getCell('A1').value = "Fecha Solicitud";
@@ -2587,8 +2587,9 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
 					parseInt(ops[i-4].ing_oda) - (
-						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados) + parseInt(ops[i-4].rechazados_reg)
-					);//STOCK FINAL SIDERVAL
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)
+					) +
+					(parseInt(ops[i-4].ajuste_bodega) + parseInt(ops[i-4].ajuste_produccion) - parseInt(ops[i-4].rechazados_reg));//STOCK FINAL SIDERVAL
 				//sheet.getCell('I'+i.toString()).value = ops[i-4].ingresoproduccion;
 
 
@@ -2606,8 +2607,9 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
 					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
-					parseInt(ops[i-4].ing_oda) - (
-						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados) + parseInt(ops[i-4].rechazados_reg));//STOCK FINAL SIDERVAL
+					parseInt(ops[i-4].ing_oda) -
+					(parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)) +
+					(parseInt(ops[i-4].ajuste_bodega) + parseInt(ops[i-4].ajuste_produccion) - parseInt(ops[i-4].rechazados_reg));//STOCK FINAL SIDERVAL
 
 
 
@@ -2627,11 +2629,14 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].sum_dev) +
 					parseInt(ops[i-4].fabricados) +
 					parseInt(ops[i-4].ing_oda) - (
-						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal));//STOCK FINAL BODEGA
+						parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal)) +
+					(parseInt(ops[i-4].ajuste_bodega));//STOCK FINAL BODEGA
 
 				sheet5.getCell('A'+(i-2)).value = ops[i-4].codigo;
-				sheet5.getCell('B'+(i-2)).value = 0;
-				sheet5.getCell('C'+(i-2)).value = 0 - ops[i-4].rechazados_reg;
+
+				sheet5.getCell('B'+(i-2)).value = ops[i-4].ajuste_bodega;
+				//RECHAZADOS POR REGULARIZACIÓN SE INCLUYE EN EL AJUSTE QUE LUEGO SE APLICARÁ EN EL STOCK FINAL
+				sheet5.getCell('C'+(i-2)).value = ops[i-4].ajuste_produccion - ops[i-4].rechazados_reg;
 
 
 				/*sheet4.getCell('A'+i.toString()).value = ops[i-2].codigo;
