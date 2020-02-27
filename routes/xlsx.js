@@ -149,9 +149,11 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
             " WHERE oda.creacion" +
             " BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
             " GROUP BY abastecimiento.idmaterial) AS virts_oda ON virts_oda.idmaterial = material.idmaterial" +
-            " WHERE ("+where+") AND (NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND salidas_mp.sum_sal = 0" +
-            " AND necesario.necesarios = 0 AND virts.virtuales = 0 AND peds_atrasados.solicitados = 0 AND virts_oda.sum_virtual = 0 AND devs.sum_devs = 0" +
-            " AND ing_oda.sum_ing = 0) OR material.s_inicial != 0 OR material.stock != 0) GROUP BY material.idmaterial "+limit,function(err, prods){
+            " WHERE ("+where+") " +
+            //" AND (NOT (peds.solicitados = 0 AND fabrs.fabricados = 0 AND desps.despachados = 0 AND salidas_mp.sum_sal = 0" +
+            //" AND necesario.necesarios = 0 AND virts.virtuales = 0 AND peds_atrasados.solicitados = 0 AND virts_oda.sum_virtual = 0 AND devs.sum_devs = 0" +
+            //" AND ing_oda.sum_ing = 0) OR material.s_inicial != 0 OR material.stock != 0)" +
+            " GROUP BY material.idmaterial "+limit,function(err, prods){
             if(err){
                 throw err;
             } else {
