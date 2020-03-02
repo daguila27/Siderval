@@ -444,10 +444,30 @@ function completarDigitos(num, dig){
             -->
             <div class="modal-body" id="cau-body" data-max="1">
                 <!--<button onclick="resetSelector(); applyMoves([1,2])">reset</button>-->
+                <script>
+                    function searchCausal(yo){
+                        var str = $(yo).val();
+                        //TODAS LAS SECCIONES SE OCULTAN
+                        $(".search_causales").addClass('hidden');
+                        if($(yo).val()==='' || $(yo).val()===' ' || $(yo).val() === null || $(yo).val()===undefined ){
+                            $(".search_causales").removeClass('hidden');
+                        }else{
+                            $(".search_causales > .etp-option").each(function(){
+                                if( $(this).html().toLowerCase().indexOf(str.toLowerCase()) !== -1 ){
+                                    //SI ALGUN ITEM DE LA SECCION INCLUYE EL STRING SE MUESTRA LA SECCION
+                                    $(this).closest('.search_causales').removeClass('hidden');
+                                }else{
+                                    //$(this).addClass('hidden');
+                                }
+                            });
+                        }
+                    }
+                </script>
+                <input class="form-control input-xs" type="text" placeholder="Buscar Causal ..." style="width: 50%" onkeyup="searchCausal(this)">
                 <div class="options-selectors">
                     <div class="left-section">
                         <% for(var w=0; w < Object.keys(opt_causal).length; w++){ %>
-                            <div>
+                            <div class="search_causales">
                                 <div class="etp-option etp<%= w%>" data-index="<%=w%>" onclick="toggleOptionAc(this)" data-state="0"><%= Object.keys(opt_causal)[w]%> :</div>
                                 <div class="vent-option">
                                     <ul>
