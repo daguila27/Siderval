@@ -198,8 +198,8 @@ router.get('/create_production_rech_prodh', function(req, res, next){
             "            LEFT JOIN rechazos_cdc ON rechazos_cdc.idproduccion_h = produccion_history.idproduccion_history \n" +
             "            LEFT JOIN etapafaena ON etapafaena.value = produccion_history.from \n" +
             "            WHERE produccion_history.to = 's' \n" +
-            //"            AND produccion_history.fecha > '2020-02-01'\n" +
-            //"            AND produccion_history.enviados = 1 \n" +
+            "            AND produccion_history.fecha > '2020-02-01'\n" +
+            "            AND produccion_history.enviados = 1 \n" +
             "            AND rechazos_cdc.idproduccion_h IS NULL"+
             "            AND !produccion_history.reg";
         req.getConnection(function(err, connection){
