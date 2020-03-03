@@ -53,7 +53,10 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
         console.log(where);
         connection.query("select " +
             "material.codigo,material.stock,coalesce(stock_mes."+mes+"_si, 0) as s_inicial," +
-            "coalesce(stock_mes."+mes+"_sp, 0) as p_inicial,coalesce(stock_mes."+mes+"_si_aj, 0) as ajuste_bodega,coalesce(stock_mes."+mes+"_sp_aj, 0) as ajuste_produccion,material.detalle, " +
+            "coalesce(stock_mes."+mes+"_sp, 0) as p_inicial," +
+            "coalesce(stock_mes."+mes+"_si_aj, 0) as ajuste_bodega," +
+            "coalesce(stock_mes."+mes+"_sp_aj, 0) as ajuste_produccion," +
+            "material.detalle, " +
             "material.precio,material.u_medida, material.peso, " +
             "coalesce(facturados.facturados, 0) as sum_fact," +
             "COALESCE(fabrs.fabricados,0) as fabricados, coalesce(peds_totales.totales, 0) as pendientes,material.idmaterial,COALESCE(peds.solicitados,0) as solicitados,coalesce(peds_atrasados.solicitados,0) AS sol_atr" +
@@ -150,12 +153,14 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
             " BETWEEN '"+fecha[0]+" 00:00:00' AND '"+fecha[1]+" 23:59:59'" +
             " GROUP BY abastecimiento.idmaterial) AS virts_oda ON virts_oda.idmaterial = material.idmaterial" +
             " WHERE ("+where+") " +
-            " AND ( true"+
-            //" peds.solicitados != 0 OR fabrs.fabricados != 0 OR desps.despachados != 0 OR salidas_mp.sum_sal != 0" +
-            //" OR necesario.necesarios != 0 OR virts.virtuales != 0 OR peds_atrasados.solicitados != 0 " +
-            //" OR virts_oda.sum_virtual != 0 OR devs.sum_devs != 0" +
-            //" OR ing_oda.sum_ing != 0 OR"+
-            //" stock_mes."+mes+"_si != 0 OR stock_mes."+mes+"_sp != 0 OR stock_mes."+mes+"_si_aj != 0 OR stock_mes."+mes+"_sp_aj != 0 OR material.stock != 0" +
+            " AND ( "+
+            " peds.solicitados != 0 OR fabrs.fabricados != 0 OR desps.despachados != 0 OR salidas_mp.sum_sal != 0 " +
+            " OR necesario.necesarios != 0 OR virts.virtuales != 0 OR peds_atrasados.solicitados != 0 " +
+            " OR virts_oda.sum_virtual != 0 OR devs.sum_devs != 0 " +
+            " OR ing_oda.sum_ing != 0 " +
+            " OR COALESCE(rechazados.rechazados,0)!=0 OR COALESCE(rechazados_reg.rechazados_reg,0)!=0 " +
+            " OR COALESCE(fundidos.fundidos,0)!=0 "+
+            " OR stock_mes."+mes+"_si != 0 OR stock_mes."+mes+"_sp != 0 OR stock_mes."+mes+"_si_aj != 0 OR stock_mes."+mes+"_sp_aj != 0 OR material.stock != 0" +
             " )" +
             " GROUP BY material.idmaterial "+limit,function(err, prods){
             if(err){
