@@ -299,6 +299,12 @@ function completarDigitos(num, dig){
                     if(c===1){$(".prin-cua").click();}
 
                 }
+                var seleccionandoCausalesMuchos = false;
+                function editCausalesSel(){
+                    resetSelector();
+                    seleccionandoCausalesMuchos = true;
+                    $("#editProdRech").modal("show");
+                }
 
                 function setDataCau(){
                     var arr = {
@@ -334,25 +340,49 @@ function completarDigitos(num, dig){
 
 
                     arr.html = "<ul style='padding: 0 0 0 2px'>"+arr.html.join(' ')+"</ul>";
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').children('div').html(arr.html);
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').data('valor', arr.cau.join('-'));
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').data('check', arr.check.join('-'));
+                    if(seleccionandoCausalesMuchos){
+                        for(var e=0; e < causal_sel.length; e++){
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="causal"]').children('div').html(arr.html);
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="causal"]').data('valor', arr.cau.join('-'));
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="causal"]').data('check', arr.check.join('-'));
 
 
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="coment"]').html(arr.comment);
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="coment"]').data('valor', arr.comment);
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="coment"]').html(arr.comment);
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="coment"]').data('valor', arr.comment);
 
 
-                    if(arr.image === null){
-                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
-                    }else {
-                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                            if(arr.image === null){
+                                $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                            }else {
+                                $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                            }
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="image"]').data('valor', arr.image);
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="image"]').data('tipo', arr.image_type);
+
+                            $(".trRech[data-idprodh='"+causal_sel[e]+"']").find('td[data-name="image"]').children('img').attr('src', $('#yourImgTagModal').attr('src') );
+                            seleccionandoCausalesMuchos = false;
+                        }
+                    }else{
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').children('div').html(arr.html);
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').data('valor', arr.cau.join('-'));
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="causal"]').data('check', arr.check.join('-'));
+
+
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="coment"]').html(arr.comment);
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="coment"]').data('valor', arr.comment);
+
+
+                        if(arr.image === null){
+                            $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                        }else {
+                            $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').html("<img class=\"\" style=\"width: 60px; margin-left: 10px;margin-top: 2px;\" src=\"\" alt=\"\">");
+                        }
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('valor', arr.image);
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('tipo', arr.image_type);
+
+                        $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').children('img').attr('src', $('#yourImgTagModal').attr('src') );
+
                     }
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('valor', arr.image);
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').data('tipo', arr.image_type);
-
-                    $("#prodCol"+$("#idColAux").val()).find('td[data-name="image"]').children('img').attr('src', $('#yourImgTagModal').attr('src') );
-
                     $("#editProdRech").modal("hide");
                 }
 
@@ -601,7 +631,8 @@ function completarDigitos(num, dig){
             <div class="panel-heading">
                 <h4 style="width: 100%">
                     Rechazos
-                    <div class="pull-right" style="width: 10%; display: flex">
+                    <div class="pull-right" style="width: 20%; display: flex">
+                        <button class="btn btn-primary btn-xs" id="editSelRech" onclick="editCausalesSel(this)" disabled="true">Editar Selecccionados</button>
                         <div class="dropdown opcion-sl">
                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i></button>
                             <ul class="dropdown-menu" style="right: 0; left: auto;">
@@ -709,7 +740,6 @@ function completarDigitos(num, dig){
                     <table id="tableProduccion" style="margin-top: 0px !important;" class="o_list_view table table-condensed table-striped o_list_view_ungrouped">
                         <thead>
                             <tr>
-                                <th data-toggle="tooltip" data-placement="bottom" title="idproduccion_h">idproduccion_h</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Orden de Fabricación">OF</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Descripción del Producto">Descripción</th>
                                 <th data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center">Cantidad</th>
@@ -731,7 +761,6 @@ function completarDigitos(num, dig){
                                 data-etapa="<%=datalen[i].from%>"
                                 data-comentario="<%=datalen[i].comentario%>"
                                 draggable="true" ondragstart="drag(event, this)">
-                            <td data-toggle="tooltip" data-placement="bottom" title="idproduccion_h"><%= datalen[i].idproduccion_history%></td>
                             <td data-toggle="tooltip" data-placement="bottom" title="Orden de Fabricación"><%= datalen[i].idof%></td>
                             <td data-toggle="tooltip" data-placement="bottom" title="Descripción del Producto"><%= datalen[i].detalle%></td>
                             <td data-toggle="tooltip" data-placement="bottom" title="Cantidad" style="text-align: center"><%= datalen[i].enviados%></td>
@@ -760,7 +789,6 @@ function completarDigitos(num, dig){
                         <%}
                         }else{%>
                             <tr>
-                                <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
@@ -1149,7 +1177,7 @@ function completarDigitos(num, dig){
         else{
             etp_nombre = etapas[etp-1];
         }
-        $("#tbody_rech").append("<tr id='prodCol"+globalIdCount+"' data-idprodh='"+$(yo).parent().parent().data('idprodh')+"'>" +
+        $("#tbody_rech").append("<tr onclick='$(this).toggleClass(\"danger\");checkCausalesAdjuntadas();' class='trRech' id='prodCol"+globalIdCount+"' data-idprodh='"+$(yo).parent().parent().data('idprodh')+"'>" +
             "<td class='tdMat' style='white-space: nowrap; ' data-name='idmat' data-valor='"+$(yo).data('idmat')+"'>"+$(yo).data('nombre')+"</td>" +
             "<td class='hidden' style='white-space: nowrap; text-align: center' data-name='env' data-valor='"+$(yo).data('env')+"'>"+$(yo).data('env')+"</td>" +
             "<td style='white-space: nowrap; text-align: center' data-name='colada' data-valor=' '><input class='form-control' type='text' placeholder='Ej: 19H15' id='coladaNum' onkeyup='if(checkExpReg(/[0-9]{2}[A-L]{1}[0-9]{2}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
@@ -1181,7 +1209,7 @@ function completarDigitos(num, dig){
         else{
             etp_nombre = etapas[etp-1];
         }
-        $("#tbody_rech").append("<tr id='prodCol"+globalIdCount+"' data-idprodh='"+idprodh+"'>" +
+        $("#tbody_rech").append("<tr onclick='$(this).toggleClass(\"danger\");checkCausalesAdjuntadas();' class='trRech' id='prodCol"+globalIdCount+"' data-idprodh='"+idprodh+"'>" +
             "<td class='tdMat' style='white-space: nowrap; ' data-name='idmat' data-valor='"+idprodh+"'>"+$("#colProdList"+idprodh).data('nombre')+"</td>" +
             "<td class='hidden' style='white-space: nowrap; text-align: center' data-name='env' data-valor='"+$("#colProdList"+idprodh).data('env')+"'>"+$("#colProdList"+idprodh).data('env')+"</td>" +
             "<td style='white-space: nowrap; text-align: center' data-name='colada' data-valor=' '><input class='form-control' type='text' value='"+colada+"'  placeholder='Ej: 19H15' id='coladaNum' onkeyup='if(checkExpReg(/[0-9]{2}[A-L]{1}[0-9]{2}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
@@ -1197,6 +1225,18 @@ function completarDigitos(num, dig){
         $("#colProdList"+idprodh).addClass('hidden');
     }
 
+    var causal_sel = [];
+    function checkCausalesAdjuntadas(){
+        causal_sel = [];
+        $(".trRech.danger").each(function(){
+            causal_sel.push($(this).data('idprodh'));
+        });
+        if(causal_sel.length > 0){
+            $('#editSelRech').prop('disabled', false);
+        }else{
+            $('#editSelRech').prop('disabled', true);
+        }
+    }
     function drop(ev) {
         ev.preventDefault();
         //LO QUE PASA CUANDO SE SUELTA EL PRODUCTO
@@ -1216,7 +1256,7 @@ function completarDigitos(num, dig){
         else{
             etp_nombre = etapas[etp-1];
         }
-        $("#tbody_rech").append("<tr id='prodCol"+globalIdCount+"' data-idprodh='"+$("#"+ev.dataTransfer.getData("text")).data('idprodh')+"'>" +
+        $("#tbody_rech").append("<tr onclick='$(this).toggleClass(\"danger\"); checkCausalesAdjuntadas();' class='trRech' id='prodCol"+globalIdCount+"' data-idprodh='"+$("#"+ev.dataTransfer.getData("text")).data('idprodh')+"'>" +
             "<td class='tdMat' style='white-space: nowrap; ' data-name='idmat' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('idmat')+"'>"+$("#"+ev.dataTransfer.getData("text")).data('nombre')+"</td>" +
             "<td class='hidden' style='white-space: nowrap; text-align: center' data-name='env' data-valor='"+$("#"+ev.dataTransfer.getData("text")).data('env')+"'>"+$("#"+ev.dataTransfer.getData("text")).data('env')+"</td>" +
             "<td style='white-space: nowrap; text-align: center' data-name='colada' data-valor=' '><input class='form-control' type='text' placeholder='Ej: 19H15' id='coladaNum' onkeyup='if(checkExpReg(/[0-9]{2}[A-L]{1}[0-9]{2}/, this)){$(this).parent().data(\"valor\", $(this).val());}' required></td>" +
@@ -1245,6 +1285,7 @@ function completarDigitos(num, dig){
         //$("#comentarioMovCau").val($(yo).parent().parent().find("td.tdCom").data("valor"));
     }
     function editCausales(globalIdCount, yo){
+        seleccionandoCausalesMuchos = false;
         if(noshowAlertDOM){
             $("#idColAux").val(globalIdCount);
 
