@@ -2574,6 +2574,9 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 
 
 			for(var i = 4; i < ops.length+4; i++){
+
+				ops[i-4].sum_sal = ops[i-4].sum_sal - ops[i-4].despachosxreservacion;
+
 				sheet.getCell('A'+i.toString()).value = ops[i-4].codigo;
 				sheet.getCell('B'+i.toString()).value = ops[i-4].detalle;
 				sheet.getCell('C'+i.toString()).value = ops[i-4].u_medida;
@@ -2610,8 +2613,6 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 					parseInt(ops[i-4].ing_oda) -
 					(parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)) +
 					(parseInt(ops[i-4].ajuste_bodega) + parseInt(ops[i-4].ajuste_produccion) - parseInt(ops[i-4].rechazados_reg));//STOCK FINAL SIDERVAL
-
-
 
 
 
