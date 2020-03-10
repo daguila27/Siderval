@@ -2575,7 +2575,7 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 
 			for(var i = 4; i < ops.length+4; i++){
 
-				ops[i-4].sum_sal = ops[i-4].sum_sal - ops[i-4].despachosxreservacion;
+				//ops[i-4].sum_sal = ops[i-4].sum_sal - ops[i-4].despachosxreservacion;
 
 				sheet.getCell('A'+i.toString()).value = ops[i-4].codigo;
 				sheet.getCell('B'+i.toString()).value = ops[i-4].detalle;
