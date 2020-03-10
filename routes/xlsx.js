@@ -136,7 +136,7 @@ informe.getdatos = function(fecha,callback, condiciones, limit){
             " LEFT JOIN (SELECT pedido.idmaterial,SUM(pedido.cantidad - pedido.despachados) as totales" +
             " FROM pedido GROUP BY pedido.idmaterial) AS peds_totales ON peds_totales.idmaterial = material.idmaterial" +
             // LEFT JOIN despachos AKA cantidad en GDD
-            " LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados, IF(pedido.bmi, despachos.cantidad, 0) AS despachosxreservacion " +
+            " LEFT JOIN (SELECT material.idmaterial,SUM(despachos.cantidad) AS despachados, SUM(IF(pedido.bmi = 1, despachos.cantidad, 0)) AS despachosxreservacion " +
             " FROM material LEFT JOIN despachos ON material.idmaterial = despachos.idmaterial" +
             " LEFT JOIN gd ON gd.idgd = despachos.idgd" +
             " LEFT JOIN pedido ON pedido.idpedido = despachos.idpedido" +
