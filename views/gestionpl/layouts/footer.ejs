@@ -3,6 +3,147 @@
 </div>
 
 
+
+
+<!-- Modal -->
+<div id="newDestino" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <form id="addclientform">
+            <!-- addclientform     editclientform-->
+
+            <!-- Modal content-->
+            <div class="modal-content panel panel-primary">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Registrar Destino:</h4>
+                </div>
+                <div class="modal-body panel-body">
+                    <script>
+                        function showCiudad(yo){
+                            //SI EL PAIS SELECCIONADO NO ES CHILE, SE MUESTRA EL SELECTOR DE CIUDADES PARA EL RESPECTIVO PAIS
+                            //SI EL PAIS SELECCIONADO ES CHILE, SE MUESTRA EL SELECTOR DE REGIONES - PROVINCIAS - COMUNAS
+                            //CUANDO SE SELECCIONA UN PAIS DISTINTO DE CHILE, EL DATO comuna ES REEMPLAZADO POR ciudad
+                            //por lo que se tendrá dos outputs distintos
+                            //[pais, ciudad, direccion] (NO CHILE)
+                            //[pais, comuna, direccion] (CHILE)
+
+                            if($(yo).val() === 'CHL'){
+                                $("#ciudad").parent().addClass('hidden');
+
+                                $("#region").parent().removeClass('hidden');
+                                $("#comuna").parent().removeClass('hidden');
+                            }else{
+                                $("#ciudad").parent().removeClass('hidden');
+
+                                $("#region").parent().addClass('hidden');
+                                $("#comuna").parent().addClass('hidden');
+
+                                //SOLO SE MUESTRAN LAS CIUDADES DE ESE PAIS
+
+                                $(".ciudad-option").addClass('hidden');
+                                $(".ciudad-option[data-pais='"+$(yo).val()+"']").removeClass('hidden');
+                                $("#ciudad").find("option[data-pais='"+$(yo).val()+"']").prop('selected', 'true');
+                            }
+
+                        }
+                        function showComunas(yo){
+                            $(".comuna-option").addClass('hidden');
+                            $(".comuna-option[data-region='"+$(yo).val()+"']").removeClass('hidden');
+                            $("#comuna").find("option[data-region='"+$(yo).val()+"']").prop('selected', 'true');
+                        }
+                    </script>
+                    <label for="pais" style="width: 100%">
+                        Seleccionar País:
+                        <select class="form-control" name="pais" id="pais" onchange="showCiudad(this)">
+                            <%for(var t=0; t < pais.length; t++){
+                            if(pais[t].PaisCodigo === 'CHL'){%>
+                                <option class="pais-option" value="<%= pais[t].PaisCodigo%>" selected><%= pais[t].PaisNombre%></option>
+                            <%}else{%>
+                                <option class="pais-option" value="<%= pais[t].PaisCodigo%>"><%= pais[t].PaisNombre%></option>
+                            <%}%>
+                            <%}%>
+                        </select>
+                    </label>
+                    <label for="ciudad" style="width: 100%">
+                        Seleccionar Ciudad:
+                        <select class="form-control" name="ciudad" id="ciudad">
+                            <%for(var t=0; t < ciudad.length; t++){%>
+                                <option class="ciudad-option" value="<%= ciudad[t].CiudadID%>" data-pais="<%= ciudad[t].PaisCodigo%>"><%= ciudad[t].CiudadNombre%></option>
+                            <%}%>
+                        </select>
+                    </label>
+                    <label for="region" style="width: 100%">
+                        Seleccionar Región:
+                        <select class="form-control" name="region" id="region" onchange="showComunas(this)">
+                            <%for(var t=0; t < region.length; t++){%>
+                                <option value="<%= region[t].region_id%>"><%= region[t].region_ordinal%> - <%= region[t].region_nombre%></option>
+                            <%}%>
+                        </select>
+                    </label>
+                    <label for="comuna" style="width: 100%">
+                        Seleccionar Comuna:
+                        <select class="form-control" name="comuna" id="comuna">
+                            <%for(var t=0; t < comuna.length; t++){%>
+                                <option class="comuna-option" value="<%= comuna[t].comuna_id%>" data-region="<%= comuna[t].region_id%>"><%= comuna[t].comuna_nombre%></option>
+                            <%}%>
+                        </select>
+                    </label>
+                    <label for="direccion" style="width: 100%">
+                        Ingresar Dirección:
+                        <input  class="form-control" name="direccion" id="direccion" type="text"/>
+                    </label>
+                    <script>
+                        showCiudad("#pais");
+                        showComunas("#region");
+                        $("#dirForm").submit(function(e){
+                            e.preventDefault();
+                            var array = $(this).serializeArray();
+                            console.log(array);
+                            alert("listo");
+                        });
+
+                        function submit_direccion(){
+                            var array;
+                            if($("select#pais").val() === 'CHL'){
+                                array = [
+                                    $("input#direccion").val(),
+                                    $("select#comuna").val(),
+                                    $("select#pais").val()
+                                ];
+                            }else{
+                                array = [
+                                    $("input#direccion").val(),
+                                    $("select#ciudad").val(),
+                                    $("select#pais").val()
+                                ];
+                            }
+                            $.ajax({
+                                type: 'POST',
+                                url: '/plan/save_destino',
+                                data: {dir: JSON.stringify(array)},
+                                success: function(data){
+                                    if(data){
+                                        alert("¡Ha ocurrido un error!");
+                                    }else{
+                                        alert("El registro ha sido exitoso.");
+                                        $("#newDestino").modal('hide');
+                                    }
+                                }
+                            });
+                        }
+
+                    </script>
+                </div>
+                <div class="modal-footer panel-footer">
+                    <button type="button" class="btn btn-primary" onclick="submit_direccion()">Registrar</button>
+                    <button type="button" class="btn btn-default" id="close-destinomodal" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Modal Crear GDD-->
 <div id="crearGddModal" class="modal fade" role="dialog">
 

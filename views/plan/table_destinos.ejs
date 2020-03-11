@@ -1,0 +1,54 @@
+<%
+function fechaLatino(string){
+    return [string.split('-')[2] , string.split('-')[1] , string.split('-')[0]].join('-');
+}
+function diff_indays(date1){
+    dt1 = new Date();
+    dt2 = new Date(date1);
+    return Math.floor((Date.UTC(dt2.getFullYear(), dt2.getMonth(), dt2.getDate()) - Date.UTC(dt1.getFullYear(), dt1.getMonth(), dt1.getDate()) ) /(1000 * 60 * 60 * 24));
+}
+%>
+<!-- Oculta cantidad de datos -->
+<div id="registros" style="display: none"><%= data.length %></div>
+
+<table id="DataTableDest" class="o_list_view table table-condensed table-striped o_list_view_ungrouped" style="width: 100%;margin-bottom: 0px !important; margin-top: 0px !important;">
+    <thead>
+    <tr>
+        <th>País</th>
+        <th>Ciudad / Comuna</th>
+        <th>Dirección</th>
+    </tr>
+    </thead>
+    <tbody>
+        <%for( var i=0; i < data.length; i++){%>
+            <%if(data[i].pais === 'CHL'){%>
+            <tr>
+                <td>Chile</td>
+                <td><%=data[i].comuna_nombre%></td>
+                <td><%=data[i].direccion_d%></td>
+            </tr>
+            <%}else{%>
+            <tr>
+                <td><%=data[i].PaisNombreLocal%></td>
+                <td><%=data[i].CiudadNombre%></td>
+                <td><%=data[i].direccion_d%></td>
+            </tr>
+            <%}%>
+        <%}%>
+    </tbody>
+    <tfoot>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    </tfoot>
+</table>
+
+<!-- Funcion para parsear nros -->
+<script src="parsear_nro.js"></script>
+
+<script type="text/javascript">
+    //setDataTableFixed("#DataTablePeds");
+    busc.setIndicadorPaginas(parseInt('<%= data.length%>'), ".indicador_paginas");
+</script>

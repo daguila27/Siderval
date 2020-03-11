@@ -1,0 +1,113 @@
+<style>
+    .o_searchview_autocomplete {
+        position: absolute;
+        top: 100%;
+        left: auto;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+    }
+    .o_searchview {
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 1px 25px 3px 5px;
+    }
+    .etiqueta-filtro{
+        padding: 5px;
+        margin: 3px;
+        display: flex;
+    }
+
+    .etiqueta-filtro div{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-filtro strong{
+        padding: 0px;
+        margin: 0px 0px 0px 7px;
+        color: white;
+    }
+    .etiqueta-input{
+        padding: 2px 6px;
+    }
+    .etiqueta-filtro-div{
+        display: flex;
+    }
+</style>
+<div id="up-fills" class="row up-fills" style="margin: 0; padding: 0; position: fixed; width: 100%;transition:0.5s; z-index: 9;">
+    <div class="col-sm-12 o_control_panel" style="display: flex; margin: 0; padding: 10px; width: 100%; position: relative">
+        <ol class="breadcrumb" style="width: 46%; padding: 10px 2px 0px 20px">
+            <li class="active">Direcciones</li>
+            <!-- Mostrar cantidad de datos -->
+            <div class="indicador_paginas" style="margin-top: 8px"></div>
+        </ol>
+        <div style="width: 50%;">
+            <div class="form-group o_searchview" style="margin: 0;padding: 0;">
+
+            </div>
+            <div class="dropdown pull-right" style="position: absolute; top: 5px; right: 1%">
+                <button class="btn btn-xs" type="button" data-toggle="dropdown"><i class="fa fa-bars dropdown-toggle"></i></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="getcsvof" data-tipo="of"><i class="fa fa-file-excel-o" aria-hidden="true" style="margin-right: 2px"></i> Descargar Excel</a></li>
+                </ul>
+            </div>
+
+            <div class="btn-group btn-group-sm o_cp_switch_buttons" style="margin-top: 5px">
+                <button type="button" accesskey="l" aria-label="list" data-view-type="list" title="" data-view='table_destinos/pedido.f_entrega-ASC/1' class="btn btn-icon fa fa-lg fa-list-ul view-option active" data-original-title="Lista"></button>
+                <div style="display: flex">
+                    <div class="filters"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="fw-container" style="background-color: white; width: 100%; height: 100%;">
+    <div id="fw-body"  style="padding:0;margin: 0;">
+        <div class="content main-page">
+        </div>
+    </div>
+</div>
+<button style="position: fixed; z-index: 5; bottom: 50px;right: 50px;box-shadow: 7px 5px 10px #888888;" class="btn btn-success btn-circle btn-lg" data-toggle="modal" data-target="#newDestino"><i class="glyphicon glyphicon-plus"></i></button>
+
+<style type="text/css">
+    .caption a:hover{
+        cursor:pointer;
+    }
+</style>
+
+<script type="text/javascript">
+
+    var alto_buscador = $(".up-fills").height();
+    var margen_tabla = $('#fw-container').css('margin-top');
+
+
+
+    function changeSize(yo){
+        alert($(yo).val());
+        $(".row_main").css('font-size', $(yo).val()+"px");
+    }
+
+    var array_fill = [
+        "País@primary",
+        "Ciudad@primary",
+        "Dirección@success"
+    ];
+
+    var busc = new Buscador("buscar_destino", ".o_searchview", array_fill, "/plan/table_destinos", "DataTableDest", false, false, null, null, 'Mostrando %S direccion');
+
+    busc.add_cond = "";
+
+    // Carga la tabla de pedidos
+    $(document).ready(function(){
+        $(".up-fills").css('margin-top', $("#oe_main_menu_navbar").outerHeight());
+        busc.buscar_action();
+    });
+
+</script>
+
+<script src="/buscador_funciones.js"></script>
+
+
