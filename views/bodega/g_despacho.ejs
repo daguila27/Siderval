@@ -51,115 +51,131 @@ function letraMayus(string) {
                         <button class="btn btn-primary loadStateButton"><i class="glyphicon glyphicon-floppy-open"></i> Cargar</button>
                     </div>-->
                 </div>
-                    <label style="width: 30%">
-                        <ul class="selector-buscador" role="navigation">
-                            <input type="hidden" id="cliente" onchange="compNum(this)" value="0">
-                            <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Cliente<b class="caret"></b></a>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
-                                    <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
-                                    <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Cliente seleccionado</a></li>
-                                    <%for(var e=0; e < cli.length; e++){%>
-                                        <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
-                                    <%}%>
-                                </ul>
-                            </li>
-                        </ul>
-                        <p style="width: 100%; padding-left: 20px" id="cliente-caret">Sin Cliente Seleccionado</p>
-                        <style>
-                            .selector-buscador{
-                                margin-left: 0;
-                                margin-bottom: 20px;
-                                list-style: none;
-                                width: 100%;
-                            }
+                <label style="width: 25%">
+                    <ul class="selector-buscador" role="navigation">
+                        <input type="hidden" id="cliente" onchange="compNum(this)" value="0">
+                        <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Cliente<b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="drop2">
+                                <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
+                                <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Cliente seleccionado</a></li>
+                                <%for(var e=0; e < cli.length; e++){%>
+                                    <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=cli[e].idcliente%>"><%=cli[e].sigla%> - <%=cli[e].razon%></a></li>
+                                <%}%>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p style="width: 100%; padding-left: 20px" id="cliente-caret">Sin Cliente Seleccionado</p>
+                </label>
+                <label style="width: 25%">
+                    <ul class="selector-buscador" role="navigation">
+                        <input type="hidden" id="destino" value="0">
+                        <li class="dropdown"> <a href="#" id="drop2" role="button" class="dropdown-toggle" data-toggle="dropdown">Seleccionar Destino<b class="caret"></b></a>
+                            <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="drop2">
+                                <li role="presentation" id><a role="menuitem" tabindex="-1" href="#"><input class="form-control" type="text" id="other"></a></li>
+                                <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="0">Sin Destino seleccionado</a></li>
+                                <%for(var e=0; e < dir.length; e++){%>
+                                <li class="option-dropdown" role="presentation"><a role="menuitem" tabindex="-1" href="#" data-value="<%=dir[e].iddireccion%>"><%=dir[e].direccion%> - <%=dir[e].pais%></a></li>
+                                <%}%>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p style="width: 100%; padding-left: 20px" id="destino-caret">Sin Destino seleccionado</p>
+                </label>
+                <style>
+                    .selector-buscador{
+                        margin-left: 0;
+                        margin-bottom: 20px;
+                        list-style: none;
+                        width: 100%;
+                    }
 
-                            .selector-buscador ul, ol {
-                                padding: 0;
-                                margin: 0 0 10px 25px;
-                            }
+                    .selector-buscador ul, ol {
+                        padding: 0;
+                        margin: 0 0 10px 25px;
+                    }
 
-                            .selector-buscador .dropup, .dropdown {
-                                position: relative;
-                            }
-                            .selector-buscador .dropup, .dropdown a{
-                                color: white;
-                            }
+                    .selector-buscador .dropup, .dropdown {
+                        position: relative;
+                    }
+                    .selector-buscador .dropup, .dropdown a{
+                        color: white;
+                    }
 
-                            .selector-buscador .open>.dropdown-menu {
-                                display: block;
-                                max-height: 450px;
-                                width: 400px;
-                                overflow-y: scroll;
-                            }
+                    .selector-buscador .open>.dropdown-menu {
+                        display: block;
+                        max-height: 450px;
+                        width: 400px;
+                        overflow-y: scroll;
+                    }
 
-                            .selector-buscador>li>a {
-                                display: block;
-                            }
+                    .selector-buscador>li>a {
+                        display: block;
+                    }
 
-                            .selector-buscador .dropdown-menu {
-                                position: absolute;
-                                top: 100%;
-                                left: 0;
-                                z-index: 1000;
-                                display: none;
-                                float: left;
-                                min-width: 160px;
-                                padding: 5px 0;
-                                margin: 2px 0 0;
-                                list-style: none;
-                                background-color: #ffffff;
-                                border: 1px solid #ccc;
-                                border: 1px solid rgba(0, 0, 0, 0.2);
-                                -webkit-border-radius: 6px;
-                                -moz-border-radius: 6px;
-                                border-radius: 6px;
-                                -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-                                -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-                                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-                                -webkit-background-clip: padding-box;
-                                -moz-background-clip: padding;
-                                background-clip: padding-box;
-                            }
+                    .selector-buscador .dropdown-menu {
+                        position: absolute;
+                        top: 100%;
+                        left: 0;
+                        z-index: 1000;
+                        display: none;
+                        float: left;
+                        min-width: 160px;
+                        padding: 5px 0;
+                        margin: 2px 0 0;
+                        list-style: none;
+                        background-color: #ffffff;
+                        border: 1px solid #ccc;
+                        border: 1px solid rgba(0, 0, 0, 0.2);
+                        -webkit-border-radius: 6px;
+                        -moz-border-radius: 6px;
+                        border-radius: 6px;
+                        -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                        -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+                        -webkit-background-clip: padding-box;
+                        -moz-background-clip: padding;
+                        background-clip: padding-box;
+                    }
 
-                            .selector-buscador .dropdown-menu .divider {
-                                height: 1px;
-                                margin: 9px 1px;
-                                overflow: hidden;
-                                background-color: #e5e5e5;
-                                border-bottom: 1px solid #ffffff;
-                            }
+                    .selector-buscador .dropdown-menu .divider {
+                        height: 1px;
+                        margin: 9px 1px;
+                        overflow: hidden;
+                        background-color: #e5e5e5;
+                        border-bottom: 1px solid #ffffff;
+                    }
 
-                            .selector-buscador .dropdown-menu>li>a {
-                                display: block;
-                                padding: 3px 20px;
-                                clear: both;
-                                font-weight: normal;
-                                line-height: 20px;
-                                color: #333333;
-                                white-space: nowrap;
+                    .selector-buscador .dropdown-menu>li>a {
+                        display: block;
+                        padding: 3px 20px;
+                        clear: both;
+                        font-weight: normal;
+                        line-height: 20px;
+                        color: #333333;
+                        white-space: nowrap;
+                    }
+                </style>
+                <script>
+                    var c = 0;
+                    $(".selector-buscador input").on('keyup', function(e){
+                        e.preventDefault();
+                        var valor = $(this).val();
+                        var res;
+                        $(".option-dropdown").addClass('hidden');
+                        $(".selector-buscador li a").each(function(){
+                            res = $(this).html().toUpperCase().includes(valor.toUpperCase());
+                            if(res){
+                                $(this).parent().removeClass('hidden');
                             }
-                        </style>
-                        <script>
-                            var c = 0;
-                            $(".selector-buscador input").on('keyup', function(e){
-                                e.preventDefault();
-                                var valor = $(this).val();
-                                var res;
-                                $(".option-dropdown").addClass('hidden');
-                                $(".selector-buscador li a").each(function(){
-                                    res = $(this).html().toUpperCase().includes(valor.toUpperCase());
-                                    if(res){
-                                        $(this).parent().removeClass('hidden');
-                                    }
-                                });
-                            });
-                            $(".option-dropdown a").on('click', function(e){
-                                e.preventDefault();
-                                $("#cliente").val($(this).data('value'));
-                                $("#cliente-caret").html($(this).html());
-                            });
-                        </script>
-                    </label>
+                        });
+                    });
+                    $(".option-dropdown a").on('click', function(e){
+                        e.preventDefault();
+
+                        $(this).closest('ul.selector-buscador').children('input').val($(this).data('value'));
+                        $(this).closest('ul.selector-buscador').parent().children('p').html($(this).html());
+                    });
+                </script>
             </div>
             <table class="o_list_view table table-responsive table-condensed table-striped o_list_view_ungrouped">
                 <thead>
@@ -191,12 +207,18 @@ function letraMayus(string) {
             </table>
                 <div class="panel-footer">
                 <div class="row">
-                    <div class="col-md-offset-1 col-md-6" style="padding-right: 8px">
+                    <div class="col-md-offset-0 col-md-3" style="padding-right: 8px">
                         <div class="form-group" id="gddobs" style="display: none; margin: 0">
                             <textarea name="obs" class="form-control" rows="1" placeholder="Observaciones"></textarea>
                         </div>
                     </div>
-                    <div class="divSelect col-md-offset-1 col-md-2"  style="padding-left: 0; padding-right: 8px; display: flex">
+                    <div class="col-md-offset-1 col-md-3">
+                        <div class="form-group" style="margin: 0; display: flex;">
+                            <input type="text" class="form-control" placeholder="Conductor" id="conductor">
+                            <input type="text" class="form-control" placeholder="Patente" id="patente">
+                        </div>
+                    </div>
+                    <div class="divSelect col-md-offset-0 col-md-2"  style="padding-left: 0; padding-right: 0px; display: flex">
                         <label for="estado" style="white-space: nowrap; margin-top:5%; margin-right: 2px">Tipo de GD:</label>
                         <select name="estado" id="estadoselect" class="form-control">
                             <option value="Venta" class="notT">Venta</option>
@@ -209,7 +231,7 @@ function letraMayus(string) {
                     </div>
                     <div class="num_pl_input col-md-1 hidden"  style="padding-left: 0; padding-right: 8px">
                         <label for="input_idpackinglist">N° Packing List:
-                            <input id="input_idpackinglist" class="form-control" type="text" placeholder="N° Packing List" disabled></input>
+                            <input id="input_idpackinglist" class="form-control" type="text" placeholder="N° Packing List" disabled/>
                         </label>
                     </div>
                     <div class="col-md-1" style="padding: 0; padding-right: 8px">
@@ -221,9 +243,8 @@ function letraMayus(string) {
                 </div>
             </div>
         </div>
-    </form>
+        </form>
 </div>
-
 <style type="text/css">
     #nolanzados_wrapper{
         padding: 1%;
@@ -249,7 +270,6 @@ function letraMayus(string) {
 </style>
 
 <div class="col-sm-12 col-md-12 col-md-offset-0">
-        
     <ul class="nav nav-tabs" style="box-shadow: 0 0px 0px;">
         <li class="pestana_xdespachar active" onclick="tab_prod()"><a data-toggle="tab" href="#prodxdeps">Productos por Despachar</a></li>
         <li class="pestana_insumos" onclick="tab_insum()"><a data-toggle="tab" href="#insum">Insumos</a></li>
@@ -773,7 +793,10 @@ function letraMayus(string) {
                             pl: pl,
                             obs:$("#gddobs .form-control").val(),
                             idcliente: $("#cliente").val(),
-                            idgd: $("#idguia").val()
+                            idgd: $("#idguia").val(),
+                            destino: $("#destino").val(),
+                            conductor: $("#conductor").val(),
+                            patente: $("#patente").val()
                         },
                         url: '/bodega/save_gdd',
                         beforeSend: function(){
@@ -844,7 +867,10 @@ function letraMayus(string) {
                         pl: pl,
                         obs:$("#gddobs .form-control").val(),
                         idcliente: $("#cliente").val(),
-                        idgd: $("#idguia").val()
+                        idgd: $("#idguia").val(),
+                        destino: $("#destino").val(),
+                        conductor: $("#conductor").val(),
+                        patente: $("#patente").val()
                     },
                     url: '/bodega/act_gdd',
                     beforeSend: function(){

@@ -239,44 +239,54 @@ router.get('/crear_gdd', function(req, res, next){
                 if(err){console.log("Error Selecting : %s", err);}
                 num = num[0].id+1;
                 connection.query("SELECT * FROM cliente", function(err, cli) {
-                    if (err) {console.log("Error Selecting : %s", err);}
-                    //COALESCE(queryReservados.reservados, 0) AS reservados ENTREGA LA CANTIDAD QUE SE HA RESERVADO EN BMI
-                    // Y ADEMAS YA SE HA RETIRADO (reservacion_detalle.estado = 1)
-                    connection.query("SELECT COALESCE(queryReservados.reservados, 0) AS reservados , fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem,pedido.bmi, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
-                        +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
-                        +" left join (select pedido.idpedido, sum(palet_item.cantidad) as cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where !palet.desp group by palet_item.idpedido) as pl on pl.idpedido = pedido.idpedido"
-                        +" left join odc on odc.idodc=pedido.idodc" +
-                        " left join cliente on cliente.idcliente=odc.idcliente" +
-                        " left join producido on producido.idmaterial=material.idmaterial" +
-                        " left join fabricaciones on fabricaciones.idpedido = pedido.idpedido LEFT JOIN (SELECT fabricaciones.idfabricaciones, SUM(reservacion_detalle.ret) AS reservados FROM reservacion_detalle " +
-                        " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones WHERE reservacion_detalle.ret > 0 GROUP BY fabricaciones.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
-                        " left join ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
-                        +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
-                        function(err, rows){
-                            if(err)
-                                console.log("Error Selecting :%s", err);
+                    if (err){console.log("Error Selecting : %s", err);}
 
-                            connection.query("select " +
-                                "palet_item.*, " +
-                                "material.detalle, material.idmaterial,pedido.idpedido," +
-                                "odc.numoc,pedido.numitem," +
-                                "palet.idpackinglist," +
-                                "q_palet.peso_palet, cliente.sigla," +
-                                "material.peso,cliente.idcliente " +
-                                "from palet_item " +
-                                "left join palet on palet.idpalet = palet_item.idpalet " +
-                                "left join pedido on pedido.idpedido = palet_item.idpedido " +
-                                "left join odc on odc.idodc = pedido.idodc " +
-                                "left join cliente on cliente.idcliente = odc.idcliente " +
-                                "left join material on material.idmaterial = pedido.idmaterial " +
-                                "left join (select palet.idpalet, sum(material.peso*palet_item.cantidad) as peso_palet from palet_item left join palet on palet.idpalet = palet_item.idpalet left join pedido on pedido.idpedido = palet_item.idpedido left join material on material.idmaterial = pedido.idmaterial group by palet.idpalet) as q_palet on q_palet.idpalet = palet.idpalet " +
-                                "where palet.idpackinglist is not null and palet.desp is false", function(err, palet){
+                    connection.query("SELECT \n" +
+                        "direccion_cliente.*, \n" +
+                        "direccion.comuna,\n" +
+                        "direccion.direccion_d as direccion,\n" +
+                        "direccion.pais,direccion.ciudad \n" +
+                        "FROM direccion_cliente \n" +
+                        "LEFT JOIN direccion ON direccion.iddireccion = direccion_cliente.iddireccion", function(err, dir) {
+                        if (err) {console.log("Error Selecting : %s", err);}
+                        //COALESCE(queryReservados.reservados, 0) AS reservados ENTREGA LA CANTIDAD QUE SE HA RESERVADO EN BMI
+                        // Y ADEMAS YA SE HA RETIRADO (reservacion_detalle.estado = 1)
+                        connection.query("SELECT COALESCE(queryReservados.reservados, 0) AS reservados , fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem,pedido.bmi, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
+                            +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
+                            +" left join (select pedido.idpedido, sum(palet_item.cantidad) as cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where !palet.desp group by palet_item.idpedido) as pl on pl.idpedido = pedido.idpedido"
+                            +" left join odc on odc.idodc=pedido.idodc" +
+                            " left join cliente on cliente.idcliente=odc.idcliente" +
+                            " left join producido on producido.idmaterial=material.idmaterial" +
+                            " left join fabricaciones on fabricaciones.idpedido = pedido.idpedido LEFT JOIN (SELECT fabricaciones.idfabricaciones, SUM(reservacion_detalle.ret) AS reservados FROM reservacion_detalle " +
+                            " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones WHERE reservacion_detalle.ret > 0 GROUP BY fabricaciones.idfabricaciones) AS queryReservados ON queryReservados.idfabricaciones = fabricaciones.idfabricaciones " +
+                            " left join ordenfabricacion on fabricaciones.idorden_f = ordenfabricacion.idordenfabricacion left join subaleacion on subaleacion.idsubaleacion=substring(material.codigo, 6,2)"
+                            +" left join aleacion on aleacion.idaleacion=substring(material.codigo, 8,2) where pedido.despachados!=pedido.cantidad-coalesce(pl.cantidad,0) group by pedido.idpedido order by pedido.f_entrega asc",
+                            function(err, rows){
                                 if(err)
                                     console.log("Error Selecting :%s", err);
 
-                                res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 0, cli: cli, sel: [], redirect: false});
+                                connection.query("select " +
+                                    "palet_item.*, " +
+                                    "material.detalle, material.idmaterial,pedido.idpedido," +
+                                    "odc.numoc,pedido.numitem," +
+                                    "palet.idpackinglist," +
+                                    "q_palet.peso_palet, cliente.sigla," +
+                                    "material.peso,cliente.idcliente " +
+                                    "from palet_item " +
+                                    "left join palet on palet.idpalet = palet_item.idpalet " +
+                                    "left join pedido on pedido.idpedido = palet_item.idpedido " +
+                                    "left join odc on odc.idodc = pedido.idodc " +
+                                    "left join cliente on cliente.idcliente = odc.idcliente " +
+                                    "left join material on material.idmaterial = pedido.idmaterial " +
+                                    "left join (select palet.idpalet, sum(material.peso*palet_item.cantidad) as peso_palet from palet_item left join palet on palet.idpalet = palet_item.idpalet left join pedido on pedido.idpedido = palet_item.idpedido left join material on material.idmaterial = pedido.idmaterial group by palet.idpalet) as q_palet on q_palet.idpalet = palet.idpalet " +
+                                    "where palet.idpackinglist is not null and palet.desp is false", function(err, palet){
+                                    if(err)
+                                        console.log("Error Selecting :%s", err);
+
+                                    res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 0, cli: cli, sel: [], redirect: false, dir: dir});
+                                });
                             });
-                        });
+                    });
                 });
             });
             
@@ -631,18 +641,19 @@ router.post('/crear_gdd_fill', function(req, res, next) {
 
 router.post('/save_gdd', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input.destino);
     req.getConnection(function (err,connection) {
         //Insertamos los valores de una GD
         let values;
         var query;
         if(input.idgd === '0'){
             //INSERT INTO `siderval`.`gd` (`estado`, `obs`, `idcliente`) VALUES ('venta', 'xxx', '555');
-            query = "INSERT INTO gd (estado, fecha, last_mod, obs,idcliente) VALUES ('"+input.estado+"',now(), now(), '"+input.obs+" ', '"+input.idcliente+"')";
+            query = "INSERT INTO gd (estado, fecha, last_mod, obs,idcliente, iddireccion, conductor, patente) VALUES ('"+input.estado+"',now(), now(), '"+input.obs+" ', '"+input.idcliente+"', '"+input.destino+"', '"+input.conductor+"' , '"+input.patente+"')";
             values = [[input.estado, new Date(), new Date() , input.obs,input.idcliente]];
         }
         else{
             //UPDATE `siderval`.`gd` SET `estado` = 'blanco', `obs` = 'comentario', `idcliente` = '1111' WHERE (`idgd` = '19861');
-            query = "UPDATE gd SET last_mod = now(), estado = '"+input.estado+"', obs = '"+input.obs+"', idcliente = '"+input.idcliente+"' WHERE (idgd = '"+input.idgd+"')";
+            query = "UPDATE gd SET last_mod = now(), estado = '"+input.estado+"', obs = '"+input.obs+"', idcliente = '"+input.idcliente+"', iddireccion='"+input.destino+"', conductor='"+input.conductor+"', patente='"+input.patente+"' WHERE (idgd = '"+input.idgd+"')";
             values = [[input.estado, new Date(), new Date() , input.obs,input.idcliente]];
         }
         console.log(query);
@@ -650,9 +661,11 @@ router.post('/save_gdd', function (req, res, next) {
             if(err) {throw err;}
             if (input.estado !== "Blanco") {
                 //ID ultima GD y lista vacia que contendra pedidos
-                let idgd;
+                let idgd, iddestino;
+
                 if(input.idgd == '0'){idgd = results.insertId;}
                 else{idgd = input.idgd;}
+
                 let despachos = [];
                 var case_p = [];
                 var case_pl = [];
@@ -665,8 +678,8 @@ router.post('/save_gdd', function (req, res, next) {
                 var up_reserv2 = "";
                 //array que almacena los idpedido que tienen reservaciones vinculadas
                 var act_reserv = [];
-                for (let i = 0; i < Object.keys(input).length - 5 ; i++) {
-                    if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
+                for (let i = 0; i < Object.keys(input).length - 8 ; i++) {
+                    if(input['list[' + i + '][]'][3].split('-')[0] !== '0'){
                         if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) === -1){
                             ids_palets.push( input['list[' + i + '][]'][3].split('-')[0]);
                             case_pl.push(input['list[' + i + '][]'][3].split('-')[0]);
@@ -678,18 +691,7 @@ router.post('/save_gdd', function (req, res, next) {
                     if (despachos[i][1] === "0") {
                         despachos[i][1] = null;
                     }
-                    /*
-                    * UPDATE reservacion_detalle
-                    * LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.desp = CASE
-                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
-                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
-                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
-                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
-                        WHEN fabricaciones.idpedido = 1 THEN reservacion_detalle.desp + 2952
-                        ELSE reservacion_detalle.desp
-                        END
-                        WHERE fabricaciones.idpedido  in (?);
-                    * */
+
                     if(i === 0){
                         up_reserv += "UPDATE reservacion_detalle" +
                             " LEFT JOIN fabricaciones ON fabricaciones.idfabricaciones = reservacion_detalle.idfabricaciones SET reservacion_detalle.desp = CASE ";
@@ -1111,15 +1113,10 @@ router.post('/act_gdd', function(req, res, next){
             ope = '-';
             ope2 = '+';
     }
-    //var input = JSON.parse(JSON.stringify(req.body));
-    console.log(input);
     req.getConnection(function (err,connection) {
         //Insertamos los valores de una GD
-        let values = [[input.estado, new Date(), new Date() , input.obs,input.idcliente]];
-        console.log("values");
-        console.log(values);
-        connection.query("UPDATE gd SET `last_mod` = CURRENT_TIMESTAMP,`estado`=?,`obs`=?,`idcliente` = ?  WHERE idgd = ?",
-            [input.estado, input.obs,input.idcliente, input.idgd], function (err, results) {
+        connection.query("UPDATE gd SET `last_mod` = CURRENT_TIMESTAMP,`estado`=?,`obs`=?, `idcliente` = ?, `iddireccion` = ?,`conductor` = ?,`patente` = ?  WHERE idgd = ?",
+            [input.estado, input.obs,input.idcliente, input.idgd, input.destino, input.conductor, input.patente], function (err, results) {
             if(err) {throw err;}
             if (input.estado !== "Blanco") {
                 //ID ultima GD y lista vacia que contendra pedidos

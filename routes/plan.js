@@ -8,7 +8,7 @@ router.use(
     connection(mysql,dbCredentials,'pool')
 );
 function verificar(usr){
-  if(usr.nombre === 'plan' || usr.nombre === 'gerencia' || usr.nombre === 'abastecimiento' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'bodega'){
+  if(usr.nombre === 'plan' || usr.nombre === 'gerencia' || usr.nombre === 'abastecimiento' || usr.nombre === 'siderval' || usr.nombre === 'jefeplanta' || usr.nombre === 'bodega' || usr.nombre === 'gestionpl'){
     return true;
   }else{
     return false;
@@ -85,7 +85,36 @@ function parsear_crl(nro){
 /* GET users listing. */
 router.get('/', function(req, res) {
     if(req.session.userData.nombre === 'plan'){
-        res.render('plan/indx_new',{page_title:"Planificación",username: req.session.userData.nombre,  route: '/plan/lanzar_of/pedido'});}
+        req.getConnection(function(err,connection){
+            if(err) console.log("Connection Error: %s",err);
+            connection.query("SELECT * FROM pais", function (err,pais){
+                    if(err) console.log("Select Error: %s",err);
+                    connection.query("SELECT * FROM ciudad", function (err,ciudad){
+                            if(err) console.log("Select Error: %s",err);
+                            connection.query("SELECT * FROM regiones", function (err,region){
+                                    if(err) console.log("Select Error: %s",err);
+                                    connection.query("SELECT * FROM provincias", function (err,provincia){
+                                            if(err) console.log("Select Error: %s",err);
+                                            connection.query("select comunas.*, regiones.region_id from comunas left join provincias on provincias.provincia_id = comunas.provincia_id left join regiones on regiones.region_id = provincias.region_id", function (err,comuna){
+                                                    if(err) console.log("Select Error: %s",err);
+                                                    res.render('plan/indx_new',{
+                                                        page_title:"Planificación",
+                                                        username: req.session.userData.nombre,
+                                                        route: '/plan/lanzar_of/pedido',
+                                                        pais: pais,
+                                                        ciudad: ciudad,
+                                                        region: region,
+                                                        provincia: provincia,
+                                                        comuna: comuna,
+                                                        user: req.session.userData
+                                                    });
+                                            });
+                                    });
+                            });
+                    });
+            });
+        });
+    }
     else{res.redirect('bad_login');}
 });
 
@@ -93,7 +122,35 @@ router.get('/', function(req, res) {
 router.post('/indx', function(req, res, next) {
     var r = req.body.route.split('%').join('/');
     if(req.session.userData.nombre === 'plan'){
-        res.render('plan/indx_new', {page_title: "Planificación", username: req.session.userData.nombre, route: r});
+        req.getConnection(function(err,connection){
+            if(err) console.log("Connection Error: %s",err);
+            connection.query("SELECT * FROM pais", function (err,pais){
+                if(err) console.log("Select Error: %s",err);
+                connection.query("SELECT * FROM ciudad", function (err,ciudad){
+                    if(err) console.log("Select Error: %s",err);
+                    connection.query("SELECT * FROM regiones", function (err,region){
+                        if(err) console.log("Select Error: %s",err);
+                        connection.query("SELECT * FROM provincias", function (err,provincia){
+                            if(err) console.log("Select Error: %s",err);
+                            connection.query("select comunas.*, regiones.region_id from comunas left join provincias on provincias.provincia_id = comunas.provincia_id left join regiones on regiones.region_id = provincias.region_id", function (err,comuna){
+                                if(err) console.log("Select Error: %s",err);
+                                res.render('plan/indx_new',{
+                                    page_title:"Planificación",
+                                    username: req.session.userData.nombre,
+                                    route: r,
+                                    pais: pais,
+                                    ciudad: ciudad,
+                                    region: region,
+                                    provincia: provincia,
+                                    comuna: comuna,
+                                    user: req.session.userData
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
     }
     else{res.redirect('bad_login');}
 });
@@ -715,6 +772,112 @@ router.get('/all_clientes', function(req, res, next){
 });
 /*
 Desc:
+    Ruta que muestra todos los clientes/proveedores y cuantas OC tiene cada uno
+Variables influyentes:
+    req.body = {}
+Usages:
+    siderval/layouts/header.ejs boton panel de control
+    plan/layouts/header.ejs boton panel de control
+    plan.js (/add_user) redireccionamiento post creacion
+    plan.js (/edit_user) redireccionamiento post edicion
+ */
+router.get('/view_destinos', function(req, res, next){
+    if(verificar(req.session.userData)){
+        if(req.session.isUserLogged){
+            res.render('plan/view_destinos',{
+                user: req.session.userData,
+                username: req.session.userData.username
+            });
+        } else res.redirect("/bad_login");
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+
+router.post('/save_destino', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var dir = JSON.parse(input.dir);
+        var query;
+        var err = false;
+        if(dir[2] && dir[1] && dir[0]){
+            if(dir[2] === 'CHL'){
+                query = "INSERT INTO direccion (direccion_d, comuna, pais) VALUES ('"+dir[0]+"','"+dir[1]+"','"+dir[2]+"')";
+            }else{
+                query = "INSERT INTO direccion (direccion_d, ciudad, pais) VALUES ('"+dir[0]+"','"+dir[1]+"','"+dir[2]+"')";
+            }
+        }
+        else{err=true;}
+
+        req.getConnection(function(err,connection){
+            if(err) {
+                console.log("Connection Error: %s",err);
+                err = true;
+            }
+
+
+            connection.query(query,
+                function (err,inDir) {
+                    if (err){
+                        console.log("Select Error: %s", err);
+                        err = true;
+                    }
+                    res.send(err);
+            });
+        });
+    }
+    else{res.redirect('bad_login');}
+
+});
+
+router.post('/table_destinos', function(req, res, next){
+    if(verificar(req.session.userData)){
+        var input = JSON.parse(JSON.stringify(req.body));
+        var array_fill = [
+            "COALESCE(pais.PaisNombreLocal,'Chile')",
+            "COALESCE(ciudad.CiudadNombre, comunas.comuna_nombre)",
+            "direccion.direccion_d"
+        ];
+        var object_fill = {
+            "COALESCE(pais.PaisNombreLocal,'Chile')-off": [],
+            "COALESCE(ciudad.CiudadNombre, comunas.comuna_nombre)-off": [],
+            "direccion.direccion_d-off": [],
+            "COALESCE(pais.PaisNombreLocal,'Chile')-on": [],
+            "COALESCE(ciudad.CiudadNombre, comunas.comuna_nombre)-on": [],
+            "direccion.direccion_d-on": []
+        };
+        var condiciones_where = [];
+
+        if(input.cond != '') {
+            for (var e = 0; e < input.cond.split('@').length; e++) {
+                condiciones_where.push(input.cond.split('@')[e]);
+            }
+        }
+        //SE LLAMA A LA FUNCIÓN QUE GENERA CONDICIÓN WHERE QUE LUEGO SE APLICARÁ A LA QUERY
+        var result = getConditionArray(object_fill, array_fill, condiciones_where, input);
+        var where = result[0];
+        var limit = result[1];
+        req.getConnection(function(err, connection){
+            if(err) throw err;
+            connection.query("SELECT * FROM direccion \n" +
+                "LEFT JOIN ciudad ON ciudad.CiudadID=direccion.ciudad \n" +
+                "LEFT JOIN pais ON pais.PaisCodigo = ciudad.PaisCodigo \n" +
+                "LEFT JOIN comunas ON comunas.comuna_id = direccion.comuna "
+                + where + " GROUP BY direccion.iddireccion " + limit,
+                function(err, dets){
+                    if(err) throw err;
+
+                    console.log(dets[0]);
+                    res.render('plan/table_destinos', {data: dets});
+
+                });
+        });
+    }
+    else{res.redirect('bad_login');}
+});
+/*
+Desc:
     Ruta para buscar info de clientes según SIGLA, RAZON, GIRO o RUT
 Variables influyentes:
     req.params = {
@@ -1053,6 +1216,9 @@ router.post('/crear_odc', function(req, res, next){
           numordenfabricacion: req.body.nroordenfabricacion,
           estado: "incompleto"
         };
+        if(!req.body.descuento){
+            req.body.descuento = 0;
+        }
         var cliente = JSON.parse(JSON.stringify(req.body)).cliente;
         var moneda = JSON.parse(JSON.stringify(req.body)).moneda;
         var factor_item = JSON.parse(JSON.stringify(req.body)).factor_item;
@@ -1079,7 +1245,7 @@ router.post('/crear_odc', function(req, res, next){
                     " where ped_xdesp.disponible > 0", function(err, stocks){
                     if(err) throw err;
 
-                    connection.query("INSERT INTO odc SET ?",[{numoc: req.body.nroordenfabricacion, idcliente: cliente, moneda: moneda}],function(err,odc){
+                    connection.query("INSERT INTO odc SET ?",[{numoc: req.body.nroordenfabricacion, idcliente: cliente, moneda: moneda, desc: req.body.descuento}],function(err,odc){
                         if(err)throw err;
                         if(typeof req.body['idm[]'] === 'string'){
                             //si el pedido el tipo de fabricacion es INTERNA, NO se crea ABASTECIMIENTO

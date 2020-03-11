@@ -83,39 +83,87 @@ function parsear_crl(nro){
     return num;
 }
 
-
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-    if(verificar(req.session.userData)){
-        req.getConnection(function(err, connection){
-            if(err){console.log("Error Connecting : %s", err);}
-            connection.query("SELECT * FROM etapafaena", function(err, etp){
-                if(err){console.log("Error Selecting : %s", err);}
-                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp, route: '/gestionpl/create_production_history'});
+router.get('/', function(req, res) {
+    if(req.session.userData.nombre === 'gestionpl'){
+        req.getConnection(function(err,connection){
+            if(err) console.log("Connection Error: %s",err);
+            connection.query("SELECT * FROM pais", function (err,pais){
+                if(err) console.log("Select Error: %s",err);
+                connection.query("SELECT * FROM ciudad", function (err,ciudad){
+                    if(err) console.log("Select Error: %s",err);
+                    connection.query("SELECT * FROM regiones", function (err,region){
+                        if(err) console.log("Select Error: %s",err);
+                        connection.query("SELECT * FROM provincias", function (err,provincia){
+                            if(err) console.log("Select Error: %s",err);
+                            connection.query("select comunas.*, regiones.region_id from comunas left join provincias on provincias.provincia_id = comunas.provincia_id left join regiones on regiones.region_id = provincias.region_id", function (err,comuna){
+                                if(err) console.log("Select Error: %s",err);
+
+                                connection.query("SELECT * FROM etapafaena", function(err, etp){
+                                    if(err){console.log("Error Selecting : %s", err);}
+                                    res.render('gestionpl/indx',{
+                                        page_title:"Gestión Planta",
+                                        username: req.session.userData.nombre,
+                                        route: '/gestionpl/create_production_history',
+                                        pais: pais,
+                                        ciudad: ciudad,
+                                        region: region,
+                                        provincia: provincia,
+                                        comuna: comuna,
+                                        user: req.session.userData,
+                                        etapas: etp
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
             });
         });
     }
     else{res.redirect('bad_login');}
 });
+
 
 router.post('/indx', function(req, res, next) {
     var r = req.body.route.split('%').join('/');
-    console.log("rutaaaa");
-    console.log(r);
-
-
-    if(verificar(req.session.userData)){
-        req.getConnection(function(err, connection){
-            if(err){console.log("Error Connecting : %s", err);}
-            connection.query("SELECT * FROM etapafaena", function(err, etp){
-                if(err){ console.log("Error Selecting : %s", err);}
-                res.render('gestionpl/indx',{page_title:"Gestión Planta",username: req.session.userData.nombre, etapas: etp, route: r});
+    if(req.session.userData.nombre === 'gestionpl'){
+        req.getConnection(function(err,connection){
+            if(err) console.log("Connection Error: %s",err);
+            connection.query("SELECT * FROM pais", function (err,pais){
+                if(err) console.log("Select Error: %s",err);
+                connection.query("SELECT * FROM ciudad", function (err,ciudad){
+                    if(err) console.log("Select Error: %s",err);
+                    connection.query("SELECT * FROM regiones", function (err,region){
+                        if(err) console.log("Select Error: %s",err);
+                        connection.query("SELECT * FROM provincias", function (err,provincia){
+                            if(err) console.log("Select Error: %s",err);
+                            connection.query("select comunas.*, regiones.region_id from comunas left join provincias on provincias.provincia_id = comunas.provincia_id left join regiones on regiones.region_id = provincias.region_id", function (err,comuna){
+                                if(err) console.log("Select Error: %s",err);
+                                connection.query("SELECT * FROM etapafaena", function(err, etp){
+                                    if(err){ console.log("Error Selecting : %s", err);}
+                                    res.render('gestionpl/indx',{
+                                        page_title:"Gestión Planta",
+                                        username: req.session.userData.nombre,
+                                        route: r,
+                                        pais: pais,
+                                        ciudad: ciudad,
+                                        region: region,
+                                        provincia: provincia,
+                                        comuna: comuna,
+                                        etapas: etp,
+                                        user: req.session.userData
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
             });
         });
     }
     else{res.redirect('bad_login');}
 });
-
 
 
 router.post('/save_production_history_state', function(req, res, next){
