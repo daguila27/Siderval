@@ -1096,6 +1096,7 @@ router.get('/page_gdd/:idgd', function(req, res, next){
 router.post('/act_gdd', function(req, res, next){
     console.log("activando BLANCO");
     var input = JSON.parse(JSON.stringify(req.body));
+    console.log(input);
     var query ="UPDATE pedido SET despachados = CASE ";
     var query2 ="UPDATE material SET stock = CASE ";
     var ope;
@@ -1116,7 +1117,7 @@ router.post('/act_gdd', function(req, res, next){
     req.getConnection(function (err,connection) {
         //Insertamos los valores de una GD
         connection.query("UPDATE gd SET `last_mod` = CURRENT_TIMESTAMP,`estado`=?,`obs`=?, `idcliente` = ?, `iddireccion` = ?,`conductor` = ?,`patente` = ?  WHERE idgd = ?",
-            [input.estado, input.obs,input.idcliente, input.idgd, input.destino, input.conductor, input.patente], function (err, results) {
+            [input.estado, input.obs,input.idcliente, input.destino, input.conductor, input.patente,input.idgd], function (err, results) {
             if(err) {throw err;}
             if (input.estado !== "Blanco") {
                 //ID ultima GD y lista vacia que contendra pedidos
@@ -1128,7 +1129,7 @@ router.post('/act_gdd', function(req, res, next){
                 //matriz que contiene los id de palet
                 var ids_palets = [];
                 var ids_palet_item = [];
-                for (let i = 0; i < Object.keys(input).length - 5 ; i++) {
+                for (let i = 0; i < Object.keys(input).length - 8 ; i++) {
                     if(input['list[' + i + '][]'][3].split('-')[0] != '0'){
                         if(ids_palets.indexOf(input['list[' + i + '][]'][3].split('-')[0]) == -1){
                             ids_palets.push( input['list[' + i + '][]'][3].split('-')[0]);
