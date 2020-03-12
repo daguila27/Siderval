@@ -1569,9 +1569,19 @@ router.post('/activar_gdd', function(req,res,next){
         req.getConnection(function(err, connection){
             connection.query("SELECT * FROM gd WHERE idgd = ?", [input.id], function(err, desp){
                 if(err){console.log("Error Selecting : %s", err);}
-                num = desp[0].idgd;
+                var num = desp[0].idgd;
                 connection.query("SELECT * FROM cliente", function(err, cli) {
                     if (err) {console.log("Error Selecting : %s", err);}
+                    connection.query("SELECT \n" +
+                        "direccion_cliente.*, \n" +
+                        "direccion.comuna,\n" +
+                        "direccion.direccion_d as direccion,\n" +
+                        "direccion.pais,direccion.ciudad \n" +
+                        "FROM direccion_cliente \n" +
+                        "LEFT JOIN direccion ON direccion.iddireccion = direccion_cliente.iddireccion", function(err,dir){
+                        if (err) {console.log("Error Selecting : %s", err);}
+
+
                     connection.query("SELECT COALESCE(queryReservados.reservados, 0) AS reservados , fabricaciones.idorden_f as numof, cliente.idcliente,cliente.sigla AS cliente,pedido.idpedido as idpedido,pedido.numitem as numitem,pedido.bmi, coalesce(pl.cantidad,0) as pl_cantidad, pedido.cantidad-coalesce(pl.cantidad,0) as cantidad,pedido.f_entrega,pedido.despachados,odc.idodc as idordenfabricacion,"
                         +"odc.numoc as numordenfabricacion, subaleacion.subnom as anom, material.idmaterial,material.detalle,material.stock from pedido left join material on pedido.idmaterial=material.idmaterial"
                         +" left join (select pedido.idpedido, sum(palet_item.cantidad) as cantidad from pedido left join palet_item on palet_item.idpedido = pedido.idpedido left join palet on palet.idpalet = palet_item.idpalet where !palet.desp group by palet_item.idpedido) as pl on pl.idpedido = pedido.idpedido"
@@ -1604,10 +1614,10 @@ router.post('/activar_gdd', function(req,res,next){
                                 if(err)
                                     console.log("Error Selecting :%s", err);
 
-
-                                res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 1, cli: cli, sel: [], redirect: false});
+                                res.render('bodega/g_despacho', {data: rows, palet: palet, num: num, blanco: 1, cli: cli, sel: [], redirect: false, dir: dir});
                             });
                         });
+                    });
                 });
 
 
