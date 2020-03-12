@@ -2,7 +2,56 @@
 </div>
 </div>
 
+<!-- Modal -->
+<div id="editCliente" class="modal fade" role="dialog">
+    <div class="modal-dialog">
 
+        <form id="editprovform">
+            <!-- addclientform     editclientform-->
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Agregar Cliente:</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="rut" id="rut" type="text" class="form-control" placeholder="Rut Cliente">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                        <input name="sigla" id="sigla" type="text" class="form-control" placeholder="Sigla">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="razon" id="razon" type="text" class="form-control" placeholder="Razon Social">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-flag"></i></span>
+                        <input name="giro" id="giro" type="text" class="form-control" placeholder="Giro">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="dir" id="dir" type="text" class="form-control" placeholder="Direccion">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="city" id="city" type="text" class="form-control" placeholder="Ciudad / Comuna">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="telefono" id="telefono" type="text" class="form-control" placeholder="Telefono">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-map-marker"></i></span>
+                        <input name="contacto" id="contacto" type="text" class="form-control" placeholder="Contacto">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Editar</button>
+                    <button type="button" class="btn btn-default" id="close-editclientemodal" data-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 <style type="text/css">
     /* The snackbar - position it at the bottom and in the middle of the screen */
     #snackbar {
@@ -1349,6 +1398,40 @@
         $(".alert-screen").css("background-color", "white");
         //$(".alert-screen .mensaje").css('background-color', 'white');
     }
+
+
+
+
+
+
+    $("form#editprovform").on('submit', function(e){
+        e.preventDefault();
+        alert("hhh");
+        var array = $(this).serializeArray();
+        var datos = {
+            rut: array[0].value,
+            sigla: array[1].value,
+            razon: array[2].value,
+            direccion: array[4].value,
+            ciudad: array[5].value,
+            giro: array[3].value,
+            telefono: array[6].value,
+            contacto: array[7].value
+        };
+        $.ajax({
+            type: 'POST',
+            data: datos,
+            url: '/plan/edit_client',
+            success: function(data){
+                $("#page-wrapper").html(data);
+                $("#close-editclientemodal").click();
+                $("#editclientform input").val('');
+
+            }
+        });
+
+
+    });
 </script>
 <!--CÓDIGO Y FUNCIONES NECESARIAS PARA USAR LA FUNCION ALERTA [FIN] -->
 
