@@ -139,17 +139,20 @@ function completarDigitos(num, dig){
     <%}}
     } else { %>
         <tr>
-            <td colspan="4">
-                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay nada por producir</small></h2>
+            <td colspan="12">
+                <h2 style="text-align: center"><small> <i class="fa fa-exclamation-circle"></i> No hay Productos Rechazados</small></h2>
             </td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
-            <td colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
+            <td style="padding: 0 !important;" colspan="0"></td>
         </tr>
     <%}%>
     </tbody>
@@ -220,7 +223,7 @@ function completarDigitos(num, dig){
                     // id="demo" class="collapse"
                     if(e === 0){
                         if(parseInt(princ[e]) === 1){
-                            html.push("<li data-toggle=\"collapse\" data-target=\".causal-"+$(this).data('key')+"\"><b>"+sec[e]+" (P)</b></li>");
+                            html.push("<li data-toggle=\"collapse\" onclick=\"$(this).find('i').toggleClass('fa-angle-double-down fa-angle-double-up');\" data-target=\".causal-"+$(this).data('key')+"\"><i class=\"fa fa-angle-double-down\" style=\"margin-right: 3px\"></i><b>"+sec[e]+" (P)</b></li>");
                         }else{
                             html.push("<li data-toggle=\"collapse\" data-target=\".causal-"+$(this).data('key')+"\">"+sec[e]+"</li>");
                         }

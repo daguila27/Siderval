@@ -1183,14 +1183,14 @@ router.post("/preparar_reserva",function(req,res,next){
         for(var e=0; e < input.length; e++){
             console.log(e);
             if(e === 0){
-                updateReserv+="UPDATE reservacion_detalle SET prep = CASE ";
+                updateReserv+="UPDATE reservacion_detalle SET ret = CASE ";
                 updateReserv2+="UPDATE reservacion_detalle SET sin_prep = CASE ";
             }
-            updateReserv += " WHEN idreservacion_d = "+input[e][1]+" THEN prep + "+input[e][2];
+            updateReserv += " WHEN idreservacion_d = "+input[e][1]+" THEN ret + "+input[e][2];
             updateReserv2 += " WHEN idreservacion_d = "+input[e][1]+" THEN sin_prep - "+input[e][2];
             id_rd.push(input[e][1]);
             if(e === input.length - 1){
-                updateReserv += " ELSE prep END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
+                updateReserv += " ELSE ret END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
                 updateReserv2 += " ELSE sin_prep END WHERE idreservacion_d IN ("+id_rd.join(',')+")";
             }
         }
