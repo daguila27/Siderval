@@ -2499,8 +2499,9 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 			sheet.getCell('D3').value = "Valor Medida Unitaria";
 			sheet.getCell('E3').value = "Stock Inicial";
 			sheet.getCell('F3').value = "Ingreso";
-			sheet.getCell('G3').value = "Salida";
-			sheet.getCell('H3').value = "Stock Final";
+			sheet.getCell('G3').value = "Salida Ventas";
+			sheet.getCell('H3').value = "Salida Otros";
+			sheet.getCell('I3').value = "Stock Final";
 			//sheet.getCell('I3').value = "Ingreso a Produccion por ODV";
 
 			sheet2.getCell('B1').value = "Código";
@@ -2584,8 +2585,9 @@ router.get('/xlsx_icm/:token', function (req, res, next) {
 				//Stock Inicial
 				sheet.getCell('E'+i.toString()).value = ops[i-4].s_inicial + ops[i-4].p_inicial;
 				sheet.getCell('F'+i.toString()).value = parseInt(ops[i-4].fundidos) + parseInt(ops[i-4].sum_dev) + parseInt(ops[i-4].ing_oda);
-				sheet.getCell('G'+i.toString()).value = parseInt(ops[i-4].despachados) + parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados);
-				sheet.getCell('H'+i.toString()).value =
+				sheet.getCell('G'+i.toString()).value = parseInt(ops[i-4].despachados);
+				sheet.getCell('H'+i.toString()).value =  parseInt(ops[i-4].sum_sal) + parseInt(ops[i-4].rechazados)
+				sheet.getCell('I'+i.toString()).value =
 					parseInt(ops[i-4].s_inicial) + parseInt(ops[i-4].p_inicial) +
 					parseInt(ops[i-4].fundidos) +
 					parseInt(ops[i-4].sum_dev) +
