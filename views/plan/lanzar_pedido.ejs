@@ -90,6 +90,7 @@
                 <div class="panel-footer">
                     <div class="row">
                         <div class="col-md-6">
+                            <input type="number" name="descuento" id="descuento" class="form-control" placeholder="Descuento ($)" min="0" style="width: 40%; margin-right: 10px">
                             <input type="text" name="nroordenfabricacion" id="num" style="width:80%" placeholder="N° Orden de Compra" class="form-control" required>
                         </div>
                         <div class="col-md-1 col-md-offset-5" style="padding: 0; padding-right: 8px">
@@ -340,8 +341,8 @@
         }
         for(var i =0;i<$(this).serializeArray().length;i++){
             console.log(lista[i].name);
-            if(lista[i].name != 'nroordenfabricacion'){
-                if(lista[i].name == 'precio' && (lista[i].value == null || lista[i].value == '') ){
+            if(lista[i].name !== 'nroordenfabricacion' && lista[i].name !== 'descuento'){
+                if(lista[i].name === 'precio' && (lista[i].value === null || lista[i].value === '') ){
                     data[lista[i].name].push(0);
                 }
                 else{
@@ -453,8 +454,8 @@
         }
         for(var i =0;i<$("#send_of").serializeArray().length;i++){
             console.log(lista[i].name);
-            if(lista[i].name != 'nroordenfabricacion'){
-                if(lista[i].name == 'precio' && (lista[i].value == null || lista[i].value == '') ){
+            if(lista[i].name !== 'nroordenfabricacion' && lista[i].name !== 'descuento'){
+                if(lista[i].name === 'precio' && (lista[i].value === null || lista[i].value === '') ){
                     data[lista[i].name].push(0);
                 }
                 else{
@@ -472,7 +473,6 @@
             else{
                 data.lock.push('0');
             }
-            //console.log($(this).val());
         });
         $.ajax({
             type: 'POST',
