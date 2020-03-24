@@ -35,7 +35,7 @@ var calidad = require('./routes/calidad');
 
 
 // view engine setup
-app.set('port', process.env.PORT || 6300);
+app.set('port', process.env.PORT || 4300);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
@@ -47,7 +47,7 @@ app.use(cookieParser("usuarios"));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieSession({
     name: 'session',
-    keys: ['usuario_espejo']
+    keys: ['usuario']
 }));
 
 
@@ -302,41 +302,31 @@ io.on('connection', function (socket) {
     });
     socket.on('dteError', function(obj){
       var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
-      connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegdd@@' + obj.idgdd + '@@' + fecha + '@@false@@' + obj.msg}, function(err){
+      connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddplan@' + obj.idgdd + '@' + fecha + '@false@' + obj.msg}, function(err){
         if(err){
           console.log(err);
         }
       });
     })
     socket.on('dteSuccess', function(obj) {
-      connection.query('UPDATE gd SET timbrado = 1 where idgd = ?', obj.idgdd, function(err, rows){
+      var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
+      connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddgpl@' + obj.idgdd + '@' + fecha + '@true@' + obj.path}, function(err, rows){
         if(err){
           console.log(err);
         } else {
-          var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
-          if(err){
-            console.log(err);
-          } else {
-            connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddgpl@' + obj.idgdd + '@' + fecha + '@true@' + obj.path}, function(err, rows){
-              if(err){
-                console.log(err);
-              } else {
-                io.sockets.emit('refreshGestionplNotif', [rows.insertId]);
-                connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddplan@' + obj.idgdd + '@' + fecha + '@true@' + obj.path}, function(err, rows){
-                  if(err){
-                    console.log(err);
-                  } else {
-                    io.sockets.emit('refreshPlanNotif', [rows.insertId]);
-                  }
-                });
+          io.sockets.emit('refreshGestionplNotif', [rows.insertId]);
+          connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddplan@' + obj.idgdd + '@' + fecha + '@true@' + obj.path}, function(err, rows){
+            if(err){
+              console.log(err);
+            } else {
+              io.sockets.emit('refreshPlanNotif', [rows.insertId]);
+            }
+          });
 
-              }
-            });
-          }
         }
       });
     });
-      app.locals.socket = socket;
+    app.locals.socket = socket;
 });
 
 

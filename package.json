@@ -31,6 +31,7 @@
     "mysql": "^2.17.1",
     "node-latex": "^2.4.4",
     "node-windows": "^0.1.14",
+    "path": "^0.12.7",
     "nodemon": "^2.0.2",
     "pdfkit": "^0.8.3",
     "pdfkitjs": "0.0.5",

@@ -637,7 +637,10 @@ router.post('/crear_gdd_fill', function(req, res, next) {
         res.redirect('bad_login');
     }
 });
-
+router.get('/testSocket', function(req, res){
+    req.app.locals.io.sockets.emit('hiDuds')
+    res.send({jeje: 'jojo'})
+})
 router.post('/save_gdd', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input.destino);
@@ -1601,7 +1604,6 @@ router.get('/confirm_notificacion/:idnotificacion/:cantidad', function(req,res,n
 		req.getConnection(function(err, connection){
 			connection.query("SELECT * FROM notificacion WHERE idnotificacion = ?", [idnotificacion], function(err, mat){
 				if(err){console.log("Error Selecting : %s", err);}
-
                 connection.query("SELECT * FROM material WHERE idmaterial = ?", [mat[0].descripcion.split('@')[1]], function(err, mats){
                     if(err){console.log("Error Selecting : %s", err);}
                     var stock_a = mats[0].stock;
