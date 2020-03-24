@@ -302,7 +302,7 @@ io.on('connection', function (socket) {
     });
     socket.on('dteError', function(obj){
       var fecha = new Date().toLocaleDateString()+" "+ new Date().toLocaleTimeString();
-      connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegdd@@' + obj.idgdd + '@@' + fecha + '@@false@@' + obj.msg}, function(err){
+      connection.query('INSERT INTO notificacion SET ?', {descripcion: 'dtegddplan@' + obj.idgdd + '@' + fecha + '@false@' + obj.msg}, function(err){
         if(err){
           console.log(err);
         }

@@ -638,7 +638,10 @@ router.post('/crear_gdd_fill', function(req, res, next) {
         res.redirect('bad_login');
     }
 });
-
+router.get('/testSocket', function(req, res){
+    req.app.locals.io.sockets.emit('hiDuds')
+    res.send({jeje: 'jojo'})
+})
 router.post('/save_gdd', function (req, res, next) {
     var input = JSON.parse(JSON.stringify(req.body));
     console.log(input.destino);
