@@ -26,7 +26,7 @@ function getConditionArray(object_fill,array_fill, condiciones_where, input){
     }
     if(clave.length>0){
         for(var e=0; e < clave.length; e++){
-            if(clave[e].split('@')[2] == 'off') {
+            if(clave[e].split('@')[2] === 'off') {
                 object_fill[array_fill[parseInt(clave[e].split('@')[0])] + "-off"].push(array_fill[parseInt(clave[e].split('@')[0])] + " LIKE '%" + clave[e].split('@')[1] + "%'");
             }
             else{
@@ -240,7 +240,6 @@ router.get('/crear_gdd', function(req, res, next){
                 num = num[0].id+1;
                 connection.query("SELECT * FROM cliente", function(err, cli) {
                     if (err){console.log("Error Selecting : %s", err);}
-
                     connection.query("SELECT \n" +
                         "direccion_cliente.*, \n" +
                         "direccion.comuna,\n" +
@@ -1510,8 +1509,76 @@ router.get('/add_notificacion/:idproduccion/:cantidad', function(req,res,next){
 	}
 	else{res.redirect('bad_login');}
 });
-
 router.get('/render_notificaciones', function(req, res, next){
+    req.getConnection(function(err,connection){
+        connection.query("SELECT " +
+            "notificacion.*," +
+            "material.detalle," +
+            "etapafaena.nombre_etapa, material2.detalle AS detalle2, odc.numoc, odc.idodc " +
+            "from notificacion " +
+            "LEFT JOIN material ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=material.idmaterial " +
+            "LEFT JOIN pedido ON substring_index(substring_index(notificacion.descripcion,'@',2), '@', -1)=pedido.idpedido " +
+            "LEFT JOIN odc ON odc.idodc=pedido.idodc " +
+            "LEFT JOIN (SELECT * FROM material) AS material2 ON material2.idmaterial=pedido.idmaterial " +
+            "LEFT JOIN etapafaena ON SUBSTRING_INDEX(notificacion.descripcion,'@',-1)=etapafaena.value " +
+            "WHERE (SUBSTRING(notificacion.descripcion,1,3) = 'jfp' OR SUBSTRING(notificacion.descripcion,1,3) = 'idm' OR SUBSTRING(notificacion.descripcion,1,9) = 'dtegddgpl' OR SUBSTRING(notificacion.descripcion,1,5) = 'crgdd') AND notificacion.active = true", function(err, notif){
+            if(err){console.log("Error Selecting : %s", err);}
+            var idprods = [];
+            for(var e=0; e < notif.length; e++){
+                if(notif[e].descripcion.split('@')[0] !== 'crgdd'){
+                    for(var w=0; w < notif[e].descripcion.split('@')[4].split('-').length; w++){
+                        idprods.push(notif[e].descripcion.split('@')[4].split('-')[w]);
+                    }
+                }
+            }
+            var q;
+            if(idprods.length === 0){
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ('0')";
+            }else{
+                q = "SELECT idproduccion,coalesce(externo,false) as externo FROM produccion WHERE idproduccion IN ("+idprods.join(',')+")";
+            }
+            connection.query(q, function(err, ext){
+                if(err){console.log("Error Selecting : %s", err);}
+
+                for(var e=0; e < notif.length; e++){
+                    if(notif[e].descripcion.split('@')[0] !== 'crgdd') {
+                        for (var w = 0; w < notif[e].descripcion.split('@')[4].split('-').length; w++) {
+                            for (var q = 0; q < ext.length; q++) {
+                                if (ext[q].idproduccion.toString() === notif[e].descripcion.split('@')[4].split('-')[w]) {
+                                    //SE CREA
+                                    if (notif[e].externo === undefined || !notif[e].externo) {
+                                        notif[e].externo = ext[q].externo;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                console.log(req.session.msgNotif);
+                var auxmsg;
+                connection.query("select * from notificacion WHERE SUBSTRING(notificacion.descripcion,1,9) = 'dtegddgpl'", function(err, rows) {
+                    if(err) {
+                        console.log(err)
+                    } else {
+                        console.log({rows})
+                        notif = notif.concat(rows)
+                    }
+                    if(req.session.msgNotif){
+                        auxmsg = req.session.msgNotif;
+                        req.session.msgNotif = false;
+                        console.log(req.session.msgNotif);
+                        res.render('gestionpl/notificaciones', {notif: notif, msgNotif: auxmsg});
+                    }
+                    else{
+                        res.render('gestionpl/notificaciones', {notif: notif, msgNotif: false});
+                    }
+                })
+            });
+        });
+    });
+});
+/*router.get('/render_notificaciones', function(req, res, next){
 	req.getConnection(function(err,connection){
 		connection.query("select " +
             "notificacion.*,material.detalle, pedido.idpedido, pedido.idodc, odc.numoc, material2.detalle AS detalle2 " +
@@ -1526,7 +1593,7 @@ router.get('/render_notificaciones', function(req, res, next){
 			res.render('bodega/notificaciones', {notif: notif});
 		});
 	});
-});
+});*/
 
 router.get('/confirm_notificacion/:idnotificacion/:cantidad', function(req,res,next){
 		var idnotificacion = req.params.idnotificacion;

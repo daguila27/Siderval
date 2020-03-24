@@ -4,13 +4,14 @@
     <div class="alert alert-success thumbnail">
       <img src="" alt="">
       <div class="caption">
-      		<!--<div class="dropdown" style="position: absolute; top: 15px; right: 30px;">
+      		<div class="dropdown" style="position: absolute; top: 15px; right: 30px;">
       		  <a class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-option-vertical"></i></a>
       		  <ul class="dropdown-menu dropdown-menu-right">
+				  <li><a class="editClient" data-idcl="<%=data[t].idcliente%>">Editar</a></li>
 			     <li><a>Ver Ordenes de Compra</a></li>
         
 			  </ul>
-			</div>-->
+			</div>
 	        <%if(data[t].sigla.length>20){%>
 	        	<h4><a title="<%=data[t].sigla%>  -  <%=data[t].rut%>" data-content="<%=data[t].razon%>" data-toggle="popover" data-placement="top"><%=data[t].sigla.substring(0,20)%>...</a></h4>
 	        <%}else{%>

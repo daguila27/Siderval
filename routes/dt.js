@@ -81,9 +81,15 @@ router.post('/save_producto',function(req, res){
     if(verificar(req.session.userData)){
         var input = JSON.parse(JSON.stringify(req.body));
         var data = [];
+		var rutas = [];
+
+        //FALTA HACER CONTROLADOR
         if(typeof input['cod[]'] === 'string'){
         	if(input["peso[]"] === ''){
         		input["peso[]"] = 0;
+			}
+        	if(input["ruta[]"] !== '' && input["ruta[]"] !== ' ' && input["ruta[]"] !== undefined){
+				rutas.push([input["ruta[]"],input["cod[]"].substring(6,7)]);
 			}
             data.push([input["cod[]"], input["nombre[]"], input["unid[]"], input["peso[]"],input["cod[]"].substring(0,1)]);
 		}
@@ -97,9 +103,22 @@ router.post('/save_producto',function(req, res){
 		}
 
         req.getConnection(function(err, connection){
-            connection.query("INSERT INTO material (codigo, detalle, u_medida, peso, tipo) VALUES ?", [data], function(err, rows){
-                if(err){console.log("Error Selecting : %s", err);}
-                res.redirect('/dt/create_producto');
+            connection.query("INSERT INTO material (codigo, detalle, u_medida, peso, tipo) VALUES ?", [data], function(err, inMats){
+                if(err){console.log("Error Inserting Material : %s", err);}
+
+				if(rutas.length > 0){
+					for(var t=0; t < rutas.length; t++){
+						rutas[t].push(inMats.insertId+t);
+					}
+					connection.query("INSERT INTO producido (ruta, idsubaleacion, idmaterial) VALUES ?", [rutas], function(err, inRutas){
+						if(err){console.log("Error Inserting Producidos : %s", err);}
+
+						res.redirect('/dt/create_producto');
+					});
+				}
+				else{
+					res.redirect('/dt/create_producto');
+				}
             });
         });
 

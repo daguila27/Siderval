@@ -10,28 +10,31 @@
                 <div class="panel-heading">Productos Nuevos: <button class="btn btn-xs btn-primary pull-right" onclick="add_col_p()">Agregar <i class="fa fa-plus"></i></button></div>
                 <div class="panel-body" style="padding: 0%">
                     <div style="overflow-y: scroll; max-height: 500px;">
+                        <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped new_product_table">
+                            <thead>
+                            <tr>
+                                <th class="o_column_sortable ">Código</th>
+                                <th class="o_column_sortable ">Descripción</th>
+                                <th class="o_column_sortable ">Unidad de Medida</th>
+                                <th class="o_column_sortable ">Peso (kg)</th>
+                                <th class="o_column_sortable ">Ruta de Producción</th>
+                                <th></th>
 
-                    <table class="o_list_view table table-condensed table-striped o_list_view_ungrouped new_product_table">
-                        <thead>
-                        <tr>
-                            <th class="o_column_sortable ">Código</th>
-                            <th class="o_column_sortable ">Descripción</th>
-                            <th class="o_column_sortable ">Unidad de Medida</th>
-                            <th class="o_column_sortable ">Peso (kg)</th>
-                            <th></th>
-
-                        </tr>
-                        </thead>
+                            </tr>
+                            </thead>
                             <tbody class="ui-sortable">
                                 <tr id="col-newp">
                                     <td class="codigo-col"></td>
                                     <td><input placeholder="Descipción del Producto" style="width: 100%" type="text" class="form-control input-sm" id="nombre"></td>
                                     <td><input placeholder="Unidad de Medida" style="width: 100%" type="text" class="form-control input-sm" id="unid"></td>
                                     <td><input placeholder="Peso (kg)" style="width: 100%" type="number" class="form-control input-sm" id="peso"></td>
+                                    <td><input placeholder="Ruta de Producción" style="width: 100%" data-disp="1,2,3,4,5,6,7,8,e" onkeyup="
+                                    if(new Array('1','2','3','4','5','6','7','8','e').indexOf( $(this).val().substring( $(this).val().length-1, $(this).val().length ) ) !== -1){$(this).val(Array.from($(this).val().split(',').join('')).join(','))}
+                                    else{$(this).val($(this).val().substring(0,$(this).val().length-1))}" type="text" class="form-control input-sm" id="ruta"></td>
                                     <td></td>
                                 </tr>
                             </tbody>
-                    </table>
+                        </table>
                     </div>
                 </div>
                 <div class="panel-footer" style="text-align: right">
@@ -375,6 +378,7 @@
                         "<td data-name='nombre' class='info-td'><input type='hidden' value='"+$("#nombre").val()+"'>"+$("#nombre").val()+"</td>" +
                         "<td data-name='unid' class='info-td'><input type='hidden' value='"+$("#unid").val()+"'>"+$("#unid").val()+"</td>" +
                         "<td data-name='peso' class='info-td'><input type='hidden' value='"+$("#peso").val()+"'>"+$("#peso").val()+"</td>" +
+                        "<td data-name='ruta' class='info-td'><input type='hidden' value='"+$("#ruta").val()+"'>"+$("#ruta").val()+"</td>" +
                         "<td><button class='btn btn-danger btn-xs del-newp' data-cod='"+$(".codigo-col").text().substring(0,9)+"' onclick='rem_col_p(this)'><i class='fa fa-times'></i></button></td>" +
                         "</tr>"
                     );
@@ -395,7 +399,8 @@
                 cod: [],
                 nombre: [],
                 unid: [],
-                peso: []
+                peso: [],
+                ruta: []
             };
             $(".info-tr").each(function(){
                 $(this).children('.info-td').each(function(){
@@ -407,6 +412,7 @@
                 data: data,
                 url: '/dt/save_producto',
                 success: function(data){
+                    alert("¡Registro Exitoso!");
                     $("#page-wrapper").html(data);
                     $("#page-wrapper").fadeIn();
                 }
