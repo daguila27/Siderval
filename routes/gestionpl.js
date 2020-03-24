@@ -224,16 +224,13 @@ router.get('/render_notificaciones', function(req, res, next){
             connection.query(q, function(err, ext){
                 if(err){console.log("Error Selecting : %s", err);}
 
-                
 
-                console.log(req.session.msgNotif);
                 var auxmsg;
                 connection.query("select * from notificacion WHERE SUBSTRING(notificacion.descripcion,1,9) = 'dtegddgpl'", function(err, rows) {
                     if(err) {
-                        console.log(err)
+                        console.log(err);
                     } else {
-                        console.log({rows})
-                        notif = notif.concat(rows)
+                        notif = notif.concat(rows);
                         
                     }   
                     for(var e=0; e < notif.length; e++){
@@ -250,16 +247,16 @@ router.get('/render_notificaciones', function(req, res, next){
                             }
                         }
                     }
+
                     if(req.session.msgNotif){
                         auxmsg = req.session.msgNotif;
                         req.session.msgNotif = false;
-                        console.log(req.session.msgNotif);
                         res.render('gestionpl/notificaciones', {notif: notif, msgNotif: auxmsg});
                     }
                     else{
                         res.render('gestionpl/notificaciones', {notif: notif, msgNotif: false});
                     }
-                })
+                });
             });
         });
     });
