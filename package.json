@@ -13,7 +13,7 @@
     "cookie-parser": "~1.4.3",
     "cookie-session": "~2.0.0-beta.3",
     "csv": "^2.0.0",
-    "csv-parse": "~2.0.0",
+    "csv-parse": "~4.4.6",
     "csv-write-stream": "^2.0.0",
     "debug": "~2.6.9",
     "dns": "^0.2.2",
