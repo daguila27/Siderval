@@ -738,11 +738,11 @@ router.post('/table_rechazos', function(req, res, next){
                     " FROM (SELECT \n" +
                     "\t\t\t\t\tproduccionh_causal.idproduccion_h,\n" +
                     "                    fabricaciones.idmaterial, \n" +
-                    "                    pedido.idpedido, \n" +
+                    "                    COALESCE(pedido.idpedido,0) AS idpedido, \n" +
                     "                    fabricaciones.idfabricaciones, \n" +
                     "                    COALESCE(cliente.sigla, ' - ') AS sigla, \n" +
                     "                    material.detalle, \n" +
-                    "                    material.peso, \n" +
+                    "                    COALESCE(material.peso,0) AS peso, \n" +
                     "                    produccion_history.enviados, \n" +
                     "                    COALESCE(rechazos_cdc.colada, ' - ') AS colada, \n" +
                     "                    COALESCE(rechazos_cdc.producto, ' - ') AS producto, \n" +
@@ -906,6 +906,8 @@ router.post('/table_rechazos', function(req, res, next){
             connection.query(query,
                 function(err, rech){
                     if(err) throw err;
+                    console.log(rech);
+                    console.log('calidad/'+view);
                     res.render('calidad/'+view, {datalen: rech, user: req.session.userData.nombre });
                 });
         });

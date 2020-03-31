@@ -8,14 +8,20 @@ function fechaLatino(string){
     }
 }
 
+
 function completarDigitos(num, dig){
-    var arr = [];
-    if(num.toString().length >= dig){
-        return num.toString();
+    if(num === null || num === undefined){
+        return '0';
     }
     else{
-        for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
-        return arr.join('')+num.toString();
+        var arr = [];
+        if(num.toString().length >= dig){
+            return num.toString();
+        }
+        else{
+            for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
+            return arr.join('')+num.toString();
+        }
     }
 }
 %>

@@ -9,13 +9,18 @@ function fechaLatino(string){
 }
 
 function completarDigitos(num, dig){
-    var arr = [];
-    if(num.toString().length >= dig){
-        return num.toString();
+    if(num === null || num === undefined){
+        return '0';
     }
     else{
-        for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
-        return arr.join('')+num.toString();
+        var arr = [];
+        if(num.toString().length >= dig){
+            return num.toString();
+        }
+        else{
+            for(var w=0; w < dig-num.toString().length; w++){arr.push(0);}
+            return arr.join('')+num.toString();
+        }
     }
 }
 %>
@@ -47,6 +52,7 @@ function completarDigitos(num, dig){
     $(".selectGroup").each(function(){
         $(this).html('');
     });
+
 </script>
 <style>
     .hiddenCol{
@@ -74,21 +80,13 @@ function completarDigitos(num, dig){
     <tbody id="rechTablebody">
     <%
     var pesoT = 0;
-    if(datalen.length){
-      for(var i=0; i < datalen.length; i++){%>
-        <%if(i === 0){%>
+    if(datalen.length){%>
+        <% for(var i=0; i < datalen.length; i++){%>
             <tr class="column-prods idmat<%= datalen[i].idmaterial%>"
                 onclick="
                         $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
                         $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
                         busc.resetFixed('main-page');">
-        <%}else{%>
-            <tr class="column-prods idmat<%= datalen[i].idmaterial%>"
-                onclick="
-                        $('.hiddenCol<%= i%>').toggleClass('hiddenCol');
-                        $(this).find('i.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-                        busc.resetFixed('main-page');">
-        <%}%>
             <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
             <td data-order="<%=i%>" style="padding: 1px; text-align: center;white-space: nowrap"> -- </td>
             <td data-order="<%=datalen[i].detalle%>-<%=i%>" style="padding: auto; text-align: left;white-space: nowrap"><%=datalen[i].detalle %></td>
@@ -122,8 +120,8 @@ function completarDigitos(num, dig){
             <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[7] %></td>
             <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[6] %></td>
             <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=datalen[i].det_rech.split('%')[t].split('@')[1] %></td>
-            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%=completarDigitos(datalen[i].det_rech.split('%')[t].split('@')[2],3) %></td>
-            <td data-order="<%= datalen[i].det_rech.split('%').length%>-<%=i%>" style="text-align: center;white-space: nowrap" class="parsear_nro" data-cs="0" data-valor="<%=1%>">1</td>
+            <td data-order="<%=i%>" style="text-align: center;white-space: nowrap"><%= completarDigitos(datalen[i].det_rech.split('%')[t].split('@')[2],3) %></td>
+            <td data-order="<%= datalen[i].det_rech.split('%').length%>-<%=i%>" style="text-align: center;white-space: nowrap" class="parsear_nro" data-cs="0" data-valor="<%= 1%>">1</td>
             <td data-order="<%= datalen[i].peso %>-<%=i%>" style="text-align: center;white-space: nowrap" class="peso-rech parsear_nro" data-cs="1" data-valor="<%=datalen[i].peso %>"><%= datalen[i].peso %></td>
             <% if(i === 0){pesoT += datalen[i].peso;}%>
             <td data-order="<%=i%>" class="causal-order" data-key="<%=i%>-<%=t%>" data-princ="<%= datalen[i].det_rech.split('%')[t].split('@')[8]%>" data-sec="<%= datalen[i].det_rech.split('%')[t].split('@')[4]%>" style="text-align: left;white-space: nowrap">
