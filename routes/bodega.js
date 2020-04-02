@@ -1275,8 +1275,6 @@ router.post('/anular_gdd', function(req, res, next){
                 });
             }
             else{
-                console.log("DESPACHOS");
-                console.log(desp);
                 var idpedido = [];
                 var idfabricaciones = [];
                 var cant_ped = [];
@@ -1331,21 +1329,20 @@ router.post('/anular_gdd', function(req, res, next){
                     for(var i=0; i < idmaterial.length; i++){
                         mat_query += " WHEN material.idmaterial=" + idmaterial[i] + " THEN material.stock+" + cant_mat[i];
                         mat_where += "" + idmaterial[i];
-                        if(i+1 != idmaterial.length){
+                        if( (i+1) !== idmaterial.length ){
                             mat_where += ",";
                         }
                     }
                     mat_query += " END " + mat_where + ")";
                     for(var i=0; i < idfabricaciones.length; i++){
-                        reserv_query_desp += " WHEN reservacion_detalle.idfabricaciones=" + idpedido[i] + " THEN reservacion_detalle.desp-" + cant_fabs[i];
+                        reserv_query_desp += " WHEN reservacion_detalle.idfabricaciones=" + idfabricaciones[i] + " THEN reservacion_detalle.desp-" + cant_fabs[i];
                         reserv_where_desp.push(idfabricaciones[i]);
                         reserv_query_ret += " WHEN reservacion_detalle.idfabricaciones=" + idfabricaciones[i] + " THEN reservacion_detalle.ret+" + cant_fabs[i];
                     }
-                    reserv_where_desp = " WHERE reservacion_detalle.idfabricaciones in ("+reserv_where_desp.join(',')+")";
-                    reserv_where_ret = " WHERE reservacion_detalle.idfabricaciones in ("+reserv_where_desp.join(',')+")";
+                    reserv_where_desp = " WHERE reservacion_detalle.idfabricaciones in (" + reserv_where_desp.join(',') + ")";
 
                     reserv_query_desp += reserv_where_desp;
-                    reserv_query_ret += reserv_where_ret;
+                    reserv_query_ret += reserv_where_desp;
                     connection.query(mat_query, function(err, ped){
                         if(err) console.log("Error Selecting : %s", err);
                         connection.query("UPDATE gd SET estado = ? WHERE idgd = ?", ["Anulado",desp[0].idgd],function(err, up){
