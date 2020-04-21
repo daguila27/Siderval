@@ -11,7 +11,7 @@ router.use(
 var conn = mysql.createConnection(dbCredentials);
 
 function verificar(usr){
-    if(usr.nombre === 'calidad' || usr.nombre === 'siderval'){
+    if(usr.nombre === 'calidad' || usr.nombre === 'siderval' || usr.nombre === 'plan'){
         return true;
     }else{
         return false;

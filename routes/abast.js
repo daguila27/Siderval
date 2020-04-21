@@ -1314,15 +1314,16 @@ router.post('/save_factura', function(req, res, next){
         var fact = [];
         var items = [];
         var receps = [];
-        if(typeof input['idabast[]'] == 'string' && input['costo_unid[]'] != '0' && input['costo_unid[]'] != '' && input['cantidad[]'] != '0'){
+        if(typeof input['idabast[]'] === 'string' && input['costo_unid[]'] !== '0' && input['costo_unid[]'] !== '' && input['cantidad[]'] !== '0'){
             items.push([input['costo_unid[]'], input['moneda-factura[]'], input['idabast[]'], input['cantidad[]']]);
             if(input['recepcion[]'] === 'true'/* && input['maxrec[]'] != '0'*/){
             	receps.push([input['idabast[]'], parseInt(input['cantidad[]'])]);
 			}
-        } else{
+        }
+        else{
             for (var i = 0; i < input['idabast[]'].length; i++){
             	console.log(input['recepcion[]'][i]);
-                if(input['costo_unid[]'][i] != '0' && input['costo_unid[]'][i] != '' && input['cantidad[]'][i] != '0'){
+                if(input['costo_unid[]'][i] !== '0' && input['costo_unid[]'][i] !== '' && input['cantidad[]'][i] !== '0'){
                     items.push([input['costo_unid[]'][i], input['moneda-factura[]'][i], input['idabast[]'][i], input['cantidad[]'][i]]);
                     if(input['recepcion[]'][i] === 'true'/* && input['maxrec[]'][i] != '0'*/){
                         receps.push([input['idabast[]'][i], parseInt(input['cantidad[]'][i])]);
@@ -1360,7 +1361,7 @@ router.post('/save_factura', function(req, res, next){
                             var where_material = [];
                             for(var i=0; i<row.length; i++){
 								for(var j=0; j<items.length; j++){
-									if(items[j][3] == row[i].idabast){
+									if(items[j][3] === row[i].idabast){
 										update_material += " WHEN idmaterial = " + row[i].idmaterial + " THEN " + items[j][1];
 									}
 								}
@@ -1370,6 +1371,8 @@ router.post('/save_factura', function(req, res, next){
                             update_material += where_material;
 							connection.query(update_material, function(err,row){
 								if(err) console.log("Error Update : %s", err);
+
+
 								//SI EXISTEN PEDIDOS QUE SON F.D
 								if(receps.length){
 									console.log("RECEPCIONAR");
