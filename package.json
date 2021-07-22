@@ -40,6 +40,6 @@
     "puppeteer": "^1.19.0",
     "serve-favicon": "~2.4.5",
     "socket.io": "^2.0.4",
-    "xlsx": "^0.12.11"
+    "xlsx": "^0.17.0"
   }
 }
